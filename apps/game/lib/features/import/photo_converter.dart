@@ -120,7 +120,7 @@ Map<String, Object> convertPhoto(Map<String, Object> request) {
       if (boxes[i].length < 2) continue;
       final candidate =
           _spread(boxes[i]).$2 *
-          boxes[i].fold(0, (n, bucket) => n + bucket.count);
+          boxes[i].fold<int>(0, (n, bucket) => n + bucket.count);
       if (candidate > score) {
         chosen = i;
         score = candidate;
