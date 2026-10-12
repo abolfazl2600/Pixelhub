@@ -72,8 +72,7 @@ class PaintingController extends ChangeNotifier {
     if (active == null || status != PaintingStatus.ready) return null;
     int? candidate;
     for (var i = 0; i < level.cells.length; i++) {
-      if (!active.isCompleted(i) &&
-          level.cells[i] == active.selectedColor) {
+      if (!active.isCompleted(i) && level.cells[i] == active.selectedColor) {
         candidate = i;
         break;
       }

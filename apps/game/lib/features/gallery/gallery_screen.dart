@@ -96,7 +96,14 @@ class _GalleryScreenState extends State<GalleryScreen> {
             icon: const Icon(Icons.arrow_back),
           ),
           title: Text(widget.personal ? s.myGallery : s.gallery),
-          actions: [LanguageButton(onToggle: widget.onLanguageToggle)],
+          actions: [
+            IconButton(
+              tooltip: s.profile,
+              onPressed: () => context.push('/profile'),
+              icon: const Icon(Icons.person_outline_rounded),
+            ),
+            LanguageButton(onToggle: widget.onLanguageToggle),
+          ],
         ),
         floatingActionButton: widget.personal
             ? FloatingActionButton(
@@ -114,6 +121,14 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      Text(
+                        s.galleryResults(context.digits(levels.length)),
+                        style: const TextStyle(
+                          color: PixelTokens.muted,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
                       TextField(
                         decoration: InputDecoration(
                           labelText: s.searchPictures,

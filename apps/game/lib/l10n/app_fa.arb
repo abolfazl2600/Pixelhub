@@ -195,5 +195,15 @@
         "type": "String"
       }
     }
+  },
+  "sessionCompleted": "تصاویر تکمیل‌شده در این نشست",
+  "catalogLoadTime": "زمان بارگذاری اولیهٔ فهرست",
+  "milliseconds": "{value} میلی‌ثانیه",
+  "@milliseconds": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
   }
 }

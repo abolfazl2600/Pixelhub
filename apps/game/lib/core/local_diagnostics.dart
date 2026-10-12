@@ -8,6 +8,7 @@ final class LocalDiagnostics extends ChangeNotifier {
   int bombs = 0;
   int completions = 0;
   int frameworkErrors = 0;
+  int? catalogLoadMilliseconds;
 
   /// Remains disabled until an approved provider and consent are configured.
   bool get remoteCrashReportingEnabled => false;
@@ -29,6 +30,11 @@ final class LocalDiagnostics extends ChangeNotifier {
 
   void recordCompletion() {
     completions++;
+    notifyListeners();
+  }
+
+  void recordCatalogLoad(int milliseconds) {
+    catalogLoadMilliseconds ??= milliseconds;
     notifyListeners();
   }
 

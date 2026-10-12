@@ -1,3 +1,11 @@
+## V6 early local UX and tools groundwork (unreleased)
+
+- Added functional, locally free Hint highlighting and Bomb filling up to five matching cells as one undoable action. No coins, wallet consumption or purchases.
+- Added Guest Profile with local completion/favorite counts, disabled inventory/coins with "Coming soon" messaging in Persian and English.
+- Home and Gallery surface local completion progress, profile navigation and filter result counts.
+- Added ephemeral on-device aggregate session diagnostics (screen opens, tool use, completion, framework error counts and catalog-load timing). Remote crash reporting and retention analytics stay disabled pending provider, consent and privacy review.
+- Added source-level regression cases for local tools. No tests or builds were run locally under project development policy.
+
 # Changelog
 
 ## Unreleased — V4 progress-sync domain groundwork

@@ -77,8 +77,13 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       _progress,
     );
     _bootstrap = BootstrapController(widget.repository);
+    final catalogTimer = Stopwatch()..start();
     _bootstrap.addListener(() {
       if (_bootstrap.status == BootstrapStatus.ready) {
+        if (catalogTimer.isRunning) {
+          catalogTimer.stop();
+          _diagnostics.recordCatalogLoad(catalogTimer.elapsedMilliseconds);
+        }
         _library.setCatalog(_bootstrap.levels, _bootstrap.metadata);
       }
     });
@@ -301,6 +306,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       if (id == null) {
         return HomeScreen(
           levels: _bootstrap.levels,
+          library: _library,
           onLanguageToggle: _toggleLanguage,
         );
       }

@@ -34,7 +34,9 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
     if (count == 0 || !mounted) return;
     widget.diagnostics.recordBomb();
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.strings.bombFilled(context.digits(count)))),
+      SnackBar(
+        content: Text(context.strings.bombFilled(context.digits(count))),
+      ),
     );
   }
 
@@ -252,14 +254,21 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                 Text(
                   s.freeToolsNote,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 12, color: PixelTokens.muted),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: PixelTokens.muted,
+                  ),
                 ),
                 if (controller.hintIndex != null) ...[
                   const SizedBox(height: 4),
                   Text(
                     s.hintLocation(
-                      context.digits(controller.hintIndex! ~/ controller.level.width + 1),
-                      context.digits(controller.hintIndex! % controller.level.width + 1),
+                      context.digits(
+                        controller.hintIndex! ~/ controller.level.width + 1,
+                      ),
+                      context.digits(
+                        controller.hintIndex! % controller.level.width + 1,
+                      ),
                     ),
                     key: const ValueKey('hint-location'),
                     textAlign: TextAlign.center,

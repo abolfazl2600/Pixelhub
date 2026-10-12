@@ -6,14 +6,17 @@ import 'package:level_schema/level_schema.dart';
 import '../../app/language_button.dart';
 import '../../core/pixel_art_preview.dart';
 import '../../l10n/strings.dart';
+import '../gallery/library_controller.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
     required this.levels,
+    required this.library,
     required this.onLanguageToggle,
     super.key,
   });
   final List<LevelDefinition> levels;
+  final LibraryController library;
   final VoidCallback onLanguageToggle;
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -46,6 +49,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
+                  IconButton(
+                    tooltip: s.profile,
+                    icon: const Icon(Icons.person_outline_rounded),
+                    onPressed: () => context.push('/profile'),
+                  ),
                   LanguageButton(onToggle: widget.onLanguageToggle),
                 ],
               ),
@@ -70,6 +78,34 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: PixelTokens.muted,
                   fontSize: 15,
                   height: 1.8,
+                ),
+              ),
+              const SizedBox(height: 18),
+              Card(
+                color: PixelTokens.lemon,
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.check_circle_outline_rounded,
+                        color: PixelTokens.green,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          s.homeCompleted(
+                            context.digits(widget.library.levels.where(widget.library.isComplete).length),
+                            context.digits(widget.library.levels.length),
+                          ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () => context.push('/profile'),
+                        child: Text(s.profile),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 24),

@@ -140,6 +140,20 @@ class ProfileScreen extends StatelessWidget {
                   value: context.digits(diagnostics.bombs),
                 ),
                 _MetricTile(
+                  icon: Icons.check_rounded,
+                  title: s.sessionCompleted,
+                  value: context.digits(diagnostics.completions),
+                ),
+                _MetricTile(
+                  icon: Icons.timer_outlined,
+                  title: s.catalogLoadTime,
+                  value: diagnostics.catalogLoadMilliseconds == null
+                      ? '—'
+                      : s.milliseconds(
+                          context.digits(diagnostics.catalogLoadMilliseconds!),
+                        ),
+                ),
+                _MetricTile(
                   icon: Icons.error_outline_rounded,
                   title: s.sessionErrors,
                   value: context.digits(diagnostics.frameworkErrors),

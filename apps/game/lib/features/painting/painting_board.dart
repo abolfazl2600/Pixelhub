@@ -320,10 +320,7 @@ class _GridPainter extends CustomPainter {
       final hx = hint % level.width;
       final hy = hint ~/ level.width;
       final hintRect = Rect.fromLTWH(hx * cw, hy * ch, cw, ch);
-      canvas.drawRect(
-        hintRect,
-        Paint()..color = const Color(0x66ffac42),
-      );
+      canvas.drawRect(hintRect, Paint()..color = const Color(0x66ffac42));
       canvas.drawRect(
         hintRect.deflate(1 / scale),
         Paint()

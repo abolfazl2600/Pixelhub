@@ -97,6 +97,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const Text('Pixelhub · 0.3.0'),
               const SizedBox(height: 12),
               Text(s.aboutMessage, style: const TextStyle(height: 1.8)),
+              const SizedBox(height: 16),
+              OutlinedButton.icon(
+                onPressed: _busy ? null : () => context.push('/profile'),
+                icon: const Icon(Icons.person_outline_rounded),
+                label: Text(s.profile),
+              ),
               const SizedBox(height: 24),
               Text(s.importPrivacy, style: const TextStyle(height: 1.8)),
               const SizedBox(height: 12),

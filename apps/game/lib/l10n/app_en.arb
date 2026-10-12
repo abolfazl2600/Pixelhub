@@ -195,5 +195,15 @@
         "type": "String"
       }
     }
+  },
+  "sessionCompleted": "Pictures completed this session",
+  "catalogLoadTime": "Initial catalog load time",
+  "milliseconds": "{value} ms",
+  "@milliseconds": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
   }
 }
