@@ -31,12 +31,12 @@ The next roadmap stage is account-based progress synchronization. A pure conflic
 ## GitHub Actions: automatic Web, manual Android
 
 - **[Checks and Web artifacts](https://github.com/abolfazl2600/Pixelhub/actions/workflows/ci.yml)** runs formatting, package analysis, unit/widget tests, Web build and browser checks automatically on PRs, main pushes and version tags. **It does not build an APK.**
-- **[Build Android APK (manual)](https://github.com/abolfazl2600/Pixelhub/actions/workflows/android-build.yml)** has only `workflow_dispatch`. Open it in Actions, choose **Run workflow**, select your branch, optionally enter an exact commit SHA/tag in `ref`, and run. Download `pixelhub-apk-v<VERSION>-<SHA>` from that run's **Artifacts**, extract the ZIP and install `app-release.apk` on Android. The optional `ref` lets you match a particular Web commit; the artifact includes the actual source `commit.txt`.
+- **[Build Android (manual)](https://github.com/abolfazl2600/Pixelhub/actions/workflows/android-build.yml)** only runs by `workflow_dispatch`. Select `preview-apk` for a debug-signed test APK or `play-aab` for an AAB signed using **private GitHub Secrets**. Choose the exact commit SHA/tag in `ref` when necessary. The upload key is not stored in the repository. See [Google Play setup](docs/play/PLAY_CONSOLE_SUBMISSION.md).
 - **Publish verified Web artifact** deploys the exact Web artifact after a successful main Web CI run. In **Settings → Pages → Build and deployment**, select **GitHub Actions**. No PR artifact is published.
 
 Expected Pages address: **https://abolfazl2600.github.io/Pixelhub/**. Check Actions for actual deployment status. Painting deep links use `#/painting/sunflower` (or another picture ID); static-host refresh works with hash routes.
 
-The internal APK uses Android debug signing, is not a Play Store submission and needs no production signing secret. Android 7.0 / API 24 or newer is required. Nothing triggers an Android build automatically in the current workflows.
+The preview APK uses Android debug signing and cannot be submitted to Google Play. The `play-aab` mode requires the owner's release upload key through GitHub Secrets and never falls back to debug signing. Android compile/target SDK is set to 36; compatibility and 16 KB native-library checks remain part of release QA. Nothing triggers an Android build automatically. A bilingual [privacy policy](https://abolfazl2600.github.io/Pixelhub/privacy.html) is stored under `apps/game/web/privacy.html` and shown in the app; public URL deployment needs verification.
 
 ## Development
 
@@ -64,10 +64,11 @@ On another host, install the pinned SDKs, add Flutter to PATH, run `flutter pub 
 bash tool/build_web.sh
 # Android is also an explicit local command, never part of validate.sh:
 cd apps/game
-flutter build apk --release --no-pub
+flutter build apk --debug --no-pub  # local preview only
+# For Play: configure private upload-key variables, then build appbundle --release
 ```
 
-Outputs: `apps/game/build/web/` and `apps/game/build/app/outputs/flutter-apk/app-release.apk`.
+Outputs: `apps/game/build/web/`, debug preview `apps/game/build/app/outputs/flutter-apk/app-debug.apk`, and (only with signing credentials) release AAB `apps/game/build/app/outputs/bundle/release/app-release.aab`.
 
 To test the production Web build under its `/Pixelhub/` base path:
 

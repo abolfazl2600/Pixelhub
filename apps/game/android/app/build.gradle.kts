@@ -1,3 +1,10 @@
+plugins {
+    id("com.android.application")
+    id("kotlin-android")
+    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id("dev.flutter.flutter-gradle-plugin")
+}
+
 // Play signing is loaded only from private CI environment variables.
 val signingKeys = listOf(
     "PIXELHUB_RELEASE_STORE_FILE",
@@ -7,12 +14,6 @@ val signingKeys = listOf(
 )
 val hasPlaySigning = signingKeys.all { !System.getenv(it).isNullOrBlank() }
 
-plugins {
-    id("com.android.application")
-    id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
-    id("dev.flutter.flutter-gradle-plugin")
-}
 
 android {
     namespace = "io.github.abolfazl2600.pixelhub"
