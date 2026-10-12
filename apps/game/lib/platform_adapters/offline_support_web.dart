@@ -16,7 +16,7 @@ Future<void> _prepare() async {
   offlineStatus.value = OfflineStatus.preparing;
   try {
     final registration = await web.window.navigator.serviceWorker
-        .register('offline-worker.js')
+        .register('offline-worker.js'.toJS)
         .toDart;
     final worker =
         registration.installing ?? registration.waiting ?? registration.active;
