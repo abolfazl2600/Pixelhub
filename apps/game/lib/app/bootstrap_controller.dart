@@ -24,7 +24,7 @@ class BootstrapController extends ChangeNotifier {
       final result = await repository.loadLevels();
       final source = repository;
       final details = source is CatalogMetadataRepository
-          ? await source.loadMetadata()
+          ? await (source as CatalogMetadataRepository).loadMetadata()
           : <String, CatalogMetadata>{};
       if (_disposed || generation != _generation) return;
       if (result.isEmpty) throw const FormatException('Empty level catalog.');
