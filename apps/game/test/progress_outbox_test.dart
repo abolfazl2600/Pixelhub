@@ -61,26 +61,26 @@ void main() {
     expect(decoded.operations[1].baseServerRevision, 5);
   });
 
-  test('retry with same ID and content is safe; changed content is rejected', () {
-    final level = fixture();
-    final first = pending(level);
-    final queue = ProgressSyncOutbox(accountId: 'account-a').enqueue(first);
-    expect(identical(queue.enqueue(first), queue), isTrue);
-    expect(
-      () => queue.enqueue(pending(level, cell: 1)),
-      throwsFormatException,
-    );
-  });
+  test(
+    'retry with same ID and content is safe; changed content is rejected',
+    () {
+      final level = fixture();
+      final first = pending(level);
+      final queue = ProgressSyncOutbox(accountId: 'account-a').enqueue(first);
+      expect(identical(queue.enqueue(first), queue), isTrue);
+      expect(
+        () => queue.enqueue(pending(level, cell: 1)),
+        throwsFormatException,
+      );
+    },
+  );
 
   test('acknowledgment removes only the FIFO head', () {
     final level = fixture();
     final queue = ProgressSyncOutbox(accountId: 'account-a')
         .enqueue(pending(level))
         .enqueue(pending(level, id: 'operation-two-02', cell: 2));
-    expect(
-      () => queue.acknowledge('operation-two-02'),
-      throwsStateError,
-    );
+    expect(() => queue.acknowledge('operation-two-02'), throwsStateError);
     final after = queue.acknowledge('operation-one-01');
     expect(after.operations.length, 1);
     expect(after.next!.operationId, 'operation-two-02');
@@ -93,10 +93,8 @@ void main() {
       operations: [pending(fixture())],
     );
     expect(
-      () => ProgressSyncOutbox.fromJson(
-        source.toJson(),
-        accountId: 'account-b',
-      ),
+      () =>
+          ProgressSyncOutbox.fromJson(source.toJson(), accountId: 'account-b'),
       throwsFormatException,
     );
     final json =
@@ -131,6 +129,76 @@ void main() {
     await repository.enqueueSyncOperation('account-b', pending(level));
     await repository.clearPixelhubData();
     expect((await repository.readSyncOutbox('account-b')).isEmpty, isTrue);
+  });
+
+  test('invalid outgoing level identity cannot poison persistent queue', () {
+    final level = fixture();
+    final invalid = PendingProgressSync(
+      operationId: 'invalid-checksum-01',
+      progress: ProgressSnapshot(
+        levelId: level.id,
+        levelVersion: level.contentVersion,
+        levelChecksum: 'broken-checksum',
+        cellCount: level.cells.length,
+        generation: 0,
+        revision: 0,
+        bits: Uint8List((level.cells.length + 7) ~/ 8),
+      ),
+      baseServerRevision: 0,
+      baseGeneration: 0,
+    );
+    final queue = ProgressSyncOutbox(accountId: 'account-a');
+    expect(() => queue.enqueue(invalid), throwsFormatException);
+    expect(queue.isEmpty, isTrue);
+  });
+
+  test('simultaneous in-memory operations preserve FIFO without lost writes', () async {
+    final level = fixture();
+    final store = MemoryPreferences();
+    await Future.wait([
+      store.enqueueSyncOperation(
+        'account-a',
+        pending(level, id: 'simultaneous-one'),
+      ),
+      store.enqueueSyncOperation(
+        'account-a',
+        pending(level, id: 'simultaneous-two', cell: 2),
+      ),
+    ]);
+    final queue = await store.readSyncOutbox('account-a');
+    expect(
+      queue.operations.map((operation) => operation.operationId).toList(),
+      ['simultaneous-one', 'simultaneous-two'],
+    );
+  });
+
+  test('stale reset stays queued and leaves the server state untouched', () {
+    final level = fixture();
+    final operation = pending(
+      level,
+      id: 'stale-reset-operation',
+      generation: 1,
+      reset: true,
+    );
+    final queue =
+        ProgressSyncOutbox(accountId: 'account-a').enqueue(operation);
+    final server = ServerProgressState(
+      progress: ProgressSnapshot(
+        levelId: level.id,
+        levelVersion: level.contentVersion,
+        levelChecksum: level.checksum,
+        cellCount: level.cells.length,
+        generation: 1,
+        revision: 10,
+        bits: Uint8List((level.cells.length + 7) ~/ 8),
+      ),
+      serverRevision: 10,
+    );
+    final result = mergeProgress(server, operation);
+    expect(result.status, ProgressSyncStatus.staleGeneration);
+    expect(identical(result.state, server), isTrue);
+    expect(queue.next!.operationId, operation.operationId);
+    expect(queue.operations.length, 1);
   });
 
   test('bounded capacity and invalid scope fail closed', () {

@@ -172,10 +172,7 @@ final class LocalPreferences
   Future<ProgressSyncOutbox> acknowledgeSyncOperation(
     String accountId,
     String operationId,
-  ) => _changeOutbox(
-    accountId,
-    (outbox) => outbox.acknowledge(operationId),
-  );
+  ) => _changeOutbox(accountId, (outbox) => outbox.acknowledge(operationId));
 
   @override
   Future<String?> readLanguage() => _preferences.getString('pixelhub.language');
@@ -247,7 +244,11 @@ final class MemoryPreferences
     String accountId,
     PendingProgressSync operation,
   ) async {
-    final updated = (await readSyncOutbox(accountId)).enqueue(operation);
+    // Keep this read-modify-write synchronous before returning the Future:
+    // concurrent test enqueues must not both read the same stale snapshot.
+    final current =
+        _outboxes[accountId] ?? ProgressSyncOutbox(accountId: accountId);
+    final updated = current.enqueue(operation);
     _outboxes[accountId] = updated;
     return updated;
   }
@@ -257,7 +258,9 @@ final class MemoryPreferences
     String accountId,
     String operationId,
   ) async {
-    final updated = (await readSyncOutbox(accountId)).acknowledge(operationId);
+    final current =
+        _outboxes[accountId] ?? ProgressSyncOutbox(accountId: accountId);
+    final updated = current.acknowledge(operationId);
     _outboxes[accountId] = updated;
     return updated;
   }

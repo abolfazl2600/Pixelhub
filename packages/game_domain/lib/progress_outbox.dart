@@ -51,6 +51,9 @@ final class ProgressSyncOutbox {
   /// Persist before sending. Retrying an identical ID is a no-op; never
   /// overwrite a possibly transmitted operation with different content.
   ProgressSyncOutbox enqueue(PendingProgressSync pending) {
+    // Match the persisted decoder's validations *before* saving. A malformed
+    // level checksum or identity must never poison an otherwise sound queue.
+    _decodeSyncOperation(_encodeSyncOperation(pending));
     for (final existing in operations) {
       if (existing.operationId == pending.operationId) {
         if (jsonEncode(_encodeSyncOperation(existing)) ==

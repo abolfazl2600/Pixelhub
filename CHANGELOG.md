@@ -7,6 +7,7 @@
 - Added source-level regression tests and ADR 0004 covering conflict handling, stable operation IDs and required server-side transactional deduplication.
 - Drafted a versioned OpenAPI contract and additive PostgreSQL V4 identity/progress/idempotency schema with row-level scope policies; neither is deployed or executed.
 - Added a bounded per-account, durable FIFO outbox using Android/Web local preferences, strict JSON bitset validation, explicit acknowledgments and an in-memory testing adapter. No network sync is enabled.
+- Hardened the outbox: invalid outgoing payloads are rejected before persistence; concurrent in-memory operations cannot overwrite each other; regression cases cover FIFO, malformed progress and stale Reset preservation.
 - This is **not** account login or cloud sync: backend, secure authentication, guest migration, network coordination and cross-device validation remain pending. No local tests or builds were run for this development increment.
 
 ## 0.3.0 — local gallery and photo import (source implementation)
