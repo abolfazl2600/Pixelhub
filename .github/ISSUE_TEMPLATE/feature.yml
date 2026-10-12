@@ -1,0 +1,21 @@
+name: Milestone task
+description: A scoped task with acceptance criteria.
+body:
+  - type: input
+    id: milestone
+    attributes:
+      label: Milestone (V1–V7)
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal, scope and exclusions
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria and Android/Web validation
+    validations:
+      required: true

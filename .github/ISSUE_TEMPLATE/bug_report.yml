@@ -1,0 +1,23 @@
+name: Bug report
+description: Report an observed Pixelhub defect.
+body:
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps and expected/actual behavior
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+    validations:
+      required: true
+  - type: textarea
+    id: platform
+    attributes:
+      label: Platform, browser/device, viewport and text size
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs or screenshots (remove personal data)

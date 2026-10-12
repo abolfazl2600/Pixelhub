@@ -1,26 +1,26 @@
 # V1 — پایه محصول و تولید خروجی ابری
 
-نسخه پیشنهادی: v0.1.0 | وضعیت هدف: Technical Preview | وابستگی: هیچ نسخه پیشین
+نسخه پیشنهادی: v0.1.0 | وضعیت: پیاده‌سازی Technical Preview؛ گیت انتشار در انتظار GitHub و گوشی واقعی | وابستگی: هیچ نسخه پیشین
 تجربه کاربر در این نسخه **بازی کامل نیست**؛ هدف اعتبارسنجی زنجیره توسعه AI -> GitHub -> Web/APK است.
 
 ## هدف نسخه
 با یک Codebase بتوان اپ Flutter را روی Web در GitHub Pages مشاهده و فایل APK آزمایشی آن را از GitHub Actions دریافت کرد. نسخه وب و اندروید در ظاهر و ساختار صفحه یکسان‌اند.
 
 ## داخل محدوده (Must Have)
-- [ ] scaffold Flutter با پشتیبانی Android و Web.
-- [ ] پوشه‌ها و package boundaries مطابق سند Architecture.
-- [ ] Design tokens: palette، فونت، spacing، component states.
-- [ ] shell اپ: Splash، Home آزمایشی، navigation اولیه.
-- [ ] نمایش قاب موبایلی واحد در مرورگر دسکتاپ با عرض حداکثر 430 منطقی و وسط‌چین.
-- [ ] تست landscape/height کم، safe area و حفظ قابلیت اسکرول.
-- [ ] نمونه Fixture یک تصویر ثابت و placeholder صفحه Painting (نه موتور واقعی).
-- [ ] Flutter version pin، .gitignore، formatting و lint config.
-- [ ] workflow CI برای analyze/test/build web/android.
-- [ ] workflow GitHub Pages با base href /Pixelhub/ و routing سازگار Refresh.
-- [ ] workflow Artifact APK آزمایشی، build from same commit.
-- [ ] فایل README ریشه با لینک‌های Web/Artifacts و روش توسعه بدون IDE محلی.
-- [ ] ثبت ADR انتخاب state manager و local store، حتی اگر هنوز استفاده‌ای نشده.
-- [ ] template برای Issue/PR و کاتالوگ تست دستی ابتدایی.
+- [x] scaffold Flutter با پشتیبانی Android و Web.
+- [x] پوشه‌ها و package boundaries مطابق سند Architecture.
+- [x] Design tokens: palette، فونت، spacing، component states.
+- [x] shell اپ: Splash، Home آزمایشی، navigation اولیه.
+- [x] نمایش قاب موبایلی واحد در مرورگر دسکتاپ با عرض حداکثر 430 منطقی و وسط‌چین.
+- [x] تست landscape/height کم، safe area و حفظ قابلیت اسکرول.
+- [x] نمونه Fixture یک تصویر ثابت و placeholder صفحه Painting (نه موتور واقعی).
+- [x] Flutter version pin، .gitignore، formatting و lint config.
+- [x] workflow CI برای analyze/test/build web/android.
+- [x] workflow GitHub Pages با base href /Pixelhub/ و routing سازگار Refresh.
+- [x] workflow Artifact APK آزمایشی، build from same commit.
+- [x] فایل README ریشه با لینک‌های Web/Artifacts و روش توسعه بدون IDE محلی.
+- [x] ثبت ADR انتخاب state manager و local store، حتی اگر هنوز استفاده‌ای نشده.
+- [x] template برای Issue/PR و کاتالوگ تست دستی ابتدایی.
 
 ## خارج از محدوده (Must Not)
 - رنگ‌آمیزی واقعی، Undo، Zoom و ذخیره پیشرفت.
@@ -53,6 +53,12 @@
 - [ ] مرورگر دسکتاپ، UI موبایل را بدون تبدیل به صفحه دسکتاپ نشان دهد.
 - [ ] README نصب، مسیر Artifact و خطاهای شناخته‌شده را توضیح دهد.
 - [ ] هیچ Secret یا Keystore واقعی Commit نشده باشد.
+
+## شواهد پیاده‌سازی V1
+- سورس در `apps/game` و چهار پکیج مشترک ساخته شده است؛ Fixture و فونت‌ها محلی‌اند.
+- فایل‌های گردش‌کار CI و Pages ایجاد شده‌اند؛ اجرای واقعی GitHub و انتشار عمومی هنوز تأیید نشده‌اند.
+- [گزارش اعتبارسنجی محیط ابری](../../qa/v1-validation.md)، [چک‌لیست گوشی/مرورگر](../../qa/v1-manual-checklist.md) و [تصمیم معماری](../../adr/0001-v1-foundation.md) وضعیت واقعی آزمون‌ها و محدودیت‌ها را ثبت می‌کنند.
+- تیک‌های Must Have به پیاده‌سازی فایل‌ها اشاره دارند؛ معیار پذیرش بالا تا ثبت CI، Pages و نصب روی گوشی واقعی باز می‌ماند.
 
 ## خروجی و انتقال به V2
 Web Demo + APK تستی + Repo ساختارمند. V2 با تکیه به این shell موتور نقاشی را اضافه می‌کند؛ قابلیت‌های backend هنوز تعهد نیستند.

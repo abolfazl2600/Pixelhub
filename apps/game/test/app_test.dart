@@ -1,0 +1,142 @@
+import 'package:design_system/design_system.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:persistence/persistence.dart';
+import 'package:pixelhub/app/pixelhub_app.dart';
+import 'package:pixelhub/core/pixel_art_preview.dart';
+
+import 'bootstrap_test.dart' show TestRepository, fixture;
+
+// Asset I/O must run in real async time, outside the widget fake clock.
+Future<void> pumpAssetApp(WidgetTester tester, {String? initialRoute}) async {
+  final level = await tester.runAsync(AssetLevelRepository().loadPreview);
+  final repository = TestRepository();
+  await tester.pumpWidget(
+    PixelhubApp(repository: repository, initialRoute: initialRoute),
+  );
+  repository.requests.single.complete(level!);
+  await tester.pumpAndSettle();
+}
+
+void main() {
+  testWidgets('splash loads asset and navigates to preview and back', (
+    tester,
+  ) async {
+    final repository = TestRepository();
+    await tester.pumpWidget(PixelhubApp(repository: repository));
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    repository.requests.single.complete(fixture());
+    await tester.pumpAndSettle();
+    expect(find.text('کمی مکث،\nکمی رنگ.'), findsOneWidget);
+    expect(
+      Directionality.of(tester.element(find.byType(PixelArtPreview))),
+      TextDirection.rtl,
+    );
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('open-preview')),
+      250,
+    );
+    await tester.tap(find.byKey(const ValueKey('open-preview')));
+    await tester.pumpAndSettle();
+    expect(find.text('رنگ‌های این تصویر'), findsOneWidget);
+    await tester.tap(find.byTooltip('بازگشت به خانه'));
+    await tester.pumpAndSettle();
+    expect(find.text('کمی مکث،\nکمی رنگ.'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('failed bootstrap presents a working retry', (tester) async {
+    final repository = TestRepository();
+    await tester.pumpWidget(PixelhubApp(repository: repository));
+    repository.requests.single.completeError(StateError('missing asset'));
+    await tester.pumpAndSettle();
+    expect(find.text('تصویر نمونه بارگذاری نشد.'), findsOneWidget);
+    await tester.tap(find.text('تلاش دوباره'));
+    await tester.pump();
+    repository.requests.last.complete(fixture());
+    await tester.pumpAndSettle();
+    expect(find.text('کمی مکث،\nکمی رنگ.'), findsOneWidget);
+  });
+
+  for (final viewport in [
+    const Size(360, 800),
+    const Size(390, 844),
+    const Size(430, 932),
+    const Size(800, 360),
+    const Size(1440, 900),
+  ]) {
+    testWidgets(
+      'same centered mobile frame at $viewport, safe scroll and back',
+      (tester) async {
+        tester.view.devicePixelRatio = 1;
+        tester.view.physicalSize = viewport;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        await pumpAssetApp(tester);
+        final frame = find.byKey(const ValueKey('mobile-frame'));
+        final width = viewport.width.clamp(0, PixelTokens.maxWidth);
+        expect(tester.getSize(frame).width, width);
+        expect(tester.getTopLeft(frame).dx, (viewport.width - width) / 2);
+        await tester.scrollUntilVisible(
+          find.byKey(const ValueKey('open-preview')),
+          200,
+        );
+        await tester.tap(find.byKey(const ValueKey('open-preview')));
+        await tester.pumpAndSettle();
+        await tester.scrollUntilVisible(
+          find.text('به‌زودی، نوبت رنگ کردن است'),
+          200,
+        );
+        expect(tester.takeException(), isNull);
+        expect(tester.getSize(frame).width, width);
+      },
+    );
+  }
+
+  testWidgets('direct painting route restores the local asset', (tester) async {
+    await pumpAssetApp(tester, initialRoute: '/painting');
+    expect(find.text('رنگ‌های این تصویر'), findsOneWidget);
+    await tester.tap(find.byTooltip('بازگشت به خانه'));
+    await tester.pumpAndSettle();
+    expect(find.text('کمی مکث،\nکمی رنگ.'), findsOneWidget);
+  });
+
+  testWidgets('system Back returns from the nested preview route', (
+    tester,
+  ) async {
+    await pumpAssetApp(tester, initialRoute: '/painting');
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.text('کمی مکث،\nکمی رنگ.'), findsOneWidget);
+    expect(find.byTooltip('بازگشت به خانه'), findsNothing);
+  });
+
+  testWidgets('unknown route has a working Home recovery', (tester) async {
+    await pumpAssetApp(tester, initialRoute: '/missing');
+    expect(find.text('این صفحه پیدا نشد.'), findsOneWidget);
+    await tester.tap(find.text('بازگشت به خانه'));
+    await tester.pumpAndSettle();
+    expect(find.text('کمی مکث،\nکمی رنگ.'), findsOneWidget);
+  });
+
+  testWidgets('safe insets and larger text remain scrollable', (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(360, 640);
+    tester.view.padding = const FakeViewPadding(top: 32, bottom: 24);
+    tester.platformDispatcher.textScaleFactorTestValue = 1.5;
+    addTearDown(tester.view.reset);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await pumpAssetApp(tester);
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('open-preview')),
+      200,
+    );
+    await tester.tap(find.byKey(const ValueKey('open-preview')));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('به‌زودی، نوبت رنگ کردن است'),
+      200,
+    );
+    expect(tester.takeException(), isNull);
+  });
+}

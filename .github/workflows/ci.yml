@@ -1,0 +1,106 @@
+name: V1 checks and artifacts
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        with:
+          flutter-version: '3.35.7'
+          channel: stable
+          cache: true
+      - run: bash tool/validate.sh
+
+  web:
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        with:
+          flutter-version: '3.35.7'
+          channel: stable
+          cache: true
+      - run: bash tool/build_web.sh
+      - run: npm ci
+        working-directory: tool/browser
+      - run: npx playwright install --with-deps chromium
+        working-directory: tool/browser
+      - name: Exercise built Web application
+        run: |
+          ln -s web apps/game/build/Pixelhub
+          python3 -m http.server 8080 --bind 127.0.0.1 --directory apps/game/build > "$RUNNER_TEMP/pixelhub-http.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8080/Pixelhub/ > /dev/null; then break; fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:8080/Pixelhub/ > /dev/null
+          npm --prefix tool/browser test
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: pixelhub-browser-v0.1.0-${{ github.sha }}
+          path: tool/browser/artifacts
+          if-no-files-found: warn
+          retention-days: 14
+      - run: printf '%s\n' '${{ github.sha }}' > apps/game/build/web/commit.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: pixelhub-web-v0.1.0-${{ github.sha }}
+          path: apps/game/build/web
+          if-no-files-found: error
+          retention-days: 14
+
+  android:
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        with:
+          flutter-version: '3.35.7'
+          channel: stable
+          cache: true
+      - run: flutter pub get --enforce-lockfile
+        working-directory: apps/game
+      - run: flutter build apk --release --no-pub
+        working-directory: apps/game
+      - run: printf '%s\n' '${{ github.sha }}' > apps/game/build/app/outputs/flutter-apk/commit.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: pixelhub-apk-v0.1.0-${{ github.sha }}
+          path: |
+            apps/game/build/app/outputs/flutter-apk/app-release.apk
+            apps/game/build/app/outputs/flutter-apk/commit.txt
+          if-no-files-found: error
+          retention-days: 14
