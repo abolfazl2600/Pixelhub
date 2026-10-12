@@ -42,7 +42,7 @@ PendingProgressSync change(
 );
 
 void main() {
-  test('disjoint offline painting merges even with a stale server revision', () {
+  test('disjoint painting merges despite a stale server revision', () {
     final level = fixture();
     final initial = ServerProgressState(
       progress: progress(level, [0], revision: 2),
@@ -194,10 +194,7 @@ void main() {
     expect(
       () => mergeProgress(
         server,
-        change(
-          progress(level, [1]),
-          baseServerRevision: 3,
-        ),
+        change(progress(level, [1]), baseServerRevision: 3),
       ),
       throwsFormatException,
     );
