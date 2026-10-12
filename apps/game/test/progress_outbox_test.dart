@@ -152,25 +152,28 @@ void main() {
     expect(queue.isEmpty, isTrue);
   });
 
-  test('simultaneous in-memory operations preserve FIFO without lost writes', () async {
-    final level = fixture();
-    final store = MemoryPreferences();
-    await Future.wait([
-      store.enqueueSyncOperation(
-        'account-a',
-        pending(level, id: 'simultaneous-one'),
-      ),
-      store.enqueueSyncOperation(
-        'account-a',
-        pending(level, id: 'simultaneous-two', cell: 2),
-      ),
-    ]);
-    final queue = await store.readSyncOutbox('account-a');
-    expect(
-      queue.operations.map((operation) => operation.operationId).toList(),
-      ['simultaneous-one', 'simultaneous-two'],
-    );
-  });
+  test(
+    'simultaneous in-memory operations preserve FIFO without lost writes',
+    () async {
+      final level = fixture();
+      final store = MemoryPreferences();
+      await Future.wait([
+        store.enqueueSyncOperation(
+          'account-a',
+          pending(level, id: 'simultaneous-one'),
+        ),
+        store.enqueueSyncOperation(
+          'account-a',
+          pending(level, id: 'simultaneous-two', cell: 2),
+        ),
+      ]);
+      final queue = await store.readSyncOutbox('account-a');
+      expect(
+        queue.operations.map((operation) => operation.operationId).toList(),
+        ['simultaneous-one', 'simultaneous-two'],
+      );
+    },
+  );
 
   test('stale reset stays queued and leaves the server state untouched', () {
     final level = fixture();
@@ -180,8 +183,7 @@ void main() {
       generation: 1,
       reset: true,
     );
-    final queue =
-        ProgressSyncOutbox(accountId: 'account-a').enqueue(operation);
+    final queue = ProgressSyncOutbox(accountId: 'account-a').enqueue(operation);
     final server = ServerProgressState(
       progress: ProgressSnapshot(
         levelId: level.id,
