@@ -49,12 +49,11 @@ async function main() {
       },count);
       await page.locator('flutter-view').getByText('Saved',{exact:true}).waitFor();
     }
-    // Flutter's Web semantics can recreate the board node immediately after
-    // navigation. Wait for a laid-out, on-screen rectangle in one browser
-    // evaluation rather than reading a possibly detached node's boundingBox.
+    // Flutter frequently replaces semantics nodes during layout. Avoid
+    // Playwright element actions here: the target may detach while the action
+    // waits for stability. Query its current rect atomically on each frame.
+    // Call scrollTop() first when navigating from a scrolled viewport.
     async function boardBox() {
-      await board().waitFor({state:'visible'});
-      await board().scrollIntoViewIfNeeded();
       const handle=await page.waitForFunction(()=>{
         const element=document.querySelector('[flt-semantics-identifier="painting-board"]');
         if(!element)return false;
@@ -131,6 +130,7 @@ async function main() {
     // Paint a real cell in each required size, using actual browser storage.
     for (const id of ['rainbow','gem','planet']) {
       await page.goto(base+'#/painting/'+id); await ready(); await board().waitFor();
+      await scrollTop();
       const current=await boardBox();
       const dimension={rainbow:32,gem:64,planet:128}[id];
       await page.mouse.click(current.x+current.width/(dimension*2),current.y+current.height/(dimension*2));
@@ -145,6 +145,7 @@ async function main() {
     // A large level exercises zoom/culling without introducing a desktop layout.
     console.log('Browser: large grid and viewports');
     await page.goto(base+'#/painting/planet'); await ready(); await board().waitFor();
+    await scrollTop();
     for(let n=0;n<5;n++) await page.getByRole('button',{name:'Zoom in',exact:true}).click();
     await page.getByRole('button',{name:'Move / zoom',exact:true}).click();
     const b=await boardBox();
