@@ -122,6 +122,22 @@ final class PaintingSession {
     return changed;
   }
 
+  /// Paint up to [maxCells] unfinished cells matching the selected color.
+  /// All affected cells are one undoable stroke. No network or wallet needed.
+  int paintBurst({int maxCells = 5}) {
+    if (maxCells < 1 || maxCells > 64) {
+      throw RangeError.range(maxCells, 1, 64, 'maxCells');
+    }
+    endStroke();
+    beginStroke();
+    var painted = 0;
+    for (var i = 0; i < level.cells.length && painted < maxCells; i++) {
+      if (paintCell(i)) painted++;
+    }
+    endStroke();
+    return painted;
+  }
+
   void _erase(List<int> cells) {
     for (final index in cells) {
       _bits[index ~/ 8] &= ~(1 << (index % 8));

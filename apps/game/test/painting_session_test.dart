@@ -129,4 +129,27 @@ void main() {
       expect(session.remaining.every((value) => value >= 0), isTrue);
     }
   });
+  test('burst paints at most five matching cells as one undoable stroke', () {
+    final level = LevelDefinition(
+      id: 'bomb-test',
+      title: 'بمب',
+      titleEn: 'Bomb',
+      schemaVersion: 2,
+      contentVersion: 1,
+      width: 4,
+      height: 4,
+      palette: [0xff000000, 0xffffffff],
+      cells: List<int>.filled(16, 0),
+    );
+    final session = PaintingSession(level);
+    expect(session.paintBurst(), 5);
+    expect(session.completedCount, 5);
+    expect(session.canUndo, isTrue);
+    expect(session.undo(), isTrue);
+    expect(session.completedCount, 0);
+    expect(session.paintBurst(maxCells: 3), 3);
+    expect(session.paintBurst(maxCells: 0), throwsRangeError);
+  });
+
 }
+

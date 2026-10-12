@@ -101,4 +101,28 @@ void main() {
     expect(reopened.session!.isComplete, isTrue);
     expect(reopened.session!.completedCount, 4);
   });
+  test('hint does not change progress; bomb paints and reset clears hint', () async {
+    final store = MemoryPreferences();
+    final controller = PaintingController(fixture(), store);
+    addTearDown(controller.dispose);
+    await controller.load();
+    final before = controller.session!.snapshot.revision;
+    expect(controller.showHint(), 0);
+    expect(controller.hintIndex, 0);
+    expect(controller.session!.snapshot.revision, before);
+    expect(controller.useBomb(), 2);
+    expect(controller.hintIndex, isNull);
+    await controller.flush();
+    expect(controller.session!.completedCount, 2);
+    expect(controller.session!.canUndo, isTrue);
+    controller.undo();
+    await controller.flush();
+    expect(controller.session!.completedCount, 0);
+    controller.showHint();
+    controller.reset();
+    await controller.flush();
+    expect(controller.hintIndex, isNull);
+    expect(controller.session!.generation, 1);
+  });
+
 }

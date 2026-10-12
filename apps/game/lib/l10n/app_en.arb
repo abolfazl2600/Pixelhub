@@ -139,5 +139,27 @@
   "clearDataError": "Clearing did not finish. Reopen the gallery and check your data before retrying.",
   "offlinePreparing": "Preparing the app and bundled pictures for offline reopening…",
   "offlineReady": "Bundled pictures are ready for offline use. On Web, a new version activates after previous tabs are closed.",
-  "offlineUnavailable": "Offline app caching is unavailable in this browser; online play and local data remain available."
+  "offlineUnavailable": "Offline app caching is unavailable in this browser; online play and local data remain available.",
+  "hintTool": "Hint",
+  "bombTool": "Bomb",
+  "freeToolsNote": "Free practice tools on this device. Coins and inventory: coming soon.",
+  "hintLocation": "Hint: row {row}, column {column}. The cell is marked in orange.",
+  "@hintLocation": {
+    "placeholders": {
+      "row": {
+        "type": "String"
+      },
+      "column": {
+        "type": "String"
+      }
+    }
+  },
+  "bombFilled": "Bomb colored {count} matching cells. Undo is available.",
+  "@bombFilled": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  }
 }

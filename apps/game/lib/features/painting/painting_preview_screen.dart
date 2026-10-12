@@ -26,6 +26,14 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
   bool _moveMode = false;
   bool _viewResult = false;
 
+  void _bomb() {
+    final count = widget.controller.useBomb();
+    if (count == 0 || !mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(context.strings.bombFilled(context.digits(count)))),
+    );
+  }
+
   @override
   void didUpdateWidget(PaintingPreviewScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -206,6 +214,50 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        key: const ValueKey('hint-tool'),
+                        onPressed: session.isComplete
+                            ? null
+                            : controller.showHint,
+                        icon: const Icon(Icons.lightbulb_outline_rounded),
+                        label: Text(s.hintTool),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        key: const ValueKey('bomb-tool'),
+                        onPressed: session.remaining[session.selectedColor] == 0
+                            ? null
+                            : _bomb,
+                        icon: const Icon(Icons.auto_awesome_rounded),
+                        label: Text(s.bombTool),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  s.freeToolsNote,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 12, color: PixelTokens.muted),
+                ),
+                if (controller.hintIndex != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    s.hintLocation(
+                      context.digits(controller.hintIndex! ~/ controller.level.width + 1),
+                      context.digits(controller.hintIndex! % controller.level.width + 1),
+                    ),
+                    key: const ValueKey('hint-location'),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                ],
                 const SizedBox(height: 12),
                 PaintingBoard(
                   key: ValueKey(controller.level.id),

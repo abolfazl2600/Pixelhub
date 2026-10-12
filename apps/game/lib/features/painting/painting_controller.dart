@@ -18,6 +18,7 @@ class PaintingController extends ChangeNotifier {
   SaveStatus saveStatus = SaveStatus.saved;
   PaintingSession? session;
   ProgressSnapshot? _pendingSave;
+  int? hintIndex;
   Future<void>? _draining;
   bool _disposed = false;
   int _loadGeneration = 0;
@@ -34,6 +35,7 @@ class PaintingController extends ChangeNotifier {
       final progress = await repository.read(level);
       if (_disposed || request != _loadGeneration) return;
       session = PaintingSession(level, progress: progress);
+      hintIndex = null;
       status = PaintingStatus.ready;
     } on Object {
       if (_disposed || request != _loadGeneration) return;
@@ -55,8 +57,48 @@ class PaintingController extends ChangeNotifier {
 
   bool paintLine(int x1, int y1, int x2, int y2) {
     if (session!.paintLine(x1, y1, x2, y2) == 0) return false;
+    hintIndex = null;
     _changed();
     return true;
+  }
+
+  /// Reveal a still-uncolored cell. This never alters saved progress.
+  /// If the selected color has none left, select the next useful color.
+  int? showHint() {
+    final active = session;
+    if (active == null || status != PaintingStatus.ready) return null;
+    int? candidate;
+    for (var i = 0; i < level.cells.length; i++) {
+      if (!active.isCompleted(i) &&
+          level.cells[i] == active.selectedColor) {
+        candidate = i;
+        break;
+      }
+    }
+    if (candidate == null) {
+      for (var i = 0; i < level.cells.length; i++) {
+        if (!active.isCompleted(i)) {
+          candidate = i;
+          active.selectColor(level.cells[i]);
+          break;
+        }
+      }
+    }
+    hintIndex = candidate;
+    _notify();
+    return candidate;
+  }
+
+  /// Local free demo. Paid charges, inventory and coins are not activated.
+  int useBomb() {
+    final active = session;
+    if (active == null || status != PaintingStatus.ready) return 0;
+    final painted = active.paintBurst();
+    if (painted > 0) {
+      hintIndex = null;
+      _changed();
+    }
+    return painted;
   }
 
   void cancelStroke() {
@@ -64,13 +106,17 @@ class PaintingController extends ChangeNotifier {
   }
 
   void undo() {
-    if (session!.undo()) _changed();
+    if (session!.undo()) {
+      hintIndex = null;
+      _changed();
+    }
   }
 
   /// Called only after an explicit reset confirmation, including damaged saves.
   void reset() {
     session ??= PaintingSession(level);
     session!.reset();
+    hintIndex = null;
     status = PaintingStatus.ready;
     _changed();
   }

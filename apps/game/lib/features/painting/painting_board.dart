@@ -315,6 +315,23 @@ class _GridPainter extends CustomPainter {
         ..style = PaintingStyle.stroke
         ..strokeWidth = 0.6 / scale,
     );
+    final hint = controller.hintIndex;
+    if (hint != null && !session.isCompleted(hint)) {
+      final hx = hint % level.width;
+      final hy = hint ~/ level.width;
+      final hintRect = Rect.fromLTWH(hx * cw, hy * ch, cw, ch);
+      canvas.drawRect(
+        hintRect,
+        Paint()..color = const Color(0x66ffac42),
+      );
+      canvas.drawRect(
+        hintRect.deflate(1 / scale),
+        Paint()
+          ..color = const Color(0xffff8200)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 3 / scale,
+      );
+    }
     if (cursor != null) {
       canvas.drawRect(
         Rect.fromLTWH(cursor!.$1 * cw, cursor!.$2 * ch, cw, ch),
