@@ -230,9 +230,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                     Expanded(
                       child: OutlinedButton.icon(
                         key: const ValueKey('hint-tool'),
-                        onPressed: session.isComplete
-                            ? null
-                            : _hint,
+                        onPressed: session.isComplete ? null : _hint,
                         icon: const Icon(Icons.lightbulb_outline_rounded),
                         label: Text(s.hintTool),
                       ),

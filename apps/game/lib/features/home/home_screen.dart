@@ -95,7 +95,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       Expanded(
                         child: Text(
                           s.homeCompleted(
-                            context.digits(widget.library.levels.where(widget.library.isComplete).length),
+                            context.digits(
+                              widget.library.levels
+                                  .where(widget.library.isComplete)
+                                  .length,
+                            ),
                             context.digits(widget.library.levels.length),
                           ),
                         ),
