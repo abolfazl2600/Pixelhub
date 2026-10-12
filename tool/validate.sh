@@ -7,7 +7,12 @@ flutter --version --machine | python3 -c 'import json,sys; version=json.load(sys
 cd apps/game
 flutter pub get --enforce-lockfile
 cd "$repo_root"
-dart --suppress-analytics format --output=none --set-exit-if-changed apps/game/lib apps/game/test packages
+# Print the exact formatter edits on failure, so source fixes are actionable.
+if ! dart --suppress-analytics format --output=none --set-exit-if-changed apps/game/lib apps/game/test packages; then
+  echo "Dart formatting differs from the committed source:" >&2
+  git --no-pager diff -- apps/game/lib apps/game/test packages >&2
+  exit 1
+fi
 for package in level_schema game_domain persistence design_system painting_engine; do
   cd "$repo_root/packages/$package"
   flutter pub get
