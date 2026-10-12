@@ -41,8 +41,13 @@ void main() {
       accountId: 'account-a',
       operations: [
         pending(level),
-        pending(level, id: 'reset-operation-02', cell: 3, generation: 1,
-            reset: true),
+        pending(
+          level,
+          id: 'reset-operation-02',
+          cell: 3,
+          generation: 1,
+          reset: true,
+        ),
       ],
     );
     final decoded = ProgressSyncOutbox.fromJson(
@@ -94,8 +99,8 @@ void main() {
       ),
       throwsFormatException,
     );
-    final json = jsonDecode(jsonEncode(source.toJson()))
-        as Map<String, Object?>;
+    final json =
+        jsonDecode(jsonEncode(source.toJson())) as Map<String, Object?>;
     final operations = json['operations']! as List<Object?>;
     final item = operations.first! as Map<String, Object?>;
     final progress = item['progress']! as Map<String, Object?>;
@@ -106,7 +111,7 @@ void main() {
     );
   });
 
-  test('memory repository isolates accounts and retains pending resets', () async {
+  test('memory adapter isolates accounts and retains resets', () async {
     final repository = MemoryPreferences();
     final level = fixture();
     await repository.enqueueSyncOperation(
@@ -114,7 +119,10 @@ void main() {
       pending(level, id: 'reset-operation-01', generation: 1, reset: true),
     );
     expect((await repository.readSyncOutbox('account-b')).isEmpty, isTrue);
-    expect((await repository.readSyncOutbox('account-a')).next!.isReset, isTrue);
+    expect(
+      (await repository.readSyncOutbox('account-a')).next!.isReset,
+      isTrue,
+    );
     final after = await repository.acknowledgeSyncOperation(
       'account-a',
       'reset-operation-01',
@@ -129,10 +137,8 @@ void main() {
     final level = fixture();
     var queue = ProgressSyncOutbox(accountId: 'account-a');
     for (var i = 0; i < ProgressSyncOutbox.maxOperations; i++) {
-      queue = queue.enqueue(pending(
-        level,
-        id: 'operation-' + i.toString().padLeft(5, '0'),
-      ));
+      final operationId = 'operation-' + i.toString().padLeft(5, '0');
+      queue = queue.enqueue(pending(level, id: operationId));
     }
     expect(queue.operations.length, ProgressSyncOutbox.maxOperations);
     expect(

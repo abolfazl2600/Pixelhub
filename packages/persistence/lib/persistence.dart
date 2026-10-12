@@ -118,8 +118,8 @@ final class LocalPreferences
   String _outboxKey(String accountId) {
     // The verified account scope is encoded in the key and the document.
     ProgressSyncOutbox(accountId: accountId);
-    return 'pixelhub.sync.outbox.v1.' +
-        base64UrlEncode(utf8.encode(accountId));
+    final encoded = base64UrlEncode(utf8.encode(accountId));
+    return 'pixelhub.sync.outbox.v1.$encoded';
   }
 
   Future<ProgressSyncOutbox> _loadOutbox(String accountId) async {
