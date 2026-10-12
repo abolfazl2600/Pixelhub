@@ -24,6 +24,10 @@ Completed pictures offer **Export PNG / share**: Android opens its share sheet, 
 
 Android's bundled catalog works without a content server. On the production Web artifact, wait for Settings' offline-ready message before relying on offline reopening; the first visit needs connectivity. A service worker caches only public app resources, fonts, CanvasKit and levels. Updates activate after previous tabs close. Private browsing, browser policy, quota or eviction can prevent offline availability. The development server lacks the generated offline manifest. This new behavior is implemented but has not been validated in this session.
 
+## V4 development status
+
+The next roadmap stage is account-based progress synchronization. A pure conflict-resolution contract now lives in `packages/game_domain/lib/progress_sync.dart` (ADR 0004): disjoint completed cells merge within the same server reset generation, while a Reset invalidates older-generation writes. This is **domain groundwork only**, not an online feature. Auth, PostgreSQL persistence, an idempotency ledger, a client queue, guest migration, account deletion and cross-device verification are still pending. Personal photo originals remain local.
+
 ## GitHub Actions: automatic Web, manual Android
 
 - **[Checks and Web artifacts](https://github.com/abolfazl2600/Pixelhub/actions/workflows/ci.yml)** runs formatting, package analysis, unit/widget tests, Web build and browser checks automatically on PRs, main pushes and version tags. **It does not build an APK.**
