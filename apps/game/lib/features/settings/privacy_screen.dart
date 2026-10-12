@@ -69,10 +69,7 @@ class PrivacyScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   for (final section in sections) ...[
-                    Text(
-                      section,
-                      style: const TextStyle(height: 1.75),
-                    ),
+                    Text(section, style: const TextStyle(height: 1.75)),
                     const SizedBox(height: 16),
                   ],
                   Text(
@@ -94,9 +91,7 @@ class PrivacyScreen extends StatelessWidget {
             const SizedBox(height: 16),
             OutlinedButton.icon(
               onPressed: () async {
-                await Clipboard.setData(
-                  const ClipboardData(text: publicUrl),
-                );
+                await Clipboard.setData(const ClipboardData(text: publicUrl));
                 if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(context.strings.privacyLinkCopied)),
