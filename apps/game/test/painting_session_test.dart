@@ -149,6 +149,4 @@ void main() {
     expect(session.completedCount, 0);
     expect(session.paintBurst(maxCells: 3), 3);
     expect(() => session.paintBurst(maxCells: 0), throwsRangeError);
-  });
-
-}
+  });}
