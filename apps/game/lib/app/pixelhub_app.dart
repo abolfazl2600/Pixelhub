@@ -15,6 +15,7 @@ import '../features/gallery/gallery_screen.dart';
 import '../features/gallery/library_controller.dart';
 import '../features/import/import_screen.dart';
 import '../features/settings/settings_screen.dart';
+import '../features/settings/privacy_screen.dart';
 import '../features/painting/painting_controller.dart';
 import '../features/painting/painting_preview_screen.dart';
 import '../l10n/generated/app_localizations.dart';
@@ -111,6 +112,10 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
             GoRoute(
               path: 'profile',
               builder: (context, state) => _route(page: 'profile'),
+            ),
+            GoRoute(
+              path: 'privacy',
+              builder: (context, state) => _route(page: 'privacy'),
             ),
             GoRoute(
               path: 'settings',
@@ -259,6 +264,8 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
   Widget _route({String? id, String page = 'home'}) => ListenableBuilder(
     listenable: _routeChanges,
     builder: (context, _) {
+      // Privacy is reachable even when the picture catalog fails to load.
+      if (page == 'privacy') return const PrivacyScreen();
       if (_bootstrap.status == BootstrapStatus.loading) {
         return const _SplashScreen();
       }

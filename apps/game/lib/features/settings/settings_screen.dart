@@ -103,6 +103,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: const Icon(Icons.person_outline_rounded),
                 label: Text(s.profile),
               ),
+              const SizedBox(height: 14),
+              OutlinedButton.icon(
+                onPressed: _busy ? null : () => context.push('/privacy'),
+                icon: const Icon(Icons.privacy_tip_outlined),
+                label: Text(s.privacyPolicyTitle),
+              ),
               const SizedBox(height: 24),
               Text(s.importPrivacy, style: const TextStyle(height: 1.8)),
               const SizedBox(height: 12),
