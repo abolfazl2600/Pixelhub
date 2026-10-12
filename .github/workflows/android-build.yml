@@ -1,4 +1,4 @@
-name: Build Android (manual: preview APK or signed Play AAB)
+name: "Build Android (manual: preview APK or signed Play AAB)"
 
 on:
   workflow_dispatch:
