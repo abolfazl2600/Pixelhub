@@ -346,7 +346,7 @@ class _ImportScreenState extends State<ImportScreen> {
                   onChanged: _busy
                       ? null
                       : (value) {
-                          if (value != null)
+                          if (value != null) {
                             _changed(() {
                               _difficulty = value;
                               _colors = switch (value) {
@@ -355,6 +355,7 @@ class _ImportScreenState extends State<ImportScreen> {
                                 _ => 24,
                               };
                             });
+                          }
                         },
                 ),
                 const SizedBox(height: 16),
