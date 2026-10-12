@@ -5,7 +5,8 @@
 ## پیشرفت پیاده‌سازی
 
 - [x] هسته مستقل همگرایی progress مبتنی بر Bitset، server revision و نسل Reset، با کد و تست‌های منبع. قرارداد: [ADR 0004](../../adr/0004-v4-progress-sync.md).
-- [ ] قرارداد پایدار idempotency و تراکنش پایگاه داده، پس از انتخاب Auth/Hosting.
+- [x] پیش‌نویس OpenAPI احرازشده و migration اولیه PostgreSQL همراه با RLS و جدول idempotency (فقط سورس، اجرا نشده): [backend](../../../backend/README.md).
+- [ ] پیاده‌سازی سرویس تراکنشی idempotency و اتصال Auth پس از انتخاب Auth/Hosting.
 - [ ] Auth، API، صف آفلاین، مهاجرت مهمان، UI وضعیت Sync و پذیرش بین‌دستگاهی.
 
 این یک گام آماده‌سازی V4 است و به معنی فعال‌بودن حساب کاربری یا Sync در محصول نیست. بنا بر دستور مالک، تست یا Build محلی این تغییر اجرا نشده است.

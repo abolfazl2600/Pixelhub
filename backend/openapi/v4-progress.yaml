@@ -1,0 +1,210 @@
+openapi: 3.1.0
+info:
+  title: Pixelhub V4 Progress Contract
+  version: 0.4.0-draft
+  description: |
+    Contract only; no deployed API or authentication provider is implemented.
+    No original photos or private-artwork payloads are accepted.
+    The authenticated user is taken from the verified bearer session, not
+    from request-supplied identity fields.
+servers:
+  - url: https://staging-api.example.invalid
+    description: Placeholder; never use as a deployed endpoint.
+security:
+  - bearerAuth: []
+paths:
+  /api/v1/me/progress/{levelId}:
+    get:
+      operationId: getMyLevelProgress
+      summary: Read the authenticated user's canonical progress for one level version
+      parameters:
+        - name: levelId
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 128
+        - name: levelVersion
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Current server state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerProgress'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: No record for this user and level version
+        '429':
+          $ref: '#/components/responses/RateLimited'
+  /api/v1/me/progress/sync:
+    post:
+      operationId: syncMyLevelProgress
+      summary: Merge a single idempotent offline progress operation
+      description: |
+        The backend must verify bearer identity, validate the immutable level
+        checksum and bitset, lock the progress row and persist the operation
+        ledger with the progress update in one DB transaction.
+        Repeated (user, operationId) with the same canonical payload returns
+        the exact stored response. Reuse with different payload returns 422.
+        Guest migration of a previously unknown level is a distinct flow.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PendingProgressSync'
+      responses:
+        '200':
+          description: Applied or unchanged, possibly replayed from the ledger
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncResult'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Stale reset generation; client must retain local pending data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncResult'
+        '422':
+          description: Invalid payload, identity, or reused operation ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Issuer, audience and key validation are chosen in the V4 Auth ADR.
+  responses:
+    Unauthorized:
+      description: Missing or invalid verified session
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    RateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+  schemas:
+    ProgressSnapshot:
+      type: object
+      additionalProperties: false
+      required:
+        - schemaVersion
+        - levelId
+        - levelVersion
+        - levelChecksum
+        - cellCount
+        - generation
+        - revision
+        - completedCells
+        - completedCount
+      properties:
+        schemaVersion:
+          type: integer
+          const: 1
+        levelId:
+          type: string
+          minLength: 1
+          maxLength: 128
+        levelVersion:
+          type: integer
+          minimum: 1
+        levelChecksum:
+          type: string
+          pattern: '^[0-9a-f]{64}$'
+        cellCount:
+          type: integer
+          minimum: 1
+          maximum: 65536
+        generation:
+          type: integer
+          minimum: 0
+        revision:
+          type: integer
+          minimum: 0
+        completedCells:
+          type: string
+          contentEncoding: base64
+          maxLength: 11000
+          description: Exact ceil(cellCount/8) bytes; unused high bits are zero.
+        completedCount:
+          type: integer
+          minimum: 0
+          maximum: 65536
+          description: Must equal the popcount of decoded completedCells.
+    ServerProgress:
+      type: object
+      additionalProperties: false
+      required: [serverRevision, progress]
+      properties:
+        serverRevision:
+          type: integer
+          minimum: 0
+        progress:
+          $ref: '#/components/schemas/ProgressSnapshot'
+    PendingProgressSync:
+      type: object
+      additionalProperties: false
+      required:
+        - operationId
+        - baseServerRevision
+        - baseGeneration
+        - isReset
+        - progress
+      properties:
+        operationId:
+          type: string
+          minLength: 8
+          maxLength: 128
+          pattern: '^[A-Za-z0-9_-]{8,128}$'
+        baseServerRevision:
+          type: integer
+          minimum: 0
+        baseGeneration:
+          type: integer
+          minimum: 0
+        isReset:
+          type: boolean
+        progress:
+          $ref: '#/components/schemas/ProgressSnapshot'
+    SyncResult:
+      type: object
+      additionalProperties: false
+      required: [status, state]
+      properties:
+        status:
+          type: string
+          enum: [applied, unchanged, staleGeneration]
+        state:
+          $ref: '#/components/schemas/ServerProgress'
+    ApiError:
+      type: object
+      additionalProperties: false
+      required: [code, message, traceId]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        traceId:
+          type: string

@@ -26,7 +26,7 @@ Android's bundled catalog works without a content server. On the production Web 
 
 ## V4 development status
 
-The next roadmap stage is account-based progress synchronization. A pure conflict-resolution contract now lives in `packages/game_domain/lib/progress_sync.dart` (ADR 0004): disjoint completed cells merge within the same server reset generation, while a Reset invalidates older-generation writes. This is **domain groundwork only**, not an online feature. Auth, PostgreSQL persistence, an idempotency ledger, a client queue, guest migration, account deletion and cross-device verification are still pending. Personal photo originals remain local.
+The next roadmap stage is account-based progress synchronization. A pure conflict-resolution contract now lives in `packages/game_domain/lib/progress_sync.dart` (ADR 0004): disjoint completed cells merge within the same server reset generation, while a Reset invalidates older-generation writes. This is **domain groundwork only**, not an online feature. The [backend contract files](backend/README.md) now include a draft OpenAPI document and unexecuted PostgreSQL migration with an idempotency ledger schema. Auth, a running API, persistent sync behavior, a client queue, guest migration, account deletion and cross-device verification are still pending. Personal photo originals remain local.
 
 ## GitHub Actions: automatic Web, manual Android
 
