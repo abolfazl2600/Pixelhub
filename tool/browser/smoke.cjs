@@ -49,8 +49,23 @@ async function main() {
       },count);
       await page.locator('flutter-view').getByText('Saved',{exact:true}).waitFor();
     }
+    // Flutter's Web semantics can recreate the board node immediately after
+    // navigation. Wait for a laid-out, on-screen rectangle in one browser
+    // evaluation rather than reading a possibly detached node's boundingBox.
+    async function boardBox() {
+      await board().waitFor({state:'visible'});
+      await board().scrollIntoViewIfNeeded();
+      const handle=await page.waitForFunction(()=>{
+        const element=document.querySelector('[flt-semantics-identifier="painting-board"]');
+        if(!element)return false;
+        const rect=element.getBoundingClientRect();
+        if(rect.width<=0 || rect.height<=0 || rect.top<0 || rect.bottom>innerHeight)return false;
+        return {x:rect.x,y:rect.y,width:rect.width,height:rect.height};
+      });
+      return handle.jsonValue();
+    }
     async function point(x,y) {
-      const b=await board().boundingBox(); assert(b && b.y>=0 && b.y+b.height<=page.viewportSize().height);
+      const b=await boardBox();
       return {x:b.x+b.width*(x+.5)/16, y:b.y+b.height*(y+.5)/16};
     }
     async function line(x1,y,x2) {
@@ -116,7 +131,7 @@ async function main() {
     // Paint a real cell in each required size, using actual browser storage.
     for (const id of ['rainbow','gem','planet']) {
       await page.goto(base+'#/painting/'+id); await ready(); await board().waitFor();
-      const current=await board().boundingBox();
+      const current=await boardBox();
       const dimension={rainbow:32,gem:64,planet:128}[id];
       await page.mouse.click(current.x+current.width/(dimension*2),current.y+current.height/(dimension*2));
       await page.waitForFunction(id=>{
@@ -132,7 +147,7 @@ async function main() {
     await page.goto(base+'#/painting/planet'); await ready(); await board().waitFor();
     for(let n=0;n<5;n++) await page.getByRole('button',{name:'Zoom in',exact:true}).click();
     await page.getByRole('button',{name:'Move / zoom',exact:true}).click();
-    const b=await board().boundingBox();
+    const b=await boardBox();
     await page.mouse.move(b.x+b.width*.5,b.y+b.height*.5); await page.mouse.down();
     await page.mouse.move(b.x+b.width*.65,b.y+b.height*.6,{steps:10}); await page.mouse.up();
     await page.screenshot({path:path.join(output,'planet-zoom.png')});

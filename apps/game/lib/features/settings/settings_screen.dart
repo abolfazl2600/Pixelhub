@@ -105,7 +105,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Text(s.storageNote, style: const TextStyle(height: 1.8)),
               const SizedBox(height: 24),
               ValueListenableBuilder(
-                listenable: offlineStatus,
+                valueListenable: offlineStatus,
                 builder: (context, status, _) => Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [

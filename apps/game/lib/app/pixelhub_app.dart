@@ -66,7 +66,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     _library = LibraryController(
       widget.artworkRepository ??
           (preferences is ArtworkRepository
-              ? preferences
+              ? preferences as ArtworkRepository
               : MemoryPreferences()),
       _progress,
     );
