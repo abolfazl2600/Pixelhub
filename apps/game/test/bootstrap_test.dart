@@ -6,9 +6,10 @@ import 'package:level_schema/level_schema.dart';
 import 'package:pixelhub/app/bootstrap_controller.dart';
 
 LevelDefinition fixture() => LevelDefinition(
-  id: 'sample',
+  id: 'sunflower',
   title: 'آفتابگردان',
-  schemaVersion: 1,
+  titleEn: 'Sunflower',
+  schemaVersion: 2,
   contentVersion: 1,
   width: 2,
   height: 2,
@@ -18,6 +19,9 @@ LevelDefinition fixture() => LevelDefinition(
 
 class TestRepository implements LevelRepository {
   final requests = <Completer<LevelDefinition>>[];
+
+  @override
+  Future<List<LevelDefinition>> loadLevels() async => [await loadPreview()];
 
   @override
   Future<LevelDefinition> loadPreview() {

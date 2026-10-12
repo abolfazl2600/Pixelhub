@@ -76,7 +76,7 @@ fi
 flutter precache --android --web
 cd "$repo_root/apps/game"
 flutter pub get --enforce-lockfile
-for package in level_schema game_domain persistence design_system; do
+for package in level_schema game_domain persistence design_system painting_engine; do
   cd "$repo_root/packages/$package"
   flutter pub get
 done

@@ -1,3 +1,5 @@
+> قرارداد اجرایی V2: schema 2، عنوان‌های فارسی/انگلیسی، رنگ‌های ARGB هشت‌رقمی و checksum با serialization ثابت در [ADR 0002](../adr/0002-v2-painting-and-localization.md) تعریف شده‌اند. نمونه‌های زیر طرح اولیهٔ schema 1 و Sync آینده‌اند؛ مرجع فایل‌های فعلی `packages/level_schema` است. ذخیرهٔ فعلی bitset و generation/revision را دارد؛ هویت و Sync هنوز فعال نیستند.
+
 # 03 | قرارداد داده و مشخصات موتور Pixel Coloring
 
 ## Level format v1 (قرارداد پیشنهادی)

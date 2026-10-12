@@ -4,13 +4,14 @@ import 'package:level_schema/level_schema.dart';
 
 enum BootstrapStatus { loading, ready, error }
 
-/// The sole V1 state owner. Injected ports keep loading/retry testable.
+/// Loads the local catalog. Injected ports keep loading/retry testable.
 class BootstrapController extends ChangeNotifier {
   BootstrapController(this.repository);
 
   final LevelRepository repository;
   BootstrapStatus status = BootstrapStatus.loading;
   LevelDefinition? level;
+  List<LevelDefinition> levels = [];
   bool _disposed = false;
   int _generation = 0;
 
@@ -19,9 +20,11 @@ class BootstrapController extends ChangeNotifier {
     status = BootstrapStatus.loading;
     notifyListeners();
     try {
-      final result = await repository.loadPreview();
+      final result = await repository.loadLevels();
       if (_disposed || generation != _generation) return;
-      level = result;
+      if (result.isEmpty) throw const FormatException('Empty level catalog.');
+      levels = result;
+      level = result.first;
       status = BootstrapStatus.ready;
     } on Object {
       if (_disposed || generation != _generation) return;

@@ -8,7 +8,7 @@ cd apps/game
 flutter pub get --enforce-lockfile
 cd "$repo_root"
 dart --suppress-analytics format --output=none --set-exit-if-changed apps/game/lib apps/game/test packages
-for package in level_schema game_domain persistence design_system; do
+for package in level_schema game_domain persistence design_system painting_engine; do
   cd "$repo_root/packages/$package"
   flutter pub get
   flutter analyze --no-pub

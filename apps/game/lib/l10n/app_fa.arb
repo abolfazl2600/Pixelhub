@@ -1,0 +1,82 @@
+{
+  "@@locale": "fa",
+  "headline": "کمی مکث،\nکمی رنگ.",
+  "welcome": "یک دنیای کوچک، پیکسل به پیکسل. تصویرت را انتخاب کن و رنگ بزن.",
+  "demoBadge": "دموی قابل بازی ۰.۲",
+  "choosePicture": "انتخاب تصویر",
+  "startPainting": "شروع / ادامهٔ رنگ‌آمیزی",
+  "offlineNote": "تصاویر و پیشرفت روی همین دستگاه نگه‌داری می‌شوند.",
+  "storageNote": "پاک‌کردن داده‌های برنامه یا مرورگر، پیشرفت را حذف می‌کند.",
+  "backHome": "بازگشت به خانه",
+  "loading": "در حال بارگذاری…",
+  "loadError": "بارگذاری تصویرها انجام نشد.",
+  "retry": "تلاش دوباره",
+  "notFound": "این صفحه پیدا نشد.",
+  "colors": "رنگ‌ها",
+  "paintMode": "رنگ‌آمیزی",
+  "panMode": "حرکت / زوم",
+  "gestureHelp": "در حالت رنگ‌آمیزی بکشید؛ برای جابه‌جایی حالت حرکت را انتخاب کنید. با دو انگشت بزرگ‌نمایی کنید.",
+  "undo": "بازگردانی",
+  "reset": "شروع دوباره",
+  "resetTitle": "پیشرفت این تصویر پاک شود؟",
+  "resetMessage": "رنگ‌های ثبت‌شدهٔ این تصویر پاک می‌شوند. این کار قابل بازگشت نیست.",
+  "cancel": "انصراف",
+  "saved": "ذخیره شد",
+  "saving": "در حال ذخیره…",
+  "saveError": "پیشرفت هنوز ذخیره نشده؛ دوباره تلاش کنید.",
+  "progressLoadError": "پیشرفت ذخیره‌شده باز نشد. برای حفظ داده، آن را تغییر ندادیم.",
+  "wrongColor": "شمارهٔ خانه با رنگ انتخاب‌شده یکی نیست.",
+  "completedTitle": "آفرین، تصویرت کامل شد!",
+  "completedMessage": "پیکسل به پیکسل، یک اثر کوچک ساختی.",
+  "viewResult": "دیدن نتیجه",
+  "nextPicture": "انتخاب تصویر بعدی",
+  "zoomIn": "بزرگ‌نمایی",
+  "zoomOut": "کوچک‌نمایی",
+  "fitCanvas": "نمایش کامل تصویر",
+  "canvasLabel": "بوم شماره‌دار رنگ‌آمیزی",
+  "progressSummary": "رنگ‌شده: {done} از {total}",
+  "@progressSummary": {
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "colorLabel": "رنگ {number}، {remaining} خانه باقی‌مانده",
+  "@colorLabel": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      },
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "previewLabel": "تصویر {title}، {width} در {height}",
+  "@previewLabel": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "width": {
+        "type": "String"
+      },
+      "height": {
+        "type": "String"
+      }
+    }
+  },
+  "languageSaveError": "زبان انتخاب‌شده ذخیره نشد؛ پس از بازکردن دوباره ممکن است تغییر کند.",
+  "progressPercent": "{value}٪",
+  "@progressPercent": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  }
+}

@@ -21,3 +21,4 @@
 packages/**/pubspec.lock
 **/node_modules/
 tool/browser/artifacts/
+apps/game/lib/l10n/generated/

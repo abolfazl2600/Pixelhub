@@ -12,7 +12,12 @@ Future<void> pumpAssetApp(WidgetTester tester, {String? initialRoute}) async {
   final level = await tester.runAsync(AssetLevelRepository().loadPreview);
   final repository = TestRepository();
   await tester.pumpWidget(
-    PixelhubApp(repository: repository, initialRoute: initialRoute),
+    PixelhubApp(
+      repository: repository,
+      initialRoute: initialRoute,
+      progressRepository: MemoryPreferences(),
+      preferences: MemoryPreferences(),
+    ),
   );
   repository.requests.single.complete(level!);
   await tester.pumpAndSettle();
@@ -23,7 +28,13 @@ void main() {
     tester,
   ) async {
     final repository = TestRepository();
-    await tester.pumpWidget(PixelhubApp(repository: repository));
+    await tester.pumpWidget(
+      PixelhubApp(
+        repository: repository,
+        progressRepository: MemoryPreferences(),
+        preferences: MemoryPreferences(),
+      ),
+    );
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
     repository.requests.single.complete(fixture());
     await tester.pumpAndSettle();
@@ -38,7 +49,7 @@ void main() {
     );
     await tester.tap(find.byKey(const ValueKey('open-preview')));
     await tester.pumpAndSettle();
-    expect(find.text('رنگ‌های این تصویر'), findsOneWidget);
+    expect(find.text('رنگ‌ها'), findsOneWidget);
     await tester.tap(find.byTooltip('بازگشت به خانه'));
     await tester.pumpAndSettle();
     expect(find.text('کمی مکث،\nکمی رنگ.'), findsOneWidget);
@@ -47,10 +58,16 @@ void main() {
 
   testWidgets('failed bootstrap presents a working retry', (tester) async {
     final repository = TestRepository();
-    await tester.pumpWidget(PixelhubApp(repository: repository));
+    await tester.pumpWidget(
+      PixelhubApp(
+        repository: repository,
+        progressRepository: MemoryPreferences(),
+        preferences: MemoryPreferences(),
+      ),
+    );
     repository.requests.single.completeError(StateError('missing asset'));
     await tester.pumpAndSettle();
-    expect(find.text('تصویر نمونه بارگذاری نشد.'), findsOneWidget);
+    expect(find.text('بارگذاری تصویرها انجام نشد.'), findsOneWidget);
     await tester.tap(find.text('تلاش دوباره'));
     await tester.pump();
     repository.requests.last.complete(fixture());
@@ -84,7 +101,7 @@ void main() {
         await tester.tap(find.byKey(const ValueKey('open-preview')));
         await tester.pumpAndSettle();
         await tester.scrollUntilVisible(
-          find.text('به‌زودی، نوبت رنگ کردن است'),
+          find.byKey(const ValueKey('color-5')),
           200,
         );
         expect(tester.takeException(), isNull);
@@ -95,7 +112,7 @@ void main() {
 
   testWidgets('direct painting route restores the local asset', (tester) async {
     await pumpAssetApp(tester, initialRoute: '/painting');
-    expect(find.text('رنگ‌های این تصویر'), findsOneWidget);
+    expect(find.text('رنگ‌ها'), findsOneWidget);
     await tester.tap(find.byTooltip('بازگشت به خانه'));
     await tester.pumpAndSettle();
     expect(find.text('کمی مکث،\nکمی رنگ.'), findsOneWidget);
@@ -133,10 +150,7 @@ void main() {
     );
     await tester.tap(find.byKey(const ValueKey('open-preview')));
     await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(
-      find.text('به‌زودی، نوبت رنگ کردن است'),
-      200,
-    );
+    await tester.scrollUntilVisible(find.byKey(const ValueKey('color-5')), 200);
     expect(tester.takeException(), isNull);
   });
 }

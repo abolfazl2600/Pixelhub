@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:level_schema/level_schema.dart';
 
+import '../l10n/strings.dart';
+
 /// Read-only fixture rendering. No input, painting engine or progress in V1.
 class PixelArtPreview extends StatelessWidget {
   const PixelArtPreview({required this.level, super.key});
@@ -9,7 +11,11 @@ class PixelArtPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Semantics(
-    label: 'پیش‌نمایش پیکسلی ${level.title}، ${level.width} در ${level.height}',
+    label: context.strings.previewLabel(
+      level.titleFor(context.isPersian ? 'fa' : 'en'),
+      context.digits(level.width),
+      context.digits(level.height),
+    ),
     image: true,
     child: AspectRatio(
       aspectRatio: level.width / level.height,

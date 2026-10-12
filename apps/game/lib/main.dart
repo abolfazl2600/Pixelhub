@@ -5,5 +5,12 @@ import 'app/pixelhub_app.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(PixelhubApp(repository: AssetLevelRepository()));
+  final storage = LocalPreferences();
+  runApp(
+    PixelhubApp(
+      repository: AssetLevelRepository(),
+      progressRepository: storage,
+      preferences: storage,
+    ),
+  );
 }

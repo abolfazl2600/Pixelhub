@@ -1,111 +1,371 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:level_schema/level_schema.dart';
 
+import '../../app/language_button.dart';
 import '../../core/pixel_art_preview.dart';
+import '../../l10n/strings.dart';
+import 'painting_board.dart';
+import 'painting_controller.dart';
 
-class PaintingPreviewScreen extends StatelessWidget {
-  const PaintingPreviewScreen({required this.level, super.key});
-
+class PaintingPreviewScreen extends StatefulWidget {
+  const PaintingPreviewScreen({
+    required this.controller,
+    required this.onLanguageToggle,
+    super.key,
+  });
   static const route = '/painting';
-  final LevelDefinition level;
+  final PaintingController controller;
+  final VoidCallback onLanguageToggle;
+  @override
+  State<PaintingPreviewScreen> createState() => _PaintingPreviewScreenState();
+}
+
+class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
+  bool _moveMode = false;
+  bool _viewResult = false;
 
   @override
+  void didUpdateWidget(PaintingPreviewScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      _viewResult = false;
+      _moveMode = false;
+    }
+  }
+
+  Future<void> _reset() async {
+    final s = context.strings;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(s.resetTitle),
+        content: Text(s.resetMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(s.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(s.reset),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && mounted) {
+      setState(() => _viewResult = false);
+      widget.controller.reset();
+    }
+  }
+
+  void _back() {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go('/');
+    }
+  }
+
+  Widget _saveState() {
+    final s = context.strings;
+    final controller = widget.controller;
+    if (controller.saveStatus == SaveStatus.error) {
+      return TextButton.icon(
+        onPressed: controller.flush,
+        icon: const Icon(Icons.sync_problem),
+        label: Text(s.saveError),
+      );
+    }
+    return Semantics(
+      liveRegion: true,
+      child: Text(
+        controller.saveStatus == SaveStatus.saving ? s.saving : s.saved,
+        key: const ValueKey('save-status'),
+        style: const TextStyle(color: PixelTokens.muted, fontSize: 12),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+    listenable: widget.controller,
+    builder: (context, _) {
+      final s = context.strings;
+      final controller = widget.controller;
+      final session = controller.session;
+      final title = controller.level.titleFor(context.isPersian ? 'fa' : 'en');
+      final appBar = AppBar(
+        leading: IconButton(
+          tooltip: s.backHome,
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: _back,
+        ),
+        title: Text(
+          title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+        ),
+        actions: [LanguageButton(onToggle: widget.onLanguageToggle)],
+      );
+      if (controller.status == PaintingStatus.loading) {
+        return Scaffold(
+          appBar: appBar,
+          body: Center(
+            child: CircularProgressIndicator(semanticsLabel: s.loading),
+          ),
+        );
+      }
+      if (controller.status == PaintingStatus.error) {
+        return Scaffold(
+          appBar: appBar,
+          body: SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(s.progressLoadError),
+                    const SizedBox(height: 16),
+                    FilledButton(
+                      onPressed: controller.load,
+                      child: Text(s.retry),
+                    ),
+                    TextButton(onPressed: _reset, child: Text(s.reset)),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+      if (session!.isComplete && !_viewResult) {
+        return CompletionScreen(
+          controller: controller,
+          appBar: appBar,
+          saveState: _saveState(),
+          onView: () => setState(() => _viewResult = true),
+          onNext: () => context.go('/'),
+        );
+      }
+      return Scaffold(
+        appBar: appBar,
+        body: SafeArea(
+          top: false,
+          child: SingleChildScrollView(
+            key: const ValueKey('painting-scroll'),
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  '${s.progressSummary(context.digits(session.completedCount), context.digits(controller.level.cells.length))} · ${s.progressPercent(context.digits((session.fraction * 100).floor()))}',
+                  key: const ValueKey('progress-summary'),
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 8),
+                LinearProgressIndicator(
+                  value: session.fraction,
+                  minHeight: 6,
+                  semanticsLabel: s.colors,
+                ),
+                const SizedBox(height: 8),
+                _saveState(),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  alignment: WrapAlignment.center,
+                  children: [
+                    ChoiceChip(
+                      label: Text(s.paintMode),
+                      selected: !_moveMode,
+                      onSelected: (_) {
+                        controller.endStroke();
+                        setState(() => _moveMode = false);
+                      },
+                    ),
+                    ChoiceChip(
+                      label: Text(s.panMode),
+                      selected: _moveMode,
+                      onSelected: (_) {
+                        controller.endStroke();
+                        setState(() => _moveMode = true);
+                      },
+                    ),
+                    IconButton(
+                      tooltip: s.undo,
+                      onPressed: session.canUndo ? controller.undo : null,
+                      icon: const Icon(Icons.undo_rounded),
+                    ),
+                    IconButton(
+                      tooltip: s.reset,
+                      onPressed: _reset,
+                      icon: const Icon(Icons.restart_alt_rounded),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                PaintingBoard(
+                  key: ValueKey(controller.level.id),
+                  controller: controller,
+                  moveMode: _moveMode,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  s.colors,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (var i = 0; i < controller.level.palette.length; i++)
+                      Semantics(
+                        label: s.colorLabel(
+                          context.digits(i + 1),
+                          context.digits(session.remaining[i]),
+                        ),
+                        button: true,
+                        onTap: () => controller.selectColor(i),
+                        selected: session.selectedColor == i,
+                        child: ExcludeSemantics(
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              key: ValueKey('color-$i'),
+                              borderRadius: BorderRadius.circular(16),
+                              onTap: () => controller.selectColor(i),
+                              child: Container(
+                                width: 56,
+                                constraints: const BoxConstraints(
+                                  minHeight: 72,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: session.selectedColor == i
+                                        ? PixelTokens.green
+                                        : PixelTokens.backdrop,
+                                    width: session.selectedColor == i ? 2 : 1,
+                                  ),
+                                ),
+                                child: Column(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 16,
+                                      backgroundColor: Color(
+                                        controller.level.palette[i],
+                                      ),
+                                      child: Text(
+                                        context.digits(i + 1),
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          color:
+                                              ThemeData.estimateBrightnessForColor(
+                                                    Color(
+                                                      controller
+                                                          .level
+                                                          .palette[i],
+                                                    ),
+                                                  ) ==
+                                                  Brightness.dark
+                                              ? Colors.white
+                                              : PixelTokens.ink,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      context.digits(session.remaining[i]),
+                                      style: const TextStyle(fontSize: 11),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  s.gestureHelp,
+                  style: const TextStyle(
+                    color: PixelTokens.muted,
+                    fontSize: 12,
+                    height: 1.8,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
+
+class CompletionScreen extends StatelessWidget {
+  const CompletionScreen({
+    required this.controller,
+    required this.appBar,
+    required this.saveState,
+    required this.onView,
+    required this.onNext,
+    super.key,
+  });
+  final PaintingController controller;
+  final PreferredSizeWidget appBar;
+  final Widget saveState;
+  final VoidCallback onView;
+  final VoidCallback onNext;
+  @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      leading: IconButton(
-        tooltip: 'بازگشت به خانه',
-        icon: const Icon(Icons.arrow_forward_rounded),
-        onPressed: () {
-          if (context.canPop()) {
-            context.pop();
-          } else {
-            context.go('/');
-          }
-        },
-      ),
-      title: Text(
-        level.title,
-        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-      ),
-    ),
+    appBar: appBar,
     body: SafeArea(
       top: false,
       child: SingleChildScrollView(
-        key: const ValueKey('painting-scroll'),
-        padding: const EdgeInsets.all(PixelTokens.space),
+        padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Align(alignment: Alignment.center, child: PreviewBadge()),
-            const SizedBox(height: 24),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(PixelTokens.radius),
-              child: PixelArtPreview(level: level),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'رنگ‌های این تصویر',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+            const Icon(
+              Icons.celebration_rounded,
+              size: 48,
+              color: PixelTokens.green,
             ),
             const SizedBox(height: 16),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: [
-                for (var i = 0; i < level.palette.length; i++)
-                  Semantics(
-                    label: 'رنگ ${i + 1}، فقط برای نمایش',
-                    child: Container(
-                      width: 48,
-                      height: 48,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: Color(level.palette[i]),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: PixelTokens.ink.withValues(alpha: 0.15),
-                        ),
-                      ),
-                      child: Text(
-                        '${i + 1}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w800,
-                          color:
-                              ThemeData.estimateBrightnessForColor(
-                                    Color(level.palette[i]),
-                                  ) ==
-                                  Brightness.dark
-                              ? Colors.white
-                              : PixelTokens.ink,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
+            Text(
+              context.strings.completedTitle,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
             ),
-            const SizedBox(height: 28),
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: PixelTokens.lemon,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'به‌زودی، نوبت رنگ کردن است',
-                    style: TextStyle(fontWeight: FontWeight.w800),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'در نسخهٔ ۲ می‌توانید پیکسل‌ها را رنگ کنید. فعلاً این تصویر و پالت فقط برای نمایش هستند.',
-                    style: TextStyle(height: 1.8),
-                  ),
-                ],
-              ),
+            const SizedBox(height: 12),
+            Text(context.strings.completedMessage, textAlign: TextAlign.center),
+            const SizedBox(height: 24),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: PixelArtPreview(level: controller.level),
+            ),
+            const SizedBox(height: 16),
+            saveState,
+            const SizedBox(height: 16),
+            FilledButton(
+              onPressed: onNext,
+              child: Text(context.strings.nextPicture),
+            ),
+            TextButton(
+              onPressed: onView,
+              child: Text(context.strings.viewResult),
             ),
           ],
         ),

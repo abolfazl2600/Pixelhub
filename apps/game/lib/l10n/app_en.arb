@@ -1,0 +1,82 @@
+{
+  "@@locale": "en",
+  "headline": "Slow down.\nAdd some color.",
+  "welcome": "A little world, pixel by pixel. Pick a picture and make it yours.",
+  "demoBadge": "Playable demo 0.2",
+  "choosePicture": "Choose a picture",
+  "startPainting": "Start / resume coloring",
+  "offlineNote": "Pictures and progress stay on this device.",
+  "storageNote": "Clearing app or browser data removes your progress.",
+  "backHome": "Back to Home",
+  "loading": "Loading…",
+  "loadError": "Pictures could not be loaded.",
+  "retry": "Try again",
+  "notFound": "This page could not be found.",
+  "colors": "Colors",
+  "paintMode": "Paint",
+  "panMode": "Move / zoom",
+  "gestureHelp": "Drag in Paint mode to color. Switch to Move to pan. Pinch with two fingers to zoom.",
+  "undo": "Undo",
+  "reset": "Start over",
+  "resetTitle": "Reset this picture?",
+  "resetMessage": "This picture’s saved colors will be cleared. This cannot be undone.",
+  "cancel": "Cancel",
+  "saved": "Saved",
+  "saving": "Saving…",
+  "saveError": "Progress has not been saved yet. Please retry.",
+  "progressLoadError": "Saved progress could not be opened. Your stored data has been preserved.",
+  "wrongColor": "That cell needs a different color number.",
+  "completedTitle": "You did it! Your picture is complete.",
+  "completedMessage": "Pixel by pixel, you made a little work of art.",
+  "viewResult": "View result",
+  "nextPicture": "Choose another picture",
+  "zoomIn": "Zoom in",
+  "zoomOut": "Zoom out",
+  "fitCanvas": "Fit picture",
+  "canvasLabel": "Numbered coloring canvas",
+  "progressSummary": "Colored: {done} of {total}",
+  "@progressSummary": {
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "colorLabel": "Color {number}, {remaining} cells remaining",
+  "@colorLabel": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      },
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "previewLabel": "Picture {title}, {width} by {height}",
+  "@previewLabel": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "width": {
+        "type": "String"
+      },
+      "height": {
+        "type": "String"
+      }
+    }
+  },
+  "languageSaveError": "Your language choice could not be saved; it may change after reopening.",
+  "progressPercent": "{value}%",
+  "@progressPercent": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  }
+}

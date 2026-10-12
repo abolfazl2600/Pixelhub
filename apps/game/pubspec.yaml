@@ -1,7 +1,7 @@
 name: pixelhub
-description: Pixelhub V1 technical preview for Android and Web.
+description: Pixelhub bilingual pixel coloring game for Android and Web.
 publish_to: none
-version: 0.1.0+1
+version: 0.2.0+2
 
 environment:
   sdk: '>=3.9.0 <4.0.0'
@@ -10,6 +10,9 @@ environment:
 dependencies:
   cupertino_icons: 1.0.8
   go_router: 16.2.4
+  web: 1.1.1
+  painting_engine:
+    path: ../../packages/painting_engine
   flutter:
     sdk: flutter
   flutter_localizations:
@@ -23,6 +26,7 @@ dependencies:
   persistence:
     path: ../../packages/persistence
 
+  intl: 0.20.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -30,8 +34,9 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  generate: true
   assets:
-    - assets/levels/sunflower.json
+    - assets/levels/
   fonts:
     # Flutter Web's engine default is also local, avoiding its remote fallback.
     - family: Roboto

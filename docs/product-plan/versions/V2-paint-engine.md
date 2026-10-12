@@ -1,27 +1,27 @@
 # V2 — موتور اصلی نقاشی و ذخیره پیشرفت
 
-نسخه پیشنهادی: v0.2.0 | وضعیت هدف: Playable Demo | وابستگی: V1 و قرارداد Level schema.
+نسخه پیشنهادی: v0.2.0 | وضعیت: Playable Demo پیاده‌سازی شده؛ تأیید گوشی و پروفایل رندر در انتظار | وابستگی: V1 و قرارداد Level schema.
 
 ## هدف نسخه
 کاربر از ابتدا تا انتها یک تصویر پیکسلی شماره‌دار را رنگ کند و پیشرفت با بسته‌شدن اپ حفظ شود. همان مکانیک روی Android و Web کار کند.
 
 ## داخل محدوده (Must Have)
-- [ ] مدل LevelDefinition با schemaVersion، levelVersion، width/height، palette، cells، checksum.
-- [ ] Parser، validator و reject کردن فایل Level نامعتبر.
-- [ ] renderer grid و شماره‌های قابل خواندن.
-- [ ] پالت شماره‌دار + رنگ انتخاب‌شده.
-- [ ] tap برای رنگ‌کردن خانه معتبر، جلوگیری از خانه اشتباه.
-- [ ] drag stroke برای چند خانه، بدون جاانداختن سلول در حرکت سریع.
-- [ ] Pinch zoom در Android و Web touch؛ pan صحیح و bounds.
-- [ ] Mouse/pointer support برای Web desktop.
-- [ ] highlight شماره‌های هم‌رنگ و شمارنده خانه‌های باقی‌مانده.
-- [ ] Progress percentage، completion detector و Completion screen.
-- [ ] Undo حداقل چند اقدام اخیر؛ Reset با تأیید.
-- [ ] ذخیره محلی با adapter مناسب برای Android و Web، autosave.
-- [ ] resume پس از خروج ناگهانی و بازگشت.
-- [ ] مجموعه 10–20 نمونه Level مجاز برای تست.
-- [ ] تست‌های Unit و Widget برای Paint، Undo، finish و persistence.
-- [ ] پروفایل‌کردن عملکرد روی گوشی واقعی و مرورگر.
+- [x] مدل LevelDefinition با schemaVersion، levelVersion، width/height، palette، cells، checksum.
+- [x] Parser، validator و reject کردن فایل Level نامعتبر.
+- [x] renderer grid و شماره‌های قابل خواندن.
+- [x] پالت شماره‌دار + رنگ انتخاب‌شده.
+- [x] tap برای رنگ‌کردن خانه معتبر، جلوگیری از خانه اشتباه.
+- [x] drag stroke برای چند خانه، بدون جاانداختن سلول در حرکت سریع.
+- [x] Pinch zoom در Android و Web touch؛ pan صحیح و bounds.
+- [x] Mouse/pointer support برای Web desktop.
+- [x] highlight شماره‌های هم‌رنگ و شمارنده خانه‌های باقی‌مانده.
+- [x] Progress percentage، completion detector و Completion screen.
+- [x] Undo حداقل چند اقدام اخیر؛ Reset با تأیید.
+- [x] ذخیره محلی با adapter مناسب برای Android و Web، autosave.
+- [x] resume پس از خروج ناگهانی و بازگشت.
+- [x] مجموعه 10–20 نمونه Level مجاز برای تست.
+- [x] تست‌های Unit و Widget برای Paint، Undo، finish و persistence.
+- [ ] پروفایل‌کردن عملکرد روی گوشی واقعی و مرورگر (نتایج عملکرد Domain ابری جدا ثبت شده‌اند).
 
 ## خارج از محدوده (Must Not)
 - تبدیل تصویر کاربر، Crop یا Pixelation.
@@ -59,3 +59,8 @@
 
 ## انتقال به V3
 موتور باید هر LevelDefinition معتبر را مستقل از منبع تصویر اجرا کند؛ V3 فرایند تبدیل عکس را به همان فرمت خروجی وصل می‌کند.
+
+## تغییرات درخواستی مالک
+- فارسی/انگلیسی، پیش‌فرض فارسی و حفظ انتخاب زبان، در این نسخه پیاده‌سازی شده است.
+- ساخت APK فقط با workflow دستی انجام می‌شود؛ CI خودکار فقط وب و تست‌ها را اجرا می‌کند.
+- [گزارش اعتبارسنجی](../../qa/v2-validation.md) و [چک‌لیست دستی](../../qa/v2-manual-checklist.md) وضعیت واقعی آزمون‌ها را مشخص می‌کنند. تیک پیاده‌سازی جای تأیید انتشار یا گوشی واقعی را نمی‌گیرد.

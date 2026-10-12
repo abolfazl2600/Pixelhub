@@ -79,7 +79,8 @@ class MobileFrame extends StatelessWidget {
 }
 
 class PreviewBadge extends StatelessWidget {
-  const PreviewBadge({super.key});
+  const PreviewBadge({required this.label, super.key});
+  final String label;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -88,9 +89,9 @@ class PreviewBadge extends StatelessWidget {
       color: PixelTokens.lemon,
       borderRadius: BorderRadius.circular(10),
     ),
-    child: const Text(
-      'نسخهٔ آزمایشی ۰.۱',
-      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+    child: Text(
+      label,
+      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
     ),
   );
 }
