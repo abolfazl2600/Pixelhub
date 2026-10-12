@@ -1,12 +1,20 @@
-name: Build Android APK (manual)
+name: Build Android (manual: preview APK or signed Play AAB)
 
 on:
   workflow_dispatch:
     inputs:
       ref:
-        description: 'Optional commit SHA or tag; leave empty to build the selected branch'
+        description: 'Optional SHA or tag; leave empty to build the selected branch'
         required: false
         type: string
+      build_kind:
+        description: 'Select a preview APK or a Play-uploadable AAB (needs secrets)'
+        required: true
+        default: preview-apk
+        type: choice
+        options:
+          - preview-apk
+          - play-aab
 
 permissions:
   contents: read
@@ -14,7 +22,7 @@ permissions:
 jobs:
   android:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -41,17 +49,72 @@ jobs:
           channel: stable
           cache: true
       - run: bash tool/validate.sh
-      - run: flutter build apk --release --no-pub
+      - name: Decode private Play upload keystore
+        if: ${{ inputs.build_kind == 'play-aab' }}
+        env:
+          KEYSTORE_B64: ${{ secrets.PIXELHUB_UPLOAD_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.PIXELHUB_UPLOAD_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.PIXELHUB_UPLOAD_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.PIXELHUB_UPLOAD_KEY_PASSWORD }}
+        run: |
+          python3 - <<'PY'
+          import base64
+          import os
+          from pathlib import Path
+          if any(not os.environ.get(k) for k in (
+              'KEYSTORE_B64', 'STORE_PASSWORD', 'KEY_ALIAS', 'KEY_PASSWORD'
+          )):
+              raise SystemExit('Missing private Google Play upload signing secrets.')
+          output = Path(os.environ['RUNNER_TEMP']) / 'pixelhub-upload.jks'
+          output.write_bytes(base64.b64decode(os.environ['KEYSTORE_B64'], validate=True))
+          output.chmod(0o600)
+          PY
+      - name: Build preview APK (debug signed, NOT for Google Play)
+        if: ${{ inputs.build_kind == 'preview-apk' }}
+        run: flutter build apk --debug --no-pub
         working-directory: apps/game
+      - name: Build signed Google Play AAB
+        if: ${{ inputs.build_kind == 'play-aab' }}
+        working-directory: apps/game
+        env:
+          PIXELHUB_RELEASE_STORE_FILE: ${{ runner.temp }}/pixelhub-upload.jks
+          PIXELHUB_RELEASE_STORE_PASSWORD: ${{ secrets.PIXELHUB_UPLOAD_STORE_PASSWORD }}
+          PIXELHUB_RELEASE_KEY_ALIAS: ${{ secrets.PIXELHUB_UPLOAD_KEY_ALIAS }}
+          PIXELHUB_RELEASE_KEY_PASSWORD: ${{ secrets.PIXELHUB_UPLOAD_KEY_PASSWORD }}
+        run: |
+          test -s "$PIXELHUB_RELEASE_STORE_FILE"
+          test -n "$PIXELHUB_RELEASE_STORE_PASSWORD"
+          test -n "$PIXELHUB_RELEASE_KEY_ALIAS"
+          test -n "$PIXELHUB_RELEASE_KEY_PASSWORD"
+          flutter build appbundle --release --no-pub
       - name: Record artifact commit
         env:
           SOURCE_SHA: ${{ steps.source.outputs.sha }}
-        run: printf '%s\n' "$SOURCE_SHA" > apps/game/build/app/outputs/flutter-apk/commit.txt
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+          BUILD_KIND: ${{ inputs.build_kind }}
+        run: |
+          if [[ "$BUILD_KIND" == "play-aab" ]]; then
+            path=apps/game/build/app/outputs/bundle/release
+          else
+            path=apps/game/build/app/outputs/flutter-apk
+          fi
+          printf '%s\n' "$SOURCE_SHA" > "$path/commit.txt"
+      - name: Upload preview APK
+        if: ${{ inputs.build_kind == 'preview-apk' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: pixelhub-apk-v${{ steps.source.outputs.version }}-${{ steps.source.outputs.sha }}
+          name: pixelhub-preview-apk-v${{ steps.source.outputs.version }}-${{ steps.source.outputs.sha }}
           path: |
-            apps/game/build/app/outputs/flutter-apk/app-release.apk
+            apps/game/build/app/outputs/flutter-apk/app-debug.apk
             apps/game/build/app/outputs/flutter-apk/commit.txt
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload Play AAB
+        if: ${{ inputs.build_kind == 'play-aab' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: pixelhub-play-aab-v${{ steps.source.outputs.version }}-${{ steps.source.outputs.sha }}
+          path: |
+            apps/game/build/app/outputs/bundle/release/app-release.aab
+            apps/game/build/app/outputs/bundle/release/commit.txt
           if-no-files-found: error
           retention-days: 14
