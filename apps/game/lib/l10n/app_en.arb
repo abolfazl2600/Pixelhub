@@ -161,5 +161,39 @@
         "type": "String"
       }
     }
+  },
+  "profile": "Profile",
+  "guestMode": "Guest · local only",
+  "localStatsCaption": "Pictures and favorites are stored on this device. Sign-in is coming soon.",
+  "localProgressTitle": "Your local gallery",
+  "completedPictures": "Completed pictures",
+  "localToolTitle": "Tools and wallet",
+  "inventoryComingSoon": "Inventory, rewards and balances: coming soon. No purchases or coins are active.",
+  "coinComingSoon": "Coins · Coming soon",
+  "analyticsTitle": "On-device session diagnostics",
+  "sessionViews": "Screen opens",
+  "sessionHints": "Hints used this session",
+  "sessionBombs": "Bombs used this session",
+  "sessionErrors": "Framework errors this session",
+  "crashReportingDisabled": "Remote crash reporting: disabled. No error details or personal data are uploaded.",
+  "retentionComingSoon": "Retention and conversion analytics: coming soon; only in-memory counters are shown.",
+  "galleryResults": "{count} pictures match your filters",
+  "@galleryResults": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "homeCompleted": "{done} of {total} pictures completed on this device",
+  "@homeCompleted": {
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
   }
 }

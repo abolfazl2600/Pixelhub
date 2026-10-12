@@ -10,10 +10,12 @@ enum PaintingStatus { loading, ready, error }
 enum SaveStatus { saved, saving, error }
 
 class PaintingController extends ChangeNotifier {
-  PaintingController(this.level, this.repository);
+  PaintingController(this.level, this.repository, {this.onCompleted});
 
   final LevelDefinition level;
   final ProgressRepository repository;
+  final VoidCallback? onCompleted;
+  bool _completionReported = false;
   PaintingStatus status = PaintingStatus.loading;
   SaveStatus saveStatus = SaveStatus.saved;
   PaintingSession? session;
@@ -35,6 +37,7 @@ class PaintingController extends ChangeNotifier {
       final progress = await repository.read(level);
       if (_disposed || request != _loadGeneration) return;
       session = PaintingSession(level, progress: progress);
+      _completionReported = session!.isComplete;
       hintIndex = null;
       status = PaintingStatus.ready;
     } on Object {
@@ -116,12 +119,17 @@ class PaintingController extends ChangeNotifier {
   void reset() {
     session ??= PaintingSession(level);
     session!.reset();
+    _completionReported = false;
     hintIndex = null;
     status = PaintingStatus.ready;
     _changed();
   }
 
   void _changed() {
+    if (session!.isComplete && !_completionReported) {
+      _completionReported = true;
+      onCompleted?.call();
+    }
     _pendingSave = session!.snapshot;
     saveStatus = SaveStatus.saving;
     _notify();

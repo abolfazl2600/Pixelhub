@@ -161,5 +161,39 @@
         "type": "String"
       }
     }
+  },
+  "profile": "پروفایل",
+  "guestMode": "مهمان · فقط محلی",
+  "localStatsCaption": "تصاویر و علاقه‌مندی‌ها روی همین دستگاه هستند. ورود به حساب به‌زودی.",
+  "localProgressTitle": "گالری محلی شما",
+  "completedPictures": "تصاویر کامل‌شده",
+  "localToolTitle": "ابزارها و کیف پول",
+  "inventoryComingSoon": "موجودی، پاداش و اعتبار: به‌زودی. خرید و سکه فعلاً فعال نیستند.",
+  "coinComingSoon": "سکه · به‌زودی",
+  "analyticsTitle": "آمار همین نشست روی دستگاه",
+  "sessionViews": "باز شدن صفحه‌ها",
+  "sessionHints": "راهنماهای استفاده‌شده",
+  "sessionBombs": "بمب‌های استفاده‌شده",
+  "sessionErrors": "خطاهای چارچوب در این نشست",
+  "crashReportingDisabled": "گزارش خطای آنلاین: غیرفعال. هیچ جزئیات خطا یا اطلاعات شخصی ارسال نمی‌شود.",
+  "retentionComingSoon": "شاخص نگهداشت و تبدیل: به‌زودی؛ فعلاً فقط شمارنده‌های موقت همین نشست نمایش داده می‌شوند.",
+  "galleryResults": "{count} تصویر مطابق فیلتر شما",
+  "@galleryResults": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "homeCompleted": "{done} تصویر از {total} تصویر روی این دستگاه کامل شده",
+  "@homeCompleted": {
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
   }
 }

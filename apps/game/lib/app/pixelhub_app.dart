@@ -8,6 +8,8 @@ import 'package:level_schema/level_schema.dart';
 import 'package:persistence/persistence.dart';
 
 import '../features/home/home_screen.dart';
+import '../core/local_diagnostics.dart';
+import '../features/profile/profile_screen.dart';
 import '../features/gallery/artwork_screen.dart';
 import '../features/gallery/gallery_screen.dart';
 import '../features/gallery/library_controller.dart';
@@ -28,6 +30,7 @@ class PixelhubApp extends StatefulWidget {
     this.preferences,
     this.artworkRepository,
     this.initialRoute,
+    this.diagnostics,
     super.key,
   });
   final LevelRepository repository;
@@ -35,6 +38,7 @@ class PixelhubApp extends StatefulWidget {
   final PreferencesRepository? preferences;
   final ArtworkRepository? artworkRepository;
   final String? initialRoute;
+  final LocalDiagnostics? diagnostics;
 
   @override
   State<PixelhubApp> createState() => _PixelhubAppState();
@@ -46,6 +50,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
   late final ProgressRepository _progress;
   late final PreferencesRepository _preferences;
   late final LibraryController _library;
+  late final LocalDiagnostics _diagnostics;
   late final Listenable _routeChanges;
   final Map<String, PaintingController> _sessions = {};
   Locale _locale = const Locale('fa');
@@ -56,6 +61,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _diagnostics = widget.diagnostics ?? LocalDiagnostics();
     final local =
         widget.progressRepository == null || widget.preferences == null
         ? LocalPreferences()
@@ -79,6 +85,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     _routeChanges = Listenable.merge([_bootstrap, _library]);
     _router = GoRouter(
       initialLocation: widget.initialRoute,
+      observers: [LocalNavigationObserver(_diagnostics)],
       routes: [
         GoRoute(
           path: '/',
@@ -95,6 +102,10 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
             GoRoute(
               path: 'import',
               builder: (context, state) => _route(page: 'import'),
+            ),
+            GoRoute(
+              path: 'profile',
+              builder: (context, state) => _route(page: 'profile'),
             ),
             GoRoute(
               path: 'settings',
@@ -170,7 +181,11 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
 
   PaintingController _controller(LevelDefinition level) => _sessions
       .putIfAbsent('${level.id}:${level.contentVersion}:${level.checksum}', () {
-        final controller = PaintingController(level, _progress);
+        final controller = PaintingController(
+          level,
+          _progress,
+          onCompleted: _diagnostics.recordCompletion,
+        );
         controller.addListener(() {
           if (controller.status == PaintingStatus.ready) {
             _library.updateProgress(controller.session!.snapshot);
@@ -252,6 +267,13 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
           personal: page == 'my-gallery',
         );
       }
+      if (page == 'profile') {
+        return ProfileScreen(
+          library: _library,
+          diagnostics: _diagnostics,
+          onLanguageToggle: _toggleLanguage,
+        );
+      }
       if (page == 'settings') {
         return SettingsScreen(
           library: _library,
@@ -296,6 +318,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       }
       return PaintingPreviewScreen(
         controller: _controller(matches.first),
+        diagnostics: _diagnostics,
         onLanguageToggle: _toggleLanguage,
       );
     },
@@ -319,6 +342,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     _router.dispose();
     _bootstrap.dispose();
     _library.dispose();
+    if (widget.diagnostics == null) _diagnostics.dispose();
     for (final controller in _sessions.values) {
       controller.dispose();
     }

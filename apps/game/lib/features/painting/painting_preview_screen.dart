@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/language_button.dart';
+import '../../core/local_diagnostics.dart';
 import '../../core/pixel_art_preview.dart';
 import '../../l10n/strings.dart';
 import '../gallery/export_button.dart';
@@ -13,10 +14,12 @@ class PaintingPreviewScreen extends StatefulWidget {
   const PaintingPreviewScreen({
     required this.controller,
     required this.onLanguageToggle,
+    required this.diagnostics,
     super.key,
   });
   static const route = '/painting';
   final PaintingController controller;
+  final LocalDiagnostics diagnostics;
   final VoidCallback onLanguageToggle;
   @override
   State<PaintingPreviewScreen> createState() => _PaintingPreviewScreenState();
@@ -29,6 +32,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
   void _bomb() {
     final count = widget.controller.useBomb();
     if (count == 0 || !mounted) return;
+    widget.diagnostics.recordBomb();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(context.strings.bombFilled(context.digits(count)))),
     );
@@ -41,6 +45,10 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
       _viewResult = false;
       _moveMode = false;
     }
+  }
+
+  void _hint() {
+    if (widget.controller.showHint() != null) widget.diagnostics.recordHint();
   }
 
   Future<void> _reset() async {
@@ -222,7 +230,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                         key: const ValueKey('hint-tool'),
                         onPressed: session.isComplete
                             ? null
-                            : controller.showHint,
+                            : _hint,
                         icon: const Icon(Icons.lightbulb_outline_rounded),
                         label: Text(s.hintTool),
                       ),
