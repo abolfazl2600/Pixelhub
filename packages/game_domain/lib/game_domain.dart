@@ -3,6 +3,8 @@ import 'dart:typed_data';
 
 import 'package:level_schema/level_schema.dart';
 
+export 'artwork.dart';
+
 abstract interface class LevelRepository {
   Future<LevelDefinition> loadPreview();
   Future<List<LevelDefinition>> loadLevels();

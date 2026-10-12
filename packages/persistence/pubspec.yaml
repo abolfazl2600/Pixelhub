@@ -1,5 +1,5 @@
 name: persistence
-description: Asset backed repositories for the Pixelhub V1 preview.
+description: Pixelhub catalog, progress, preferences and private artwork storage.
 publish_to: none
 version: 0.1.0
 environment:

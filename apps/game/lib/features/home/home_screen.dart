@@ -128,6 +128,33 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const SizedBox(height: 24),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: () => context.push('/gallery'),
+                    icon: const Icon(Icons.grid_view_rounded),
+                    label: Text(s.gallery),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: () => context.push('/my-gallery'),
+                    icon: const Icon(Icons.collections_outlined),
+                    label: Text(s.myGallery),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: () => context.push('/import'),
+                    icon: const Icon(Icons.add_photo_alternate_outlined),
+                    label: Text(s.importPhoto),
+                  ),
+                  TextButton.icon(
+                    onPressed: () => context.push('/settings'),
+                    icon: const Icon(Icons.settings_outlined),
+                    label: Text(s.settings),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
               Text(
                 s.offlineNote,
                 style: const TextStyle(color: PixelTokens.muted, height: 1.8),

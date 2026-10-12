@@ -12,6 +12,7 @@ class BootstrapController extends ChangeNotifier {
   BootstrapStatus status = BootstrapStatus.loading;
   LevelDefinition? level;
   List<LevelDefinition> levels = [];
+  Map<String, CatalogMetadata> metadata = {};
   bool _disposed = false;
   int _generation = 0;
 
@@ -21,9 +22,14 @@ class BootstrapController extends ChangeNotifier {
     notifyListeners();
     try {
       final result = await repository.loadLevels();
+      final source = repository;
+      final details = source is CatalogMetadataRepository
+          ? await source.loadMetadata()
+          : <String, CatalogMetadata>{};
       if (_disposed || generation != _generation) return;
       if (result.isEmpty) throw const FormatException('Empty level catalog.');
       levels = result;
+      metadata = details;
       level = result.first;
       status = BootstrapStatus.ready;
     } on Object {

@@ -8,7 +8,7 @@
 - Progressive enhancement: Backend و خدمات آنلاین به‌تدریج در نسخه‌های ۴ به بعد افزوده شوند.
 - Versioned data contracts: تمام تصاویر و پیشرفت‌ها Schema Version دارند.
 
-## ساختار هدف مخزن (بخش‌های V1 و V2 پیاده‌سازی شده؛ سایر اجزا مطابق milestone آینده)
+## ساختار هدف مخزن (بخش‌های V1، V2 و V3 در سورس پیاده‌سازی شده؛ سایر اجزا مطابق milestone آینده)
 ~~~
 Pixelhub/
   docs/product-plan/         # همین نقشه توسعه

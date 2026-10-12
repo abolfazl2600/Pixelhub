@@ -21,10 +21,10 @@ void main() {
   });
 
   test(
-    'all ten checksummed samples load, including 32, 64 and 128 grids',
+    'all forty checksummed pictures load, including 32, 64 and 128 grids',
     () async {
       final levels = await AssetLevelRepository().loadLevels();
-      expect(levels, hasLength(10));
+      expect(levels, hasLength(40));
       expect(
         levels.map((l) => l.width).toSet(),
         containsAll([16, 32, 64, 128]),

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../app/language_button.dart';
 import '../../core/pixel_art_preview.dart';
 import '../../l10n/strings.dart';
+import '../gallery/export_button.dart';
 import 'painting_board.dart';
 import 'painting_controller.dart';
 
@@ -359,6 +360,8 @@ class CompletionScreen extends StatelessWidget {
             const SizedBox(height: 16),
             saveState,
             const SizedBox(height: 16),
+            ExportButton(level: controller.level),
+            const SizedBox(height: 8),
             FilledButton(
               onPressed: onNext,
               child: Text(context.strings.nextPicture),

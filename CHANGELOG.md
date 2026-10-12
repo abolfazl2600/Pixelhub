@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.0 — local gallery and photo import (source implementation)
+
+- 40 original bundled pictures, category/tag metadata, bilingual search and artwork details.
+- My Gallery with favorites, in-progress/completed and private-picture filters; local library storage and confirmed deletion.
+- Private JPEG/PNG/WebP input, EXIF orientation normalization, square crop/rotation, 32/64/128 difficulty presets, controlled 2–24 color quantization and a preview before saving.
+- UUID-based personal schema-2 levels, saved locally with conversion metadata; original photos and location metadata are not persisted or uploaded.
+- Completed PNG export through Android's share sheet or Web download; bilingual About and confirmed local-data clearing.
+- Versioned public-resource offline packaging for Web, readiness/retry in Settings and updates after previous tabs close. Manual Android builds remain separate.
+- Owner workflow recorded in AGENTS.md: no local tests, analyzer, browser checks or builds, and no wait for CI. V3 runtime, offline, memory and device acceptance remain pending.
+
 ## 0.2.0 — playable local demo
 
 - Persian/English UI, default Persian, saved language selection, translated titles/digits and RTL/LTR layout.

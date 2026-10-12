@@ -8,3 +8,7 @@
 V1 fixtures carry `schemaVersion` and `contentVersion`. A production level checksum and migrations are part of the V2 contract; V1 has no saved sessions.
 
 V2 uses ten original geometric fixtures listed in `levels/catalog.json`, including `sunflower-v2.json` with a new content version. All are repository Apache-2.0 assets. Schema 2 SHA-256 canonical payload is defined in ADR 0002; existing versioned assets must remain immutable once published. No competitor art or generated-AI artwork is used.
+
+V3 expands the catalog to 40 pictures with 30 additional original geometric designs created for Pixelhub on 2026-10-12. The construction source is `tool/generate_catalog.py` (ellipses, polygons and lines); these assets use the repository Apache-2.0 license. `metadata.json` records nature/animals/objects/patterns/space categories and tags. Existing V2 level files are preserved. Artistic/device QA remains pending; the optional roadmap target of 80–120 is not claimed.
+
+Imported personal pictures are private local user content, excluded from repository assets and public offline caches. Only their converted grids are persisted; they inherit no public-content license from this catalog.

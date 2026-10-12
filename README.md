@@ -1,16 +1,28 @@
 # Pixelhub
 
-Pixelhub is a shared Flutter pixel-coloring game for Android and Web. V2 adds a playable numbered canvas, local progress and **Persian/English UI, with Persian as the default**. Desktop browsers keep the same centered mobile frame, at most 430 logical pixels wide.
+Pixelhub is a shared Flutter pixel-coloring game for Android and Web. V3 adds a local gallery, private photo conversion, PNG export and **Persian/English UI, with Persian as the default**. Desktop browsers keep the same centered mobile frame, at most 430 logical pixels wide.
 
 ## Play and language
 
-Pick one of ten original bundled pictures, then **Start / resume coloring**. Choose a numbered color and tap or drag over matching cells. A fast stroke fills the intervening matching cells. Wrong colors never count.
+Pick one of 40 original bundled pictures, then **Start / resume coloring**. Choose a numbered color and tap or drag over matching cells. A fast stroke fills the intervening matching cells. Wrong colors never count.
 
 Use **Move / zoom** to pan, pinch with two fingers to zoom, or use the zoom/fit buttons. Pinching does not paint. Undo reverts a whole stroke, with up to 50 recent strokes retained during the current session. Reset requires confirmation. A completion screen appears after every cell is colored, including background color 1.
 
 Use **English** / **فارسی** in the header to switch language. Text, direction, numbers, image titles and dialogs update together; the choice is remembered. A fresh installation starts in Persian regardless of the device/browser language.
 
 Progress is autosaved per picture/version: Android DataStore via SharedPreferencesAsync, or browser localStorage. Wait for **Saved** before closing; pending/failed writes are shown with retry. Interrupted writes can only guarantee the last acknowledged save. Browser/app data deletion or storage eviction removes local progress; there is no cloud backup or account yet. Undo history and viewport zoom are not persisted across process restarts.
+
+## Gallery, photos and export
+
+Open **Picture gallery** to browse categories or search Persian/English titles. Picture details show a preview, progress and favorites. **My gallery** filters in-progress, completed, favorite and personal pictures. Existing V2 progress stays in its original versioned records.
+
+Choose **Import a photo**, then a local JPEG, PNG or WebP. Still images only, at most 12 MiB, 12 million pixels and 6000 pixels per side. Orientation is normalized; use square crop positioning and 90-degree rotation, choose easy/normal/hard (32/64/128 grids), adjust the maximum colors (2–24), then create a preview. Changes invalidate the preview. **Save and color** persists the converted grid before starting a game.
+
+Photos are processed on this device. Original photos, file names and location metadata are not stored or uploaded. You can retain up to 20 personal pictures within a 2 MiB library document limit; storage failures are reported. Native processing uses an isolate; Web processing can briefly pause the UI. Names are user-provided, with a bilingual fallback. Personal artworks can be resumed, favorited or deleted with confirmation.
+
+Completed pictures offer **Export PNG / share**: Android opens its share sheet, Web downloads a crisp PNG, at most 1024 pixels on its longest side. **Settings** includes About, offline readiness/retry and confirmed clearing of Pixelhub progress, private pictures, favorites and language. Unrelated preferences and bundled pictures are preserved.
+
+Android's bundled catalog works without a content server. On the production Web artifact, wait for Settings' offline-ready message before relying on offline reopening; the first visit needs connectivity. A service worker caches only public app resources, fonts, CanvasKit and levels. Updates activate after previous tabs close. Private browsing, browser policy, quota or eviction can prevent offline availability. The development server lacks the generated offline manifest. This new behavior is implemented but has not been validated in this session.
 
 ## GitHub Actions: automatic Web, manual Android
 
@@ -24,6 +36,8 @@ The internal APK uses Android debug signing, is not a Play Store submission and 
 
 ## Development
 
+The owner requests code development without local tests, automated analysis, browser checks or builds, and without waiting for CI. This is recorded in [AGENTS.md](AGENTS.md). The optional validation/build commands below are for a later explicit request; automatic Web CI remains in place.
+
 Pinned tools: Flutter **3.35.7**, Dart **3.9.2**, JDK 17, Android API 36/build tools 35.0.0, NDK 27.0.12077973 and CMake 3.22.1. App and browser-tool lockfiles are committed. No app secrets or backend services are needed.
 
 In this cloud machine:
@@ -32,13 +46,14 @@ In this cloud machine:
 cd /workspace/Pixelhub
 bash tool/cloud_setup.sh       # install/refresh only when needed
 source tool/cloud_env.sh
-bash tool/validate.sh
+# Run tests/builds only when explicitly requested by the owner.
+# Optional preview, when requested:
 bash tool/run_web_cloud.sh 8081
 ```
 
 The Web launcher has an isolated Flutter configuration to avoid ADB discovery against the read-only cloud home. Normal Android builds remain enabled. It serves CanvasKit locally. Tools/caches live under `/workspace/.tools` and `/workspace/.cache`; use the existing isolated checkout, without creating a worktree.
 
-On another host, install the pinned SDKs, add Flutter to PATH, run `bash tool/validate.sh`, then `flutter run -d chrome` or `flutter run -d web-server --no-web-resources-cdn` from `apps/game`. Flutter generates localization classes from `apps/game/lib/l10n/app_fa.arb` and `app_en.arb` during dependency/build preparation; generated classes are ignored. Use `flutter gen-l10n` after editing translations.
+On another host, install the pinned SDKs, add Flutter to PATH, run `flutter pub get` in `apps/game`, then `flutter run -d chrome` or `flutter run -d web-server --no-web-resources-cdn` from `apps/game`. Flutter generates localization classes from `apps/game/lib/l10n/app_fa.arb` and `app_en.arb` during dependency/build preparation; generated classes are ignored. Use `flutter gen-l10n` after editing translations.
 
 ```bash
 # From the repository root:
@@ -69,7 +84,7 @@ npm test
 CHROMIUM_PATH=/usr/bin/chromium npm test
 ```
 
-The browser suite covers both languages, real localStorage writes, wrong-color rejection, fast strokes, Undo/Reset/completion, application recreation and refresh, history, large-grid zoom/pan and viewport constraints. Build resources/fonts are local; Web first download needs connectivity and offline browser reopening is not promised.
+The browser suite covers both languages, real localStorage writes, wrong-color rejection, fast strokes, Undo/Reset/completion, application recreation and refresh, history, large-grid zoom/pan and viewport constraints. Build resources/fonts are local; Web first download needs connectivity; V3 adds versioned public-resource caching for offline reopening once Settings reports readiness.
 
 ## Boundaries and evidence
 
@@ -80,6 +95,6 @@ The browser suite covers both languages, real localStorage writes, wrong-color r
 - `packages/design_system`: shared tokens, theme and mobile frame.
 - `apps/game`: localization, state, renderer and screens.
 
-[Product plan](docs/product-plan/README.md) · [V2 decisions](docs/adr/0002-v2-painting-and-localization.md) · [V2 validation](docs/qa/v2-validation.md) · [Manual checklist](docs/qa/v2-manual-checklist.md) · [Asset provenance](apps/game/assets/README.md) · [Changelog](CHANGELOG.md).
+[V3 decisions](docs/adr/0003-v3-private-gallery-and-import.md) · [V3 pending acceptance](docs/qa/v3-manual-checklist.md) · [Product plan](docs/product-plan/README.md) · [V2 decisions](docs/adr/0002-v2-painting-and-localization.md) · [V2 validation](docs/qa/v2-validation.md) · [Manual checklist](docs/qa/v2-manual-checklist.md) · [Asset provenance](apps/game/assets/README.md) · [Changelog](CHANGELOG.md).
 
-V2 has no photo import, online gallery, accounts/sync, ads, purchases or community. Physical-phone behavior/performance and current public deployment need separate verification; cloud builds and tests do not establish those release gates.
+V3 has no online gallery, accounts/sync, ads, purchases or community. V3 has not been tested or built locally under the owner’s workflow; no CI, public deployment, offline or physical-phone result is claimed. Prior V2 validation applies to its historical implementation only.

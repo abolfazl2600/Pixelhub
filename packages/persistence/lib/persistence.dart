@@ -5,7 +5,8 @@ import 'package:game_domain/game_domain.dart';
 import 'package:level_schema/level_schema.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-final class AssetLevelRepository implements LevelRepository {
+final class AssetLevelRepository
+    implements LevelRepository, CatalogMetadataRepository {
   AssetLevelRepository({AssetBundle? bundle}) : _bundle = bundle ?? rootBundle;
   final AssetBundle _bundle;
 
@@ -24,7 +25,7 @@ final class AssetLevelRepository implements LevelRepository {
   @override
   Future<List<LevelDefinition>> loadLevels() async {
     final decoded = jsonDecode(await _bundle.loadString(LevelAssets.catalog));
-    if (decoded is! List<Object?> || decoded.isEmpty || decoded.length > 20) {
+    if (decoded is! List<Object?> || decoded.isEmpty || decoded.length > 200) {
       throw const FormatException('Invalid local catalog.');
     }
     final result = <LevelDefinition>[];
@@ -39,11 +40,42 @@ final class AssetLevelRepository implements LevelRepository {
     }
     return List.unmodifiable(result);
   }
+
+  @override
+  Future<Map<String, CatalogMetadata>> loadMetadata() async {
+    final decoded =
+        jsonDecode(await _bundle.loadString('assets/levels/metadata.json'))
+            as Map<String, Object?>;
+    return Map.unmodifiable(
+      decoded.map((id, value) {
+        final data = value! as Map<String, Object?>;
+        final category = data['category']! as String;
+        if (!{
+          'nature',
+          'animals',
+          'objects',
+          'patterns',
+          'space',
+        }.contains(category)) {
+          throw const FormatException('Invalid catalog category.');
+        }
+        return MapEntry(
+          id,
+          CatalogMetadata(
+            category: category,
+            tags: List.unmodifiable(
+              (data['tags']! as List<Object?>).cast<String>(),
+            ),
+          ),
+        );
+      }),
+    );
+  }
 }
 
 /// Native: Android DataStore. Web: localStorage. No cached read of progress.
 final class LocalPreferences
-    implements ProgressRepository, PreferencesRepository {
+    implements ProgressRepository, PreferencesRepository, ArtworkRepository {
   LocalPreferences({SharedPreferencesAsync? preferences})
     : _preferences = preferences ?? SharedPreferencesAsync();
   final SharedPreferencesAsync _preferences;
@@ -84,14 +116,55 @@ final class LocalPreferences
 
   @override
   Future<void> writeLanguage(String language) =>
-      _preferences.setString('pixelhub.language', language);
+      _enqueue(() => _preferences.setString('pixelhub.language', language));
+
+  Future<void> _enqueue(Future<void> Function() operation) {
+    final result = _writes.then((_) => operation());
+    _writes = result.catchError((Object _) {});
+    return result;
+  }
+
+  @override
+  Future<ArtworkLibrary> readLibrary() async {
+    await _writes;
+    final source = await _preferences.getString('pixelhub.library.v1');
+    if (source == null) return ArtworkLibrary();
+    return ArtworkLibrary.fromJson(jsonDecode(source) as Map<String, Object?>);
+  }
+
+  @override
+  Future<void> writeLibrary(ArtworkLibrary library) {
+    final source = jsonEncode(library.toJson());
+    if (utf8.encode(source).length > 2 * 1024 * 1024) {
+      return Future<void>.error(
+        const FormatException('Local library capacity reached.'),
+      );
+    }
+    return _enqueue(
+      () => _preferences.setString('pixelhub.library.v1', source),
+    );
+  }
+
+  @override
+  Future<void> removeProgress(LevelDefinition level) =>
+      _enqueue(() => _preferences.remove(_key(level.id, level.contentVersion)));
+
+  @override
+  Future<void> clearPixelhubData() => _enqueue(() async {
+    // Do not clear unrelated plugin/application preferences on the same origin.
+    final keys = await _preferences.getKeys();
+    for (final key in keys.where((key) => key.startsWith('pixelhub.'))) {
+      await _preferences.remove(key);
+    }
+  });
 }
 
 /// Explicit ephemeral adapter for tests. Production always injects LocalPreferences.
 final class MemoryPreferences
-    implements ProgressRepository, PreferencesRepository {
+    implements ProgressRepository, PreferencesRepository, ArtworkRepository {
   final Map<String, ProgressSnapshot> _records = {};
   String? language;
+  ArtworkLibrary _library = ArtworkLibrary();
   String _key(String id, int version) => '$id:$version';
   @override
   Future<ProgressSnapshot?> read(LevelDefinition level) async =>
@@ -106,5 +179,24 @@ final class MemoryPreferences
   @override
   Future<void> writeLanguage(String value) async {
     language = value;
+  }
+
+  @override
+  Future<ArtworkLibrary> readLibrary() async => _library;
+  @override
+  Future<void> writeLibrary(ArtworkLibrary library) async {
+    _library = library;
+  }
+
+  @override
+  Future<void> removeProgress(LevelDefinition level) async {
+    _records.remove(_key(level.id, level.contentVersion));
+  }
+
+  @override
+  Future<void> clearPixelhubData() async {
+    _records.clear();
+    _library = ArtworkLibrary();
+    language = null;
   }
 }

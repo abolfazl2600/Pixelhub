@@ -1,0 +1,272 @@
+{
+  "sunflower": {
+    "category": "nature",
+    "tags": [
+      "nature"
+    ]
+  },
+  "heart": {
+    "category": "patterns",
+    "tags": [
+      "patterns"
+    ]
+  },
+  "rainbow": {
+    "category": "nature",
+    "tags": [
+      "nature"
+    ]
+  },
+  "moon": {
+    "category": "space",
+    "tags": [
+      "space"
+    ]
+  },
+  "tree": {
+    "category": "nature",
+    "tags": [
+      "nature"
+    ]
+  },
+  "star": {
+    "category": "space",
+    "tags": [
+      "space"
+    ]
+  },
+  "gem": {
+    "category": "patterns",
+    "tags": [
+      "patterns"
+    ]
+  },
+  "cat": {
+    "category": "animals",
+    "tags": [
+      "animals"
+    ]
+  },
+  "house": {
+    "category": "objects",
+    "tags": [
+      "objects"
+    ]
+  },
+  "planet": {
+    "category": "space",
+    "tags": [
+      "space"
+    ]
+  },
+  "flower": {
+    "category": "nature",
+    "tags": [
+      "nature",
+      "flower"
+    ]
+  },
+  "tulip": {
+    "category": "nature",
+    "tags": [
+      "nature",
+      "tulip"
+    ]
+  },
+  "cactus": {
+    "category": "nature",
+    "tags": [
+      "nature",
+      "cactus"
+    ]
+  },
+  "mountain": {
+    "category": "nature",
+    "tags": [
+      "nature",
+      "mountain"
+    ]
+  },
+  "leaf": {
+    "category": "nature",
+    "tags": [
+      "nature",
+      "leaf"
+    ]
+  },
+  "mushroom": {
+    "category": "nature",
+    "tags": [
+      "nature",
+      "mushroom"
+    ]
+  },
+  "apple": {
+    "category": "nature",
+    "tags": [
+      "nature",
+      "apple"
+    ]
+  },
+  "cherry": {
+    "category": "nature",
+    "tags": [
+      "nature",
+      "cherry"
+    ]
+  },
+  "watermelon": {
+    "category": "nature",
+    "tags": [
+      "nature",
+      "watermelon"
+    ]
+  },
+  "butterfly": {
+    "category": "animals",
+    "tags": [
+      "animals",
+      "butterfly"
+    ]
+  },
+  "bird": {
+    "category": "animals",
+    "tags": [
+      "animals",
+      "bird"
+    ]
+  },
+  "fish": {
+    "category": "animals",
+    "tags": [
+      "animals",
+      "fish"
+    ]
+  },
+  "turtle": {
+    "category": "animals",
+    "tags": [
+      "animals",
+      "turtle"
+    ]
+  },
+  "fox": {
+    "category": "animals",
+    "tags": [
+      "animals",
+      "fox"
+    ]
+  },
+  "bunny": {
+    "category": "animals",
+    "tags": [
+      "animals",
+      "bunny"
+    ]
+  },
+  "owl": {
+    "category": "animals",
+    "tags": [
+      "animals",
+      "owl"
+    ]
+  },
+  "dog": {
+    "category": "animals",
+    "tags": [
+      "animals",
+      "dog"
+    ]
+  },
+  "bee": {
+    "category": "animals",
+    "tags": [
+      "animals",
+      "bee"
+    ]
+  },
+  "rocket": {
+    "category": "space",
+    "tags": [
+      "space",
+      "rocket"
+    ]
+  },
+  "saturn": {
+    "category": "space",
+    "tags": [
+      "space",
+      "saturn"
+    ]
+  },
+  "ufo": {
+    "category": "space",
+    "tags": [
+      "space",
+      "ufo"
+    ]
+  },
+  "comet": {
+    "category": "space",
+    "tags": [
+      "space",
+      "comet"
+    ]
+  },
+  "sun": {
+    "category": "space",
+    "tags": [
+      "space",
+      "sun"
+    ]
+  },
+  "snowflake": {
+    "category": "patterns",
+    "tags": [
+      "patterns",
+      "snowflake"
+    ]
+  },
+  "umbrella": {
+    "category": "objects",
+    "tags": [
+      "objects",
+      "umbrella"
+    ]
+  },
+  "cup": {
+    "category": "objects",
+    "tags": [
+      "objects",
+      "cup"
+    ]
+  },
+  "book": {
+    "category": "objects",
+    "tags": [
+      "objects",
+      "book"
+    ]
+  },
+  "kite": {
+    "category": "objects",
+    "tags": [
+      "objects",
+      "kite"
+    ]
+  },
+  "sailboat": {
+    "category": "objects",
+    "tags": [
+      "objects",
+      "sailboat"
+    ]
+  },
+  "diamond": {
+    "category": "patterns",
+    "tags": [
+      "patterns",
+      "diamond"
+    ]
+  }
+}
