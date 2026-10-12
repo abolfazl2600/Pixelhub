@@ -40,6 +40,7 @@ flutter:
   generate: true
   assets:
     - assets/levels/
+    - assets/brand/pixelhub_mark.png
   fonts:
     # Flutter Web's engine default is also local, avoiding its remote fallback.
     - family: Roboto

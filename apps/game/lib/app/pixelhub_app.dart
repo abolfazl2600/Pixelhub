@@ -332,7 +332,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) => MaterialApp.router(
-    title: 'Pixelhub',
+    title: 'PixelHub',
     debugShowCheckedModeBanner: false,
     theme: PixelTokens.theme,
     locale: _locale,
@@ -367,14 +367,16 @@ class _SplashScreen extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
-                Icons.grid_view_rounded,
-                size: 56,
-                color: PixelTokens.green,
+              Image.asset(
+                'assets/brand/pixelhub_mark.png',
+                width: 88,
+                height: 88,
+                filterQuality: FilterQuality.none,
+                semanticLabel: 'PixelHub',
               ),
               const SizedBox(height: 16),
               const Text(
-                'Pixelhub',
+                'PixelHub',
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 24),
