@@ -8,7 +8,7 @@ cd apps/game
 flutter pub get --enforce-lockfile
 cd "$repo_root"
 # Print the exact formatter edits on failure, so source fixes are actionable.
-if ! dart --suppress-analytics format --output=none --set-exit-if-changed apps/game/lib apps/game/test packages; then
+if ! dart --suppress-analytics format --output=write --set-exit-if-changed apps/game/lib apps/game/test packages; then
   echo "Dart formatting differs from the committed source:" >&2
   git --no-pager diff -- apps/game/lib apps/game/test packages >&2
   exit 1
