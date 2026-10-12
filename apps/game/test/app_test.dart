@@ -1,4 +1,3 @@
-import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:persistence/persistence.dart';
@@ -83,7 +82,7 @@ void main() {
     const Size(1440, 900),
   ]) {
     testWidgets(
-      'same centered mobile frame at $viewport, safe scroll and back',
+      'full viewport frame at $viewport, safe scroll and back',
       (tester) async {
         tester.view.devicePixelRatio = 1;
         tester.view.physicalSize = viewport;
@@ -91,7 +90,7 @@ void main() {
         addTearDown(tester.view.resetDevicePixelRatio);
         await pumpAssetApp(tester);
         final frame = find.byKey(const ValueKey('mobile-frame'));
-        final width = viewport.width.clamp(0, PixelTokens.maxWidth);
+        final width = viewport.width;
         expect(tester.getSize(frame).width, width);
         expect(tester.getTopLeft(frame).dx, (viewport.width - width) / 2);
         await tester.scrollUntilVisible(

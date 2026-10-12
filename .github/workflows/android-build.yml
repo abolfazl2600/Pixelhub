@@ -87,6 +87,37 @@ jobs:
           test -n "$PIXELHUB_RELEASE_KEY_ALIAS"
           test -n "$PIXELHUB_RELEASE_KEY_PASSWORD"
           flutter build appbundle --release --no-pub
+      - name: Print Android package size breakdown
+        env:
+          BUILD_KIND: ${{ inputs.build_kind }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          from zipfile import ZipFile
+
+          kind = os.environ['BUILD_KIND']
+          path = (Path('apps/game/build/app/outputs/bundle/release/app-release.aab')
+                  if kind == 'play-aab'
+                  else Path('apps/game/build/app/outputs/flutter-apk/app-debug.apk'))
+          print(f'Artifact: {path}')
+          print(f'Package size: {path.stat().st_size / 1048576:.2f} MiB')
+          with ZipFile(path) as package:
+              entries = package.infolist()
+              compressed = sorted(entries, key=lambda item: item.compress_size, reverse=True)
+              print('Largest package entries (compressed MiB):')
+              for item in compressed[:12]:
+                  print(f'  {item.compress_size / 1048576:6.2f}  {item.filename}')
+              natives = {}
+              for item in entries:
+                  if item.filename.endswith('.so'):
+                      abi = next((part for part in item.filename.split('/')
+                                  if part in ('arm64-v8a','armeabi-v7a','x86_64')), 'other')
+                      natives[abi] = natives.get(abi, 0) + item.compress_size
+              print('Native libraries by ABI (compressed MiB):')
+              for abi, total in sorted(natives.items()):
+                  print(f'  {abi}: {total / 1048576:.2f}')
+          PY
       - name: Record artifact commit
         env:
           SOURCE_SHA: ${{ steps.source.outputs.sha }}

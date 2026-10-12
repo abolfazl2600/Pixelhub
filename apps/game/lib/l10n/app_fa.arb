@@ -154,7 +154,7 @@
       }
     }
   },
-  "bombFilled": "بمب {count} خانهٔ هم‌رنگ را رنگ کرد. امکان بازگردانی وجود دارد.",
+  "bombFilled": "بمب {count} خانهٔ هم‌رنگ را رنگ کرد.",
   "@bombFilled": {
     "placeholders": {
       "count": {

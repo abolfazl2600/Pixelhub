@@ -47,34 +47,18 @@ abstract final class PixelTokens {
   );
 }
 
-/// Applied outside the navigator so every route uses exactly the same frame.
+/// Fills the actual phone, tablet or Web viewport without blank side gutters.
 class MobileFrame extends StatelessWidget {
   const MobileFrame({required this.child, super.key});
 
   final Widget child;
 
   @override
-  Widget build(BuildContext context) => ColoredBox(
-    color: PixelTokens.backdrop,
-    child: Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: PixelTokens.maxWidth),
-        child: SizedBox(
-          key: const ValueKey('mobile-frame'),
-          width: double.infinity,
-          height: double.infinity,
-          child: MediaQuery(
-            data: MediaQuery.of(context).copyWith(
-              size: Size(
-                MediaQuery.sizeOf(context).width.clamp(0, PixelTokens.maxWidth),
-                MediaQuery.sizeOf(context).height,
-              ),
-            ),
-            child: child,
-          ),
-        ),
-      ),
-    ),
+  Widget build(BuildContext context) => SizedBox(
+    key: const ValueKey('mobile-frame'),
+    width: double.infinity,
+    height: double.infinity,
+    child: child,
   );
 }
 

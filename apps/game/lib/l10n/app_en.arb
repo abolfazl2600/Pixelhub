@@ -154,7 +154,7 @@
       }
     }
   },
-  "bombFilled": "Bomb colored {count} matching cells. Undo is available.",
+  "bombFilled": "Bomb colored {count} matching cells.",
   "@bombFilled": {
     "placeholders": {
       "count": {

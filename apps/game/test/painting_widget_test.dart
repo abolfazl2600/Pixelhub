@@ -138,7 +138,7 @@ void main() {
     },
   );
 
-  testWidgets('valid taps paint; wrong color does not paint; Undo reverts', (
+  testWidgets('valid taps paint; wrong color does not paint; Undo is hidden', (
     tester,
   ) async {
     final controller = await pumpPainting(tester);
@@ -151,9 +151,8 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(controller.session!.completedCount, 1);
-    await tester.tap(find.byTooltip('بازگردانی'));
-    await tester.pumpAndSettle();
-    expect(controller.session!.completedCount, 0);
+    expect(find.byTooltip('بازگردانی'), findsNothing);
+    expect(controller.session!.completedCount, 1);
   });
 
   testWidgets('Reset needs confirmation and cancels without losing progress', (

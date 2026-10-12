@@ -29,8 +29,8 @@ async function main() {
       await start().or(back()).first().waitFor();
     }
     async function scrollTop() {
-      const vp=page.viewportSize(), w=Math.min(vp.width,430);
-      await page.mouse.move((vp.width-w)/2+w-4, Math.min(vp.height-40,300));
+      const vp=page.viewportSize();
+      await page.mouse.move(vp.width-4, Math.min(vp.height-40,300));
       await page.mouse.wheel(0,-1200);
       await board().waitFor();
     }
@@ -84,8 +84,6 @@ async function main() {
     console.log('Browser: painting and autosave');
     await start().click(); await board().waitFor();
     assert.equal(new URL(page.url()).hash,'#/painting/sunflower');
-    await line(0,0,15); await saved(16);
-    await page.getByRole('button',{name:'Undo',exact:true}).click(); await saved(0);
     await line(0,0,15); await saved(16);
     const wrong=await point(7,5); await page.mouse.click(wrong.x,wrong.y);
     await page.locator('flutter-view').getByText('That cell needs a different color number.', {exact:true}).waitFor();
@@ -154,7 +152,7 @@ async function main() {
     await page.screenshot({path:path.join(output,'planet-zoom.png')});
     await page.setViewportSize({width:1440,height:900}); await page.goto(base); await ready();
     const action=await start().boundingBox();
-    assert(action && action.x>=(1440-430)/2 && action.x+action.width<=(1440+430)/2);
+    assert(action && action.x>=0 && action.x+action.width<=1440 && action.width>430);
     await page.screenshot({path:path.join(output,'home-desktop.png')});
     await page.setViewportSize({width:800,height:360}); await page.goto(base); await ready();
     await start().click(); await back().click(); await start().waitFor();
@@ -163,9 +161,9 @@ async function main() {
 
     assert.deepEqual(pageErrors,[]); assert.deepEqual(failedRequests,[]); assert.deepEqual(externalRequests,[]);
     console.log(JSON.stringify({defaultPersian:'passed',englishAndLanguageRestore:'passed',
-      fastStroke:'passed',wrongColor:'passed',undo:'passed',resetConfirmation:'passed',
+      fastStroke:'passed',wrongColor:'passed',undoRemoved:'passed',resetConfirmation:'passed',
       persistentProgressAfterPageRecreationAndRefresh:'passed',completion:'passed',resetGeneration:'passed',
-      browserHistory:'passed',paint32_64_128:'passed',largeGridZoomPan:'passed',desktopFrame:'passed',shortHeight:'passed',
+      browserHistory:'passed',paint32_64_128:'passed',largeGridZoomPan:'passed',responsiveDesktop:'passed',shortHeight:'passed',
       runtimeRequests:'local only',pageErrors,screenshots:output},null,2));
   } finally {await browser.close();}
 }

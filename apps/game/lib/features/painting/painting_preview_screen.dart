@@ -213,11 +213,6 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                       },
                     ),
                     IconButton(
-                      tooltip: s.undo,
-                      onPressed: session.canUndo ? controller.undo : null,
-                      icon: const Icon(Icons.undo_rounded),
-                    ),
-                    IconButton(
                       tooltip: s.reset,
                       onPressed: _reset,
                       icon: const Icon(Icons.restart_alt_rounded),

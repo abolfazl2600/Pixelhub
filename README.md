@@ -1,16 +1,16 @@
 # Pixelhub
 
-Pixelhub is a shared Flutter pixel-coloring game for Android and Web. V3 adds a local gallery, private photo conversion, PNG export and **Persian/English UI, with Persian as the default**. Desktop browsers keep the same centered mobile frame, at most 430 logical pixels wide.
+Pixelhub is a shared Flutter pixel-coloring game for Android and Web. V3 adds a local gallery, private photo conversion, PNG export and **Persian/English UI, with Persian as the default**. The layout fills phone, tablet and Web viewports; gallery cards adapt to available width.
 
 ## Play and language
 
 Pick one of 40 original bundled pictures, then **Start / resume coloring**. Choose a numbered color and tap or drag over matching cells. A fast stroke fills the intervening matching cells. Wrong colors never count.
 
-Use **Move / zoom** to pan, pinch with two fingers to zoom, or use the zoom/fit buttons. Pinching does not paint. Undo reverts a whole stroke, with up to 50 recent strokes retained during the current session. Reset requires confirmation. A completion screen appears after every cell is colored, including background color 1.
+Use **Move / zoom** to pan, pinch with two fingers to zoom, or use the zoom/fit buttons. Pinching does not paint. The user-facing Undo action has been removed; Reset still requires confirmation. The engine keeps internal reversible stroke tracking for gesture cancellation and backward compatibility. A completion screen appears after every cell is colored, including background color 1.
 
 Use **English** / **فارسی** in the header to switch language. Text, direction, numbers, image titles and dialogs update together; the choice is remembered. A fresh installation starts in Persian regardless of the device/browser language.
 
-Progress is autosaved per picture/version: Android DataStore via SharedPreferencesAsync, or browser localStorage. Wait for **Saved** before closing; pending/failed writes are shown with retry. Interrupted writes can only guarantee the last acknowledged save. Browser/app data deletion or storage eviction removes local progress; there is no cloud backup or account yet. Undo history and viewport zoom are not persisted across process restarts.
+Progress is autosaved per picture/version: Android DataStore via SharedPreferencesAsync, or browser localStorage. Wait for **Saved** before closing; pending/failed writes are shown with retry. Interrupted writes can only guarantee the last acknowledged save. Browser/app data deletion or storage eviction removes local progress; there is no cloud backup or account yet. Viewport zoom is not persisted across process restarts.
 
 ## Gallery, photos and export
 
@@ -89,7 +89,7 @@ npm test
 CHROMIUM_PATH=/usr/bin/chromium npm test
 ```
 
-The browser suite covers both languages, real localStorage writes, wrong-color rejection, fast strokes, Undo/Reset/completion, application recreation and refresh, history, large-grid zoom/pan and viewport constraints. Build resources/fonts are local; Web first download needs connectivity; V3 adds versioned public-resource caching for offline reopening once Settings reports readiness.
+The browser suite covers both languages, real localStorage writes, wrong-color rejection, fast strokes, Reset/completion, application recreation and refresh, history, large-grid zoom/pan and viewport constraints. Build resources/fonts are local; Web first download needs connectivity; V3 adds versioned public-resource caching for offline reopening once Settings reports readiness.
 
 ## Boundaries and evidence
 

@@ -230,9 +230,15 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 ),
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 96),
-                sliver: SliverList.separated(
+                sliver: SliverGrid.builder(
+                  gridDelegate:
+                      const SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: 540,
+                        mainAxisExtent: 176,
+                        mainAxisSpacing: 12,
+                        crossAxisSpacing: 12,
+                      ),
                   itemCount: levels.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final level = levels[index];
                     final count = library.completed(level);
@@ -261,6 +267,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
                                       level.titleFor(
                                         context.isPersian ? 'fa' : 'en',
                                       ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
                                         fontWeight: FontWeight.w700,
                                       ),
