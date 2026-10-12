@@ -126,4 +126,5 @@ void main() {
       expect(controller.hintIndex, isNull);
       expect(controller.session!.generation, 1);
     },
-  );}
+  );
+}
