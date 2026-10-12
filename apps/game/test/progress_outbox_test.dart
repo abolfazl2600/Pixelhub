@@ -137,7 +137,7 @@ void main() {
     final level = fixture();
     var queue = ProgressSyncOutbox(accountId: 'account-a');
     for (var i = 0; i < ProgressSyncOutbox.maxOperations; i++) {
-      final operationId = 'operation-' + i.toString().padLeft(5, '0');
+      final operationId = 'operation-${i.toString().padLeft(5, '0')}';
       queue = queue.enqueue(pending(level, id: operationId));
     }
     expect(queue.operations.length, ProgressSyncOutbox.maxOperations);
