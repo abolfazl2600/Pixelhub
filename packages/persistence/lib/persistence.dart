@@ -75,7 +75,11 @@ final class AssetLevelRepository
 
 /// Native: Android DataStore. Web: localStorage. No cached read of progress.
 final class LocalPreferences
-    implements ProgressRepository, PreferencesRepository, ArtworkRepository {
+    implements
+        ProgressRepository,
+        PreferencesRepository,
+        ArtworkRepository,
+        ProgressSyncOutboxRepository {
   LocalPreferences({SharedPreferencesAsync? preferences})
     : _preferences = preferences ?? SharedPreferencesAsync();
   final SharedPreferencesAsync _preferences;
@@ -110,6 +114,68 @@ final class LocalPreferences
     _writes = write.catchError((Object _) {});
     return write;
   }
+
+  String _outboxKey(String accountId) {
+    // The verified account scope is encoded in the key and the document.
+    ProgressSyncOutbox(accountId: accountId);
+    return 'pixelhub.sync.outbox.v1.' +
+        base64UrlEncode(utf8.encode(accountId));
+  }
+
+  Future<ProgressSyncOutbox> _loadOutbox(String accountId) async {
+    final source = await _preferences.getString(_outboxKey(accountId));
+    if (source == null) return ProgressSyncOutbox(accountId: accountId);
+    if (utf8.encode(source).length > ProgressSyncOutbox.maxBytes) {
+      throw const FormatException('Sync outbox is too large.');
+    }
+    final decoded = jsonDecode(source);
+    if (decoded is! Map<String, Object?>) {
+      throw const FormatException('Invalid sync outbox document.');
+    }
+    return ProgressSyncOutbox.fromJson(decoded, accountId: accountId);
+  }
+
+  @override
+  Future<ProgressSyncOutbox> readSyncOutbox(String accountId) async {
+    await _writes;
+    return _loadOutbox(accountId);
+  }
+
+  /// Serialize outbox writes with existing painting and clear-data writes.
+  /// Storage failures propagate and never count as a successful enqueue.
+  Future<ProgressSyncOutbox> _changeOutbox(
+    String accountId,
+    ProgressSyncOutbox Function(ProgressSyncOutbox) transform,
+  ) {
+    final result = _writes.then((_) async {
+      final current = await _loadOutbox(accountId);
+      final next = transform(current);
+      if (identical(next, current)) return current;
+      final source = jsonEncode(next.toJson());
+      if (utf8.encode(source).length > ProgressSyncOutbox.maxBytes) {
+        throw const FormatException('Sync outbox capacity reached.');
+      }
+      await _preferences.setString(_outboxKey(accountId), source);
+      return next;
+    });
+    _writes = result.then<void>((_) {}, onError: (Object _) {});
+    return result;
+  }
+
+  @override
+  Future<ProgressSyncOutbox> enqueueSyncOperation(
+    String accountId,
+    PendingProgressSync operation,
+  ) => _changeOutbox(accountId, (outbox) => outbox.enqueue(operation));
+
+  @override
+  Future<ProgressSyncOutbox> acknowledgeSyncOperation(
+    String accountId,
+    String operationId,
+  ) => _changeOutbox(
+    accountId,
+    (outbox) => outbox.acknowledge(operationId),
+  );
 
   @override
   Future<String?> readLanguage() => _preferences.getString('pixelhub.language');
@@ -161,11 +227,41 @@ final class LocalPreferences
 
 /// Explicit ephemeral adapter for tests. Production always injects LocalPreferences.
 final class MemoryPreferences
-    implements ProgressRepository, PreferencesRepository, ArtworkRepository {
+    implements
+        ProgressRepository,
+        PreferencesRepository,
+        ArtworkRepository,
+        ProgressSyncOutboxRepository {
   final Map<String, ProgressSnapshot> _records = {};
   String? language;
   ArtworkLibrary _library = ArtworkLibrary();
+  final Map<String, ProgressSyncOutbox> _outboxes = {};
   String _key(String id, int version) => '$id:$version';
+
+  @override
+  Future<ProgressSyncOutbox> readSyncOutbox(String accountId) async =>
+      _outboxes[accountId] ?? ProgressSyncOutbox(accountId: accountId);
+
+  @override
+  Future<ProgressSyncOutbox> enqueueSyncOperation(
+    String accountId,
+    PendingProgressSync operation,
+  ) async {
+    final updated = (await readSyncOutbox(accountId)).enqueue(operation);
+    _outboxes[accountId] = updated;
+    return updated;
+  }
+
+  @override
+  Future<ProgressSyncOutbox> acknowledgeSyncOperation(
+    String accountId,
+    String operationId,
+  ) async {
+    final updated = (await readSyncOutbox(accountId)).acknowledge(operationId);
+    _outboxes[accountId] = updated;
+    return updated;
+  }
+
   @override
   Future<ProgressSnapshot?> read(LevelDefinition level) async =>
       _records[_key(level.id, level.contentVersion)];
@@ -196,6 +292,7 @@ final class MemoryPreferences
   @override
   Future<void> clearPixelhubData() async {
     _records.clear();
+    _outboxes.clear();
     _library = ArtworkLibrary();
     language = null;
   }

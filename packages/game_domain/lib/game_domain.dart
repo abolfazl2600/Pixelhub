@@ -6,6 +6,7 @@ import 'package:level_schema/level_schema.dart';
 export 'artwork.dart';
 
 part 'progress_sync.dart';
+part 'progress_outbox.dart';
 
 abstract interface class LevelRepository {
   Future<LevelDefinition> loadPreview();

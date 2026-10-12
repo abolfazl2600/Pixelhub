@@ -34,8 +34,27 @@ The backend must commit progress and the operationId/result ledger in a **single
 
 Keep every guest progress record until the server has acknowledged a reconciled copy. Do not automatically union a guest snapshot into an existing registered record with a different reset history. Initial upload of a previously absent record can import its bits under server generation 0; any existing remote record with an unproven baseline requires a dedicated migration choice. V3 artwork/photo originals must never be included in progress sync; private converted grids remain local unless a separate explicit consent flow is developed.
 
+## Local FIFO outbox (source implementation)
+
+`ProgressSyncOutbox` stores only immutable, validated progress bitsets under an
+authenticated account scope. Android/Web preferences use distinct keys by
+account. Reads reject damaged or wrong-account documents rather than clearing
+or silently overwriting them. The queue caps at 128 operations and 512 KiB.
+
+The storage adapter serializes all mutations with local writes and propagates
+write failures. A future coordinator must durably enqueue *before* sending,
+retransmit the exact operation ID and body on an uncertain response, and
+acknowledge only the queue head on a validated `applied` or `unchanged`
+response. Never acknowledge on a timeout or stale-generation conflict.
+
+The current outbox deliberately does not coalesce resets that might already
+have reached the server. Before activation, implement generation rebasing for
+multiple pending offline resets, a bounded-queue recovery path, verified
+account switching, transactional server deduplication and conflict UX.
+Clearing all Pixelhub data intentionally clears stored queues.
+
 ## Verification and rollout
 
-The pure merge implementation and regression test source cover concurrent painting, replayed paint, Reset, late stale writes, competing resets, repeated offline resets, invalid level identity and future revisions. They were added **without running tests or a build** per the repository owner's development workflow. The database schema, idempotency ledger, authentication provider, offline outbox, app UI and cross-device tests are not implemented by this change.
+The pure merge implementation and regression test source cover concurrent painting, replayed paint, Reset, late stale writes, competing resets, repeated offline resets, invalid level identity and future revisions. They were added **without running tests or a build** per the repository owner's development workflow. The database has an unexecuted migration draft and the account-scoped offline outbox has Android/Web source adapters and regression test source. The backend transaction handler, authenticated network coordinator, auth provider, app sync UI and cross-device validation remain unimplemented.
 
 Do not advertise V4 cloud sync as available until authorization, transactional idempotency and the full Android-to-Web acceptance gate pass.

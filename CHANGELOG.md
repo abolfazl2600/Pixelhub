@@ -6,7 +6,8 @@
 - Reset creates a new authoritative generation; stale offline paints cannot resurrect cleared cells. Concurrent ordinary painting retains the union of completed cells.
 - Added source-level regression tests and ADR 0004 covering conflict handling, stable operation IDs and required server-side transactional deduplication.
 - Drafted a versioned OpenAPI contract and additive PostgreSQL V4 identity/progress/idempotency schema with row-level scope policies; neither is deployed or executed.
-- This is **not** account login or cloud sync: backend, secure authentication, guest migration, sync queue and cross-device validation remain pending. No local tests or builds were run for this development increment.
+- Added a bounded per-account, durable FIFO outbox using Android/Web local preferences, strict JSON bitset validation, explicit acknowledgments and an in-memory testing adapter. No network sync is enabled.
+- This is **not** account login or cloud sync: backend, secure authentication, guest migration, network coordination and cross-device validation remain pending. No local tests or builds were run for this development increment.
 
 ## 0.3.0 — local gallery and photo import (source implementation)
 
