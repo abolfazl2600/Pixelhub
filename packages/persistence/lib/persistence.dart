@@ -153,7 +153,7 @@ final class LocalPreferences
           result[level.id] = PixelAnimation.fromJson(value, level);
         }
       } on Object {
-        // Corrupt optional animation must not hide a downloadable picture.
+        // Damaged optional animation must not hide a painting.
       }
     }
     return Map.unmodifiable(result);
@@ -164,7 +164,6 @@ final class LocalPreferences
     LevelDefinition level,
     PixelAnimation animation,
   ) => _enqueue(() async {
-    // Verify that a sidecar cannot be installed on a different picture.
     animation.pixelsFor(level, 0);
     final value = jsonEncode(animation.toJson());
     if (utf8.encode(value).length > 2 * 1024 * 1024) {
@@ -178,7 +177,17 @@ final class LocalPreferences
 
   @override
   Future<void> removeDownloadedAnimation(String id) => _enqueue(() async {
-    if (!RegExp(r'^online-[a-z0-9-]+
+    if (!RegExp(r'^online-[a-z0-9-]+$').hasMatch(id)) {
+      throw const FormatException('Invalid animation ID.');
+    }
+    await _preferences.remove('pixelhub.online.animation.$id');
+  });
+
+  @override
+  Future<void> saveDownloadedLevel(
+    LevelDefinition level, {
+    required String category,
+  }) => _enqueue(() async {
     if (!level.id.startsWith('online-') ||
         !onlinePictureCategories.contains(category)) {
       throw const FormatException('Invalid online level or category.');
@@ -435,6 +444,7 @@ final class MemoryPreferences
   Future<void> removeDownloadedAnimation(String id) async {
     _downloadAnimations.remove(id);
   }
+
   String _key(String id, int version) => '$id:$version';
 
   @override
@@ -553,369 +563,6 @@ final class MemoryPreferences
     _downloads.clear();
     _downloadCategories.clear();
     _downloadAnimations.clear();
-    _library = ArtworkLibrary();
-    language = null;
-    recentArtworkId = null;
-  }
-}
-).hasMatch(id)) {
-      throw const FormatException('Invalid animation ID.');
-    }
-    await _preferences.remove('pixelhub.online.animation.$id');
-  });
-
-  @override
-  Future<void> saveDownloadedLevel(
-    LevelDefinition level, {
-    required String category,
-  }) => _enqueue(() async {
-    if (!level.id.startsWith('online-') ||
-        !onlinePictureCategories.contains(category)) {
-      throw const FormatException('Invalid online level or category.');
-    }
-    final key = 'pixelhub.online.level.${level.id}';
-    final payload = jsonEncode(level.toJson());
-    if (utf8.encode(payload).length > 262144) {
-      throw const FormatException('Downloaded picture too large.');
-    }
-    final source = await _preferences.getString('pixelhub.online.index.v1');
-    final ids = source == null
-        ? <String>[]
-        : (jsonDecode(source) as List<Object?>).cast<String>().toList();
-    if (!ids.contains(level.id)) {
-      if (ids.length >= 1000) {
-        throw const FormatException('Downloaded picture quota reached.');
-      }
-      ids.add(level.id);
-    }
-    await _preferences.setString(key, payload);
-    // Write category before the index so a newly listed download is complete.
-    await _preferences.setString(
-      'pixelhub.online.category.${level.id}',
-      category,
-    );
-    await _preferences.setString('pixelhub.online.index.v1', jsonEncode(ids));
-  });
-
-  @override
-  Future<void> saveDownloadedCategory(String id, String category) =>
-      _enqueue(() async {
-        if (!RegExp(r'^online-[a-z0-9-]+$').hasMatch(id) ||
-            !onlinePictureCategories.contains(category)) {
-          throw const FormatException('Invalid online category metadata.');
-        }
-        final source = await _preferences.getString('pixelhub.online.index.v1');
-        if (source == null ||
-            !(jsonDecode(source) as List<Object?>).contains(id)) {
-          return; // Never recreate metadata for an already-deleted download.
-        }
-        await _preferences.setString('pixelhub.online.category.$id', category);
-      });
-
-  @override
-  Future<void> removeDownloadedLevel(String id) => _enqueue(() async {
-    if (!RegExp(r'^online-[a-z0-9-]+$').hasMatch(id)) {
-      throw const FormatException('Invalid downloaded level ID.');
-    }
-    final source = await _preferences.getString('pixelhub.online.index.v1');
-    final ids = source == null
-        ? <String>[]
-        : (jsonDecode(source) as List<Object?>).cast<String>().toList();
-    await _preferences.remove('pixelhub.online.level.$id');
-    await _preferences.remove('pixelhub.online.category.$id');
-    ids.remove(id);
-    await _preferences.setString('pixelhub.online.index.v1', jsonEncode(ids));
-  });
-
-  @override
-  Future<ProgressSnapshot?> read(LevelDefinition level) async {
-    await _writes;
-    final source = await _preferences.getString(
-      _key(level.id, level.contentVersion),
-    );
-    if (source == null) return null;
-    final decoded = jsonDecode(source);
-    if (decoded is! Map<String, Object?>) {
-      throw const FormatException('Invalid saved progress.');
-    }
-    return ProgressSnapshot.fromJson(decoded, level);
-  }
-
-  @override
-  Future<void> write(ProgressSnapshot progress) {
-    final source = jsonEncode(progress.toJson());
-    final write = _writes.then(
-      (_) => _preferences.setString(
-        _key(progress.levelId, progress.levelVersion),
-        source,
-      ),
-    );
-    // Preserve failure for the caller, while keeping the storage queue usable.
-    _writes = write.catchError((Object _) {});
-    return write;
-  }
-
-  String _outboxKey(String accountId) {
-    // The verified account scope is encoded in the key and the document.
-    ProgressSyncOutbox(accountId: accountId);
-    final encoded = base64UrlEncode(utf8.encode(accountId));
-    return 'pixelhub.sync.outbox.v1.$encoded';
-  }
-
-  Future<ProgressSyncOutbox> _loadOutbox(String accountId) async {
-    final source = await _preferences.getString(_outboxKey(accountId));
-    if (source == null) return ProgressSyncOutbox(accountId: accountId);
-    if (utf8.encode(source).length > ProgressSyncOutbox.maxBytes) {
-      throw const FormatException('Sync outbox is too large.');
-    }
-    final decoded = jsonDecode(source);
-    if (decoded is! Map<String, Object?>) {
-      throw const FormatException('Invalid sync outbox document.');
-    }
-    return ProgressSyncOutbox.fromJson(decoded, accountId: accountId);
-  }
-
-  @override
-  Future<ProgressSyncOutbox> readSyncOutbox(String accountId) async {
-    await _writes;
-    return _loadOutbox(accountId);
-  }
-
-  /// Serialize outbox writes with existing painting and clear-data writes.
-  /// Storage failures propagate and never count as a successful enqueue.
-  Future<ProgressSyncOutbox> _changeOutbox(
-    String accountId,
-    ProgressSyncOutbox Function(ProgressSyncOutbox) transform,
-  ) {
-    final result = _writes.then((_) async {
-      final current = await _loadOutbox(accountId);
-      final next = transform(current);
-      if (identical(next, current)) return current;
-      final source = jsonEncode(next.toJson());
-      if (utf8.encode(source).length > ProgressSyncOutbox.maxBytes) {
-        throw const FormatException('Sync outbox capacity reached.');
-      }
-      await _preferences.setString(_outboxKey(accountId), source);
-      return next;
-    });
-    _writes = result.then<void>((_) {}, onError: (Object _) {});
-    return result;
-  }
-
-  @override
-  Future<ProgressSyncOutbox> enqueueSyncOperation(
-    String accountId,
-    PendingProgressSync operation,
-  ) => _changeOutbox(accountId, (outbox) => outbox.enqueue(operation));
-
-  @override
-  Future<ProgressSyncOutbox> acknowledgeSyncOperation(
-    String accountId,
-    String operationId,
-  ) => _changeOutbox(accountId, (outbox) => outbox.acknowledge(operationId));
-
-  @override
-  Future<String?> readLanguage() => _preferences.getString('pixelhub.language');
-
-  @override
-  Future<void> writeLanguage(String language) =>
-      _enqueue(() => _preferences.setString('pixelhub.language', language));
-
-  @override
-  Future<String?> readRecentArtworkId() async {
-    await _writes;
-    final id = await _preferences.getString('pixelhub.recentArtwork.v1');
-    return id != null && RegExp(r'^[a-z0-9-]+$').hasMatch(id) ? id : null;
-  }
-
-  @override
-  Future<void> writeRecentArtworkId(String id) {
-    if (!RegExp(r'^[a-z0-9-]+$').hasMatch(id)) {
-      return Future<void>.error(const FormatException('Invalid artwork ID.'));
-    }
-    return _enqueue(
-      () => _preferences.setString('pixelhub.recentArtwork.v1', id),
-    );
-  }
-
-  @override
-  Future<void> clearRecentArtworkId() =>
-      _enqueue(() => _preferences.remove('pixelhub.recentArtwork.v1'));
-
-  Future<void> _enqueue(Future<void> Function() operation) {
-    final result = _writes.then((_) => operation());
-    _writes = result.catchError((Object _) {});
-    return result;
-  }
-
-  @override
-  Future<ArtworkLibrary> readLibrary() async {
-    await _writes;
-    final source = await _preferences.getString('pixelhub.library.v1');
-    if (source == null) return ArtworkLibrary();
-    return ArtworkLibrary.fromJson(jsonDecode(source) as Map<String, Object?>);
-  }
-
-  @override
-  Future<void> writeLibrary(ArtworkLibrary library) {
-    final source = jsonEncode(library.toJson());
-    if (utf8.encode(source).length > 2 * 1024 * 1024) {
-      return Future<void>.error(
-        const FormatException('Local library capacity reached.'),
-      );
-    }
-    return _enqueue(
-      () => _preferences.setString('pixelhub.library.v1', source),
-    );
-  }
-
-  @override
-  Future<void> removeProgress(LevelDefinition level) =>
-      _enqueue(() => _preferences.remove(_key(level.id, level.contentVersion)));
-
-  @override
-  Future<void> clearPixelhubData() => _enqueue(() async {
-    // Do not clear unrelated plugin/application preferences on the same origin.
-    final keys = await _preferences.getKeys();
-    for (final key in keys.where((key) => key.startsWith('pixelhub.'))) {
-      await _preferences.remove(key);
-    }
-  });
-}
-
-/// Explicit ephemeral adapter for tests. Production always injects LocalPreferences.
-final class MemoryPreferences
-    implements
-        ProgressRepository,
-        PreferencesRepository,
-        RecentArtworkRepository,
-        ArtworkRepository,
-        ProgressSyncOutboxRepository,
-        OnlineLevelStorage,
-        OnlineAnimationStorage {
-  final Map<String, ProgressSnapshot> _records = {};
-  String? language;
-  String? recentArtworkId;
-  ArtworkLibrary _library = ArtworkLibrary();
-  final Map<String, ProgressSyncOutbox> _outboxes = {};
-  final Map<String, LevelDefinition> _downloads = {};
-  final Map<String, String> _downloadCategories = {};
-  String _key(String id, int version) => '$id:$version';
-
-  @override
-  Future<List<LevelDefinition>> readDownloadedLevels() async =>
-      List.unmodifiable(_downloads.values);
-
-  @override
-  Future<Map<String, String>> readDownloadedCategories() async =>
-      Map.unmodifiable(_downloadCategories);
-
-  @override
-  Future<void> saveDownloadedLevel(
-    LevelDefinition level, {
-    required String category,
-  }) async {
-    if (!level.id.startsWith('online-') ||
-        !onlinePictureCategories.contains(category)) {
-      throw const FormatException('Invalid online level or category.');
-    }
-    _downloads[level.id] = level;
-    _downloadCategories[level.id] = category;
-  }
-
-  @override
-  Future<void> saveDownloadedCategory(String id, String category) async {
-    if (!onlinePictureCategories.contains(category)) {
-      throw const FormatException('Invalid online category.');
-    }
-    if (_downloads.containsKey(id)) _downloadCategories[id] = category;
-  }
-
-  @override
-  Future<void> removeDownloadedLevel(String id) async {
-    _downloads.remove(id);
-    _downloadCategories.remove(id);
-  }
-
-  @override
-  Future<ProgressSyncOutbox> readSyncOutbox(String accountId) async =>
-      _outboxes[accountId] ?? ProgressSyncOutbox(accountId: accountId);
-
-  @override
-  Future<ProgressSyncOutbox> enqueueSyncOperation(
-    String accountId,
-    PendingProgressSync operation,
-  ) async {
-    // Keep this read-modify-write synchronous before returning the Future:
-    // concurrent test enqueues must not both read the same stale snapshot.
-    final current =
-        _outboxes[accountId] ?? ProgressSyncOutbox(accountId: accountId);
-    final updated = current.enqueue(operation);
-    _outboxes[accountId] = updated;
-    return updated;
-  }
-
-  @override
-  Future<ProgressSyncOutbox> acknowledgeSyncOperation(
-    String accountId,
-    String operationId,
-  ) async {
-    final current =
-        _outboxes[accountId] ?? ProgressSyncOutbox(accountId: accountId);
-    final updated = current.acknowledge(operationId);
-    _outboxes[accountId] = updated;
-    return updated;
-  }
-
-  @override
-  Future<ProgressSnapshot?> read(LevelDefinition level) async =>
-      _records[_key(level.id, level.contentVersion)];
-  @override
-  Future<void> write(ProgressSnapshot progress) async {
-    _records[_key(progress.levelId, progress.levelVersion)] = progress;
-  }
-
-  @override
-  Future<String?> readLanguage() async => language;
-  @override
-  Future<void> writeLanguage(String value) async {
-    language = value;
-  }
-
-  @override
-  Future<String?> readRecentArtworkId() async => recentArtworkId;
-
-  @override
-  Future<void> writeRecentArtworkId(String id) async {
-    if (!RegExp(r'^[a-z0-9-]+$').hasMatch(id)) {
-      throw const FormatException('Invalid artwork ID.');
-    }
-    recentArtworkId = id;
-  }
-
-  @override
-  Future<void> clearRecentArtworkId() async {
-    recentArtworkId = null;
-  }
-
-  @override
-  Future<ArtworkLibrary> readLibrary() async => _library;
-  @override
-  Future<void> writeLibrary(ArtworkLibrary library) async {
-    _library = library;
-  }
-
-  @override
-  Future<void> removeProgress(LevelDefinition level) async {
-    _records.remove(_key(level.id, level.contentVersion));
-  }
-
-  @override
-  Future<void> clearPixelhubData() async {
-    _records.clear();
-    _outboxes.clear();
-    _downloads.clear();
-    _downloadCategories.clear();
     _library = ArtworkLibrary();
     language = null;
     recentArtworkId = null;
