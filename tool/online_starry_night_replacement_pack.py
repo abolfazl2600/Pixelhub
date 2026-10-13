@@ -12,7 +12,7 @@ import zipfile
 from online_release import checksum, compact, png, validate_new_pack_manifest
 from online_starter_pack import Sprite
 
-ID = "online-starry-night-detailed"
+ID = "online-classic-starry-night-detailed"
 
 
 def draw():
