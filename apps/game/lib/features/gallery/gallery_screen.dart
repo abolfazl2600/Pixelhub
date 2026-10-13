@@ -123,7 +123,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
       if (previewContext != null && previewContext.mounted) {
         Navigator.of(previewContext).pop();
       }
-      if (mounted) context.push('/painting/${picture.id}');
+      if (mounted) context.go('/painting/${picture.id}');
     } else {
       ScaffoldMessenger.of(
         context,
