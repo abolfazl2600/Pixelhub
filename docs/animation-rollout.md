@@ -31,6 +31,7 @@ Recipes live in `tool/animation_batches/`; each batch records up to ten pictures
 | Online 12 | classic-wheatfield-crows, classic-sleeping-gypsy, mona-lisa, starry-night, the-scream, sunflowers, girl-pearl, great-wave, object-alarm-clock, object-vintage-camera | glimmer, pulse, ripple, sway |
 | Online 13 | object-headphones, object-electric-guitar, object-retro-radio, object-desk-lamp, object-porcelain-teapot, object-rainbow-umbrella, object-backpack, object-running-sneaker, object-city-bicycle, object-sailboat | float, glimmer, pulse, sway |
 | Online 14 | object-steam-train, object-travel-suitcase, object-treasure-chest, object-hourglass, object-telescope, object-microscope, object-toy-robot, object-game-controller, object-typewriter, object-camping-lantern | float, glimmer, pulse, sway |
+| Online 15 | object-world-globe, object-magnetic-compass, object-paint-palette, object-book-stack, object-birthday-gift, object-table-fan, object-sewing-machine, object-fountain-pen, playful-smiling-sun, playful-rainbow-cloud | flap, float, spin, sway |
 
 CI and Pages results must be checked before describing a batch as verified or
 published. Online animation assets are generated during Pages publication and
