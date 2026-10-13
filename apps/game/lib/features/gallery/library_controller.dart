@@ -53,8 +53,9 @@ class LibraryController extends ChangeNotifier {
                 incoming.contentVersion == current.contentVersion &&
                 incoming.checksum == current.checksum,
           ),
-        ))
+        )) {
       return;
+    }
     onlineLevels = levels
         .where((level) => !catalog.any((original) => original.id == level.id))
         .toList(growable: false);
