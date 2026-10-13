@@ -225,8 +225,7 @@ class OnlineCatalogController extends ChangeNotifier {
           }
         }
       }
-    } on Object catch (error) {
-      debugPrint('Online catalog check failed: $error');
+    } on Object {
       if (_disposed) return;
       status = OnlineCatalogStatus.error;
     }
