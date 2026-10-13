@@ -41,10 +41,10 @@ MockClient serverFor(LevelDefinition level, {String category = 'animals'}) {
   });
   return MockClient((request) async {
     if (request.url.path.endsWith('/catalog.json')) {
-      return http.Response(metadata, 200);
+      return http.Response.bytes(utf8.encode(metadata), 200);
     }
     if (request.url.path.endsWith('/${level.id}-v1.json')) {
-      return http.Response(body, 200);
+      return http.Response.bytes(utf8.encode(body), 200);
     }
     return http.Response('Not found', 404);
   });
