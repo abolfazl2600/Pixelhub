@@ -162,6 +162,20 @@ jobs:
               --notes "Ten original nature color-by-number designs: Mountain Sunset, Alpine Lake and Forest, Forest Waterfall, Countryside Cottage, Golden Desert Dunes, Tropical Beach, Misty Forest, River and Stone Bridge, Moonlit Mountain Night, and Wildflower Valley. Bilingual JSON levels and PNG previews are Release assets, not shipped in the APK or tracked by Git." \
               --latest=false
           fi
+      - name: Publish redesigned Azadi Tower v2 and ten Persian architectural abstractions
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-iran-z-architecture-11-v1 >/dev/null 2>&1; then
+            python3 tool/online_iran_architecture_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-iran-z-architecture-11-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: redesigned Azadi Tower and ten Persian architectural patterns" \
+              --notes "Original numbered pixel art: redesigned 80x80 Azadi Tower (existing ID, levelVersion 2) and ten new 64x64 abstract Persian architecture studies (muqarnas, dome, orsi glass, eslimi, arches, windcatcher, shamsa, mosque, brickwork and iwan). Bilingual schema-v2 levels, catalog and PNG previews live in Release assets, not Git or APK. Tag sorts after the immutable initial Iranian landmarks release for deterministic upgraded ID selection." \
+              --latest=false
+          fi
       - name: Download release packs and assemble online catalog
         env:
           GH_TOKEN: ${{ github.token }}

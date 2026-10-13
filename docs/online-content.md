@@ -264,6 +264,65 @@ history: `python3 tool/online_landscapes_pack.py /tmp/content.zip`.
 Do not overwrite published version 1 assets; future design edits must use
 a new version.
 
+## Persian architectural abstractions and the redesigned Azadi Tower
+
+`tool/online_iran_architecture_pack.py` authors **11 original numbered
+pixel-art levels** for the online gallery. Ten are new 64×64 abstract
+interpretations of Iranian architecture. The eleventh is a full redesign of
+Azadi Tower at 80×80 pixels (6,400 colorable cells), with a taller,
+recognizable open pointed arch, four flared marble pier faces, glazed
+turquoise lattice details and perspective plaza paving.
+
+**Azadi Tower upgrade:** keep the existing stable ID
+`online-iran-azadi-tower` and publish `levelVersion: 2`, with a new
+checksum and `levels/online-iran-azadi-tower-v2.json` / corresponding PNG.
+The original `levelVersion: 1` remains immutable in its earlier Release.
+The online assembler selects the newer version because its tag sorts after
+the original Iranian landmarks tag.
+
+| Stable level ID | Version | فارسی | English | Grid |
+| --- | --- | --- | --- | --- |
+| `online-iran-azadi-tower` | **2** | برج آزادی - بازطراحی | Azadi Tower - Redesigned | **80×80** |
+| `online-iran-abstract-muqarnas` | 1 | مقرنس فیروزه‌ای | Turquoise Muqarnas | 64×64 |
+| `online-iran-abstract-dome` | 1 | گنبد هندسی ایرانی | Geometric Persian Dome | 64×64 |
+| `online-iran-abstract-orsi` | 1 | پنجره ارسی رنگی | Colorful Orsi Window | 64×64 |
+| `online-iran-abstract-eslimi` | 1 | کاشی‌کاری اسلیمی | Arabesque Tile Scroll | 64×64 |
+| `online-iran-abstract-arches` | 1 | قوس‌های متقارن ایرانی | Receding Persian Arches | 64×64 |
+| `online-iran-abstract-windcatcher` | 1 | هندسه بادگیر | Windcatcher Geometry | 64×64 |
+| `online-iran-abstract-shamsa` | 1 | شمسه هشت‌پر | Eight-Point Shamsa | 64×64 |
+| `online-iran-abstract-mosque` | 1 | نمای هندسی مسجد ایرانی | Symmetrical Persian Mosque | 64×64 |
+| `online-iran-abstract-brickwork` | 1 | آجر و کاشی ایرانی | Persian Brick and Tile Weave | 64×64 |
+| `online-iran-abstract-iwan` | 1 | ایوان و حیاط ایرانی | Abstract Iwan Courtyard | 64×64 |
+
+The content pack uses the existing **`patterns`** category, bilingual
+titles, unique stable IDs for new drawings, palette-indexed cells and
+canonical SHA-256 level checksums. After a successful main Web CI run, the
+Pages workflow creates the immutable Release
+[`pixelhub-content-iran-z-architecture-11-v1`](https://github.com/abolfazl2600/Pixelhub/releases/tag/pixelhub-content-iran-z-architecture-11-v1)
+with a downloadable `content.zip` containing 11 schema-v2 JSON levels,
+11 PNG previews and one bilingual manifest. These assets are never placed
+in Git history or bundled into an APK. The tag intentionally sorts
+lexicographically *after* `pixelhub-content-iran-landmarks-10-v1`,
+because the existing `online_release.py assemble` implementation requires
+ascending per-ID versions while reading alphabetically sorted pack paths.
+
+The previous **55 unique online pictures** are preserved. The target
+aggregate is **65 unique pictures**, not 66, because Azadi v2 supersedes
+the v1 listing with the same ID. Both underlying numbered version assets
+remain available. Web CI, Release creation and GitHub Pages deployment
+must finish successfully before the upgraded gallery is publicly visible;
+committing this code does not confirm its deployment.
+
+**Important for prior downloads:** previously downloaded Azadi v1 levels
+are not replaced automatically on a device. Local progress is versioned;
+users may need to remove/re-download that level to fetch v2. No Android
+rebuild is required for newly downloaded online artwork.
+
+Reproducible release-only command:
+`python3 tool/online_iran_architecture_pack.py /tmp/content.zip`.
+Never modify a published release in place; use a new level version and
+Release tag for subsequent revisions.
+
 ## Publish more pictures
 
 1. Create one or more schema-v2 level JSON files with unique `online-...`
