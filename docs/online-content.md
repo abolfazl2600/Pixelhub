@@ -180,6 +180,49 @@ To generate outside the repository:
 `python3 tool/online_animals_pack.py /tmp/content.zip`.
 Never overwrite version 1 after publication.
 
+## Iranian landmarks: ten architectural pixel-art pictures
+
+Ten new **original, hand-designed simplified pixel-art representations** of
+famous Iranian structures are authored in `tool/online_iran_landmarks_pack.py`.
+The drawing instructions, not their JSON/PNG art files, are committed to Git.
+
+After a successful main-branch Web CI run, the existing GitHub Pages workflow
+creates the immutable
+[`pixelhub-content-iran-landmarks-10-v1`](https://github.com/abolfazl2600/Pixelhub/releases/tag/pixelhub-content-iran-landmarks-10-v1)
+Release with one `content.zip`. It contains ten schema-v2 numbered JSON levels,
+ten PNG previews and a bilingual `catalog.json`. All ten are 48×48 grids for
+architectural detail.
+
+| Stable level ID | فارسی | English | Canvas |
+| --- | --- | --- | --- |
+| `online-iran-persepolis` | تخت جمشید | Persepolis | 48×48 |
+| `online-iran-azadi-tower` | برج آزادی | Azadi Tower | 48×48 |
+| `online-iran-milad-tower` | برج میلاد | Milad Tower | 48×48 |
+| `online-iran-imam-mosque` | مسجد امام اصفهان | Imam Mosque, Isfahan | 48×48 |
+| `online-iran-sio-se-pol` | سی‌وسه‌پل | Si-o-se-pol Bridge | 48×48 |
+| `online-iran-nasir-ol-molk` | مسجد نصیرالملک | Nasir ol-Molk Mosque | 48×48 |
+| `online-iran-arg-e-bam` | ارگ بم | Bam Citadel | 48×48 |
+| `online-iran-hafez-tomb` | آرامگاه حافظ | Tomb of Hafez | 48×48 |
+| `online-iran-amir-chakhmaq` | میدان امیرچخماق | Amir Chakhmaq Complex | 48×48 |
+| `online-iran-golestan-palace` | کاخ گلستان | Golestan Palace | 48×48 |
+
+**Compatibility:** All ten entries use the existing `patterns` category.
+Currently deployed clients only accept a fixed category allowlist and would
+reject an unrecognized new `landmarks` category. The distinct Persian and
+English titles identify each Iranian monument without a client update.
+
+The five existing content packs and their 35 online picture IDs stay intact.
+The expected overall catalog total becomes **45 pictures** once all six
+Release packs are successfully published and Pages deployment finishes.
+Neither code commit nor Release generation alone establishes public
+availability. No Android APK/AAB rebuild is needed to fetch compatible new
+online content.
+
+To create the ZIP independently, without placing generated pictures in the
+working tree:
+`python3 tool/online_iran_landmarks_pack.py /tmp/content.zip`.
+Published level IDs and versions must remain immutable.
+
 ## Publish more pictures
 
 1. Create one or more schema-v2 level JSON files with unique `online-...`
