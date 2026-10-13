@@ -110,7 +110,6 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-
   testWidgets('downloaded online picture opens painting immediately', (
     tester,
   ) async {
@@ -150,9 +149,8 @@ void main() {
         ),
         GoRoute(
           path: '/painting/:id',
-          builder: (context, state) => Scaffold(
-            body: Text('Painting ${state.pathParameters['id']}'),
-          ),
+          builder: (context, state) =>
+              Scaffold(body: Text('Painting ${state.pathParameters['id']}')),
         ),
       ],
     );
@@ -177,7 +175,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(online.downloaded.map((value) => value.id), contains(level.id));
     expect(find.text('Painting ${level.id}'), findsOneWidget);
-    expect(router.routeInformationProvider.value.uri.path, '/painting/${level.id}');
+    expect(
+      router.routeInformationProvider.value.uri.path,
+      '/painting/${level.id}',
+    );
     expect(tester.takeException(), isNull);
   });
 
