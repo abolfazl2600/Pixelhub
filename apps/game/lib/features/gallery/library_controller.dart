@@ -14,6 +14,7 @@ class LibraryController extends ChangeNotifier {
   LibraryStatus status = LibraryStatus.loading;
   List<LevelDefinition> catalog = [];
   List<LevelDefinition> onlineLevels = [];
+  Map<String, String> onlineCategories = {};
   Map<String, CatalogMetadata> metadata = {};
   final Map<String, ProgressSnapshot> progress = {};
   final Set<String> damagedProgress = {};
@@ -42,6 +43,12 @@ class LibraryController extends ChangeNotifier {
     metadata = details;
     _notify();
     unawaited(_readProgress());
+  }
+
+  void setOnlineCategories(Map<String, String> categories) {
+    if (mapEquals(onlineCategories, categories)) return;
+    onlineCategories = Map.unmodifiable(categories);
+    _notify();
   }
 
   void setDownloadedOnline(List<LevelDefinition> levels) {
@@ -131,7 +138,7 @@ class LibraryController extends ChangeNotifier {
 
   String category(LevelDefinition level) => level.id.startsWith('private-')
       ? 'personal'
-      : metadata[level.id]?.category ?? 'patterns';
+      : onlineCategories[level.id] ?? metadata[level.id]?.category ?? 'patterns';
   bool isFavorite(LevelDefinition level) =>
       library.favorites.contains(level.id);
   int completed(LevelDefinition level) =>
@@ -206,6 +213,7 @@ class LibraryController extends ChangeNotifier {
     await repository.clearPixelhubData();
     library = ArtworkLibrary();
     onlineLevels = [];
+    onlineCategories = {};
     progress.clear();
     damagedProgress.clear();
     _revisions.clear();
