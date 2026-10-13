@@ -5,6 +5,7 @@ import 'package:level_schema/level_schema.dart';
 
 import '../../core/pixel_art_preview.dart';
 import '../../l10n/strings.dart';
+import 'artwork_categories.dart';
 import 'library_controller.dart';
 import 'online_catalog_controller.dart';
 
@@ -13,6 +14,8 @@ String categoryLabel(BuildContext context, String category) =>
       'nature' => context.strings.categoryNature,
       'animals' => context.strings.categoryAnimals,
       'objects' => context.strings.categoryObjects,
+      'masterpieces' => context.strings.categoryMasterpieces,
+      'persian_architecture' => context.strings.categoryPersianArchitecture,
       'space' => context.strings.categorySpace,
       'personal' => context.strings.categoryPersonal,
       _ => context.strings.categoryPatterns,
@@ -263,31 +266,36 @@ class _GalleryScreenState extends State<GalleryScreen> {
                         onChanged: (value) => setState(() => _search = value),
                       ),
                       const SizedBox(height: 12),
-                      Wrap(
-                        spacing: 6,
-                        runSpacing: 4,
-                        children: [
-                          ChoiceChip(
-                            label: Text(s.allPictures),
-                            selected: _category == 'all',
-                            onSelected: (_) =>
-                                setState(() => _category = 'all'),
-                          ),
-                          for (final category in [
-                            'nature',
-                            'animals',
-                            'objects',
-                            'patterns',
-                            'space',
-                            if (widget.personal) 'personal',
-                          ])
+                      // Keep the additional categories in one compact row.
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
                             ChoiceChip(
-                              label: Text(categoryLabel(context, category)),
-                              selected: _category == category,
+                              label: Text(s.allPictures),
+                              selected: _category == 'all',
                               onSelected: (_) =>
-                                  setState(() => _category = category),
+                                  setState(() => _category = 'all'),
                             ),
-                        ],
+                            for (final category in [
+                              ...publicArtworkCategories,
+                              if (widget.personal) 'personal',
+                            ])
+                              Padding(
+                                padding: const EdgeInsetsDirectional.only(
+                                  start: 6,
+                                ),
+                                child: ChoiceChip(
+                                  label: Text(
+                                    categoryLabel(context, category),
+                                  ),
+                                  selected: _category == category,
+                                  onSelected: (_) =>
+                                      setState(() => _category = category),
+                                ),
+                              ),
+                          ],
+                        ),
                       ),
                       if (widget.personal) ...[
                         const SizedBox(height: 12),

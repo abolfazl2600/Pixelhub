@@ -77,6 +77,12 @@ LEGACY_AZADI_ID = "online-iran-azadi-tower"
 LEGACY_AZADI_V1 = ("pixelhub-content-iran-landmarks-10-v1", 1)
 LEGACY_AZADI_V2 = ("pixelhub-content-iran-z-architecture-11-v1", 2)
 
+# Legacy clients reject unknown category values. Existing releases and the
+# public catalog remain on these five values until a versioned rollout exists.
+LEGACY_PUBLIC_CATEGORIES = frozenset({
+    "nature", "animals", "objects", "patterns", "space",
+})
+
 
 def valid_online_id(ident):
     return isinstance(ident, str) and re.fullmatch(
@@ -100,6 +106,9 @@ def validate_new_pack_manifest(pictures):
             raise ValueError(f"New picture must have levelVersion 1: {ident}")
         if ident in seen:
             raise ValueError(f"Duplicate online content ID in pack: {ident}")
+        if ("category" in item and
+                item["category"] not in LEGACY_PUBLIC_CATEGORIES):
+            raise ValueError(f"Unknown legacy online category: {ident}")
         seen.add(ident)
 
 
@@ -195,6 +204,8 @@ def assemble(pack_dir, output_dir):
             for item in manifest["pictures"]:
                 ident = item["id"]
                 version = item["version"]
+                if item.get("category") not in LEGACY_PUBLIC_CATEGORIES:
+                    raise ValueError(f"Unsupported public catalog category: {ident}")
                 if not valid_online_id(ident):
                     raise ValueError(f"Invalid online content ID: {ident}")
                 origin = (pack.parent.name, version)

@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:game_domain/game_domain.dart';
 import 'package:level_schema/level_schema.dart';
 
+import 'artwork_categories.dart';
+
 enum LibraryStatus { loading, ready, error }
 
 class LibraryController extends ChangeNotifier {
@@ -204,9 +206,12 @@ class LibraryController extends ChangeNotifier {
 
   String category(LevelDefinition level) => level.id.startsWith('private-')
       ? 'personal'
-      : onlineCategories[level.id] ??
-            metadata[level.id]?.category ??
-            'patterns';
+      : displayArtworkCategory(
+          level.id,
+          onlineCategories[level.id] ??
+              metadata[level.id]?.category ??
+              'patterns',
+        );
   bool isFavorite(LevelDefinition level) =>
       library.favorites.contains(level.id);
   int completed(LevelDefinition level) =>

@@ -30,6 +30,28 @@ files on `main`. A standard `git clone` does **not** download Release assets.
   reported. This initial adapter caps locally downloaded levels at 1000.
   A future move to IndexedDB/files can retain the same repository interface.
 
+## Seven gallery categories without breaking published catalogs (Issue #17)
+
+The new client presents seven public categories: `nature`, `animals`,
+`objects`, `masterpieces`, `persian_architecture`, `patterns`, and
+`space`. Imported personal artwork remains separate.
+
+Historic classic painting IDs (the six original masterworks and
+`online-classic-*` collection) display as `masterpieces`, and the
+`online-iran-*` landmark/architecture collection displays as
+`persian_architecture`, although immutable published manifests still
+say `patterns`. The overlay uses stable IDs rather than translated names.
+It works for undownloaded catalog entries, downloads, and offline restarts.
+Existing downloaded metadata is migrated on-device without redownloading
+artwork, editing level files, or losing progress and favorites.
+
+**Backward compatibility:** The shared `/online/catalog.json` endpoint
+must continue publishing only the five old category values. Older app
+versions reject unknown values and can lose the entire online catalog.
+The Release aggregator rejects incompatible pack categories to guard this.
+Do not republish existing ZIPs. Publishing new categories from the server
+requires a separate versioned/backwards-compatible catalog rollout first.
+
 ## Immutable publication policy (Issue #3)
 
 **Every new picture gets a previously unused `online-...` ID and

@@ -13,11 +13,14 @@ abstract interface class LevelRepository {
   Future<List<LevelDefinition>> loadLevels();
 }
 
-/// Categories used by the existing online catalog and gallery filters.
+/// New clients support seven categories; the public legacy catalog must still
+/// publish only the original five categories for older installed clients.
 const onlinePictureCategories = <String>{
   'nature',
   'animals',
   'objects',
+  'masterpieces',
+  'persian_architecture',
   'patterns',
   'space',
 };

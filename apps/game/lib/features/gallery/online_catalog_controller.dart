@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:game_domain/game_domain.dart';
 import 'package:level_schema/level_schema.dart';
 
+import 'artwork_categories.dart';
+
 /// Public, versioned files served by the same repository's GitHub Pages site.
 /// The base URL is replaceable without changing level IDs or saved progress.
 const onlineContentRoot = 'https://abolfazl2600.github.io/Pixelhub/online/';
@@ -46,13 +48,7 @@ final class OnlinePicture {
         titleEn.isEmpty ||
         titleEn.length > 100 ||
         category is! String ||
-        !{
-          'nature',
-          'animals',
-          'objects',
-          'patterns',
-          'space',
-        }.contains(category) ||
+        !onlinePictureCategories.contains(category) ||
         width is! int ||
         width < 1 ||
         width > 256 ||
@@ -71,7 +67,7 @@ final class OnlinePicture {
       version: version,
       title: title,
       titleEn: titleEn,
-      category: category,
+      category: displayArtworkCategory(id, category),
       width: width,
       height: height,
       bytes: bytes,
@@ -158,13 +154,29 @@ class OnlineCatalogController extends ChangeNotifier {
       }
       try {
         final saved = await storage.readDownloadedCategories();
-        _downloadedCategories
-          ..clear()
-          ..addEntries(
-            saved.entries.where((entry) => _downloaded.containsKey(entry.key)),
-          );
+        _downloadedCategories.clear();
+        for (final id in _downloaded.keys) {
+          final previous = saved[id];
+          final historicCategory = historicOnlineArtworkCategory(id);
+          // The known artworks work offline immediately even when old
+          // installations still have 'patterns' category metadata.
+          final category = historicCategory ?? previous;
+          if (category == null) continue;
+          _downloadedCategories[id] = category;
+          if (historicCategory != null && category != previous) {
+            try {
+              await storage.saveDownloadedCategory(id, category);
+            } on Object {
+              // Retry persisting on the next launch; keep the UI correct.
+            }
+          }
+        }
       } on Object {
-        // Legacy levels remain playable with the normal fallback category.
+        // Old or corrupt metadata must not hide downloaded paintings.
+        for (final id in _downloaded.keys) {
+          final category = historicOnlineArtworkCategory(id);
+          if (category != null) _downloadedCategories[id] = category;
+        }
       }
     } on Object {
       // Keep built-in pictures playable if optional downloaded storage fails.
@@ -216,7 +228,7 @@ class OnlineCatalogController extends ChangeNotifier {
       for (final picture in result) {
         if (_disposed) return;
         if (_downloaded.containsKey(picture.id) &&
-            !_downloadedCategories.containsKey(picture.id)) {
+            _downloadedCategories[picture.id] != picture.category) {
           try {
             await storage.saveDownloadedCategory(picture.id, picture.category);
             _downloadedCategories[picture.id] = picture.category;

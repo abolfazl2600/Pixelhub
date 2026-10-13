@@ -126,6 +126,13 @@ class ImmutableOnlineReleaseTests(unittest.TestCase):
             {"id": "online-cat-remake", "version": 1},
         ])
 
+    def test_new_catalog_categories_are_not_published_to_legacy_clients(self):
+        with self.assertRaisesRegex(ValueError, "Unknown legacy online category"):
+            validate_new_pack_manifest([
+                {"id": "online-new-art", "version": 1,
+                 "category": "masterpieces"},
+            ])
+
     def test_archived_azadi_exception_keeps_both_files(self):
         self.pack(LEGACY_AZADI_V1[0], [(LEGACY_AZADI_ID, 1)])
         self.pack(LEGACY_AZADI_V2[0], [(LEGACY_AZADI_ID, 2)])
