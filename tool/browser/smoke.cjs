@@ -226,7 +226,10 @@ async function main() {
     // The online collection now follows the local grid. Scroll to the end
     // until its lazy sliver builds the explicit download control.
     const downloadButton = page.getByRole('button',{name:'دریافت تصویر',exact:true});
-    await page.mouse.move(180,400);
+    // This test previously switched to a 360px-tall viewport; keep the
+    // pointer inside it or wheel events will not scroll the gallery.
+    const galleryViewport = page.viewportSize();
+    await page.mouse.move(180, Math.min(250, galleryViewport.height - 30));
     for(let i=0;i<25 && !(await downloadButton.isVisible());i++) {
       await page.mouse.wheel(0,1600);
       await page.waitForTimeout(80);
