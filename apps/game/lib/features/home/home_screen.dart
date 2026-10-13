@@ -19,6 +19,7 @@ class HomeScreen extends StatelessWidget {
       orElse: () => levels.first,
     );
     final s = context.strings;
+    final continueLevel = library.continueLevel;
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -123,6 +124,13 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 24),
+              if (continueLevel != null) ...[
+                _ContinuePaintingCard(
+                  level: continueLevel,
+                  percent: library.continuePercent(continueLevel),
+                ),
+                const SizedBox(height: 24),
+              ],
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -156,6 +164,82 @@ class HomeScreen extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ContinuePaintingCard extends StatelessWidget {
+  const _ContinuePaintingCard({required this.level, required this.percent});
+
+  final LevelDefinition level;
+  final int percent;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = context.strings;
+    return Card(
+      key: const ValueKey('continue-painting-card'),
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final thumbnail = ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: SizedBox(
+                width: 108,
+                height: 108,
+                child: PixelArtPreview(level: level),
+              ),
+            );
+            final details = Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  s.continuePainting,
+                  style: const TextStyle(fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  level.titleFor(context.isPersian ? 'fa' : 'en'),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 18),
+                ),
+                const SizedBox(height: 8),
+                Text(s.progressPercent(context.digits(percent))),
+                const SizedBox(height: 6),
+                LinearProgressIndicator(value: percent / 100),
+                const SizedBox(height: 10),
+                FilledButton.icon(
+                  key: const ValueKey('continue-painting-button'),
+                  onPressed: () => context.push('/painting/${level.id}'),
+                  icon: const Icon(Icons.brush_rounded),
+                  label: Text(s.continueAction),
+                ),
+              ],
+            );
+            if (constraints.maxWidth < 340) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Center(child: thumbnail),
+                  const SizedBox(height: 12),
+                  details,
+                ],
+              );
+            }
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                thumbnail,
+                const SizedBox(width: 16),
+                Expanded(child: details),
+              ],
+            );
+          },
         ),
       ),
     );

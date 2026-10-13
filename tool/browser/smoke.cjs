@@ -170,6 +170,10 @@ async function main() {
     await page.screenshot({path:path.join(output,'home-tablet.png')});
     await page.setViewportSize({width:800,height:360}); await page.goto(base); await ready();
     await start().click(); await back().click(); await start().waitFor();
+    // The taller Home (with Continue Painting) may restore its prior scroll.
+    // Scroll to the header before targeting Profile in a short viewport.
+    await page.mouse.move(400,180);
+    await page.mouse.wheel(0,-2000);
     await page.getByRole('button',{name:'Profile',exact:true}).first().click();
     await page.getByRole('button',{name:'فارسی',exact:true}).click();
     assert.equal(await page.evaluate(()=>document.documentElement.lang),'fa');

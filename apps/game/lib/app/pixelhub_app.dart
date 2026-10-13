@@ -78,6 +78,9 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
               ? preferences as ArtworkRepository
               : MemoryPreferences()),
       _progress,
+      recentArtworkRepository: preferences is RecentArtworkRepository
+          ? preferences as RecentArtworkRepository
+          : null,
     );
     _online = OnlineCatalogController(
       preferences is OnlineLevelStorage
@@ -153,6 +156,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       errorBuilder: (context, state) => _notFound(context),
     );
     unawaited(_loadLanguage());
+    unawaited(_library.loadRecentArtwork());
     unawaited(_library.load());
     unawaited(_bootstrap.load());
     unawaited(prepareOfflineApp());
@@ -339,6 +343,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       return PaintingPreviewScreen(
         controller: _controller(matches.first),
         diagnostics: _diagnostics,
+        onOpened: () => unawaited(_library.markOpened(matches.first)),
       );
     },
   );
