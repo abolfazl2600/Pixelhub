@@ -1,5 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <!-- Online gallery metadata and user-approved downloads need network access. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <!-- Photos use the system file picker; broad storage/camera access is not needed. -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove"/>
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:node="remove"/>
