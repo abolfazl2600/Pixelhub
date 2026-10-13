@@ -250,6 +250,7 @@ class OnlineCatalogController extends ChangeNotifier {
         }
       }
     }
+
     await Future.wait([for (var i = 0; i < 3; i++) worker()]);
   }
 
