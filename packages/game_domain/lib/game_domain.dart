@@ -46,6 +46,13 @@ abstract interface class PreferencesRepository {
   Future<void> writeLanguage(String language);
 }
 
+/// Persist only the identifier of the most recently opened painting.
+abstract interface class RecentArtworkRepository {
+  Future<String?> readRecentArtworkId();
+  Future<void> writeRecentArtworkId(String id);
+  Future<void> clearRecentArtworkId();
+}
+
 /// Versioned compact bitset; stored independently of immutable level assets.
 final class ProgressSnapshot {
   ProgressSnapshot({
