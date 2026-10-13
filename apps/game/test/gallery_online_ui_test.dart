@@ -95,7 +95,10 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('اشیا'));
     await tester.pumpAndSettle();
-    expect(find.text('هنوز نقاشی‌ای از این دسته روی دستگاه نیست.'), findsOneWidget);
+    expect(
+      find.text('هنوز نقاشی‌ای از این دسته روی دستگاه نیست.'),
+      findsOneWidget,
+    );
     await tester.scrollUntilVisible(
       find.byKey(const ValueKey('online-gallery-section')),
       300,
@@ -123,11 +126,7 @@ void main() {
         locale: const Locale('fa'),
         supportedLocales: AppLocalizations.supportedLocales,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
-        home: GalleryScreen(
-          library: library,
-          online: online,
-          personal: true,
-        ),
+        home: GalleryScreen(library: library, online: online, personal: true),
       ),
     );
     await tester.pumpAndSettle();
