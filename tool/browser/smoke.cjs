@@ -75,11 +75,14 @@ async function main() {
 
     console.log('Browser: default language and home');
     await page.goto(base); await ready();
-    await page.getByRole('button',{name:'English',exact:true}).waitFor();
+    assert.equal(await page.evaluate(()=>document.documentElement.lang),'fa');
     await page.screenshot({path:path.join(output,'home-fa.png')});
+    // Language selection belongs to Profile, not Home or the painting toolbar.
+    await page.getByRole('button',{name:'پروفایل',exact:true}).first().click();
     await page.getByRole('button',{name:'English',exact:true}).click();
     await page.getByRole('button',{name:'فارسی',exact:true}).waitFor();
     assert.equal(await page.evaluate(()=>document.documentElement.lang),'en');
+    await back().click(); await start().waitFor();
     await page.screenshot({path:path.join(output,'home-en.png')});
     console.log('Browser: painting and autosave');
     await start().click(); await board().waitFor();
@@ -96,8 +99,9 @@ async function main() {
     // Recreate the entire Flutter application in a new page, retaining real browser storage.
     await page.close(); page=await context.newPage(); watch(page);
     await page.goto(base+'#/painting/sunflower'); await ready(); await board().waitFor(); await saved(16);
-    await page.getByRole('button',{name:'فارسی',exact:true}).waitFor();
+    assert.equal(await page.evaluate(()=>document.documentElement.lang),'en');
     await page.reload(); await ready(); await board().waitFor(); await saved(16);
+    assert.equal(await page.evaluate(()=>document.documentElement.lang),'en');
     await back().click(); await start().waitFor();
     await page.goBack(); await back().waitFor();
     await page.goForward(); await start().waitFor();
@@ -164,8 +168,13 @@ async function main() {
     await page.screenshot({path:path.join(output,'home-tablet.png')});
     await page.setViewportSize({width:800,height:360}); await page.goto(base); await ready();
     await start().click(); await back().click(); await start().waitFor();
-    await page.getByRole('button',{name:'فارسی',exact:true}).click(); await page.reload(); await ready();
+    await page.getByRole('button',{name:'Profile',exact:true}).first().click();
+    await page.getByRole('button',{name:'فارسی',exact:true}).click();
+    assert.equal(await page.evaluate(()=>document.documentElement.lang),'fa');
+    await back().click(); await page.reload(); await ready();
+    await page.getByRole('button',{name:'پروفایل',exact:true}).first().click();
     await page.getByRole('button',{name:'English',exact:true}).waitFor();
+    await back().click();
 
     assert.deepEqual(pageErrors,[]); assert.deepEqual(failedRequests,[]); assert.deepEqual(externalRequests,[]);
     console.log(JSON.stringify({defaultPersian:'passed',englishAndLanguageRestore:'passed',
