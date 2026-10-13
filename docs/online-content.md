@@ -323,6 +323,57 @@ Reproducible release-only command:
 Never modify a published release in place; use a new level version and
 Release tag for subsequent revisions.
 
+## More unique animal pictures: twenty 48×48 levels
+
+`tool/online_animals_more_pack.py` authors a further **20 original
+color-by-number animal designs**, each with its own hand-drawn pixel
+illustration, a 48×48 canvas (2,304 numbered cells), a dedicated ARGB
+color palette, and titles in Persian and English. These are **new species**
+not present in the starter, collection or original ten-animal packs.
+
+| Stable ID | فارسی | English |
+| --- | --- | --- |
+| `online-fox` | روباه نارنجی | Red Fox |
+| `online-wolf` | گرگ خاکستری | Gray Wolf |
+| `online-brown-bear` | خرس قهوه‌ای | Brown Bear |
+| `online-zebra` | گورخر راه‌راه | Striped Zebra |
+| `online-tiger` | ببر نارنجی | Orange Tiger |
+| `online-cheetah` | یوزپلنگ خال‌دار | Spotted Cheetah |
+| `online-kangaroo` | کانگوروی بازیگوش | Playful Kangaroo |
+| `online-hippopotamus` | اسب آبی | Hippopotamus |
+| `online-rhinoceros` | کرگدن خاکستری | Gray Rhinoceros |
+| `online-crocodile` | تمساح سبز | Green Crocodile |
+| `online-toucan` | توکان رنگارنگ | Colorful Toucan |
+| `online-peacock` | طاووس پرنقش | Bright Peacock |
+| `online-hedgehog` | جوجه‌تیغی | Hedgehog |
+| `online-raccoon` | راکون نقاب‌دار | Masked Raccoon |
+| `online-sloth` | تنبل درختی | Tree Sloth |
+| `online-seal` | فک دریایی | Harbor Seal |
+| `online-whale` | نهنگ آبی | Blue Whale |
+| `online-shark` | کوسه اقیانوس | Ocean Shark |
+| `online-frog` | قورباغه سبز | Green Frog |
+| `online-chameleon` | آفتاب‌پرست | Chameleon |
+
+All use the existing compatible `animals` category, unique
+`online-` IDs and `levelVersion: 1`. On the next successful main
+Web CI run, the Pages publisher will create immutable Release
+[`pixelhub-content-animals-more-20-v1`](https://github.com/abolfazl2600/Pixelhub/releases/tag/pixelhub-content-animals-more-20-v1)
+with `content.zip`: 20 schema-v2 JSON levels, 20 PNG previews,
+and one bilingual `catalog.json`. The aggregator combines this with
+existing Releases; generated assets are not stored in the Git repository
+or included in an APK. Pictures downloaded once remain locally available
+without an internet connection.
+
+The expected number of **distinct online pictures increases from 65
+to 85** when all prior packs and this new pack are published and Pages
+deployment succeeds. No Android release or APK rebuild is necessary.
+A git commit only installs the *publishing instructions*: it does not
+verify that release generation or public delivery succeeded.
+
+Create an asset independently, outside the tracked source tree:
+`python3 tool/online_animals_more_pack.py /tmp/content.zip`.
+Published artwork version 1 must remain unchanged.
+
 ## Publish more pictures
 
 1. Create one or more schema-v2 level JSON files with unique `online-...`

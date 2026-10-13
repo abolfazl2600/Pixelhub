@@ -176,6 +176,20 @@ jobs:
               --notes "Original numbered pixel art: redesigned 80x80 Azadi Tower (existing ID, levelVersion 2) and ten new 64x64 abstract Persian architecture studies (muqarnas, dome, orsi glass, eslimi, arches, windcatcher, shamsa, mosque, brickwork and iwan). Bilingual schema-v2 levels, catalog and PNG previews live in Release assets, not Git or APK. Tag sorts after the immutable initial Iranian landmarks release for deterministic upgraded ID selection." \
               --latest=false
           fi
+      - name: Publish twenty more distinct animal pictures outside git
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-animals-more-20-v1 >/dev/null 2>&1; then
+            python3 tool/online_animals_more_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-animals-more-20-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: 20 new detailed animal coloring pictures" \
+              --notes "Twenty original 48x48 numbered animal paintings: fox, wolf, brown bear, zebra, tiger, cheetah, kangaroo, hippopotamus, rhinoceros, crocodile, toucan, peacock, hedgehog, raccoon, sloth, seal, whale, shark, frog and chameleon. Bilingual schema-v2 level JSON, catalog and PNG previews are Release-only online assets, not bundled in Android or committed to Git." \
+              --latest=false
+          fi
       - name: Download release packs and assemble online catalog
         env:
           GH_TOKEN: ${{ github.token }}
