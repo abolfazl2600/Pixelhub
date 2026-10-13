@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:game_domain/game_domain.dart';
 import 'package:level_schema/level_schema.dart';
 
@@ -119,6 +119,24 @@ class OnlineCatalogController extends ChangeNotifier {
     if (!_disposed) notifyListeners();
   }
 
+  /// Use package:http instead of Flutter's NetworkAssetBundle: on Web the
+  /// latter constructs dart:io HttpClient, which is unsupported in browsers.
+  /// http.get picks BrowserClient on Web and IOClient on Android.
+  Future<String> _loadRemote(String path, {
+    required Duration timeout,
+    required int maxBytes,
+  }) async {
+    final uri = _baseUrl.resolve(path);
+    final response = await http.get(uri).timeout(timeout);
+    if (response.statusCode != 200) {
+      throw FormatException('Online content HTTP ${response.statusCode}.');
+    }
+    if (response.bodyBytes.length > maxBytes) {
+      throw const FormatException('Online content is too large.');
+    }
+    return utf8.decode(response.bodyBytes, allowMalformed: false);
+  }
+
   Future<void> loadDownloaded() async {
     try {
       for (final level in await storage.readDownloadedLevels()) {
@@ -139,13 +157,11 @@ class OnlineCatalogController extends ChangeNotifier {
     _notify();
     try {
       final cacheBuster = DateTime.now().millisecondsSinceEpoch;
-      final bundle = NetworkAssetBundle(_baseUrl);
-      final source = await bundle
-          .loadString('catalog.json?v=$cacheBuster')
-          .timeout(const Duration(seconds: 12));
-      if (utf8.encode(source).length > 4 * 1024 * 1024) {
-        throw const FormatException('Catalog too large.');
-      }
+      final source = await _loadRemote(
+        'catalog.json?v=$cacheBuster',
+        timeout: const Duration(seconds: 12),
+        maxBytes: 4 * 1024 * 1024,
+      );
       final json = jsonDecode(source);
       if (json is! Map<String, dynamic> ||
           json['schemaVersion'] != 1 ||
@@ -184,10 +200,11 @@ class OnlineCatalogController extends ChangeNotifier {
     failedDownloadId = null;
     _notify();
     try {
-      final bundle = NetworkAssetBundle(_baseUrl);
-      final source = await bundle
-          .loadString('levels/${picture.stem}.json')
-          .timeout(const Duration(seconds: 25));
+      final source = await _loadRemote(
+        'levels/${picture.stem}.json',
+        timeout: const Duration(seconds: 25),
+        maxBytes: 262144,
+      );
       if (utf8.encode(source).length != picture.bytes) {
         throw const FormatException('Download length mismatch.');
       }
