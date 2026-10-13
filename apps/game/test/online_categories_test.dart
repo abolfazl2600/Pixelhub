@@ -221,4 +221,94 @@ void main() {
     expect(controller.categories, isEmpty);
     expect(store.savedCategories, isEmpty);
   });
+  test('retired online artwork is removed after a valid catalog refresh',
+      () async {
+    final old = onlineFixture('online-starry-night');
+    final replacement = onlineFixture('online-starry-night-detailed');
+    final store = MemoryPreferences();
+    await store.saveDownloadedLevel(old, category: 'patterns');
+    final body = jsonEncode(replacement.toJson());
+    final metadata = jsonEncode({
+      'schemaVersion': 1,
+      'retiredIds': [old.id],
+      'pictures': [
+        {
+          'id': replacement.id,
+          'version': 1,
+          'title': replacement.title,
+          'titleEn': replacement.titleEn,
+          'category': 'patterns',
+          'width': replacement.width,
+          'height': replacement.height,
+          'bytes': utf8.encode(body).length,
+          'checksum': replacement.checksum,
+        },
+      ],
+    });
+    final client = MockClient((request) async {
+      if (request.url.path.endsWith('/catalog.json')) {
+        return http.Response.bytes(utf8.encode(metadata), 200);
+      }
+      if (request.url.path.endsWith('/online-starry-night-detailed-v1.json')) {
+        return http.Response.bytes(utf8.encode(body), 200);
+      }
+      return http.Response('Not found', 404);
+    });
+    addTearDown(client.close);
+    final controller = OnlineCatalogController(
+      store,
+      client: client,
+      baseUrl: Uri.parse('https://example.test/online/'),
+    );
+    addTearDown(controller.dispose);
+    await controller.loadDownloaded();
+    expect(controller.downloaded.single.id, old.id);
+    await controller.checkForUpdates();
+    expect(controller.status, OnlineCatalogStatus.ready);
+    expect(controller.downloaded, isEmpty);
+    expect(await store.readDownloadedLevels(), isEmpty);
+    expect(controller.available.single.id, replacement.id);
+    await controller.download(controller.available.single);
+    expect(controller.downloaded.single.id, replacement.id);
+    expect(await store.readDownloadedLevels(), hasLength(1));
+  });
+
+  test('invalid retirement metadata never deletes a downloaded painting',
+      () async {
+    final level = onlineFixture('online-starry-night');
+    final store = MemoryPreferences();
+    await store.saveDownloadedLevel(level, category: 'patterns');
+    final bogus = jsonEncode({
+      'schemaVersion': 1,
+      'pictures': [
+        {
+          'id': level.id,
+          'version': 1,
+          'title': level.title,
+          'titleEn': level.titleEn,
+          'category': 'patterns',
+          'width': level.width,
+          'height': level.height,
+          'bytes': utf8.encode(jsonEncode(level.toJson())).length,
+          'checksum': level.checksum,
+        },
+      ],
+      'retiredIds': [level.id],
+    });
+    final client = MockClient((request) async =>
+        http.Response.bytes(utf8.encode(bogus), 200));
+    addTearDown(client.close);
+    final controller = OnlineCatalogController(
+      store,
+      client: client,
+      baseUrl: Uri.parse('https://example.test/online/'),
+    );
+    addTearDown(controller.dispose);
+    await controller.loadDownloaded();
+    await controller.checkForUpdates();
+    expect(controller.status, OnlineCatalogStatus.error);
+    expect(controller.downloaded.single.id, level.id);
+    expect(await store.readDownloadedLevels(), hasLength(1));
+  });
+
 }
