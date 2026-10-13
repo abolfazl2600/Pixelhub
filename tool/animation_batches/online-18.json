@@ -1,0 +1,44 @@
+{
+  "online-mushroom": {
+    "motion": "pulse",
+    "region": [
+      0.12,
+      0.05,
+      0.9,
+      0.68
+    ],
+    "version": 1,
+    "checksum": "9b65f3f163396d6bde618cf5ef82f5935396893326454919ff3ab5847043717e",
+    "animationChecksum": "d22befd189dfbc9df49cd9c5f8ff3e97f20798f0ce0de84b00ff96dc5e98a944"
+  },
+  "online-cat-face": {
+    "motion": "blink",
+    "version": 1,
+    "checksum": "fe37723e252628b08b7417bce536c5cc5f2cbc15d56ae3f8d13bc2448f247092",
+    "animationChecksum": "171220e71ad887f12d0a598b640b9c9b97d76e52e65cd36e2fec9d9ffb2f847a"
+  },
+  "online-watermelon": {
+    "motion": "float",
+    "version": 1,
+    "checksum": "8665c8806c7c6dc6c94c15b9f58ce034d078cf5e0ec5139f04c20c180dd34dd9",
+    "animationChecksum": "8162153a816410ad6241656f93884d33fcbb94c6c17a6d5495ac037b82e26676"
+  },
+  "online-rocket": {
+    "motion": "flame",
+    "region": [
+      0.33,
+      0.67,
+      0.67,
+      0.95
+    ],
+    "version": 1,
+    "checksum": "ef7f42ed9550f3844293a5f4bfb4d46e033f576b268b7b3cb44f59326c96c33d",
+    "animationChecksum": "f3dd9d37fb000645541b480f0ac7c105ce672be31a3d118c626d62e3bd7229d1"
+  },
+  "online-butterfly": {
+    "motion": "flap",
+    "version": 1,
+    "checksum": "108ac270539bf5eeb1adff8e896f0e3b3985cbc7aedb1894706b86054095131f",
+    "animationChecksum": "fc59cc8443ca80967602867432f780bb52fdfb44c7af7540d8f283f75205f7ac"
+  }
+}

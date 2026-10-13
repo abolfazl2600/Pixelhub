@@ -34,6 +34,7 @@ Recipes live in `tool/animation_batches/`; each batch records up to ten pictures
 | Online 15 | object-world-globe, object-magnetic-compass, object-paint-palette, object-book-stack, object-birthday-gift, object-table-fan, object-sewing-machine, object-fountain-pen, playful-smiling-sun, playful-rainbow-cloud | flap, float, spin, sway |
 | Online 16 | playful-heart-smile, playful-lucky-clover, playful-friendly-ghost, playful-one-eyed-monster, playful-flying-saucer, playful-magic-wand, playful-party-hat, playful-birthday-cake, playful-popcorn-carton, playful-bubble-tea | flame, float, pulse, sparkle, sway |
 | Online 17 | playful-rubber-duck, playful-teddy-bear, playful-rainbow-yo-yo, playful-paper-kite, playful-smiling-moon, playful-star-buddy, playful-neon-jellyfish, playful-candy-land, balloon, tulip | blink, float, spin, sway |
+| Online 18 | mushroom, cat-face, watermelon, rocket, butterfly | blink, flame, flap, float, pulse |
 
 CI and Pages results must be checked before describing a batch as verified or
 published. Online animation assets are generated during Pages publication and
