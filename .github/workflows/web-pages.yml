@@ -5,6 +5,9 @@ on:
     workflows: ['Checks and Web artifacts']
     types: [completed]
     branches: [main]
+  release:
+    types: [published, edited]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -17,26 +20,78 @@ jobs:
   prepare:
     # Never publish PR artifacts, even if a PR uses a branch named main.
     if: >-
+      (github.event_name == 'workflow_run' &&
       github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.event != 'pull_request' &&
-      github.event.workflow_run.head_repository.full_name == github.repository
+      github.event.workflow_run.head_repository.full_name == github.repository) ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'release' &&
+      startsWith(github.event.release.tag_name, 'pixelhub-content-'))
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
       actions: read
-      contents: read
+      contents: write
       pages: write
     steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Resolve last verified Web artifact
+        id: web
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN: ${{ github.event.workflow_run.id }}
+          SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            run_id="$SOURCE_RUN"
+            sha="$SOURCE_SHA"
+          else
+            result=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?branch=main&status=success&per_page=20" \
+              --jq '[.workflow_runs[] | select(.conclusion == "success") | [.id, .head_sha] | join(" ")] | first')
+            test -n "$result" && test "$result" != "null"
+            read -r run_id sha <<< "$result"
+          fi
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
-          name: pixelhub-web-${{ github.event.workflow_run.head_sha }}
+          name: pixelhub-web-${{ steps.web.outputs.sha }}
           path: site
           github-token: ${{ github.token }}
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ steps.web.outputs.run_id }}
       - name: Verify artifact identity
         env:
-          EXPECTED_SHA: ${{ github.event.workflow_run.head_sha }}
+          EXPECTED_SHA: ${{ steps.web.outputs.sha }}
         run: test "$(cat site/commit.txt)" = "$EXPECTED_SHA"
+      - name: Seed one release-only sample picture
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-sample-v1 >/dev/null 2>&1; then
+            python3 tool/online_release.py sample "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-sample-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" --title "PixelHub online pictures: sample 1" \
+              --notes "First online-only example: Colorful balloon / بالن رنگی. Not part of git clone." \
+              --latest=false
+          fi
+      - name: Download release packs and assemble online catalog
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/pixelhub-release-packs"
+          while IFS= read -r tag; do
+            test -n "$tag" || continue
+            mkdir -p "$RUNNER_TEMP/pixelhub-release-packs/$tag"
+            gh release download "$tag" --pattern content.zip \
+              --dir "$RUNNER_TEMP/pixelhub-release-packs/$tag"
+          done < <(gh release list --limit 300 --json tagName,isDraft,isPrerelease \
+            --jq '.[] | select(.isDraft == false and .isPrerelease == false and (.tagName | startswith("pixelhub-content-"))) | .tagName')
+          python3 tool/online_release.py assemble \
+            "$RUNNER_TEMP/pixelhub-release-packs" site/online
       - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
         with:
