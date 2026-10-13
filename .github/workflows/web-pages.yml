@@ -190,6 +190,20 @@ jobs:
               --notes "Twenty original 48x48 numbered animal paintings: fox, wolf, brown bear, zebra, tiger, cheetah, kangaroo, hippopotamus, rhinoceros, crocodile, toucan, peacock, hedgehog, raccoon, sloth, seal, whale, shark, frog and chameleon. Bilingual schema-v2 level JSON, catalog and PNG previews are Release-only online assets, not bundled in Android or committed to Git." \
               --latest=false
           fi
+      - name: Publish twenty more famous painting interpretations outside git
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-masterworks-20-v1 >/dev/null 2>&1; then
+            python3 tool/online_masterworks_20_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-masterworks-20-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: twenty more famous paintings as original pixel art" \
+              --notes "Twenty new original 64x64 color-by-number homages to historic paintings: Birth of Venus, Creation of Adam, Last Supper, School of Athens, Night Watch, Milkmaid, Las Meninas, Third of May 1808, Liberty Leading the People, Wanderer above the Sea of Fog, Fighting Temeraire, Hay Wain, Impression Sunrise, Water Lilies, Moulin de la Galette, La Grande Jatte, The Kiss, Card Players, Wheatfield with Crows and Sleeping Gypsy. Bilingual JSON grids and PNG previews are Release assets, not bundled in Android or tracked in Git. None duplicate the six earlier masterworks." \
+              --latest=false
+          fi
       - name: Download release packs and assemble online catalog
         env:
           GH_TOKEN: ${{ github.token }}

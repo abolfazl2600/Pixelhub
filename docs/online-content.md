@@ -374,6 +374,61 @@ Create an asset independently, outside the tracked source tree:
 `python3 tool/online_animals_more_pack.py /tmp/content.zip`.
 Published artwork version 1 must remain unchanged.
 
+## Twenty additional classic painting interpretations (64×64)
+
+`tool/online_masterworks_20_pack.py` hand-draws **20 more original,
+simplified interpretations of well-known historical paintings** in pixel
+art, without redistributing scanned originals or third-party raster imagery.
+Every artwork has its own custom ARGB palette, **64×64 numbered canvas
+(4,096 cells)**, Persian and English title, stable ID, version-1 schema-v2
+JSON, checksum and small generated PNG preview.
+
+| Stable level ID | فارسی | Original title | Artist |
+| --- | --- | --- | --- |
+| `online-classic-birth-venus` | زایش ونوس | The Birth of Venus | Sandro Botticelli |
+| `online-classic-creation-adam` | آفرینش آدم | The Creation of Adam | Michelangelo |
+| `online-classic-last-supper` | شام آخر | The Last Supper | Leonardo da Vinci |
+| `online-classic-school-athens` | مکتب آتن | The School of Athens | Raphael |
+| `online-classic-night-watch` | نگهبان شب | The Night Watch | Rembrandt |
+| `online-classic-milkmaid` | زن شیرفروش | The Milkmaid | Johannes Vermeer |
+| `online-classic-las-meninas` | ندیمه‌ها | Las Meninas | Diego Velázquez |
+| `online-classic-third-may` | سوم ماه مه ۱۸۰۸ | The Third of May 1808 | Francisco Goya |
+| `online-classic-liberty-leading` | آزادی هدایتگر مردم | Liberty Leading the People | Eugène Delacroix |
+| `online-classic-wanderer-fog` | مسافر بر فراز دریای مه | Wanderer above the Sea of Fog | Caspar David Friedrich |
+| `online-classic-fighting-temeraire` | تمریر جنگجو | The Fighting Temeraire | J. M. W. Turner |
+| `online-classic-hay-wain` | گاری علف خشک | The Hay Wain | John Constable |
+| `online-classic-impression-sunrise` | برداشت، طلوع آفتاب | Impression, Sunrise | Claude Monet |
+| `online-classic-water-lilies` | نیلوفرهای آبی | Water Lilies | Claude Monet |
+| `online-classic-moulin-galette` | رقص در مولن دو لا گالت | Dance at Le Moulin de la Galette | Pierre-Auguste Renoir |
+| `online-classic-grande-jatte` | یکشنبه در جزیره گراند ژات | A Sunday Afternoon on La Grande Jatte | Georges Seurat |
+| `online-classic-klimt-kiss` | بوسه | The Kiss | Gustav Klimt |
+| `online-classic-card-players` | ورق‌بازان | The Card Players | Paul Cézanne |
+| `online-classic-wheatfield-crows` | مزرعه گندم با کلاغ‌ها | Wheatfield with Crows | Vincent van Gogh |
+| `online-classic-sleeping-gypsy` | کولی خفته | The Sleeping Gypsy | Henri Rousseau |
+
+All twenty IDs are unique and deliberately avoid the six existing
+masterpiece interpretations (Mona Lisa, The Starry Night, The Scream,
+Sunflowers, Girl with a Pearl Earring and The Great Wave). The catalog
+category remains the supported `patterns` value, since adding a new
+`masterworks` category would be rejected by existing online clients.
+
+Upon a successful **main** Web CI run, the existing Pages workflow creates
+the immutable Release
+[`pixelhub-content-masterworks-20-v1`](https://github.com/abolfazl2600/Pixelhub/releases/tag/pixelhub-content-masterworks-20-v1)
+and uploads its `content.zip` containing 20 JSON levels, 20 previews
+and the bilingual catalog. The release aggregator preserves all previous
+IDs and progress; assets are generated outside git and never included
+in Android APK/AAB bundles.
+
+The target is **105 distinct online paintings**, up from 85, once all
+releases exist and the Pages deployment completes. Adding the publisher
+code to git alone does not verify the Release exists or that the online
+gallery has updated. No Android rebuild is required for new online content.
+
+To reproduce only the release artifact outside the working tree:
+`python3 tool/online_masterworks_20_pack.py /tmp/content.zip`.
+Do not overwrite a published version 1; publish a higher version instead.
+
 ## Publish more pictures
 
 1. Create one or more schema-v2 level JSON files with unique `online-...`
