@@ -223,6 +223,47 @@ working tree:
 `python3 tool/online_iran_landmarks_pack.py /tmp/content.zip`.
 Published level IDs and versions must remain immutable.
 
+## Detailed landscape collection: ten 64×64 nature paintings
+
+`tool/online_landscapes_pack.py` defines ten fully original landscape drawings
+with separate color palettes, layered scenery, and detailed foregrounds. At
+**64×64 pixels per painting (4,096 colorable cells)**, these contain more than
+the previous 48×48 landmark pictures (2,304 cells). They are simplified
+color-by-number pixel art, not rasterized stock photographs.
+
+| Stable level ID | فارسی | English | Canvas |
+| --- | --- | --- | --- |
+| `online-landscape-sunset-mountains` | غروب کوهستان | Mountain Sunset | 64×64 |
+| `online-landscape-alpine-lake` | دریاچه و جنگل | Alpine Lake and Forest | 64×64 |
+| `online-landscape-waterfall` | آبشار جنگلی | Forest Waterfall | 64×64 |
+| `online-landscape-cottage` | مزرعه و کلبه | Countryside Cottage | 64×64 |
+| `online-landscape-golden-desert` | کویر و تپه‌های شنی | Golden Desert Dunes | 64×64 |
+| `online-landscape-tropical-beach` | ساحل و دریا | Tropical Beach | 64×64 |
+| `online-landscape-misty-forest` | جنگل مه‌آلود | Misty Forest | 64×64 |
+| `online-landscape-river-bridge` | رودخانه و پل سنگی | River and Stone Bridge | 64×64 |
+| `online-landscape-moonlit-night` | آسمان شب و ماه | Moonlit Mountain Night | 64×64 |
+| `online-landscape-flower-valley` | دشت گل‌ها | Wildflower Valley | 64×64 |
+
+A successful **main** Web CI run triggers the existing Pages publisher to
+create a new immutable GitHub Release, if missing:
+[`pixelhub-content-landscapes-10-v1`](https://github.com/abolfazl2600/Pixelhub/releases/tag/pixelhub-content-landscapes-10-v1).
+Its `content.zip` contains ten schema-v2 numbered JSON grids, ten PNG
+previews and the bilingual catalog. No generated art goes into the git tree
+or Android app binary. All ten entries use the existing compatible `nature`
+category; this preserves compatibility with existing online-capable Android
+and Web clients without shipping a new APK/AAB. Pictures are downloaded on
+demand, remain usable offline after download and keep independent progress.
+
+The 45 existing online picture IDs and their Release packs are preserved.
+After **all seven** Release packs are published and Pages deployment has
+succeeded, the aggregate catalog should contain **55 online pictures**.
+A Git commit alone does not prove that the public catalog has updated.
+
+To reproduce the release-only asset from the repository root, outside Git
+history: `python3 tool/online_landscapes_pack.py /tmp/content.zip`.
+Do not overwrite published version 1 assets; future design edits must use
+a new version.
+
 ## Publish more pictures
 
 1. Create one or more schema-v2 level JSON files with unique `online-...`

@@ -148,6 +148,20 @@ jobs:
               --notes "Ten original color-by-number pixel-art interpretations of Iranian landmarks: Persepolis, Azadi Tower, Milad Tower, Imam Mosque, Si-o-se-pol, Nasir ol-Molk Mosque, Bam Citadel, Tomb of Hafez, Amir Chakhmaq and Golestan Palace. Release-only bilingual JSON levels and previews; not bundled in the app." \
               --latest=false
           fi
+      - name: Publish ten high-detail landscape pictures outside git
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-landscapes-10-v1 >/dev/null 2>&1; then
+            python3 tool/online_landscapes_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-landscapes-10-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: ten detailed 64x64 landscape paintings" \
+              --notes "Ten original nature color-by-number designs: Mountain Sunset, Alpine Lake and Forest, Forest Waterfall, Countryside Cottage, Golden Desert Dunes, Tropical Beach, Misty Forest, River and Stone Bridge, Moonlit Mountain Night, and Wildflower Valley. Bilingual JSON levels and PNG previews are Release assets, not shipped in the APK or tracked by Git." \
+              --latest=false
+          fi
       - name: Download release packs and assemble online catalog
         env:
           GH_TOKEN: ${{ github.token }}
