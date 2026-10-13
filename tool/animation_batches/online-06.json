@@ -1,0 +1,122 @@
+{
+  "online-iran-amir-chakhmaq": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "89709d7cd0fa4b60f59bcc83e2f8065183387787bfa72c9dc51343a4b35c2ea8",
+    "animationChecksum": "26e8d48e426ececf9c80a03e1e534b8152c3c8b681a0836bac220d4bfbd3ca9a"
+  },
+  "online-iran-golestan-palace": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "fe25e31a42331e13290a456bd67a36c011447f8913e52df007d962ac3d8bf399",
+    "animationChecksum": "597f84d3d82b43904298a1ddbfd15ffc723f5b2436b54372f455618e91115116"
+  },
+  "online-iran-abstract-muqarnas": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "36286c13efaa7ff60df5952bc013ffc2d381d2bfbbf4719d6ea9a7a567b663a7",
+    "animationChecksum": "4495dfdf1d7491b9e908d49140de3fadb788e57c310e0ecdc48717847ea80d82"
+  },
+  "online-iran-abstract-dome": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "33675df00c3a37508560c6c41a842d9d0a733975035242c60100bb26166cae80",
+    "animationChecksum": "b32424077f762281ac4d108b4d1178cb50e72e7ebbf50e7948b8905f58d47329"
+  },
+  "online-iran-abstract-orsi": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "6441494dfb382c064e12cb675350fc6ad56394858d3637cd0bbaef02a5e4d0fc",
+    "animationChecksum": "35a6e2712a1613349c1b0da0902fb1e6bb12853825e9c3440aca3f94e831ab9b"
+  },
+  "online-iran-abstract-eslimi": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "d1da43d589c23e86ba71cb8ec880bb22dc00bf1aa42349bc49950b93ecca25a4",
+    "animationChecksum": "e76f72d64777c862599ade3f3dfcad1d27e7ce0d405aac463ffc789ace94bb9a"
+  },
+  "online-iran-abstract-arches": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "46499464c52f8ade1eb380e3063bad2d24943e330b74cef0e3c00837359a8b91",
+    "animationChecksum": "3adf1226701d781fe01ca39121e15d164606d7b40f88f65b1afca6899dba4760"
+  },
+  "online-iran-abstract-windcatcher": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "b1edd2a28b631d088521920d1e40535c889ed0ee3887224e4c3005aa5db2333e",
+    "animationChecksum": "1987f29f7f110488874443aeea513b404affbf835ad79ec92e4ed5c5e0eaaaab"
+  },
+  "online-iran-abstract-shamsa": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "297759f284caaeef87e38ff8a45943df28e287edb3f9de1033c120af72429513",
+    "animationChecksum": "0f3cb622736f5fae422e35e65c80861f012cdb4fd0ce41b64ff90a2b83f9e7f2"
+  },
+  "online-iran-abstract-mosque": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "ff72fd75f6b63cb8eb50094016e2451797b77b5199b760d966470656031e7cca",
+    "animationChecksum": "7454ba9cb4f50eda18448d859f0bd19c94309c49b7450d5b7eb5e578c1cd5b5b"
+  }
+}
