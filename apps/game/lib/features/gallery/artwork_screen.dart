@@ -22,6 +22,7 @@ class ArtworkScreen extends StatelessWidget {
   Future<void> _delete(BuildContext context) async {
     final s = context.strings;
     final isOnline = level.id.startsWith('online-');
+    final router = GoRouter.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -44,7 +45,6 @@ class ArtworkScreen extends StatelessWidget {
     if (confirmed != true) {
       return;
     }
-    final router = GoRouter.of(context);
     try {
       await onDelete(level);
       // Removing an online level rebuilds the artwork route immediately;
