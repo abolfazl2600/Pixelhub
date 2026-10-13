@@ -429,6 +429,49 @@ To reproduce only the release artifact outside the working tree:
 `python3 tool/online_masterworks_20_pack.py /tmp/content.zip`.
 Do not overwrite a published version 1; publish a higher version instead.
 
+## Thirty original everyday objects (48×48)
+
+`tool/online_objects_30_pack.py` contains **30 independent, hand-authored pixel-art pictures** of everyday objects. Each is a numbered 48×48 grid (2,304 coloring cells), with a bilingual Persian/English title, twelve ARGB palette entries, checksum, and a PNG preview. All IDs are unique, use level version 1, and use the existing compatible `objects` category rather than introducing an unsupported client category.
+
+| Stable level ID | فارسی | English |
+| --- | --- | --- |
+| `online-object-alarm-clock` | ساعت زنگ‌دار | Alarm Clock |
+| `online-object-vintage-camera` | دوربین عکاسی | Vintage Camera |
+| `online-object-headphones` | هدفون | Headphones |
+| `online-object-electric-guitar` | گیتار برقی | Electric Guitar |
+| `online-object-retro-radio` | رادیوی قدیمی | Retro Radio |
+| `online-object-desk-lamp` | چراغ مطالعه | Desk Lamp |
+| `online-object-porcelain-teapot` | قوری چینی | Porcelain Teapot |
+| `online-object-rainbow-umbrella` | چتر رنگی | Rainbow Umbrella |
+| `online-object-backpack` | کوله‌پشتی | Backpack |
+| `online-object-running-sneaker` | کفش کتانی | Running Sneaker |
+| `online-object-city-bicycle` | دوچرخه | City Bicycle |
+| `online-object-sailboat` | قایق بادبانی | Sailboat |
+| `online-object-steam-train` | قطار بخار | Steam Train |
+| `online-object-travel-suitcase` | چمدان سفر | Travel Suitcase |
+| `online-object-treasure-chest` | صندوقچه گنج | Treasure Chest |
+| `online-object-hourglass` | ساعت شنی | Hourglass |
+| `online-object-telescope` | تلسکوپ | Telescope |
+| `online-object-microscope` | میکروسکوپ | Microscope |
+| `online-object-toy-robot` | ربات اسباب‌بازی | Toy Robot |
+| `online-object-game-controller` | دسته بازی | Game Controller |
+| `online-object-typewriter` | ماشین تحریر | Typewriter |
+| `online-object-camping-lantern` | فانوس کمپ | Camping Lantern |
+| `online-object-world-globe` | کره جغرافیا | World Globe |
+| `online-object-magnetic-compass` | قطب‌نمای سفر | Compass |
+| `online-object-paint-palette` | پالت نقاشی | Paint Palette |
+| `online-object-book-stack` | کتاب‌های رنگی | Stacked Books |
+| `online-object-birthday-gift` | جعبه هدیه | Gift Box |
+| `online-object-table-fan` | پنکه رومیزی | Table Fan |
+| `online-object-sewing-machine` | چرخ خیاطی | Sewing Machine |
+| `online-object-fountain-pen` | خودنویس | Fountain Pen |
+
+After a successful `main` Web CI run, the Pages publisher creates the immutable `pixelhub-content-objects-30-v1` Release (if absent): [Release page](https://github.com/abolfazl2600/Pixelhub/releases/tag/pixelhub-content-objects-30-v1). The `content.zip` asset contains 30 numbered JSON levels, 30 previews, and `catalog.json`. The aggregation step merges them into the public catalog along with all older Release packs, without modifying earlier artwork or saved progress.
+
+The expected total becomes **135 distinct online pictures**, up from 105, after all content Releases have been created and GitHub Pages has deployed successfully. Adding source code is **not** evidence that the Release, public catalog, or app deployment is already live. Check Actions/Pages and the public online catalog for confirmation. Generated art stays outside Git history and Android APK/AAB packages; compatible clients can download the pictures without an app rebuild.
+
+To create the pack manually outside the tracked working tree: `python3 tool/online_objects_30_pack.py /tmp/content.zip`. Once published, never overwrite an immutable version-1 picture; publish a higher version to change existing art.
+
 ## Publish more pictures
 
 1. Create one or more schema-v2 level JSON files with unique `online-...`
