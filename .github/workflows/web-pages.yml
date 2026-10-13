@@ -79,6 +79,19 @@ jobs:
               --notes "First online-only example: Colorful balloon / بالن رنگی. Not part of git clone." \
               --latest=false
           fi
+      - name: Publish six new online pictures outside git history
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-starter-6-v1 >/dev/null 2>&1; then
+            python3 tool/online_starter_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-starter-6-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" --title "PixelHub online pictures: six new designs" \
+              --notes "Six original offline-playable levels: Pink Tulip, Forest Mushroom, Cat Face, Watermelon Slice, Little Rocket, Purple Butterfly. All level JSON and PNG previews are Release assets and excluded from git clone." \
+              --latest=false
+          fi
       - name: Download release packs and assemble online catalog
         env:
           GH_TOKEN: ${{ github.token }}
