@@ -1,0 +1,122 @@
+{
+  "online-iran-haft-sin": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "9f9c2f14fda3c37511afb5e1d7de262027af03d82d7d48f3c3c931208f50d0a2",
+    "animationChecksum": "4430d6df09b18c5495c91eb61beee4f3e5f23dad4523c4f38e3d86c770ca8a1c"
+  },
+  "online-iran-yalda-pomegranate": {
+    "motion": "glimmer",
+    "region": [
+      0.52,
+      0.32,
+      0.86,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "2aaaf0ed260bc47b93e990a21332e92d5f5efff87e69d3375f4bda1131d467ca",
+    "animationChecksum": "580d2d4ae8cef2501f0ad19620b92c1a8bacf583c61473c973f6c1a12e2d9e75"
+  },
+  "online-landscape-sunset-mountains": {
+    "motion": "sway",
+    "region": [
+      0.03,
+      0.04,
+      0.5,
+      0.25
+    ],
+    "version": 1,
+    "checksum": "90634b03cfb83b752ad48d005f73aa70b0a88ece787d1d7e0704e79402900882",
+    "animationChecksum": "cad99b126de4a53a99b443f36da0ef6976847b10a041d81e035415ac8dcd45ec"
+  },
+  "online-landscape-alpine-lake": {
+    "motion": "ripple",
+    "region": [
+      0.03,
+      0.5,
+      0.97,
+      0.99
+    ],
+    "version": 1,
+    "checksum": "7edd1f12b28295c4706bcbe57165d1e13fb00a46f029c7e9f44152d7af7f2e39",
+    "animationChecksum": "46ef019c458749c6b86e1c37946bb4a00dc0033ac57c9f6d3f623ce849380597"
+  },
+  "online-landscape-waterfall": {
+    "motion": "ripple",
+    "region": [
+      0.03,
+      0.5,
+      0.97,
+      0.99
+    ],
+    "version": 1,
+    "checksum": "184e861f3a07ccab2f488455e26c121b994fea5d0dbb80274e6ea68a3776731b",
+    "animationChecksum": "c2bed4a996c24573f5e16070af336c1245a130ad24a546c1c73e2ceaa0e2ba2b"
+  },
+  "online-landscape-cottage": {
+    "motion": "sway",
+    "region": [
+      0.03,
+      0.04,
+      0.5,
+      0.25
+    ],
+    "version": 1,
+    "checksum": "5359d5197aa99d69aef45ea2ca53a93f3e6476d58ef8481ea75d7d79cb386bfb",
+    "animationChecksum": "0016de7fd3a0f969ebc62b75abbc5dc0af38d1464ea48354b6d822baf4d4ac47"
+  },
+  "online-landscape-golden-desert": {
+    "motion": "sway",
+    "region": [
+      0.03,
+      0.04,
+      0.5,
+      0.25
+    ],
+    "version": 1,
+    "checksum": "96f016c65012b36a80de3b371f0b70e4376d37d3743f30ba9734087e964ecabd",
+    "animationChecksum": "54e254bfd52cb7dd4557cf1a14eec0e85da98c1f95dff177b5c291fbb0b6aa0f"
+  },
+  "online-landscape-tropical-beach": {
+    "motion": "ripple",
+    "region": [
+      0.03,
+      0.5,
+      0.97,
+      0.99
+    ],
+    "version": 1,
+    "checksum": "8c5fa083b41231d29503efd57303b582a9badeeaa123fd2bbeeb5f0acbc0ac65",
+    "animationChecksum": "930f446a944dde89e5bc7c76b8e02368971a914d8ebfe7aced1a5e2b8ea13991"
+  },
+  "online-landscape-misty-forest": {
+    "motion": "glimmer",
+    "region": [
+      0.04,
+      0.2,
+      0.96,
+      0.62
+    ],
+    "version": 1,
+    "checksum": "0695dfc9ff6361d68769eaef051fa821394f625b8b8f51258a187415cc1a012e",
+    "animationChecksum": "bb509c13c56c8425d1210b197b7072970d07ecf3072f208ec3c986e3043ead91"
+  },
+  "online-landscape-river-bridge": {
+    "motion": "ripple",
+    "region": [
+      0.03,
+      0.5,
+      0.97,
+      0.99
+    ],
+    "version": 1,
+    "checksum": "34530ba68230204e3e1e4b39ecc1f980fc05bbf5d4103c30a1c359d5cbe252c4",
+    "animationChecksum": "b28a681e397e261f7e3f27b4adda28c17302e9166f33faf7b66c6456b7d8a771"
+  }
+}
