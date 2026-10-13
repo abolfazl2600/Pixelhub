@@ -1,3 +1,12 @@
+## 0.3.2+5 — Google Play upload candidate (source prepared; not released)
+
+- Updated release-candidate build number while preserving the stable Android application ID.
+- Renamed the in-app alpha indicator to an accurate offline/free description in Persian and English.
+- Made the manually dispatched Android workflow default to a signed Play AAB, with signature, structure and SHA-256 checks after the release build. Preview APK remains explicitly selectable and debug-only.
+- Full-width phone/tablet layouts, adaptive painting-board bounds and removal of user-facing Undo are included from the prior commit.
+- Retain free offline Hint/Bomb, local photo privacy, and the explicit **Coming soon** state for incomplete services. No payment, ads, or account sync is enabled.
+- **Not a Play approval or completed Android release build.** Manual AAB run, physical-device and Play Console checks remain required.
+
 ## V6 early local UX and tools groundwork (unreleased)
 
 - Added functional, locally free Hint highlighting and Bomb filling up to five matching cells as one undoable action. No coins, wallet consumption or purchases.

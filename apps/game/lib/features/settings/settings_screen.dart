@@ -94,7 +94,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              const Text('PixelHub · 0.3.1'),
+              const Text('PixelHub · 0.3.2'),
               const SizedBox(height: 12),
               Text(s.aboutMessage, style: const TextStyle(height: 1.8)),
               const SizedBox(height: 16),

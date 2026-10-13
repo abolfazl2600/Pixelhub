@@ -10,7 +10,7 @@ on:
       build_kind:
         description: 'Select a preview APK or a Play-uploadable AAB (needs secrets)'
         required: true
-        default: preview-apk
+        default: play-aab
         type: choice
         options:
           - preview-apk
@@ -87,6 +87,28 @@ jobs:
           test -n "$PIXELHUB_RELEASE_KEY_ALIAS"
           test -n "$PIXELHUB_RELEASE_KEY_PASSWORD"
           flutter build appbundle --release --no-pub
+      - name: Verify signed Play AAB and record SHA-256
+        if: ${{ inputs.build_kind == 'play-aab' }}
+        working-directory: apps/game
+        run: |
+          bundle="build/app/outputs/bundle/release/app-release.aab"
+          test -s "$bundle"
+          echo 'Checking JAR signature on the release Android App Bundle...'
+          jarsigner -verify -verbose "$bundle" > "$RUNNER_TEMP/pixelhub-signature-verification.log"
+          grep -q 'jar verified.' "$RUNNER_TEMP/pixelhub-signature-verification.log"
+          echo 'Upload-key JAR signature verified.'
+          shasum -a 256 "$bundle"
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          target = Path('build/app/outputs/bundle/release/app-release.aab')
+          with ZipFile(target) as bundle:
+              required = ['base/manifest/AndroidManifest.xml', 'BundleConfig.pb']
+              for entry in required:
+                  if entry not in bundle.namelist():
+                      raise SystemExit(f'Invalid Play AAB: missing {entry}')
+              print(f'AAB structure verified: {target.stat().st_size} bytes.')
+          PY
       - name: Print Android package size breakdown
         env:
           BUILD_KIND: ${{ inputs.build_kind }}

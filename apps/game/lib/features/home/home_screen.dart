@@ -40,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   const Expanded(
                     child: Text(
-                      'Pixelhub',
+                      'PixelHub',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(

@@ -1,6 +1,6 @@
 # PixelHub — Google Play submission preparation
 
-**Scope:** Android **free, offline-first** build `0.3.1+4`, package
+**Scope:** Android **free, offline-first** build `0.3.2+5`, package
 `io.github.abolfazl2600.pixelhub`. This is developer documentation,
 **not a completed Play Console submission**.
 
@@ -12,7 +12,7 @@
 - `main` CI does **not** build Android. In GitHub Actions, manually run
   **Build Android (manual: preview APK or signed Play AAB)**.
   - `preview-apk`: debug-signed installable APK, **not** for Play upload.
-  - `play-aab`: release AAB signed with your private upload key.
+  - `play-aab` (**manual workflow default**): release AAB signed with your private upload key; the job verifies the AAB signature and ZIP structure, and prints its SHA-256 checksum.
 - Generate a secure upload keystore **outside the repository**, e.g.:
 
   ```bash
@@ -40,12 +40,12 @@
   min/target SDK, Play signing certificate fingerprints and device coverage.
 - `applicationId` is frozen at `io.github.abolfazl2600.pixelhub` unless the
   owner changes it **before** creating the listing. Each new upload must have
-  a larger Android `versionCode` (currently **4**).
+  a larger Android `versionCode` (currently **5**).
 
 ## Identity & listing
 
 - App display name: **PixelHub**. In-app label and launcher use this branding.
-- Current source version: **0.3.1+4**, **not** the completed V6 release.
+- Current source version: **0.3.2+5**, **not** the completed V6 release.
 - Branded launcher mipmaps, adaptive icon and Android 12 splash have sources
   in `apps/game/android/app/src/main/res/`. Validate on light/dark devices.
 - Prepare real game screenshots, a 512 × 512 store icon and a 1024 × 500
@@ -83,7 +83,7 @@
    Families policies for the target ages the owner chooses.
 4. Complete the required closed testing and production-access process if the
    Play Console account is subject to those rules.
-5. Test import/export, offline save, Undo/Reset, 16 KB page devices,
+5. Test import/export, offline save, Reset and cancelled multi-touch strokes, 16 KB page devices,
    accessibility, permission flows, crashes and Play pre-launch report.
 6. Do not enable login, rewards with money, purchases, ads or online
    diagnostics without revising code, privacy statement and declarations.
