@@ -17,6 +17,8 @@ Recipes live in `tool/animation_batches/`; each batch records up to ten pictures
 
 | Bundled 02 | flower, tulip, cactus, mountain, leaf, mushroom, apple, cherry, watermelon, butterfly | petal/leaf sway, drifting sun, cap stretch, fruit bob, wing flap |
 
+| Bundled 03 | bird, fish, turtle, fox, bunny, owl, dog, bee, rocket, saturn | wings, swimming/walking bob, eye blinks, flutter, exhaust flicker, rotating rings |
+
 CI and Pages results must be checked before describing a batch as verified or
 published. Online animation assets are generated during Pages publication and
 must remain independent of the immutable released paintings.

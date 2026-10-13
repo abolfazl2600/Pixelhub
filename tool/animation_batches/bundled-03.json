@@ -1,0 +1,52 @@
+{
+  "bird": {
+    "motion": "flap",
+    "region": [
+      0.24,
+      0.43,
+      0.64,
+      0.72
+    ]
+  },
+  "fish": {
+    "motion": "float"
+  },
+  "turtle": {
+    "motion": "float",
+    "durationMs": 200
+  },
+  "fox": {
+    "motion": "blink"
+  },
+  "bunny": {
+    "motion": "blink"
+  },
+  "owl": {
+    "motion": "blink"
+  },
+  "dog": {
+    "motion": "blink"
+  },
+  "bee": {
+    "motion": "flap",
+    "region": [
+      0.12,
+      0.16,
+      0.88,
+      0.47
+    ],
+    "durationMs": 90
+  },
+  "rocket": {
+    "motion": "flame",
+    "region": [
+      0.3,
+      0.65,
+      0.7,
+      1.0
+    ]
+  },
+  "saturn": {
+    "motion": "spin"
+  }
+}
