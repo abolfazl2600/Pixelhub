@@ -145,7 +145,7 @@
   "about": "About",
   "aboutMessage": "A calm pixel-coloring game with original pictures and your personal photos. Persian and English, without an account or ads.",
   "clearData": "Clear local data",
-  "clearDataMessage": "All progress, personal pictures, favorites and your language choice will be cleared. Bundled pictures remain. This cannot be undone.",
+  "clearDataMessage": "All progress, downloaded pictures, personal pictures, favorites and your language choice will be cleared. Bundled pictures remain. This cannot be undone.",
   "dataCleared": "Local data was cleared.",
   "clearDataError": "Clearing did not finish. Reopen the gallery and check your data before retrying.",
   "offlinePreparing": "Preparing the app and bundled pictures for offline reopening…",
