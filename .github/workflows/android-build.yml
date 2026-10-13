@@ -1,11 +1,6 @@
-name: "Build Android (manual: preview APK or signed Play AAB)"
+name: "Build Android (preview APK or signed store APK + Play AAB)"
 
 on:
-  # Build a store release automatically when this release workflow changes on main.
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/android-build.yml'
   workflow_dispatch:
     inputs:
       ref:
@@ -13,7 +8,7 @@ on:
         required: false
         type: string
       build_kind:
-        description: 'Select a preview APK or a Play-uploadable AAB (needs secrets)'
+        description: 'Select debug preview APK or signed store APK + Play AAB (needs secrets)'
         required: true
         default: play-aab
         type: choice
@@ -58,7 +53,7 @@ jobs:
         working-directory: apps/game
         run: dart run tool/generate_launcher_icons.dart
       - name: Decode private Play upload keystore
-        if: ${{ github.event_name == 'push' || inputs.build_kind == 'play-aab' }}
+        if: ${{ inputs.build_kind == 'play-aab' }}
         env:
           KEYSTORE_B64: ${{ secrets.PIXELHUB_UPLOAD_KEYSTORE_BASE64 }}
           STORE_PASSWORD: ${{ secrets.PIXELHUB_UPLOAD_STORE_PASSWORD }}
@@ -82,7 +77,7 @@ jobs:
         run: flutter build apk --debug --no-pub
         working-directory: apps/game
       - name: Build signed Google Play AAB
-        if: ${{ github.event_name == 'push' || inputs.build_kind == 'play-aab' }}
+        if: ${{ inputs.build_kind == 'play-aab' }}
         working-directory: apps/game
         env:
           PIXELHUB_RELEASE_STORE_FILE: ${{ runner.temp }}/pixelhub-upload.jks
@@ -96,7 +91,7 @@ jobs:
           test -n "$PIXELHUB_RELEASE_KEY_PASSWORD"
           flutter build appbundle --release --no-pub
       - name: Build signed release APK for Android app stores
-        if: ${{ github.event_name == 'push' || inputs.build_kind == 'play-aab' }}
+        if: ${{ inputs.build_kind == 'play-aab' }}
         working-directory: apps/game
         env:
           PIXELHUB_RELEASE_STORE_FILE: ${{ runner.temp }}/pixelhub-upload.jks
@@ -105,7 +100,7 @@ jobs:
           PIXELHUB_RELEASE_KEY_PASSWORD: ${{ secrets.PIXELHUB_UPLOAD_KEY_PASSWORD }}
         run: flutter build apk --release --no-pub
       - name: Verify signed release APK and record SHA-256
-        if: ${{ github.event_name == 'push' || inputs.build_kind == 'play-aab' }}
+        if: ${{ inputs.build_kind == 'play-aab' }}
         working-directory: apps/game
         run: |
           apk="build/app/outputs/flutter-apk/app-release.apk"
@@ -116,7 +111,7 @@ jobs:
           shasum -a 256 "$apk"
           du -h "$apk"
       - name: Verify signed Play AAB and record SHA-256
-        if: ${{ github.event_name == 'push' || inputs.build_kind == 'play-aab' }}
+        if: ${{ inputs.build_kind == 'play-aab' }}
         working-directory: apps/game
         run: |
           bundle="build/app/outputs/bundle/release/app-release.aab"
@@ -139,7 +134,7 @@ jobs:
           PY
       - name: Print Android package size breakdown
         env:
-          BUILD_KIND: ${{ github.event_name == 'push' && 'play-aab' || inputs.build_kind }}
+          BUILD_KIND: ${{ inputs.build_kind }}
         run: |
           python3 - <<'PY'
           import os
@@ -189,8 +184,8 @@ jobs:
             apps/game/build/app/outputs/flutter-apk/commit.txt
           if-no-files-found: error
           retention-days: 14
-      - name: Upload Play AAB
-        if: ${{ github.event_name == 'push' || inputs.build_kind == 'play-aab' }}
+      - name: Upload signed store APK and Play AAB
+        if: ${{ inputs.build_kind == 'play-aab' }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: pixelhub-store-release-v${{ steps.source.outputs.version }}-${{ steps.source.outputs.sha }}
