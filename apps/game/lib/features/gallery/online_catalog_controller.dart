@@ -160,9 +160,9 @@ class OnlineCatalogController extends ChangeNotifier {
         final saved = await storage.readDownloadedCategories();
         _downloadedCategories
           ..clear()
-          ..addEntries(saved.entries.where(
-            (entry) => _downloaded.containsKey(entry.key),
-          ));
+          ..addEntries(
+            saved.entries.where((entry) => _downloaded.containsKey(entry.key)),
+          );
       } on Object {
         // Legacy levels remain playable with the normal fallback category.
       }
@@ -218,10 +218,7 @@ class OnlineCatalogController extends ChangeNotifier {
         if (_downloaded.containsKey(picture.id) &&
             !_downloadedCategories.containsKey(picture.id)) {
           try {
-            await storage.saveDownloadedCategory(
-              picture.id,
-              picture.category,
-            );
+            await storage.saveDownloadedCategory(picture.id, picture.category);
             _downloadedCategories[picture.id] = picture.category;
           } on Object {
             // Retry a missing category the next time the gallery refreshes.
