@@ -24,6 +24,24 @@ Completed pictures offer **Export PNG / share**: Android opens its share sheet, 
 
 Android's bundled catalog works without a content server. On the production Web artifact, wait for Settings' offline-ready message before relying on offline reopening; the first visit needs connectivity. A service worker caches only public app resources, fonts, CanvasKit and levels. Updates activate after previous tabs close. Private browsing, browser policy, quota or eviction can prevent offline availability. The development server lacks the generated offline manifest. This new behavior is implemented but has not been validated in this session.
 
+## Optional online pictures (GitHub Releases)
+
+The gallery now checks a public online catalog on entry. Users see new pictures
+and explicitly choose which numbered-image JSON files to download; downloaded
+levels are stored separately from personal photo conversions and then play
+offline. The initial demo is a 24×24 hot-air balloon.
+
+**Distribution:** only GitHub Releases in this same repository store remote
+level files; `git clone` does not fetch those release assets. The Pages publish
+workflow mirrors validated Release packs as `/Pixelhub/online/` content. A
+successful Web CI and Pages run are required before the initial balloon becomes
+public. No sample image binaries are checked into `main`.
+
+Instructions for adding more pictures: [Online content publishing](docs/online-content.md).
+Published assets and live download behavior have not been manually validated in
+this development session; check GitHub Actions and the Pages catalog before
+claiming the sample is publicly available.
+
 ## V4 development status
 
 The next roadmap stage is account-based progress synchronization. A pure conflict-resolution contract now lives in `packages/game_domain/lib/progress_sync.dart` (ADR 0004): disjoint completed cells merge within the same server reset generation, while a Reset invalidates older-generation writes. This is **domain groundwork only**, not an online feature. The [backend contract files](backend/README.md) now include a draft OpenAPI document and unexecuted PostgreSQL migration with an idempotency ledger schema. A separate account-scoped durable FIFO outbox now persists queued operations on Android/Web, but no UI or network adapter uses it yet. Auth, a running API, network sync, guest migration, account deletion and cross-device verification are still pending. Personal photo originals remain local.
@@ -102,4 +120,4 @@ The browser suite covers both languages, real localStorage writes, wrong-color r
 
 [V3 decisions](docs/adr/0003-v3-private-gallery-and-import.md) · [V3 pending acceptance](docs/qa/v3-manual-checklist.md) · [Product plan](docs/product-plan/README.md) · [V2 decisions](docs/adr/0002-v2-painting-and-localization.md) · [V2 validation](docs/qa/v2-validation.md) · [Manual checklist](docs/qa/v2-manual-checklist.md) · [Asset provenance](apps/game/assets/README.md) · [Changelog](CHANGELOG.md).
 
-V3 has no online gallery, accounts/sync, ads, purchases or community. V3 has not been tested or built locally under the owner’s workflow; no CI, public deployment, offline or physical-phone result is claimed. Prior V2 validation applies to its historical implementation only.
+The original V3 bundle had no online gallery; the new optional release-backed online gallery is added in source. Accounts/sync, ads, purchases and community are still inactive. V3 has not been tested or built locally under the owner’s workflow; no CI, public deployment, offline or physical-phone result is claimed. Prior V2 validation applies to its historical implementation only.
