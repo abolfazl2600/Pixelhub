@@ -352,6 +352,8 @@ class OnlineCatalogController extends ChangeNotifier {
       for (final id in (retirement as List? ?? const [])) {
         if (id is! String ||
             !RegExp(r'^online-[a-z0-9-]{1,64}$').hasMatch(id) ||
+            id != 'online-starry-night' ||
+            !ids.contains('online-starry-night-detailed') ||
             ids.contains(id) ||
             !retired.add(id)) {
           throw const FormatException('Invalid retired online picture ID.');
