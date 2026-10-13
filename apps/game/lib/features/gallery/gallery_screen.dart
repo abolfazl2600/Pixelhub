@@ -112,7 +112,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
     }
   }
 
-
   Future<void> _downloadAndPaint(
     OnlinePicture picture, {
     BuildContext? previewContext,
@@ -126,9 +125,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
       }
       if (mounted) context.push('/painting/${picture.id}');
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.strings.downloadFailed)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.strings.downloadFailed)));
     }
   }
 
@@ -242,7 +241,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
                           tooltip: library.isFavorite(level)
                               ? s.removeFavorite
                               : s.addFavorite,
-                          onPressed: library.busy ||
+                          onPressed:
+                              library.busy ||
                                   library.status != LibraryStatus.ready
                               ? null
                               : () => _favorite(level),
@@ -354,7 +354,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
                               ? const SizedBox(
                                   width: 20,
                                   height: 20,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
                                 )
                               : const Icon(
                                   Icons.cloud_download_outlined,
@@ -394,10 +396,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 ],
               ),
               const SizedBox(height: 4),
-              Text(
-                s.onlinePictures,
-                style: const TextStyle(fontSize: 11),
-              ),
+              Text(s.onlinePictures, style: const TextStyle(fontSize: 11)),
             ],
           ),
         ),
@@ -505,9 +504,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
                               ChoiceChip(
                                 label: Text(entry.value),
                                 selected: _filter == entry.key,
-                                onSelected: (_) => setState(
-                                  () => _filter = entry.key,
-                                ),
+                                onSelected: (_) =>
+                                    setState(() => _filter = entry.key),
                               ),
                           ],
                         ),
@@ -599,14 +597,16 @@ class _GalleryScreenState extends State<GalleryScreen> {
                             if (online.status == OnlineCatalogStatus.ready)
                               Text(
                                 context.digits(available.length),
-                                style: const TextStyle(color: PixelTokens.muted),
+                                style: const TextStyle(
+                                  color: PixelTokens.muted,
+                                ),
                               ),
                             IconButton(
                               tooltip: s.checkPictures,
                               onPressed:
                                   online.status == OnlineCatalogStatus.checking
-                                      ? null
-                                      : online.checkForUpdates,
+                                  ? null
+                                  : online.checkForUpdates,
                               icon: const Icon(Icons.refresh),
                             ),
                           ],
@@ -659,9 +659,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
                       child: Center(
                         child: OutlinedButton.icon(
                           key: const ValueKey('online-show-more'),
-                          onPressed: () => setState(
-                            () => _onlineVisibleCount += 12,
-                          ),
+                          onPressed: () =>
+                              setState(() => _onlineVisibleCount += 12),
                           icon: const Icon(Icons.expand_more),
                           label: Text(
                             '${s.showMoreOnline} '
