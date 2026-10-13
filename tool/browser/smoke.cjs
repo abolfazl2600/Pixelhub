@@ -201,10 +201,10 @@ async function main() {
     await page.route(onlineBase+'**', async route => {
       const uri = new URL(route.request().url());
       if(uri.pathname.endsWith('/catalog.json')) {
-        return route.fulfill({status:200,contentType:'application/json',body:remoteCatalog});
+        return route.fulfill({status:200,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:remoteCatalog});
       }
       if(uri.pathname.endsWith('/levels/online-smoke-test-v1.json')) {
-        return route.fulfill({status:200,contentType:'application/json',body:levelPayload});
+        return route.fulfill({status:200,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:levelPayload});
       }
       if(uri.pathname.endsWith('/previews/online-smoke-test-v1.png')) {
         return route.fulfill({status:200,contentType:'image/png',body:preview});
