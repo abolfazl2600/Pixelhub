@@ -76,7 +76,7 @@ def png(level):
 # Old immutable pack remains intact; only the public gallery entry is retired.
 # Replacement ships under a fresh ID because downloaded levels are checksum-bound.
 RETIRED_ONLINE_IDS = {
-    "online-starry-night": "online-starry-night-detailed",
+    "online-starry-night": "online-classic-starry-night-detailed",
 }
 
 LEGACY_AZADI_ID = "online-iran-azadi-tower"
