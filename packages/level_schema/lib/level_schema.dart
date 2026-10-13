@@ -1,3 +1,5 @@
+export 'animation.dart';
+
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
