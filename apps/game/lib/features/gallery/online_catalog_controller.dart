@@ -342,9 +342,8 @@ class OnlineCatalogController extends ChangeNotifier {
         }
         result.add(entry);
       }
-      // Optional retirement metadata lets updated clients purge locally saved
-      // obsolete online art without requiring data migrations. Never delete
-      // anything until the entire authoritative catalog is validated.
+      // Purge retired online downloads only after complete catalog validation.
+      // Current native binaries ignore the optional hint until an app update.
       final retirement = json['retiredIds'];
       if (retirement != null && retirement is! List) {
         throw const FormatException('Invalid retired online IDs.');
@@ -352,117 +351,7 @@ class OnlineCatalogController extends ChangeNotifier {
       final retired = <String>{};
       for (final id in (retirement as List? ?? const [])) {
         if (id is! String ||
-            !RegExp(r'^online-[a-z0-9-]{1,64}
-      status = OnlineCatalogStatus.ready;
-      unawaited(_backfillAnimations(result));
-      // Upgrade legacy downloads only when an authoritative catalog is
-      // available. Failure to write metadata must not hide online pictures.
-      for (final picture in result) {
-        if (_disposed) return;
-        if (_downloaded.containsKey(picture.id) &&
-            _downloadedCategories[picture.id] != picture.category) {
-          try {
-            await storage.saveDownloadedCategory(picture.id, picture.category);
-            _downloadedCategories[picture.id] = picture.category;
-          } on Object {
-            // Retry a missing category the next time the gallery refreshes.
-          }
-        }
-      }
-    } on Object {
-      if (_disposed) return;
-      status = OnlineCatalogStatus.error;
-    }
-    _notify();
-  }
-
-  Future<void> download(OnlinePicture picture) async {
-    if (downloadingId != null || _downloaded.containsKey(picture.id)) return;
-    downloadingId = picture.id;
-    failedDownloadId = null;
-    _notify();
-    try {
-      final source = await _loadRemote(
-        'levels/${picture.stem}.json',
-        timeout: const Duration(seconds: 25),
-        maxBytes: 262144,
-      );
-      if (utf8.encode(source).length != picture.bytes) {
-        throw const FormatException('Download length mismatch.');
-      }
-      final decoded = jsonDecode(source);
-      if (decoded is! Map<String, dynamic>) {
-        throw const FormatException('Invalid downloaded level.');
-      }
-      final level = LevelDefinition.fromJson(decoded);
-      if (level.id != picture.id ||
-          level.contentVersion != picture.version ||
-          level.checksum != picture.checksum ||
-          level.width != picture.width ||
-          level.height != picture.height) {
-        throw const FormatException('Downloaded level does not match catalog.');
-      }
-      PixelAnimation? animation;
-      if (picture.animation != null) {
-        animation = await _fetchAnimation(picture, level);
-        await (storage as OnlineAnimationStorage).saveDownloadedAnimation(
-          level,
-          animation,
-        );
-      }
-      try {
-        await storage.saveDownloadedLevel(level, category: picture.category);
-      } on Object {
-        if (animation != null) {
-          try {
-            await (storage as OnlineAnimationStorage).removeDownloadedAnimation(
-              level.id,
-            );
-          } on Object {
-            // Orphan sidecars are ignored until the level is available.
-          }
-        }
-        rethrow;
-      }
-      if (_disposed) return;
-      if (animation != null) _animations[level.id] = animation;
-      _downloaded[level.id] = level;
-      _downloadedCategories[level.id] = picture.category;
-    } on Object catch (error) {
-      debugPrint('Online picture download failed: $error');
-      if (!_disposed) failedDownloadId = picture.id;
-    } finally {
-      downloadingId = null;
-      _notify();
-    }
-  }
-
-  Future<void> removeDownloaded(String id) async {
-    if (!_downloaded.containsKey(id)) return;
-    await storage.removeDownloadedLevel(id);
-    _downloaded.remove(id);
-    _downloadedCategories.remove(id);
-    _animations.remove(id);
-    _notify();
-  }
-
-  void clearDownloaded() {
-    _downloaded.clear();
-    _downloadedCategories.clear();
-    _animations.clear();
-    pictures = [];
-    status = OnlineCatalogStatus.idle;
-    _notify();
-  }
-
-  @override
-  void dispose() {
-    _disposed = true;
-    if (_ownsClient) _client.close();
-    super.dispose();
-  }
-}
-).hasMatch(id) ||
+            !RegExp(r'^online-[a-z0-9-]{1,64}$').hasMatch(id) ||
             ids.contains(id) ||
             !retired.add(id)) {
           throw const FormatException('Invalid retired online picture ID.');
@@ -475,7 +364,7 @@ class OnlineCatalogController extends ChangeNotifier {
           try {
             await removeDownloaded(id);
           } on Object {
-            // Retry retirement on the next successful online refresh.
+            // Retry on the next valid catalog fetch.
           }
         }
       }
