@@ -10,9 +10,9 @@
   `apps/game/android/app/build.gradle.kts`. Verify installation/build compatibility
   with Android SDK 36, Flutter 3.35.7, AGP and target-device behavior before release.
 - `main` CI does **not** build Android. In GitHub Actions, manually run
-  **Build Android (manual: preview APK or signed Play AAB)**.
+  **Build Android (preview APK or signed store APK + Play AAB)**.
   - `preview-apk`: debug-signed installable APK, **not** for Play upload.
-  - `play-aab` (**manual workflow default**): release AAB signed with your private upload key; the job verifies the AAB signature and ZIP structure, and prints its SHA-256 checksum.
+  - `play-aab` (**manual workflow default**): creates BOTH a Play-uploadable release AAB and a release APK for Android app stores, signed using the same private upload key. The job verifies the AAB JAR signature and the APK v2 signature, checks the AAB structure, and prints SHA-256 checksums.
 - Generate a secure upload keystore **outside the repository**, e.g.:
 
   ```bash
@@ -34,6 +34,8 @@
   when any secret is missing; it never falls back to a debug signature.
 - Enroll in **Play App Signing**. Upload the resulting
   `app-release.aab` from the specific Actions artifact to Internal Testing.
+  The companion `app-release.apk` is for other Android stores that accept APKs.
+  Confirm the Google Play **app-signing** certificate matches the cross-store APK signing certificate if you require seamless updates across stores; Play may use a different app-signing key from the upload key.
   Play Console still needs its own app/account verification and approval.
 - Confirm that Google Play accepts the bundle. In particular review 16 KB
   page-size compatibility / native libraries, final merged Android manifest,
@@ -93,9 +95,12 @@
 
 ## Unverified / owner decisions
 
-- No actual AAB, Android build, physical-device QA, merged permission report,
-  Play account, content rating certificate, accepted Data Safety form, or
-  production listing is claimed by these source changes.
+- **Verified Android release generated 2026-10-13:** GitHub Actions run
+  [38364612667](https://github.com/abolfazl2600/Pixelhub/actions/runs/38364612667)
+  produced a signed AAB and signed release APK for version `0.3.2+5`;
+  `jarsigner` and `apksigner` checks passed. This does **not** establish
+  physical-device QA, merged permission report, store acceptance,
+  content rating certificate, accepted Data Safety form, or a production listing.
 - The owner must create and retain the upload key, supply GitHub Secrets,
   choose the actual target ages/countries, provide the support email, verify
   the public policy URL and complete/submit the Console forms.
