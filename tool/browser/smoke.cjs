@@ -214,8 +214,9 @@ async function main() {
     await page.goto(base+'#/gallery'); await ready();
     await page.getByRole('button',{name:'دریافت تصویر',exact:true}).waitFor();
     await page.getByRole('button',{name:'دریافت تصویر',exact:true}).click();
-    await page.getByRole('button',{name:'دریافت تصویر',exact:true}).waitFor({state:'hidden'});
-    await page.getByText('تصویر آنلاین آزمایشی',{exact:true}).waitFor();
+    // SliverGrid is lazy: downloaded images are appended after 40 bundled
+    // levels, so their gallery cards are not mounted while viewing the top.
+    await page.getByText('فعلاً تصویر جدیدی برای دریافت وجود ندارد.',{exact:true}).waitFor();
     await page.goto(base+'#/painting/online-smoke-test');
     await ready(); await board().waitFor();
 
