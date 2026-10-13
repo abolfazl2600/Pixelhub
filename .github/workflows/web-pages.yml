@@ -106,6 +106,20 @@ jobs:
               --notes "Twelve original pixel-art coloring levels across animals, food, nature and space. Each numbered level and its PNG preview are downloadable release assets, not part of git clone." \
               --latest=false
           fi
+      - name: Publish six classic masterwork interpretations outside git
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-masterworks-6-v1 >/dev/null 2>&1; then
+            python3 tool/online_masterworks_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-masterworks-6-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: six classic masterpieces in pixel art" \
+              --notes "Six original simplified color-by-number interpretations: Mona Lisa, The Starry Night, The Scream, Sunflowers, Girl with a Pearl Earring and The Great Wave. Numbered JSON levels and PNG previews are downloadable Release assets, not tracked source files." \
+              --latest=false
+          fi
       - name: Download release packs and assemble online catalog
         env:
           GH_TOKEN: ${{ github.token }}
