@@ -8,11 +8,7 @@ import '../../l10n/strings.dart';
 import '../gallery/library_controller.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({
-    required this.levels,
-    required this.library,
-    super.key,
-  });
+  const HomeScreen({required this.levels, required this.library, super.key});
   final List<LevelDefinition> levels;
   final LibraryController library;
 
@@ -90,9 +86,7 @@ class HomeScreen extends StatelessWidget {
                         child: Text(
                           s.homeCompleted(
                             context.digits(
-                              library.levels
-                                  .where(library.isComplete)
-                                  .length,
+                              library.levels.where(library.isComplete).length,
                             ),
                             context.digits(library.levels.length),
                           ),
