@@ -1,0 +1,122 @@
+{
+  "online-classic-liberty-leading": {
+    "motion": "sway",
+    "region": [
+      0.5,
+      0.05,
+      0.85,
+      0.34
+    ],
+    "version": 1,
+    "checksum": "57da90d7f87258310b68e350cde5d7d304acc10a0438f0a2eea9774e1c1d579a",
+    "animationChecksum": "427709db36111eccf07b3b0cfe4bf425db80a0271e2ab4a0ca6be060dcf2ddb9"
+  },
+  "online-classic-wanderer-fog": {
+    "motion": "glimmer",
+    "region": [
+      0.02,
+      0.05,
+      0.98,
+      0.39
+    ],
+    "version": 1,
+    "checksum": "55ccf97a3ebed2cce3c0292956dfe095f5d830cb673cf5d449b130e962f71643",
+    "animationChecksum": "de111edba528bc73a91ca5563f675a2fac16ae2fd965ff6c43c3f06e4912cf92"
+  },
+  "online-classic-fighting-temeraire": {
+    "motion": "ripple",
+    "region": [
+      0.02,
+      0.52,
+      0.98,
+      0.96
+    ],
+    "version": 1,
+    "checksum": "3c405b155c04315c9bfbc0efc1393b28b8c0aaf6de67bebcc053a39503f0e3b4",
+    "animationChecksum": "54e898265b26860fbe09557fe5b69fa14600ef88552f979a2e9f13b88114f301"
+  },
+  "online-classic-hay-wain": {
+    "motion": "ripple",
+    "region": [
+      0.02,
+      0.52,
+      0.98,
+      0.96
+    ],
+    "version": 1,
+    "checksum": "9439208e2bb6dc1ee89698087d2d588de2d707fb301f2771c669a4b19b4bb066",
+    "animationChecksum": "e1dd52788229cca028488335cb242987747f77de8189536cb4683cc549eb815f"
+  },
+  "online-classic-impression-sunrise": {
+    "motion": "ripple",
+    "region": [
+      0.02,
+      0.52,
+      0.98,
+      0.96
+    ],
+    "version": 1,
+    "checksum": "1faf5a938fa73ae4adc1eebe43f40e14801fce497b8f05743117069ccebcfe66",
+    "animationChecksum": "48e375eb1b01f3c126d0cb140b0a2e35e8ff63b26d001319be6eaac5ad26e30a"
+  },
+  "online-classic-water-lilies": {
+    "motion": "ripple",
+    "region": [
+      0.02,
+      0.52,
+      0.98,
+      0.96
+    ],
+    "version": 1,
+    "checksum": "b713b6fce030ab22699e768cebb06a62ce0d3b9bf769a706175f11d04b9f3af4",
+    "animationChecksum": "d599db1e684bf49c2b0f92ac4b42f0c4b14fd7f9a3d199422b3d3d5d987c9772"
+  },
+  "online-classic-moulin-galette": {
+    "motion": "glimmer",
+    "region": [
+      0.24,
+      0.28,
+      0.78,
+      0.84
+    ],
+    "version": 1,
+    "checksum": "a4d694364caab2b4b054417e19f7b47b8368bd272d76c5701d3aeb412cf95ede",
+    "animationChecksum": "59bf0252bb5994b8d2b11e4d05594c2d2f13dc7c6f89c7243359e847aca2cea3"
+  },
+  "online-classic-grande-jatte": {
+    "motion": "glimmer",
+    "region": [
+      0.24,
+      0.28,
+      0.78,
+      0.84
+    ],
+    "version": 1,
+    "checksum": "4726821b26a8f45f255a2679b8797649e3f7328f855ee4b75eeb0662dab30dc2",
+    "animationChecksum": "a9fb5a1685bf1bd581853272956d0ab0e6d4fad49c46d40c5ebc5abcc8a5e23d"
+  },
+  "online-classic-klimt-kiss": {
+    "motion": "glimmer",
+    "region": [
+      0.24,
+      0.28,
+      0.78,
+      0.84
+    ],
+    "version": 1,
+    "checksum": "3b08f886562be5304c50acb3218439ec272ca4eac70b77d259d89c659ba8d10d",
+    "animationChecksum": "bc32a4d84e650d980790afa3b26477b888b0d5694090ae909e408b6f19d17315"
+  },
+  "online-classic-card-players": {
+    "motion": "glimmer",
+    "region": [
+      0.24,
+      0.28,
+      0.78,
+      0.84
+    ],
+    "version": 1,
+    "checksum": "eef7b278fc9255e6e34834c5a8fa993e25fcb08329efb2927e06685296384a01",
+    "animationChecksum": "ed6e1468b615ee02a5240dc916ffc826a5058f110bb848f9e57ec4d236138a4a"
+  }
+}
