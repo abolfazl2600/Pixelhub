@@ -1,4 +1,5 @@
-import 'package:flutter/foundation.dart' show TargetPlatform, debugDefaultTargetPlatformOverride;
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, debugDefaultTargetPlatformOverride;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:persistence/persistence.dart';
@@ -124,8 +125,9 @@ void main() {
     expect(tester.getSize(frame).width, 880);
     expect(tester.getTopLeft(frame).dx, 280);
     expect(
-      MediaQuery.sizeOf(tester.element(find.byKey(const ValueKey('home-scroll'))))
-          .width,
+      MediaQuery.sizeOf(
+        tester.element(find.byKey(const ValueKey('home-scroll'))),
+      ).width,
       880,
     );
     expect(tester.takeException(), isNull);
