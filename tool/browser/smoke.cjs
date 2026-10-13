@@ -135,9 +135,21 @@ async function main() {
     for (const id of ['rainbow','gem','planet']) {
       await page.goto(base+'#/painting/'+id); await ready(); await board().waitFor();
       await scrollTop();
-      const current=await boardBox();
       const dimension={rainbow:32,gem:64,planet:128}[id];
-      await page.mouse.click(current.x+current.width/(dimension*2),current.y+current.height/(dimension*2));
+      const picture=(await (await page.request.get(base+`assets/assets/levels/${id}.json`)).json());
+      // Painting near the extreme top-left is unreliable on very dense
+      // mobile grids. Aim at an interior cell, explicitly selecting its
+      // actual palette number so changing artwork colors doesn't break CI.
+      const x=Math.floor(dimension/4), y=Math.floor(dimension/4);
+      const color=picture.cells[y*dimension+x];
+      console.log('Browser: sample cell',id,x,y,color);
+      await page.getByRole('button',{name:new RegExp(`^Color ${color+1},`)}).click();
+      await scrollTop();
+      const current=await boardBox();
+      await page.mouse.click(
+        current.x+current.width*(x+0.5)/dimension,
+        current.y+current.height*(y+0.5)/dimension
+      );
       await page.waitForFunction(id=>{
         const k=Object.keys(localStorage).find(k=>k.includes('pixelhub.progress.v1.'+id+'.1'));
         if(!k)return false;
