@@ -138,7 +138,9 @@ class LibraryController extends ChangeNotifier {
 
   String category(LevelDefinition level) => level.id.startsWith('private-')
       ? 'personal'
-      : onlineCategories[level.id] ?? metadata[level.id]?.category ?? 'patterns';
+      : onlineCategories[level.id] ??
+            metadata[level.id]?.category ??
+            'patterns';
   bool isFavorite(LevelDefinition level) =>
       library.favorites.contains(level.id);
   int completed(LevelDefinition level) =>
