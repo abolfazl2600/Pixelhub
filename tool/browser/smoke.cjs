@@ -223,9 +223,17 @@ async function main() {
       return route.fulfill({status:404,body:'Not found'});
     });
     await page.goto(base+'#/gallery'); await ready();
-    await page.getByRole('button',{name:'دریافت تصویر',exact:true}).waitFor();
-    await page.getByRole('button',{name:'دریافت تصویر',exact:true}).click();
-    await page.waitForTimeout(1800);
+    // The online collection now follows the local grid. Scroll to the end
+    // until its lazy sliver builds the explicit download control.
+    const downloadButton = page.getByRole('button',{name:'دریافت تصویر',exact:true});
+    await page.mouse.move(180,400);
+    for(let i=0;i<25 && !(await downloadButton.isVisible());i++) {
+      await page.mouse.wheel(0,1600);
+      await page.waitForTimeout(80);
+    }
+    await downloadButton.waitFor();
+    await downloadButton.click();
+    await page.waitForTimeout(600);
     console.log('Online test requests:',remoteRequests);
     console.log('Online test download failed:',
       await page.getByText('دریافت یا ذخیره این تصویر کامل نشد. دوباره تلاش کنید.',{exact:true}).count());
@@ -233,8 +241,9 @@ async function main() {
     // Confirm the user-approved level was actually written to browser storage.
     await page.waitForFunction(() => Object.keys(localStorage).some(
       key => key.includes('pixelhub.online.level.online-smoke-test')));
-    await page.goto(base+'#/painting/online-smoke-test');
-    await ready(); await board().waitFor();
+    // Downloading a card starts painting directly, without a second action.
+    await board().waitFor();
+    assert.equal(new URL(page.url()).hash,'#/painting/online-smoke-test');
 
     assert.deepEqual(pageErrors,[]); assert.deepEqual(failedRequests,[]); assert.deepEqual(externalRequests,[]);
     console.log(JSON.stringify({defaultPersian:'passed',englishAndLanguageRestore:'passed',
