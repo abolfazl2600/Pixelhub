@@ -63,7 +63,7 @@ class ArtworkRedesignTests(unittest.TestCase):
         planet = levels["planet"]
         self.assertGreater(len(set(planet["cells"])), 12)
         self.assertNotEqual(planet["cells"][64 * 128 + 64], 0)
-        self.assertNotEqual(planet["cells"][64 * 128 + 13], 0)
+        self.assertNotEqual(planet["cells"][79 * 128 + 15], 0)
         star = levels["star"]
         c = star["cells"]
         self.assertNotEqual(c[5 * 32 + 16], c[5 * 32 + 5])
