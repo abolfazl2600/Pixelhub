@@ -6,6 +6,7 @@ import 'package:level_schema/level_schema.dart';
 import '../../core/pixel_art_preview.dart';
 import '../../l10n/strings.dart';
 import 'library_controller.dart';
+import 'online_catalog_controller.dart';
 
 String categoryLabel(BuildContext context, String category) =>
     switch (category) {
@@ -20,10 +21,12 @@ String categoryLabel(BuildContext context, String category) =>
 class GalleryScreen extends StatefulWidget {
   const GalleryScreen({
     required this.library,
+    required this.online,
     this.personal = false,
     super.key,
   });
   final LibraryController library;
+  final OnlineCatalogController online;
   final bool personal;
   @override
   State<GalleryScreen> createState() => _GalleryScreenState();
@@ -31,6 +34,89 @@ class GalleryScreen extends StatefulWidget {
 
 class _GalleryScreenState extends State<GalleryScreen> {
   String _category = 'all', _filter = 'all', _search = '';
+
+  @override
+  void initState() {
+    super.initState();
+    if (!widget.personal) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) widget.online.checkForUpdates();
+      });
+    }
+  }
+
+  Widget _onlinePanel(BuildContext context) {
+    final s = context.strings;
+    final online = widget.online;
+    final pending = online.available;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(children: [
+              const Icon(Icons.cloud_download_outlined),
+              const SizedBox(width: 8),
+              Expanded(child: Text(s.onlinePictures,
+                  style: const TextStyle(fontWeight: FontWeight.w700))),
+              TextButton.icon(
+                onPressed: online.status == OnlineCatalogStatus.checking
+                    ? null : online.checkForUpdates,
+                icon: const Icon(Icons.refresh),
+                label: Text(s.checkPictures),
+              ),
+            ]),
+            if (online.status == OnlineCatalogStatus.checking)
+              Text(s.checkingPictures),
+            if (online.status == OnlineCatalogStatus.error)
+              Text(s.onlineUnavailable),
+            if (online.status == OnlineCatalogStatus.ready && pending.isEmpty)
+              Text(s.noNewPictures),
+            if (pending.isNotEmpty) ...[
+              Text('${s.onlineCount}: ${context.digits(pending.length)}'),
+              const SizedBox(height: 8),
+              for (final picture in pending.take(5))
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        online.previewUrl(picture).toString(),
+                        width: 56, height: 56, fit: BoxFit.cover,
+                        errorBuilder: (context, error, stack) =>
+                            const SizedBox(width: 56, height: 56,
+                                child: Icon(Icons.image_outlined)),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(picture.titleFor(context.isPersian ? 'fa' : 'en'),
+                            maxLines: 2, overflow: TextOverflow.ellipsis),
+                        Text('${context.digits(picture.width)} × ${context.digits(picture.height)}',
+                            style: const TextStyle(fontSize: 12)),
+                      ],
+                    )),
+                    FilledButton(
+                      onPressed: online.downloadingId != null
+                          ? null : () => online.download(picture),
+                      child: Text(online.downloadingId == picture.id
+                          ? s.downloadingPicture : s.downloadPicture),
+                    ),
+                  ]),
+                ),
+              if (online.failedDownloadId != null)
+                Text(s.downloadFailed, style: TextStyle(
+                    color: Theme.of(context).colorScheme.error)),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
 
   bool _matches(LevelDefinition level) {
     final library = widget.library;
@@ -81,7 +167,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
-    listenable: widget.library,
+    listenable: Listenable.merge([widget.library, widget.online]),
     builder: (context, _) {
       final s = context.strings, library = widget.library;
       final levels = library.levels.where(_matches).toList();
@@ -117,6 +203,10 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      if (!widget.personal) ...[
+                        _onlinePanel(context),
+                        const SizedBox(height: 12),
+                      ],
                       Text(
                         s.galleryResults(context.digits(levels.length)),
                         style: const TextStyle(
