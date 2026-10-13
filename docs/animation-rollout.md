@@ -24,6 +24,7 @@ Recipes live in `tool/animation_batches/`; each batch records up to ten pictures
 | Online 05 | saturn, astronaut, iran-persepolis, iran-azadi-tower, iran-milad-tower, iran-imam-mosque, iran-sio-se-pol, iran-nasir-ol-molk, iran-arg-e-bam, iran-hafez-tomb | float, glimmer, ripple, spin |
 | Online 06 | iran-amir-chakhmaq, iran-golestan-palace, iran-abstract-muqarnas, iran-abstract-dome, iran-abstract-orsi, iran-abstract-eslimi, iran-abstract-arches, iran-abstract-windcatcher, iran-abstract-shamsa, iran-abstract-mosque | glimmer |
 | Online 07 | iran-abstract-brickwork, iran-abstract-iwan, iran-blue-mosque-tabriz, iran-khaju-bridge, iran-ali-qapu, iran-chehel-sotoun, iran-shah-cheragh, iran-fin-garden, iran-eram-garden, iran-masuleh-village | glimmer, ripple, sway |
+| Online 08 | iran-kandovan, iran-lut-kaluts, iran-anzali-lagoon, iran-damavand, iran-persian-carpet, iran-minakari-plate, iran-khatam-box, iran-samovar-tea, iran-santur, iran-tombak | float, glimmer, pulse, ripple |
 
 CI and Pages results must be checked before describing a batch as verified or
 published. Online animation assets are generated during Pages publication and

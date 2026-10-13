@@ -1,0 +1,122 @@
+{
+  "online-iran-kandovan": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "f183f8496793b930e48f6d1676bc3f042f8bcdaa0ca916505254f0faf9a34a10",
+    "animationChecksum": "546efc6420b2f9fb5c4da5a20b202c2c4cb9ee37b9a0fa47fcdabe0bd6f5b89b"
+  },
+  "online-iran-lut-kaluts": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "7f4b702b619265b85b21dea0aacc5248a9bddce20093fce38ac39e9235444a8b",
+    "animationChecksum": "763c00bd40cddf06cdc522ea5cb8ef95a9d5b879f39cd15b6ca4cc2bb013d911"
+  },
+  "online-iran-anzali-lagoon": {
+    "motion": "ripple",
+    "region": [
+      0.05,
+      0.65,
+      0.95,
+      0.95
+    ],
+    "version": 1,
+    "checksum": "50038a1a3052eb3d90ff580d2853317441d69c973dde315b14b6f88456533c68",
+    "animationChecksum": "449cf698d32555494e0a97957703d9a7c6c87e41d24e69679ec3f8c4e072096a"
+  },
+  "online-iran-damavand": {
+    "motion": "float",
+    "region": [
+      0.75,
+      0.05,
+      0.92,
+      0.3
+    ],
+    "version": 1,
+    "checksum": "3d53e1458ee363e36b6e7169fd690048dd1c7d7bf8b194f1e432eaa35bd3665b",
+    "animationChecksum": "f64324e73d6e250ba21ce563b70868b3dddb89e072dc0bfe09afdc2f7ce529ed"
+  },
+  "online-iran-persian-carpet": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "e97208fed0b17d4d1acf98bca6519c3d86239cb76165c3e25d49187a41dfd927",
+    "animationChecksum": "b00b265745abc2bb0ac99c8e740d52dce30cb61f59f1012f722a78eebdb047c3"
+  },
+  "online-iran-minakari-plate": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "67ececc6c217c608b3bf47b3e8042039c78a9c0acaa2e0ad74468d5cb3ee874e",
+    "animationChecksum": "890686662487ac2c7996592fce12129456967f8cd1cbbeb122ea459948c17b58"
+  },
+  "online-iran-khatam-box": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "cebaff144d3e02aada19ced45d6c2316916fb1c18d045cdda5c9cd15659ca8f1",
+    "animationChecksum": "b315e1ed169bb7636042105bc8deebd7c104dce2fd6a1129854e0892182aefe4"
+  },
+  "online-iran-samovar-tea": {
+    "motion": "glimmer",
+    "region": [
+      0.15,
+      0.14,
+      0.79,
+      0.85
+    ],
+    "version": 1,
+    "checksum": "daa76ff003541f0b420249091bfe40d4b29884718966133494f57d579a02955c",
+    "animationChecksum": "98e546b39d60cec39c895787c3d15194cbf860766465882cacbe0ec48001eb3e"
+  },
+  "online-iran-santur": {
+    "motion": "pulse",
+    "region": [
+      0.12,
+      0.3,
+      0.89,
+      0.84
+    ],
+    "version": 1,
+    "checksum": "83894eb72f7aef159af1c6dde54d640d5292fc045cccc974c7019b063fa45fe6",
+    "animationChecksum": "b267bfe7e6285b6dc2b04009c8dd6b879c3f64c4c4b4fa5b486e22ea3429d8c6"
+  },
+  "online-iran-tombak": {
+    "motion": "pulse",
+    "region": [
+      0.12,
+      0.3,
+      0.89,
+      0.84
+    ],
+    "version": 1,
+    "checksum": "ad7d26d57010ccd6db5f4e350fe02bd74a6074ae36af9fc57ac82c2762ed7ada",
+    "animationChecksum": "06f51c88127148f5794ba882a924440143a89148c4345492aa996f5302339c41"
+  }
+}
