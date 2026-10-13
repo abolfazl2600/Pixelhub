@@ -13,6 +13,7 @@ dependencies:
   web: 1.1.1
   file_selector: 1.0.4
   image: 4.5.4
+  http: 1.6.0
   share_plus: 11.1.0
   painting_engine:
     path: ../../packages/painting_engine
