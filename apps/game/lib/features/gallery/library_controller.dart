@@ -7,9 +7,14 @@ import 'package:level_schema/level_schema.dart';
 enum LibraryStatus { loading, ready, error }
 
 class LibraryController extends ChangeNotifier {
-  LibraryController(this.repository, this.progressRepository);
+  LibraryController(
+    this.repository,
+    this.progressRepository, {
+    this.recentArtworkRepository,
+  });
   final ArtworkRepository repository;
   final ProgressRepository progressRepository;
+  final RecentArtworkRepository? recentArtworkRepository;
   ArtworkLibrary library = ArtworkLibrary();
   LibraryStatus status = LibraryStatus.loading;
   List<LevelDefinition> catalog = [];
@@ -20,6 +25,9 @@ class LibraryController extends ChangeNotifier {
   final Set<String> damagedProgress = {};
   final Map<String, int> _revisions = {};
   Future<void> _operations = Future.value();
+  Future<void> _recentWrites = Future.value();
+  String? _recentArtworkId;
+  int _recentRevision = 0;
   bool busy = false;
   bool storageError = false;
   bool _disposed = false;
@@ -136,6 +144,64 @@ class LibraryController extends ChangeNotifier {
     _notify();
   }
 
+  /// Read the last opened artwork without overwriting a newer navigation.
+  Future<void> loadRecentArtwork() async {
+    final repository = recentArtworkRepository;
+    if (repository == null) return;
+    final revision = _recentRevision;
+    try {
+      final id = await repository.readRecentArtworkId();
+      if (!_disposed && revision == _recentRevision) {
+        _recentArtworkId = id;
+        _notify();
+      }
+    } on Object {
+      // Damaged optional preferences must not prevent painting offline.
+    }
+  }
+
+  /// Called when a painting screen is opened, not on every widget rebuild.
+  Future<void> markOpened(LevelDefinition level) {
+    if (_recentArtworkId == level.id) return _recentWrites;
+    _recentArtworkId = level.id;
+    ++_recentRevision;
+    _notify();
+    final repository = recentArtworkRepository;
+    if (repository != null) {
+      _recentWrites = _recentWrites
+          .then((_) => repository.writeRecentArtworkId(level.id))
+          .catchError((Object _) {
+            // Progress remains usable even when optional recency cannot save.
+          });
+    }
+    return _recentWrites;
+  }
+
+  LevelDefinition? get continueLevel {
+    bool unfinished(LevelDefinition level) {
+      if (damagedProgress.contains(level.id)) return false;
+      final snapshot = progress[level.id];
+      return snapshot != null &&
+          snapshot.levelVersion == level.contentVersion &&
+          snapshot.levelChecksum == level.checksum &&
+          snapshot.cellCount == level.cells.length &&
+          snapshot.completedCount > 0 &&
+          snapshot.completedCount < level.cells.length;
+    }
+
+    final available = levels;
+    for (final level in available) {
+      if (level.id == _recentArtworkId && unfinished(level)) return level;
+    }
+    for (final level in available) {
+      if (unfinished(level)) return level;
+    }
+    return null;
+  }
+
+  int continuePercent(LevelDefinition level) =>
+      ((completed(level) * 100) ~/ level.cells.length).clamp(1, 99);
+
   String category(LevelDefinition level) => level.id.startsWith('private-')
       ? 'personal'
       : onlineCategories[level.id] ??
@@ -229,7 +295,11 @@ class LibraryController extends ChangeNotifier {
 
   Future<void> clear() => _mutate(() async {
     ++_generation;
+    ++_recentRevision;
+    await _recentWrites;
     await repository.clearPixelhubData();
+    await recentArtworkRepository?.clearRecentArtworkId();
+    _recentArtworkId = null;
     library = ArtworkLibrary();
     onlineLevels = [];
     onlineCategories = {};
