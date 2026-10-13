@@ -20,6 +20,7 @@ Recipes live in `tool/animation_batches/`; each batch records up to ten pictures
 | Online 01 | lion, elephant, giraffe, penguin, dolphin, koala, flamingo, octopus, deer, parrot | eye blinks, trunk/neck sway, wings, swimming, tentacles |
 | Online 02 | fox, wolf, brown-bear, zebra, tiger, cheetah, kangaroo, hippopotamus, rhinoceros, crocodile | blink, sway |
 | Online 03 | toucan, peacock, hedgehog, raccoon, sloth, seal, whale, shark, frog, chameleon | blink, flap, float, sway |
+| Online 04 | panda, bunny, turtle, owl, ice-cream, donut, coffee, cactus, autumn-tree, rain-cloud | blink, float, pulse, steam, sway |
 
 CI and Pages results must be checked before describing a batch as verified or
 published. Online animation assets are generated during Pages publication and

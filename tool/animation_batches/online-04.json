@@ -1,0 +1,92 @@
+{
+  "online-panda": {
+    "motion": "blink",
+    "version": 1,
+    "checksum": "3f3c16368ee16812ed0459eb5805b130641080ddb20e10d076a3895e946fdf8e",
+    "animationChecksum": "2856f7814fbde556408855d8ba3a6ea5b1e67c2931d39a39c809111654b4e117"
+  },
+  "online-bunny": {
+    "motion": "sway",
+    "region": [
+      0.17,
+      0.05,
+      0.83,
+      0.42
+    ],
+    "version": 1,
+    "checksum": "7bdd1fe0ddb3b6ad00a53904766f3bc0369cb0450a9c0f1f74f86104dccdbdac",
+    "animationChecksum": "b747ec617893078af98ad751db629c4693105441b31a95bfe88a0445d07dfe73"
+  },
+  "online-turtle": {
+    "motion": "float",
+    "version": 1,
+    "checksum": "621dd8cc4b384e4a60002ab7d27a34e6c7e6660558b3373ecbf514554911f22a",
+    "animationChecksum": "2124b5e69f05cd0969d16051b5bc4a86b91f1a3a03c9ed89b03743f9479c3aca"
+  },
+  "online-owl": {
+    "motion": "blink",
+    "version": 1,
+    "checksum": "a30325ca6f7ccae7dac737d69d638e513fb4739d49c9727a764dadcc27b0f17f",
+    "animationChecksum": "8e4f69fe51fbfd5c22b877b122d40ab903891d266f3335256215342f7d486422"
+  },
+  "online-ice-cream": {
+    "motion": "float",
+    "version": 1,
+    "checksum": "5b0eeec9a504182a7dd444faeccd5f63ae9935da98669c1e1142d47f725d9326",
+    "animationChecksum": "fe3d7561021cae8df970c2aa349c058ce34649c3a25036f28b1362ab37748da9"
+  },
+  "online-donut": {
+    "motion": "pulse",
+    "version": 1,
+    "checksum": "e26e27b4de9ac66ab00a3a993a3e135983a352eb16c627b153d1a69f4c8a7767",
+    "animationChecksum": "5772ba15587a9b6532488b43d2c1838f0360ca425c9b5c48a78aac7b5cf38a84"
+  },
+  "online-coffee": {
+    "motion": "steam",
+    "region": [
+      0.1,
+      0.02,
+      0.9,
+      0.4
+    ],
+    "version": 1,
+    "checksum": "8c6bc0d20e6ceed1fb7e9b91d1e7c36612536c3e6b6d7572762186a9d747eb6c",
+    "animationChecksum": "0b683e5cb60eebeb6f797621d6c3935ec90280099a937ec0848e7b6705ec5430"
+  },
+  "online-cactus": {
+    "motion": "sway",
+    "region": [
+      0.18,
+      0.16,
+      0.85,
+      0.75
+    ],
+    "version": 1,
+    "checksum": "0917d1895a5a7e2348c6b61751d3d0308ba82188c7eaeadeb888dbd9f0310fd5",
+    "animationChecksum": "2bb6544b983098aa27d9d265887263a31a0caa8ca783fc1483474fbb3e2d8b23"
+  },
+  "online-autumn-tree": {
+    "motion": "sway",
+    "region": [
+      0.1,
+      0.1,
+      0.9,
+      0.68
+    ],
+    "version": 1,
+    "checksum": "db564a87124db4f9ed73ae3a8213a3ac5f3eed1166b18b7517e6fd7483059ea0",
+    "animationChecksum": "dc3f285679e6352b6d6075e9579d809b945249ff0fd0510e3a823f4b829ca347"
+  },
+  "online-rain-cloud": {
+    "motion": "float",
+    "region": [
+      0.14,
+      0.22,
+      0.86,
+      0.57
+    ],
+    "version": 1,
+    "checksum": "04412bd79318bdff6ad14b5cb204a6b9ae4a8a979a6f9e2c9fdf8a1260e7be6d",
+    "animationChecksum": "14d0337b98380d9e9def5c6dd7e245819c790cffb98c3ffd533d43e044589c67"
+  }
+}
