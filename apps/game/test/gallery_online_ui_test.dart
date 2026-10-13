@@ -76,7 +76,7 @@ void main() {
     expect(find.byKey(ValueKey('local-picture-${flower.id}')), findsOneWidget);
 
     // Selecting Animals keeps the local picture and filters online metadata.
-    await tester.tap(find.text('جانوران'));
+    await tester.tap(find.widgetWithText(ChoiceChip, 'جانوران'));
     await tester.pumpAndSettle();
     expect(find.byKey(ValueKey('local-picture-${flower.id}')), findsOneWidget);
     await tester.scrollUntilVisible(
@@ -93,7 +93,7 @@ void main() {
     // Changing the chip resets pagination and the local empty state.
     await tester.drag(find.byType(CustomScrollView), const Offset(0, 2000));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('اشیا'));
+    await tester.tap(find.widgetWithText(ChoiceChip, 'اشیا'));
     await tester.pumpAndSettle();
     expect(
       find.text('هنوز نقاشی‌ای از این دسته روی دستگاه نیست.'),
