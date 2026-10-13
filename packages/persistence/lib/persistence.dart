@@ -112,9 +112,34 @@ final class LocalPreferences
   }
 
   @override
-  Future<void> saveDownloadedLevel(LevelDefinition level) => _enqueue(() async {
-    if (!level.id.startsWith('online-')) {
-      throw const FormatException('Only online levels can be downloaded.');
+  Future<Map<String, String>> readDownloadedCategories() async {
+    await _writes;
+    final source = await _preferences.getString('pixelhub.online.index.v1');
+    if (source == null) return {};
+    final ids = (jsonDecode(source) as List<Object?>).cast<String>();
+    if (ids.length > 1000) throw const FormatException('Too many downloads.');
+    final result = <String, String>{};
+    for (final id in ids) {
+      if (!RegExp(r'^online-[a-z0-9-]+$').hasMatch(id)) continue;
+      final category = await _preferences.getString(
+        'pixelhub.online.category.$id',
+      );
+      // Older installations may have no category; ignore damaged metadata.
+      if (category != null && onlinePictureCategories.contains(category)) {
+        result[id] = category;
+      }
+    }
+    return Map.unmodifiable(result);
+  }
+
+  @override
+  Future<void> saveDownloadedLevel(
+    LevelDefinition level, {
+    required String category,
+  }) => _enqueue(() async {
+    if (!level.id.startsWith('online-') ||
+        !onlinePictureCategories.contains(category)) {
+      throw const FormatException('Invalid online level or category.');
     }
     final key = 'pixelhub.online.level.${level.id}';
     final payload = jsonEncode(level.toJson());
@@ -132,6 +157,41 @@ final class LocalPreferences
       ids.add(level.id);
     }
     await _preferences.setString(key, payload);
+    // Write category before the index so a newly listed download is complete.
+    await _preferences.setString(
+      'pixelhub.online.category.${level.id}',
+      category,
+    );
+    await _preferences.setString('pixelhub.online.index.v1', jsonEncode(ids));
+  });
+
+  @override
+  Future<void> saveDownloadedCategory(String id, String category) =>
+      _enqueue(() async {
+        if (!RegExp(r'^online-[a-z0-9-]+$').hasMatch(id) ||
+            !onlinePictureCategories.contains(category)) {
+          throw const FormatException('Invalid online category metadata.');
+        }
+        final source = await _preferences.getString('pixelhub.online.index.v1');
+        if (source == null ||
+            !(jsonDecode(source) as List<Object?>).contains(id)) {
+          return; // Never recreate metadata for an already-deleted download.
+        }
+        await _preferences.setString('pixelhub.online.category.$id', category);
+      });
+
+  @override
+  Future<void> removeDownloadedLevel(String id) => _enqueue(() async {
+    if (!RegExp(r'^online-[a-z0-9-]+$').hasMatch(id)) {
+      throw const FormatException('Invalid downloaded level ID.');
+    }
+    final source = await _preferences.getString('pixelhub.online.index.v1');
+    final ids = source == null
+        ? <String>[]
+        : (jsonDecode(source) as List<Object?>).cast<String>().toList();
+    await _preferences.remove('pixelhub.online.level.$id');
+    await _preferences.remove('pixelhub.online.category.$id');
+    ids.remove(id);
     await _preferences.setString('pixelhub.online.index.v1', jsonEncode(ids));
   });
 
@@ -283,6 +343,7 @@ final class MemoryPreferences
   ArtworkLibrary _library = ArtworkLibrary();
   final Map<String, ProgressSyncOutbox> _outboxes = {};
   final Map<String, LevelDefinition> _downloads = {};
+  final Map<String, String> _downloadCategories = {};
   String _key(String id, int version) => '$id:$version';
 
   @override
@@ -290,8 +351,34 @@ final class MemoryPreferences
       List.unmodifiable(_downloads.values);
 
   @override
-  Future<void> saveDownloadedLevel(LevelDefinition level) async {
+  Future<Map<String, String>> readDownloadedCategories() async =>
+      Map.unmodifiable(_downloadCategories);
+
+  @override
+  Future<void> saveDownloadedLevel(
+    LevelDefinition level, {
+    required String category,
+  }) async {
+    if (!level.id.startsWith('online-') ||
+        !onlinePictureCategories.contains(category)) {
+      throw const FormatException('Invalid online level or category.');
+    }
     _downloads[level.id] = level;
+    _downloadCategories[level.id] = category;
+  }
+
+  @override
+  Future<void> saveDownloadedCategory(String id, String category) async {
+    if (!onlinePictureCategories.contains(category)) {
+      throw const FormatException('Invalid online category.');
+    }
+    if (_downloads.containsKey(id)) _downloadCategories[id] = category;
+  }
+
+  @override
+  Future<void> removeDownloadedLevel(String id) async {
+    _downloads.remove(id);
+    _downloadCategories.remove(id);
   }
 
   @override
@@ -356,6 +443,7 @@ final class MemoryPreferences
     _records.clear();
     _outboxes.clear();
     _downloads.clear();
+    _downloadCategories.clear();
     _library = ArtworkLibrary();
     language = null;
   }

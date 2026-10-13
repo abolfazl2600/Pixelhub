@@ -94,12 +94,17 @@ final class OnlinePicture {
 }
 
 class OnlineCatalogController extends ChangeNotifier {
-  OnlineCatalogController(this.storage, {Uri? baseUrl})
-    : _baseUrl = baseUrl ?? Uri.parse(onlineContentRoot);
+  OnlineCatalogController(this.storage, {Uri? baseUrl, http.Client? client})
+    : _baseUrl = baseUrl ?? Uri.parse(onlineContentRoot),
+      _client = client ?? http.Client(),
+      _ownsClient = client == null;
 
   final OnlineLevelStorage storage;
   final Uri _baseUrl;
+  final http.Client _client;
+  final bool _ownsClient;
   final Map<String, LevelDefinition> _downloaded = {};
+  final Map<String, String> _downloadedCategories = {};
   List<OnlinePicture> pictures = [];
   OnlineCatalogStatus status = OnlineCatalogStatus.idle;
   bool isLoaded = false;
@@ -108,6 +113,14 @@ class OnlineCatalogController extends ChangeNotifier {
   bool _disposed = false;
 
   List<LevelDefinition> get downloaded => List.unmodifiable(_downloaded.values);
+
+  /// Online catalog metadata supplements local categories. A downloaded level
+  /// must retain its saved category when connectivity is unavailable.
+  Map<String, String> get categories => Map.unmodifiable({
+    for (final picture in pictures) picture.id: picture.category,
+    ..._downloadedCategories,
+  });
+
   List<OnlinePicture> get available => pictures
       .where((picture) => !_downloaded.containsKey(picture.id))
       .toList(growable: false);
@@ -128,7 +141,7 @@ class OnlineCatalogController extends ChangeNotifier {
     required int maxBytes,
   }) async {
     final uri = _baseUrl.resolve(path);
-    final response = await http.get(uri).timeout(timeout);
+    final response = await _client.get(uri).timeout(timeout);
     if (response.statusCode != 200) {
       throw FormatException('Online content HTTP ${response.statusCode}.');
     }
@@ -142,6 +155,16 @@ class OnlineCatalogController extends ChangeNotifier {
     try {
       for (final level in await storage.readDownloadedLevels()) {
         if (level.id.startsWith('online-')) _downloaded[level.id] = level;
+      }
+      try {
+        final saved = await storage.readDownloadedCategories();
+        _downloadedCategories
+          ..clear()
+          ..addEntries(saved.entries.where(
+            (entry) => _downloaded.containsKey(entry.key),
+          ));
+      } on Object {
+        // Legacy levels remain playable with the normal fallback category.
       }
     } on Object {
       // Keep built-in pictures playable if optional downloaded storage fails.
@@ -188,6 +211,23 @@ class OnlineCatalogController extends ChangeNotifier {
       if (_disposed) return;
       pictures = List.unmodifiable(result);
       status = OnlineCatalogStatus.ready;
+      // Upgrade legacy downloads only when an authoritative catalog is
+      // available. Failure to write metadata must not hide online pictures.
+      for (final picture in result) {
+        if (_disposed) return;
+        if (_downloaded.containsKey(picture.id) &&
+            !_downloadedCategories.containsKey(picture.id)) {
+          try {
+            await storage.saveDownloadedCategory(
+              picture.id,
+              picture.category,
+            );
+            _downloadedCategories[picture.id] = picture.category;
+          } on Object {
+            // Retry a missing category the next time the gallery refreshes.
+          }
+        }
+      }
     } on Object {
       if (_disposed) return;
       status = OnlineCatalogStatus.error;
@@ -221,9 +261,10 @@ class OnlineCatalogController extends ChangeNotifier {
           level.height != picture.height) {
         throw const FormatException('Downloaded level does not match catalog.');
       }
-      await storage.saveDownloadedLevel(level);
+      await storage.saveDownloadedLevel(level, category: picture.category);
       if (_disposed) return;
       _downloaded[level.id] = level;
+      _downloadedCategories[level.id] = picture.category;
     } on Object catch (error) {
       debugPrint('Online picture download failed: $error');
       if (!_disposed) failedDownloadId = picture.id;
@@ -233,8 +274,17 @@ class OnlineCatalogController extends ChangeNotifier {
     }
   }
 
+  Future<void> removeDownloaded(String id) async {
+    if (!_downloaded.containsKey(id)) return;
+    await storage.removeDownloadedLevel(id);
+    _downloaded.remove(id);
+    _downloadedCategories.remove(id);
+    _notify();
+  }
+
   void clearDownloaded() {
     _downloaded.clear();
+    _downloadedCategories.clear();
     pictures = [];
     status = OnlineCatalogStatus.idle;
     _notify();
@@ -243,6 +293,7 @@ class OnlineCatalogController extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    if (_ownsClient) _client.close();
     super.dispose();
   }
 }

@@ -21,11 +21,14 @@ class ArtworkScreen extends StatelessWidget {
 
   Future<void> _delete(BuildContext context) async {
     final s = context.strings;
+    final isOnline = level.id.startsWith('online-');
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(s.deleteArtwork),
-        content: Text(s.deleteArtworkMessage),
+        title: Text(isOnline ? s.removeDownloadedArtwork : s.deleteArtwork),
+        content: Text(
+          isOnline ? s.removeDownloadedArtworkMessage : s.deleteArtworkMessage,
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -41,11 +44,12 @@ class ArtworkScreen extends StatelessWidget {
     if (confirmed != true) {
       return;
     }
+    final router = GoRouter.of(context);
     try {
       await onDelete(level);
-      if (context.mounted) {
-        context.go('/my-gallery');
-      }
+      // Removing an online level rebuilds the artwork route immediately;
+      // its BuildContext may no longer be mounted after the storage write.
+      router.go(isOnline ? '/gallery' : '/my-gallery');
     } on Object {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -137,13 +141,19 @@ class ArtworkScreen extends StatelessWidget {
                 ),
               ),
               if (library.isComplete(level)) ExportButton(level: level),
-              if (level.id.startsWith('private-')) ...[
+              if (level.id.startsWith('private-') ||
+                  level.id.startsWith('online-')) ...[
                 const SizedBox(height: 16),
-                Text(s.importPrivacy, style: const TextStyle(height: 1.8)),
+                if (level.id.startsWith('private-'))
+                  Text(s.importPrivacy, style: const TextStyle(height: 1.8)),
                 TextButton.icon(
                   onPressed: library.busy ? null : () => _delete(context),
                   icon: const Icon(Icons.delete_outline),
-                  label: Text(s.deleteArtwork),
+                  label: Text(
+                    level.id.startsWith('online-')
+                        ? s.removeDownloadedArtwork
+                        : s.deleteArtwork,
+                  ),
                 ),
               ],
             ],
