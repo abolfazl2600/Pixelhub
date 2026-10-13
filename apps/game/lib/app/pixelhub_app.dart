@@ -13,6 +13,7 @@ import '../features/profile/profile_screen.dart';
 import '../features/gallery/artwork_screen.dart';
 import '../features/gallery/gallery_screen.dart';
 import '../features/gallery/library_controller.dart';
+import '../features/gallery/online_catalog_controller.dart';
 import '../features/import/import_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/settings/privacy_screen.dart';
@@ -51,6 +52,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
   late final ProgressRepository _progress;
   late final PreferencesRepository _preferences;
   late final LibraryController _library;
+  late final OnlineCatalogController _online;
   late final LocalDiagnostics _diagnostics;
   late final Listenable _routeChanges;
   final Map<String, PaintingController> _sessions = {};
@@ -77,6 +79,13 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
               : MemoryPreferences()),
       _progress,
     );
+    _online = OnlineCatalogController(
+      preferences is OnlineLevelStorage ? preferences : MemoryPreferences(),
+    );
+    _online.addListener(() {
+      if (_online.isLoaded) _library.setDownloadedOnline(_online.downloaded);
+    });
+    unawaited(_online.loadDownloaded());
     _bootstrap = BootstrapController(widget.repository);
     final catalogTimer = Stopwatch()..start();
     _bootstrap.addListener(() {
@@ -229,6 +238,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     _sessions.clear();
     try {
       await _library.clear();
+      _online.clearDownloaded();
     } on Object {
       await _library.load();
       rethrow;
@@ -275,6 +285,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       if (page == 'gallery' || page == 'my-gallery') {
         return GalleryScreen(
           library: _library,
+          online: _online,
           personal: page == 'my-gallery',
         );
       }
@@ -349,6 +360,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     _router.dispose();
     _bootstrap.dispose();
     _library.dispose();
+    _online.dispose();
     if (widget.diagnostics == null) _diagnostics.dispose();
     for (final controller in _sessions.values) {
       controller.dispose();
