@@ -13,10 +13,27 @@ abstract interface class LevelRepository {
   Future<List<LevelDefinition>> loadLevels();
 }
 
+/// Categories used by the existing online catalog and gallery filters.
+const onlinePictureCategories = <String>{
+  'nature',
+  'animals',
+  'objects',
+  'patterns',
+  'space',
+};
+
 /// Only explicitly downloaded online pictures are persisted locally.
+/// Categories are stored separately from the immutable level JSON so existing
+/// downloads and their progress remain compatible.
 abstract interface class OnlineLevelStorage {
   Future<List<LevelDefinition>> readDownloadedLevels();
-  Future<void> saveDownloadedLevel(LevelDefinition level);
+  Future<Map<String, String>> readDownloadedCategories();
+  Future<void> saveDownloadedLevel(
+    LevelDefinition level, {
+    required String category,
+  });
+  Future<void> saveDownloadedCategory(String id, String category);
+  Future<void> removeDownloadedLevel(String id);
 }
 
 abstract interface class ProgressRepository {
