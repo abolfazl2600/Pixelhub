@@ -13,10 +13,7 @@ import '../gallery/library_controller.dart';
 import 'photo_converter.dart';
 
 class ImportScreen extends StatefulWidget {
-  const ImportScreen({
-    required this.library,
-    super.key,
-  });
+  const ImportScreen({required this.library, super.key});
   final LibraryController library;
   @override
   State<ImportScreen> createState() => _ImportScreenState();
