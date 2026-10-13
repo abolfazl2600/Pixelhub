@@ -1,0 +1,122 @@
+{
+  "online-landscape-moonlit-night": {
+    "motion": "glimmer",
+    "region": [
+      0.05,
+      0.02,
+      0.95,
+      0.45
+    ],
+    "version": 1,
+    "checksum": "eedd6898d1b9885f28c97eb17b5a7cb1ff3e2a2098133814eac0dff39c0ab294",
+    "animationChecksum": "9085e4d4954f8b32a63a1b85eb1e63dca12c3d09d7672c70559c5f7e78bb6d7c"
+  },
+  "online-landscape-flower-valley": {
+    "motion": "sway",
+    "region": [
+      0.05,
+      0.77,
+      0.95,
+      0.98
+    ],
+    "version": 1,
+    "checksum": "5f0a6a7b8249fdd360ce1a4e9fb0eafaef3767cd6a37078f94b895500fff8225",
+    "animationChecksum": "54f3812cdc9ffdd9d2c20b53a70f5f9d7104d83b9d22b6a8a9b5584d13b7a863"
+  },
+  "online-classic-birth-venus": {
+    "motion": "ripple",
+    "region": [
+      0.02,
+      0.52,
+      0.98,
+      0.96
+    ],
+    "version": 1,
+    "checksum": "5bdc40158670df51732557f6ad8cdc8d4d7e2f72ee833fbb69e3f39c0a0579ce",
+    "animationChecksum": "1ec240b0910509b12fbb5c24e0bdb646a479ecf59c2ba10f2e625acc3039dd52"
+  },
+  "online-classic-creation-adam": {
+    "motion": "glimmer",
+    "region": [
+      0.24,
+      0.28,
+      0.78,
+      0.84
+    ],
+    "version": 1,
+    "checksum": "972f88f6d5778fcc4c92f4c5a7f687e45583a66975066a6315dbc8632afdd966",
+    "animationChecksum": "d0a56b3134bdb15f4131e2a4caeff0c56b6a4860d27d06975818eb7f26544bca"
+  },
+  "online-classic-last-supper": {
+    "motion": "glimmer",
+    "region": [
+      0.24,
+      0.28,
+      0.78,
+      0.84
+    ],
+    "version": 1,
+    "checksum": "a8de1afb34b5a8f11b4c12484414955e121bc5b2a7117da7bb986c717ddb81e2",
+    "animationChecksum": "af883b6782af62fbebd7afa5a033a92a267370cb22c0533ba1b8abea316d023b"
+  },
+  "online-classic-school-athens": {
+    "motion": "glimmer",
+    "region": [
+      0.24,
+      0.28,
+      0.78,
+      0.84
+    ],
+    "version": 1,
+    "checksum": "f2d2d825c96e65958054b105ce1774787e242c54f713aa1d6c89fdc494dc6586",
+    "animationChecksum": "3f51d60fc33c6e34bfd215c3ca15b9220866ed30a3b2f67685c097535bf50240"
+  },
+  "online-classic-night-watch": {
+    "motion": "glimmer",
+    "region": [
+      0.24,
+      0.28,
+      0.78,
+      0.84
+    ],
+    "version": 1,
+    "checksum": "e25e986304f71b5077613338b02e85c790e0d7d3e35236b0ae118c5e34f11700",
+    "animationChecksum": "973f440b21114a58a70cc8ff376af090f5008ef24930a381c6d604e5734ce5dc"
+  },
+  "online-classic-milkmaid": {
+    "motion": "glimmer",
+    "region": [
+      0.24,
+      0.28,
+      0.78,
+      0.84
+    ],
+    "version": 1,
+    "checksum": "32e2b235d75f78e38e365e6b4c548eb10a4365183293b6511a6208116e79569a",
+    "animationChecksum": "7b3cf159281a68c9878c96fd185c82451f712c0020bb3943df1041e131b0f954"
+  },
+  "online-classic-las-meninas": {
+    "motion": "glimmer",
+    "region": [
+      0.24,
+      0.28,
+      0.78,
+      0.84
+    ],
+    "version": 1,
+    "checksum": "bfbdf2057cb22cdbf80c4423b7e9ab6c395049112d966fb74393effc43dd0c6c",
+    "animationChecksum": "ec532ece9ab752bebd85ff80801c0ef622ab50a9f5ffcf3a82b42f20114a2ca0"
+  },
+  "online-classic-third-may": {
+    "motion": "glimmer",
+    "region": [
+      0.24,
+      0.28,
+      0.78,
+      0.84
+    ],
+    "version": 1,
+    "checksum": "7c4e8dbb46899462228712c77e22b8bce0ed4992e5dfe380a53a8b5cc3d50a9c",
+    "animationChecksum": "28bd28c5ba726096921e774c9a89152adfd6790fc3dbcd28a209543fa6fcbca1"
+  }
+}
