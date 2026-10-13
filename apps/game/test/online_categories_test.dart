@@ -225,7 +225,7 @@ void main() {
     'retired online artwork is removed after a valid catalog refresh',
     () async {
       final old = onlineFixture('online-starry-night');
-      final replacement = onlineFixture('online-starry-night-detailed');
+      final replacement = onlineFixture('online-classic-starry-night-detailed');
       final store = MemoryPreferences();
       await store.saveDownloadedLevel(old, category: 'patterns');
       final body = jsonEncode(replacement.toJson());
@@ -251,7 +251,7 @@ void main() {
           return http.Response.bytes(utf8.encode(metadata), 200);
         }
         if (request.url.path.endsWith(
-          '/online-starry-night-detailed-v1.json',
+          '/online-classic-starry-night-detailed-v1.json',
         )) {
           return http.Response.bytes(utf8.encode(body), 200);
         }
