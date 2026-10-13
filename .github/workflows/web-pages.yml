@@ -29,7 +29,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
-          name: pixelhub-web-v0.3.1-${{ github.event.workflow_run.head_sha }}
+          name: pixelhub-web-${{ github.event.workflow_run.head_sha }}
           path: site
           github-token: ${{ github.token }}
           run-id: ${{ github.event.workflow_run.id }}
