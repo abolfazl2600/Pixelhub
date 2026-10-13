@@ -69,6 +69,42 @@ To author the pack without adding binaries to Git history:
 `python3 tool/online_starter_pack.py /tmp/content.zip`. Do not modify a
 published pack in place or reuse version 1 for different pixel data.
 
+## Second online collection: 12 additional pictures
+
+`tool/online_collection_pack.py` contains only original drawing instructions,
+not the generated art assets. The GitHub Pages workflow generates the
+[collection Release](https://github.com/abolfazl2600/Pixelhub/releases/tag/pixelhub-content-collection-12-v1)
+`pixelhub-content-collection-12-v1` once, after successful main-branch Web
+CI. Its `content.zip` contains 12 versioned JSON levels, 12 PNG previews,
+and their metadata manifest; no level files are committed to Git.
+
+| Level ID | فارسی | English | Category | Canvas |
+| --- | --- | --- | --- | --- |
+| `online-panda` | پاندای بامزه | Cute Panda | animals | 24×24 |
+| `online-bunny` | خرگوش سفید | White Bunny | animals | 24×24 |
+| `online-turtle` | لاک‌پشت سبز | Green Turtle | animals | 24×24 |
+| `online-owl` | جغد کوچک | Little Owl | animals | 24×24 |
+| `online-ice-cream` | بستنی توت‌فرنگی | Strawberry Ice Cream | objects | 16×16 |
+| `online-donut` | دونات صورتی | Pink Donut | objects | 24×24 |
+| `online-coffee` | فنجان قهوه | Coffee Cup | objects | 24×24 |
+| `online-cactus` | کاکتوس گلدانی | Potted Cactus | nature | 24×24 |
+| `online-autumn-tree` | درخت پاییزی | Autumn Tree | nature | 32×32 |
+| `online-rain-cloud` | ابر بارانی | Rain Cloud | nature | 24×24 |
+| `online-saturn` | سیاره زحل | Planet Saturn | space | 32×32 |
+| `online-astronaut` | فضانورد | Astronaut | space | 32×32 |
+
+The first one-picture sample and the earlier six-picture Release are
+preserved; after successful publication and Pages deployment, the public
+catalog should contain **19 online pictures in total**. Current users
+discover the catalog automatically on gallery entry; full level grids are
+downloaded only on approval. The app's online section displays 12 undownloaded
+entries initially and offers a control to reveal more.
+
+To regenerate the package outside the repo working tree:
+`python3 tool/online_collection_pack.py /tmp/content.zip`.
+Publication status must be confirmed from GitHub Actions/Releases;
+committing these instructions alone is not proof of live availability.
+
 ## Publish more pictures
 
 1. Create one or more schema-v2 level JSON files with unique `online-...`
