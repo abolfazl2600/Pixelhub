@@ -1,0 +1,110 @@
+{
+  "online-object-steam-train": {
+    "motion": "sway",
+    "region": [
+      0.06,
+      0.06,
+      0.45,
+      0.36
+    ],
+    "version": 1,
+    "checksum": "d10897c7cfaf0a552b853662f76a8aa6286378adcdd1d08bdb3d5972517f7a5f",
+    "animationChecksum": "adaf0a43480fe188695dc1cb12d1d7e349c767af7f62ff6dee5079dd9209947d"
+  },
+  "online-object-travel-suitcase": {
+    "motion": "float",
+    "version": 1,
+    "checksum": "9814b28a013e5dc023d4c619c422c107a3a86d1e41ca3370812cda4785880874",
+    "animationChecksum": "7a817704dc9e290a46cbeb5efad2efd6758362c3fe7d6a2a51f1861fc23e99d2"
+  },
+  "online-object-treasure-chest": {
+    "motion": "glimmer",
+    "region": [
+      0.18,
+      0.18,
+      0.86,
+      0.54
+    ],
+    "version": 1,
+    "checksum": "edd0dbd2325dd8fe525ddcb6b91495d262511e702db3aa7dd23cf40f2bb44534",
+    "animationChecksum": "76ef4bdfb63facae60c6b9b1510544dd3b02793386efc0330f5bd8130701e3a4"
+  },
+  "online-object-hourglass": {
+    "motion": "glimmer",
+    "region": [
+      0.3,
+      0.2,
+      0.7,
+      0.8
+    ],
+    "version": 1,
+    "checksum": "360e98548d4f5cfb72dd34a5b8e54203cb1775c70480793543a1b73a7531487b",
+    "animationChecksum": "8f9c31ba6d3761e6a9313fc64523b42761ec604d3e837b0cf03b7d812f4224b2"
+  },
+  "online-object-telescope": {
+    "motion": "sway",
+    "region": [
+      0.08,
+      0.26,
+      0.9,
+      0.54
+    ],
+    "version": 1,
+    "checksum": "3677671c1a3e086d66124802ef85587ad3163ac640b27a0b5f114bb8fa5a5784",
+    "animationChecksum": "3d1593cb263dd9ca514ebafc5ba306a43c8440625e8bacbf2f8164b3b46b5a5b"
+  },
+  "online-object-microscope": {
+    "motion": "sway",
+    "region": [
+      0.32,
+      0.15,
+      0.7,
+      0.61
+    ],
+    "version": 1,
+    "checksum": "abe0a363e6255d0defe288bf69709486bcde58d0c56eaa9916b63aa956915a20",
+    "animationChecksum": "486bb3739b18f8e3ba9cf17040fd945c06098365ff7f8770dcbd18b9b4619a09"
+  },
+  "online-object-toy-robot": {
+    "motion": "glimmer",
+    "region": [
+      0.23,
+      0.2,
+      0.82,
+      0.58
+    ],
+    "version": 1,
+    "checksum": "9d5a1bf0a49b73c73e6e04477d92b781969a50183e9c7a042ed1fc8440cd4296",
+    "animationChecksum": "9b7df708bfb5016dd8a8803360f8c59f570ecd4c8c1c484af4ae72315478d6e6"
+  },
+  "online-object-game-controller": {
+    "motion": "pulse",
+    "version": 1,
+    "checksum": "4ad2628c96cf94b888540e913c833ea9f425edf3797c52479140971dea592b3e",
+    "animationChecksum": "39015755c2e2a6bed7ea641a3905b0d9b99ba8d0b46b5032850e36e68ce2bfab"
+  },
+  "online-object-typewriter": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.5,
+      0.85,
+      0.75
+    ],
+    "version": 1,
+    "checksum": "102afe8ad91d958a618a7349eb25bf38e99e2612a82c33c63ab058ca72630478",
+    "animationChecksum": "534c68ea206503d456acf02b358d12f755ee69f553cc46dad7f6e04418cc6a57"
+  },
+  "online-object-camping-lantern": {
+    "motion": "glimmer",
+    "region": [
+      0.3,
+      0.38,
+      0.7,
+      0.73
+    ],
+    "version": 1,
+    "checksum": "c345e9b637cd73b37ef4eac2ee23fbef9745c4d7e2d011728aec3f2deb67d9e4",
+    "animationChecksum": "0cd20a1878f3240a6aaeda61cebf40fb1b90657acffbb13635dfd62b469c4859"
+  }
+}
