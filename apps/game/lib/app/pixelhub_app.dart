@@ -297,10 +297,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
         );
       }
       if (page == 'settings') {
-        return SettingsScreen(
-          library: _library,
-          onClear: _clearLocalData,
-        );
+        return SettingsScreen(library: _library, onClear: _clearLocalData);
       }
       if (page == 'import' || (id?.startsWith('private-') ?? false)) {
         if (_library.status == LibraryStatus.loading) {
@@ -314,15 +311,10 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
         }
       }
       if (page == 'import') {
-        return ImportScreen(
-          library: _library,
-        );
+        return ImportScreen(library: _library);
       }
       if (id == null) {
-        return HomeScreen(
-          levels: _bootstrap.levels,
-          library: _library,
-        );
+        return HomeScreen(levels: _bootstrap.levels, library: _library);
       }
       final matches = _library.levels.where((level) => level.id == id);
       if (matches.isEmpty) {
