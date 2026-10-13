@@ -105,6 +105,48 @@ To regenerate the package outside the repo working tree:
 Publication status must be confirmed from GitHub Actions/Releases;
 committing these instructions alone is not proof of live availability.
 
+## Classic masterworks: six hand-drawn pixel-art interpretations
+
+Six new original, simplified 24×24 or 32×32 pixel-art coloring levels are
+defined in `tool/online_masterworks_pack.py`. The source creates the
+art programmatically without embedding copied painting scans or JPEG/PNG
+references. Each level is independently numbered and contains a versioned
+schema-v2 grid, ARGB palette, SHA-256 checksum and its own PNG preview.
+
+| Level ID | فارسی | English | Canvas |
+| --- | --- | --- | --- |
+| `online-mona-lisa` | مونالیزا | Mona Lisa | 32×32 |
+| `online-starry-night` | شب پرستاره | The Starry Night | 32×32 |
+| `online-the-scream` | جیغ | The Scream | 32×32 |
+| `online-sunflowers` | آفتابگردان‌ها | Sunflowers | 24×24 |
+| `online-girl-pearl` | دختر با گوشواره مروارید | Girl with a Pearl Earring | 32×32 |
+| `online-great-wave` | موج بزرگ | The Great Wave | 32×32 |
+
+**Compatibility:** The entries use the existing `patterns` category instead
+of adding a new `masterworks` category. Existing deployed clients enforce a
+fixed online category allowlist and reject unknown categories, which would
+otherwise break the *entire* online catalog. The painting titles identify
+each classic, and the existing Persian/English category label remains valid.
+
+Upon a successful `main` Web CI run, the existing Pages workflow creates
+`pixelhub-content-masterworks-6-v1` with one `content.zip` containing the
+manifest plus all six JSON grids and PNG previews. The Release is public
+and stored **outside git history**, so `git clone` and ordinary APK/AAB
+builds do not include the generated art. The Pages publisher aggregates this
+pack alongside the existing sample, six-design, and twelve-design Releases.
+
+[GitHub Release page](https://github.com/abolfazl2600/Pixelhub/releases/tag/pixelhub-content-masterworks-6-v1)
+
+After all four pack Releases are published and GitHub Pages deployment
+succeeds, there should be **25 online pictures**. This is a target count,
+not a claim of live availability until the GitHub Actions run completes.
+Download remains an explicit per-picture choice, and saved local progress
+and older packs are unaffected.
+
+Generate the package outside the repository with
+`python3 tool/online_masterworks_pack.py /tmp/content.zip`. Once published,
+do not overwrite version 1 files; improvements require a new level version.
+
 ## Publish more pictures
 
 1. Create one or more schema-v2 level JSON files with unique `online-...`
