@@ -163,8 +163,9 @@ class OnlineCatalogController extends ChangeNotifier {
           throw const FormatException('Invalid picture.');
         }
         final entry = OnlinePicture.fromJson(value);
-        if (!ids.add(entry.id))
+        if (!ids.add(entry.id)) {
           throw const FormatException('Duplicate picture.');
+        }
         result.add(entry);
       }
       if (_disposed) return;
