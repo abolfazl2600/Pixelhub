@@ -8,11 +8,13 @@ List<OnlinePicture> matchingOnlinePictures(
   required String search,
 }) {
   final query = search.trim().toLowerCase();
-  return pictures.where((picture) {
-    if (category != 'all' && picture.category != category) return false;
-    if (query.isEmpty) return true;
-    return '${picture.title} ${picture.titleEn}'
-        .toLowerCase()
-        .contains(query);
-  }).toList(growable: false);
+  return pictures
+      .where((picture) {
+        if (category != 'all' && picture.category != category) return false;
+        if (query.isEmpty) return true;
+        return '${picture.title} ${picture.titleEn}'.toLowerCase().contains(
+          query,
+        );
+      })
+      .toList(growable: false);
 }
