@@ -25,59 +25,73 @@ void main() {
     expect(publicArtworkCategories, isNot(contains('personal')));
   });
 
-  test('historic collections are classified by IDs, never localized titles', () {
-    for (final id in [
-      'online-mona-lisa', 'online-starry-night', 'online-the-scream',
-      'online-sunflowers', 'online-girl-pearl', 'online-great-wave',
-      'online-classic-birth-venus', 'online-classic-sleeping-gypsy',
-    ]) {
-      expect(displayArtworkCategory(id, 'patterns'), 'masterpieces');
-    }
-    for (final id in [
-      'online-iran-azadi-tower', 'online-iran-persepolis',
-      'online-iran-abstract-muqarnas', 'online-iran-abstract-iwan',
-    ]) {
-      expect(displayArtworkCategory(id, 'patterns'), 'persian_architecture');
-    }
-    expect(displayArtworkCategory('online-general-mosaic', 'patterns'),
-        'patterns');
-    expect(displayArtworkCategory('online-iran-tree', 'nature'), 'nature');
-  });
+  test(
+    'historic collections are classified by IDs, never localized titles',
+    () {
+      for (final id in [
+        'online-mona-lisa',
+        'online-starry-night',
+        'online-the-scream',
+        'online-sunflowers',
+        'online-girl-pearl',
+        'online-great-wave',
+        'online-classic-birth-venus',
+        'online-classic-sleeping-gypsy',
+      ]) {
+        expect(displayArtworkCategory(id, 'patterns'), 'masterpieces');
+      }
+      for (final id in [
+        'online-iran-azadi-tower',
+        'online-iran-persepolis',
+        'online-iran-abstract-muqarnas',
+        'online-iran-abstract-iwan',
+      ]) {
+        expect(displayArtworkCategory(id, 'patterns'), 'persian_architecture');
+      }
+      expect(
+        displayArtworkCategory('online-general-mosaic', 'patterns'),
+        'patterns',
+      );
+      expect(displayArtworkCategory('online-iran-tree', 'nature'), 'nature');
+    },
+  );
 
-  test('saved legacy categories migrate when reopening completely offline',
-      () async {
-    final store = MemoryPreferences();
-    final art = categoryFixture('online-mona-lisa');
-    final building = categoryFixture('online-iran-persepolis');
-    final pattern = categoryFixture('online-decorative-pattern');
-    for (final level in [art, building, pattern]) {
-      await store.saveDownloadedLevel(level, category: 'patterns');
-    }
-    final controller = OnlineCatalogController(store);
-    addTearDown(controller.dispose);
-    await controller.loadDownloaded();
-    expect(controller.pictures, isEmpty);
-    expect(controller.categories[art.id], 'masterpieces');
-    expect(controller.categories[building.id], 'persian_architecture');
-    expect(controller.categories[pattern.id], 'patterns');
-    expect(await store.readDownloadedCategories(), {
-      art.id: 'masterpieces',
-      building.id: 'persian_architecture',
-      pattern.id: 'patterns',
-    });
-    final library = LibraryController(store, store);
-    addTearDown(library.dispose);
-    library.setDownloadedOnline(controller.downloaded);
-    library.setOnlineCategories(controller.categories);
-    expect(library.category(art), 'masterpieces');
-    expect(library.category(building), 'persian_architecture');
-    expect(library.category(pattern), 'patterns');
-    final reopened = OnlineCatalogController(store);
-    addTearDown(reopened.dispose);
-    await reopened.loadDownloaded();
-    expect(reopened.categories[art.id], 'masterpieces');
-    expect(reopened.categories[building.id], 'persian_architecture');
-  });
+  test(
+    'saved legacy categories migrate when reopening completely offline',
+    () async {
+      final store = MemoryPreferences();
+      final art = categoryFixture('online-mona-lisa');
+      final building = categoryFixture('online-iran-persepolis');
+      final pattern = categoryFixture('online-decorative-pattern');
+      for (final level in [art, building, pattern]) {
+        await store.saveDownloadedLevel(level, category: 'patterns');
+      }
+      final controller = OnlineCatalogController(store);
+      addTearDown(controller.dispose);
+      await controller.loadDownloaded();
+      expect(controller.pictures, isEmpty);
+      expect(controller.categories[art.id], 'masterpieces');
+      expect(controller.categories[building.id], 'persian_architecture');
+      expect(controller.categories[pattern.id], 'patterns');
+      expect(await store.readDownloadedCategories(), {
+        art.id: 'masterpieces',
+        building.id: 'persian_architecture',
+        pattern.id: 'patterns',
+      });
+      final library = LibraryController(store, store);
+      addTearDown(library.dispose);
+      library.setDownloadedOnline(controller.downloaded);
+      library.setOnlineCategories(controller.categories);
+      expect(library.category(art), 'masterpieces');
+      expect(library.category(building), 'persian_architecture');
+      expect(library.category(pattern), 'patterns');
+      final reopened = OnlineCatalogController(store);
+      addTearDown(reopened.dispose);
+      await reopened.loadDownloaded();
+      expect(reopened.categories[art.id], 'masterpieces');
+      expect(reopened.categories[building.id], 'persian_architecture');
+    },
+  );
 
   test('original online catalog metadata remains compatible', () {
     final painting = categoryFixture('online-mona-lisa');
@@ -93,14 +107,20 @@ void main() {
       'checksum': painting.checksum,
     };
     expect(OnlinePicture.fromJson(oldRecord).category, 'masterpieces');
-    expect(OnlinePicture.fromJson({
-      ...oldRecord,
-      'id': 'online-future-masterwork',
-      'category': 'masterpieces',
-    }).category, 'masterpieces');
-    expect(OnlinePicture.fromJson({
-      ...oldRecord,
-      'id': 'online-decorative-pattern',
-    }).category, 'patterns');
+    expect(
+      OnlinePicture.fromJson({
+        ...oldRecord,
+        'id': 'online-future-masterwork',
+        'category': 'masterpieces',
+      }).category,
+      'masterpieces',
+    );
+    expect(
+      OnlinePicture.fromJson({
+        ...oldRecord,
+        'id': 'online-decorative-pattern',
+      }).category,
+      'patterns',
+    );
   });
 }

@@ -286,9 +286,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                                   start: 6,
                                 ),
                                 child: ChoiceChip(
-                                  label: Text(
-                                    categoryLabel(context, category),
-                                  ),
+                                  label: Text(categoryLabel(context, category)),
                                   selected: _category == category,
                                   onSelected: (_) =>
                                       setState(() => _category = category),

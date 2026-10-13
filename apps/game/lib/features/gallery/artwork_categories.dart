@@ -34,5 +34,5 @@ String? historicOnlineArtworkCategory(String id) {
 /// Preserve any explicitly assigned non-pattern category.
 String displayArtworkCategory(String id, String category) =>
     category == 'patterns'
-        ? historicOnlineArtworkCategory(id) ?? category
-        : category;
+    ? historicOnlineArtworkCategory(id) ?? category
+    : category;
