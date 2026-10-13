@@ -20,6 +20,33 @@ files on `main`. A standard `git clone` does **not** download Release assets.
   reported. This initial adapter caps locally downloaded levels at 1000.
   A future move to IndexedDB/files can retain the same repository interface.
 
+## Immutable publication policy (Issue #3)
+
+**Every new picture gets a previously unused `online-...` ID and
+`levelVersion: 1`, permanently.** Do not publish updated pixels,
+previews, titles, or a higher version under an existing ID. For a correction,
+higher-detail remake, or similar picture, publish another `id` with
+`levelVersion: 1` in a new immutable Release; retain the previous asset
+and its ID. Reuse of an ID (even with a different version) causes the Pages
+aggregator to fail. The pack generators also check the version and
+duplicates within each new pack. Existing downloads and painting progress
+remain untouched: the app only offers pictures not already downloaded.
+
+`schemaVersion` is independent: the level JSON currently uses schema 2,
+while `catalog.json` uses schema 1. Neither is a picture update version.
+The `version` field in the catalog matches the level's `levelVersion`,
+which must be **1 for new pictures**.
+
+**Historical exception only:** before this policy, the original Azadi Tower
+was published as `online-iran-azadi-tower` v1 in
+`pixelhub-content-iran-landmarks-10-v1`, and a redesigned v2 with the
+same ID was published in `pixelhub-content-iran-z-architecture-11-v1`.
+To preserve already-published URLs, existing downloads and progress, the
+aggregator accepts **exactly this release-tag/ID/version pair**, keeps
+both v1 and v2 files, and continues listing v2 in the catalog.
+It does not migrate or overwrite device data, and no other duplicated ID
+or higher version is accepted. New Azadi Tower revisions must use a new ID.
+
 ## Initial sample
 
 After successful Web CI on `main`, the existing **Publish verified Web
@@ -67,7 +94,7 @@ opening Gallery and download each on demand.
 
 To author the pack without adding binaries to Git history:
 `python3 tool/online_starter_pack.py /tmp/content.zip`. Do not modify a
-published pack in place or reuse version 1 for different pixel data.
+published pack in place; a redesign requires a fresh ID and version 1.
 
 ## Second online collection: 12 additional pictures
 
@@ -145,7 +172,7 @@ and older packs are unaffected.
 
 Generate the package outside the repository with
 `python3 tool/online_masterworks_pack.py /tmp/content.zip`. Once published,
-do not overwrite version 1 files; improvements require a new level version.
+do not overwrite version 1 files; improvements require a new level ID with version 1.
 
 ## Ten new animals: original pixel-art collection
 
@@ -261,8 +288,8 @@ A Git commit alone does not prove that the public catalog has updated.
 
 To reproduce the release-only asset from the repository root, outside Git
 history: `python3 tool/online_landscapes_pack.py /tmp/content.zip`.
-Do not overwrite published version 1 assets; future design edits must use
-a new version.
+Do not overwrite published version 1 assets; future design edits need
+a fresh level ID and version 1.
 
 ## Persian architectural abstractions and the redesigned Azadi Tower
 
@@ -273,12 +300,12 @@ Azadi Tower at 80×80 pixels (6,400 colorable cells), with a taller,
 recognizable open pointed arch, four flared marble pier faces, glazed
 turquoise lattice details and perspective plaza paving.
 
-**Azadi Tower upgrade:** keep the existing stable ID
-`online-iran-azadi-tower` and publish `levelVersion: 2`, with a new
-checksum and `levels/online-iran-azadi-tower-v2.json` / corresponding PNG.
-The original `levelVersion: 1` remains immutable in its earlier Release.
-The online assembler selects the newer version because its tag sorts after
-the original Iranian landmarks tag.
+**Archived Azadi Tower redesign (historical exception):** This pack already
+published `online-iran-azadi-tower` at `levelVersion: 2` with its
+own checksum and v2 files. The original v1 remains in the prior Release.
+For compatibility only, the assembler allows these two specific, unchanged
+Releases and continues to show v2 in the aggregated catalog. Do not use
+this pattern for any newly authored or revised picture.
 
 | Stable level ID | Version | فارسی | English | Grid |
 | --- | --- | --- | --- | --- |
@@ -303,8 +330,8 @@ with a downloadable `content.zip` containing 11 schema-v2 JSON levels,
 11 PNG previews and one bilingual manifest. These assets are never placed
 in Git history or bundled into an APK. The tag intentionally sorts
 lexicographically *after* `pixelhub-content-iran-landmarks-10-v1`,
-because the existing `online_release.py assemble` implementation requires
-ascending per-ID versions while reading alphabetically sorted pack paths.
+so the assembler can recognize the sole archived v1-to-v2 exception,
+not because future content versions may replace one another.
 
 The previous **55 unique online pictures** are preserved. The target
 aggregate is **65 unique pictures**, not 66, because Azadi v2 supersedes
@@ -313,15 +340,15 @@ remain available. Web CI, Release creation and GitHub Pages deployment
 must finish successfully before the upgraded gallery is publicly visible;
 committing this code does not confirm its deployment.
 
-**Important for prior downloads:** previously downloaded Azadi v1 levels
-are not replaced automatically on a device. Local progress is versioned;
-users may need to remove/re-download that level to fetch v2. No Android
-rebuild is required for newly downloaded online artwork.
+**Important for prior downloads:** devices with Azadi v1 or v2 keep their
+local painting and progress. The gallery does not offer updates to an
+already-downloaded ID. Users retain their copy; new designs appear only
+as separate IDs. No Android rebuild is required for newly published art.
 
 Reproducible release-only command:
 `python3 tool/online_iran_architecture_pack.py /tmp/content.zip`.
-Never modify a published release in place; use a new level version and
-Release tag for subsequent revisions.
+Never modify a published release in place; subsequent revisions require
+a new level ID, `levelVersion: 1`, and a new Release tag.
 
 ## More unique animal pictures: twenty 48×48 levels
 
@@ -427,7 +454,7 @@ gallery has updated. No Android rebuild is required for new online content.
 
 To reproduce only the release artifact outside the working tree:
 `python3 tool/online_masterworks_20_pack.py /tmp/content.zip`.
-Do not overwrite a published version 1; publish a higher version instead.
+Do not overwrite a published picture; use a new ID at version 1.
 
 ## Thirty original everyday objects (48×48)
 
@@ -470,15 +497,15 @@ After a successful `main` Web CI run, the Pages publisher creates the immutable 
 
 The expected total becomes **135 distinct online pictures**, up from 105, after all content Releases have been created and GitHub Pages has deployed successfully. Adding source code is **not** evidence that the Release, public catalog, or app deployment is already live. Check Actions/Pages and the public online catalog for confirmation. Generated art stays outside Git history and Android APK/AAB packages; compatible clients can download the pictures without an app rebuild.
 
-To create the pack manually outside the tracked working tree: `python3 tool/online_objects_30_pack.py /tmp/content.zip`. Once published, never overwrite an immutable version-1 picture; publish a higher version to change existing art.
+To create the pack manually outside the tracked working tree: `python3 tool/online_objects_30_pack.py /tmp/content.zip`. Once published, never overwrite an immutable version-1 picture; publish a new ID with level version 1 for redesigned art.
 
 ## Publish more pictures
 
 1. Create one or more schema-v2 level JSON files with unique `online-...`
-   IDs, stable `levelVersion`, titles in Persian and English, ARGB palette,
+   IDs not used by any earlier Release, `levelVersion: 1`, titles in Persian and English, ARGB palette,
    pixel indices and the canonical SHA-256 checksum already used by PixelHub.
 2. Make a PNG preview for each picture. Use consistent names:
-   `levels/<id>-v<version>.json` and `previews/<id>-v<version>.png`.
+   `levels/<id>-v1.json` and `previews/<id>-v1.png`.
 3. Create a ZIP named **`content.zip`** containing these files and a
    `catalog.json` whose entries contain `id`, `version`, `title`,
    `titleEn`, `category`, `width`, `height`, `bytes`, `checksum`.
@@ -486,10 +513,10 @@ To create the pack manually outside the tracked working tree: `python3 tool/onli
    checksum, **not a hash of the JSON file**.
 4. Create a new, published **GitHub Release** on this same repository, with a
    tag starting `pixelhub-content-`, attach the ZIP, and publish it.
-5. The Pages workflow is triggered by Release publishing. If updating assets
-   on an already-published Release, manually run **Publish verified Web
-   artifact** via `workflow_dispatch` because asset uploads do not
-   necessarily emit the `release edited` event.
+5. The Pages workflow is triggered by Release publishing. Never edit or
+   replace a previously published Release asset. If a deployment fails,
+   rerun the existing **Publish verified Web artifact** workflow without
+   modifying published content.
 6. Open the Pages `online/catalog.json` endpoint and check that the intended
    levels appear; opening the gallery will then discover them automatically.
 
@@ -498,11 +525,11 @@ The Web site is republished to mirror the new content, but its Web application
 artifact remains the last verified build. Android builds only through their
 separate manual workflow.
 
-Release packs are treated as immutable. Publish changes to an existing picture
-with a higher `levelVersion`, and do not reuse a stable ID for a different
-design: local progress is keyed to ID, version and checksum. Keep the checksum
-for published versions unchanged. Avoid deleting Releases containing pictures
-still used by users.
+Release packs are immutable. No picture is republished under the same ID,
+even with a higher `levelVersion`. All new pictures have their own ID and
+`levelVersion: 1`. Local progress is keyed to ID, version and checksum;
+keep every published file and checksum unchanged. Avoid deleting Releases
+that may still be used by users.
 
 The publisher checks picture content against catalog metadata and writes the
 aggregate catalog **after** copying the referenced files. There is deliberately
@@ -516,7 +543,7 @@ CDN without changing saved level IDs.
   paging yet; for a larger library add paginated catalogs.
 - Web downloaded files currently use per-level browser storage, which is quota
   limited; Android likewise has a local 1000-level safety limit.
-- New versions of an already downloaded ID are not auto-replaced. Progress is
-  preserved, and content updates need a deliberate user-facing migration flow.
+- Downloaded IDs remain hidden from the online download list; new pictures
+  always use new IDs. There is no per-picture update or migration flow.
 - Public GitHub Releases/Pages have their own fair-use, size and bandwidth
   limits. Move distribution to a dedicated CDN when traffic justifies it.
