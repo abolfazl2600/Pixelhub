@@ -34,6 +34,7 @@ class GalleryScreen extends StatefulWidget {
 
 class _GalleryScreenState extends State<GalleryScreen> {
   String _category = 'all', _filter = 'all', _search = '';
+  int _onlineVisibleCount = 12;
 
   @override
   void initState() {
@@ -83,7 +84,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
             if (pending.isNotEmpty) ...[
               Text('${s.onlineCount}: ${context.digits(pending.length)}'),
               const SizedBox(height: 8),
-              for (final picture in pending.take(5))
+              for (final picture in pending.take(_onlineVisibleCount))
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Row(
@@ -131,6 +132,18 @@ class _GalleryScreenState extends State<GalleryScreen> {
                         ),
                       ),
                     ],
+                  ),
+                ),
+              if (pending.length > _onlineVisibleCount)
+                Align(
+                  alignment: AlignmentDirectional.centerEnd,
+                  child: TextButton.icon(
+                    onPressed: () =>
+                        setState(() => _onlineVisibleCount += 12),
+                    icon: const Icon(Icons.expand_more),
+                    label: Text(
+                      '${s.onlinePictures} + ${context.digits(pending.length - _onlineVisibleCount)}',
+                    ),
                   ),
                 ),
               if (online.failedDownloadId != null)
