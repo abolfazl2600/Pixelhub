@@ -531,6 +531,61 @@ The expected total becomes **135 distinct online pictures**, up from 105, after 
 
 To create the pack manually outside the tracked working tree: `python3 tool/online_objects_30_pack.py /tmp/content.zip`. Once published, never overwrite an immutable version-1 picture; publish a new ID with level version 1 for redesigned art.
 
+## Twenty playful miniatures (48×48)
+
+`tool/online_playful_20_pack.py` defines **20 distinct original, whimsical
+color-by-number illustrations**, each with a 48×48 pixel grid, a bilingual
+Persian/English title, a stable unused `online-playful-...` ID and
+`levelVersion: 1`. They are playful toys, emoji-like characters, sweets
+and cheerful motifs, designed for the mobile gallery.
+
+| ID | فارسی | English | Online category |
+| --- | --- | --- | --- |
+| `online-playful-smiling-sun` | خورشید خندان | Smiling Sun | `nature` |
+| `online-playful-rainbow-cloud` | ابر رنگین‌کمانی | Rainbow Cloud | `nature` |
+| `online-playful-heart-smile` | قلب مهربان | Smiling Heart | `patterns` |
+| `online-playful-lucky-clover` | شبدر خوش‌شانس | Lucky Clover | `nature` |
+| `online-playful-friendly-ghost` | روح بازیگوش | Friendly Ghost | `patterns` |
+| `online-playful-one-eyed-monster` | هیولای یک‌چشم | One-Eyed Monster | `patterns` |
+| `online-playful-flying-saucer` | بشقاب‌پرنده بامزه | Cute UFO | `space` |
+| `online-playful-magic-wand` | چوب جادویی | Magic Wand | `objects` |
+| `online-playful-party-hat` | کلاه جشن | Party Hat | `objects` |
+| `online-playful-birthday-cake` | کیک تولد رنگی | Birthday Cake | `objects` |
+| `online-playful-popcorn-carton` | پاپ‌کورن خندان | Smiling Popcorn | `objects` |
+| `online-playful-bubble-tea` | بابل‌تی بامزه | Bubble Tea | `objects` |
+| `online-playful-rubber-duck` | اردک اسباب‌بازی | Rubber Duck | `objects` |
+| `online-playful-teddy-bear` | خرس عروسکی | Teddy Bear | `objects` |
+| `online-playful-rainbow-yo-yo` | یویوی رنگی | Rainbow Yo-yo | `objects` |
+| `online-playful-paper-kite` | بادبادک خندان | Paper Kite | `objects` |
+| `online-playful-smiling-moon` | ماه خندان | Smiling Moon | `space` |
+| `online-playful-star-buddy` | ستاره بامزه | Cute Star Buddy | `patterns` |
+| `online-playful-neon-jellyfish` | عروس دریایی نئونی | Neon Jellyfish | `animals` |
+| `online-playful-candy-land` | سرزمین آب‌نبات | Candy Land | `patterns` |
+
+The categories are intentionally limited to the five values older online
+clients understand (`nature`, `animals`, `objects`, `patterns`, and
+`space`). The currently deployed app does not need a dedicated `playful`
+category or any migration to discover these additions.
+
+The Pages workflow generates an immutable Release named
+[`pixelhub-content-playful-20-v1`](https://github.com/abolfazl2600/Pixelhub/releases/tag/pixelhub-content-playful-20-v1)
+**only after successful main Web CI**, provided the tag does not exist.
+Its `content.zip` has 20 numbered schema-v2 JSON files, 20 small PNG previews
+and a catalog manifest. All art bytes remain Release-only, off the git tree
+and out of the Android bundle. Each painting can be downloaded independently,
+then colored offline; all existing levels and saved progress are preserved.
+
+The target becomes **155 distinct online pictures**, up from 135, *after*
+the Release is actually created, assembled and GitHub Pages deployment succeeds.
+A Git commit alone does not establish public availability. Check the
+[Pages publishing workflow](https://github.com/abolfazl2600/Pixelhub/actions/workflows/web-pages.yml)
+and live `/Pixelhub/online/catalog.json` for confirmed publication.
+
+Generate the new archive outside the tracked tree:
+`python3 tool/online_playful_20_pack.py /tmp/content.zip`.
+Once published, never change the bytes or identifiers of this Release; a
+redesign requires a fresh ID and its own new immutable Release.
+
 ## Publish more pictures
 
 1. Create one or more schema-v2 level JSON files with unique `online-...`
