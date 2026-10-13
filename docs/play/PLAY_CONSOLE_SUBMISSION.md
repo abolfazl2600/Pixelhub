@@ -46,8 +46,11 @@
 
 - App display name: **PixelHub**. In-app label and launcher use this branding.
 - Current source version: **0.3.2+5**, **not** the completed V6 release.
-- Branded launcher mipmaps, adaptive icon and Android 12 splash have sources
-  in `apps/game/android/app/src/main/res/`. Validate on light/dark devices.
+- The selected blue easel-and-brush launcher icon is checked in as a small
+  optimized source at `apps/game/assets/brand/pixelhub_mark.png`; Android,
+  Web/PWA and the 512 × 512 Play listing PNG are generated before builds via
+  `tool/generate_launcher_icons.dart`. Validate appearance on light/dark
+  devices and mask shapes. The listing PNG is included in the signed AAB artifact.
 - Prepare real game screenshots, a 512 × 512 store icon and a 1024 × 500
   feature graphic as distinct store assets; source launcher art alone is
   not proof they were uploaded to the Play listing.

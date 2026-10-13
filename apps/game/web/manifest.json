@@ -4,7 +4,7 @@
   "start_url": ".",
   "display": "standalone",
   "background_color": "#f9f7f1",
-  "theme_color": "#316349",
+  "theme_color": "#069AEA",
   "description": "PixelHub: offline-first pixel-art coloring for Android and Web",
   "orientation": "any",
   "lang": "fa",

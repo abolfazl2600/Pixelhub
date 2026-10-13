@@ -49,6 +49,9 @@ jobs:
           channel: stable
           cache: true
       - run: bash tool/validate.sh
+      - name: Generate blue Android launcher and Play listing icon
+        working-directory: apps/game
+        run: dart run ../../tool/generate_launcher_icons.dart
       - name: Decode private Play upload keystore
         if: ${{ inputs.build_kind == 'play-aab' }}
         env:
@@ -169,5 +172,6 @@ jobs:
           path: |
             apps/game/build/app/outputs/bundle/release/app-release.aab
             apps/game/build/app/outputs/bundle/release/commit.txt
+            apps/game/build/play-listing/icon-512.png
           if-no-files-found: error
           retention-days: 14
