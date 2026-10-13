@@ -1,7 +1,11 @@
+import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatform;
 import 'package:flutter/material.dart';
 
 abstract final class PixelTokens {
   static const maxWidth = 430.0;
+  // Desktop windows are centered; phones and tablets retain their full width.
+  static const desktopBreakpoint = 1200.0;
+  static const desktopMaxWidth = 880.0;
   static const space = 24.0;
   static const radius = 24.0;
   static const ink = Color(0xff223a31);
@@ -47,19 +51,69 @@ abstract final class PixelTokens {
   );
 }
 
-/// Fills the actual phone, tablet or Web viewport without blank side gutters.
+/// Phones/tablets fill the viewport. Wide desktop windows use a centered,
+/// bounded canvas so painting controls and previews never stretch indefinitely.
 class MobileFrame extends StatelessWidget {
   const MobileFrame({required this.child, super.key});
 
   final Widget child;
 
   @override
-  Widget build(BuildContext context) => SizedBox(
-    key: const ValueKey('mobile-frame'),
-    width: double.infinity,
-    height: double.infinity,
-    child: child,
-  );
+  Widget build(BuildContext context) {
+    final isDesktopPlatform = switch (defaultTargetPlatform) {
+      TargetPlatform.linux ||
+      TargetPlatform.macOS ||
+      TargetPlatform.windows => true,
+      _ => false,
+    };
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final boundDesktop =
+            isDesktopPlatform &&
+            constraints.maxWidth >= PixelTokens.desktopBreakpoint;
+        final width = boundDesktop
+            ? PixelTokens.desktopMaxWidth
+            : constraints.maxWidth;
+
+        final frame = SizedBox(
+          key: const ValueKey('mobile-frame'),
+          width: width,
+          height: double.infinity,
+          child: boundDesktop
+              ? MediaQuery(
+                  // A centered layout needs the content's actual viewport
+                  // width, not the wider surrounding browser window.
+                  data: MediaQuery.of(context).copyWith(
+                    size: Size(width, constraints.maxHeight),
+                  ),
+                  child: child,
+                )
+              : child,
+        );
+
+        if (!boundDesktop) return frame;
+
+        return ColoredBox(
+          color: PixelTokens.backdrop,
+          child: Center(
+            child: DecoratedBox(
+              decoration: const BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0x14223a31),
+                    blurRadius: 28,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: frame,
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
 
 class PreviewBadge extends StatelessWidget {
