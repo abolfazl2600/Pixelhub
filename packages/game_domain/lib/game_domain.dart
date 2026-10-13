@@ -13,6 +13,12 @@ abstract interface class LevelRepository {
   Future<List<LevelDefinition>> loadLevels();
 }
 
+/// Only explicitly downloaded online pictures are persisted locally.
+abstract interface class OnlineLevelStorage {
+  Future<List<LevelDefinition>> readDownloadedLevels();
+  Future<void> saveDownloadedLevel(LevelDefinition level);
+}
+
 abstract interface class ProgressRepository {
   Future<ProgressSnapshot?> read(LevelDefinition level);
   Future<void> write(ProgressSnapshot progress);
