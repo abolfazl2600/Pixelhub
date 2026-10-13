@@ -44,11 +44,12 @@ class ArtworkScreen extends StatelessWidget {
     if (confirmed != true) {
       return;
     }
+    final router = GoRouter.of(context);
     try {
       await onDelete(level);
-      if (context.mounted) {
-        context.go(isOnline ? '/gallery' : '/my-gallery');
-      }
+      // Removing an online level rebuilds the artwork route immediately;
+      // its BuildContext may no longer be mounted after the storage write.
+      router.go(isOnline ? '/gallery' : '/my-gallery');
     } on Object {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
