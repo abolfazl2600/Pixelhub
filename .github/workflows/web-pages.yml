@@ -92,6 +92,20 @@ jobs:
               --notes "Six original offline-playable levels: Pink Tulip, Forest Mushroom, Cat Face, Watermelon Slice, Little Rocket, Purple Butterfly. All level JSON and PNG previews are Release assets and excluded from git clone." \
               --latest=false
           fi
+      - name: Publish twelve additional pictures as a release-only asset
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-collection-12-v1 >/dev/null 2>&1; then
+            python3 tool/online_collection_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-collection-12-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: 12 fresh online coloring pictures" \
+              --notes "Twelve original pixel-art coloring levels across animals, food, nature and space. Each numbered level and its PNG preview are downloadable release assets, not part of git clone." \
+              --latest=false
+          fi
       - name: Download release packs and assemble online catalog
         env:
           GH_TOKEN: ${{ github.token }}
