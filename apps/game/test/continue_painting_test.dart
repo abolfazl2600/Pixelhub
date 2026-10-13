@@ -40,46 +40,48 @@ ProgressSnapshot fullyPainted(LevelDefinition level) {
 Future<void> loadProgress() => Future<void>.delayed(Duration.zero);
 
 void main() {
-  test('last opened incomplete picture survives recreation and falls back', () async {
-    final store = MemoryPreferences();
-    final first = fixture();
-    final second = anotherLevel('second');
-    await store.write(partiallyPainted(first));
-    await store.write(partiallyPainted(second));
+  test(
+    'last opened incomplete picture survives recreation and falls back',
+    () async {      final store = MemoryPreferences();
+      final first = fixture();
+      final second = anotherLevel('second');
+      await store.write(partiallyPainted(first));
+      await store.write(partiallyPainted(second));
 
-    final library = LibraryController(
-      store,
-      store,
-      recentArtworkRepository: store,
-    );
-    addTearDown(library.dispose);
-    library.setCatalog([first, second], {});
-    await library.load();
-    await library.loadRecentArtwork();
-    await loadProgress();
-    expect(library.continueLevel?.id, first.id);
+      final library = LibraryController(
+        store,
+        store,
+        recentArtworkRepository: store,
+      );
+      addTearDown(library.dispose);
+      library.setCatalog([first, second], {});
+      await library.load();
+      await library.loadRecentArtwork();
+      await loadProgress();
+      expect(library.continueLevel?.id, first.id);
 
-    await library.markOpened(second);
-    expect(library.continueLevel?.id, second.id);
+      await library.markOpened(second);
+      expect(library.continueLevel?.id, second.id);
 
-    final reopened = LibraryController(
-      store,
-      store,
-      recentArtworkRepository: store,
-    );
-    addTearDown(reopened.dispose);
-    reopened.setCatalog([first, second], {});
-    await reopened.load();
-    await reopened.loadRecentArtwork();
-    await loadProgress();
-    expect(reopened.continueLevel?.id, second.id);
-    expect(reopened.continuePercent(second), 25);
+      final reopened = LibraryController(
+        store,
+        store,
+        recentArtworkRepository: store,
+      );
+      addTearDown(reopened.dispose);
+      reopened.setCatalog([first, second], {});
+      await reopened.load();
+      await reopened.loadRecentArtwork();
+      await loadProgress();
+      expect(reopened.continueLevel?.id, second.id);
+      expect(reopened.continuePercent(second), 25);
 
-    reopened.updateProgress(fullyPainted(second));
-    expect(reopened.continueLevel?.id, first.id);
-    reopened.updateProgress(PaintingSession(first).snapshot);
-    expect(reopened.continueLevel, isNull);
-  });
+      reopened.updateProgress(fullyPainted(second));
+      expect(reopened.continueLevel?.id, first.id);
+      reopened.updateProgress(PaintingSession(first).snapshot);
+      expect(reopened.continueLevel, isNull);
+  },
+  );
 
   test('deleted, unavailable, and mismatched artwork cannot appear', () async {
     final store = MemoryPreferences();
@@ -123,9 +125,7 @@ void main() {
     expect(library.continueLevel?.id, first.id);
 
     // An older picture version cannot reuse another version's saved bits.
-    library.setCatalog([
-      anotherLevel('sunflower'),
-    ], {});
+    library.setCatalog([anotherLevel('sunflower')], {});
     expect(library.continueLevel, isNull);
   });
 
@@ -172,7 +172,10 @@ void main() {
     expect(find.text('Continue painting'), findsOneWidget);
     expect(find.text('Sunflower'), findsWidgets);
     expect(find.text('25%'), findsOneWidget);
-    expect(find.byKey(const ValueKey('continue-painting-card')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('continue-painting-card')),
+      findsOneWidget,
+    );
 
     await tester.ensureVisible(
       find.byKey(const ValueKey('continue-painting-button')),
@@ -186,10 +189,42 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pumpAndSettle();
     await openApp();
-    expect(find.byKey(const ValueKey('continue-painting-card')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('continue-painting-card')),
+      findsOneWidget,
+    );
     expect(find.text('Continue painting'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  for (final viewport in [const Size(360, 780), const Size(1024, 768)]) {
+    testWidgets('Continue card fits viewport $viewport in Persian', (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = viewport;
+      addTearDown(tester.view.reset);
+      final level = fixture();
+      final store = MemoryPreferences();
+      await store.write(partiallyPainted(level));
+      await store.writeRecentArtworkId(level.id);
+      final repository = TestRepository();
+      await tester.pumpWidget(
+        PixelhubApp(
+          repository: repository,
+          progressRepository: store,
+          artworkRepository: store,
+          preferences: store,
+        ),
+      );
+      repository.requests.single.complete(level);
+      await tester.pumpAndSettle();
+      expect(find.text('ادامه نقاشی'), findsOneWidget);
+      expect(find.byKey(const ValueKey('continue-painting-card')), findsOneWidget);
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('continue-painting-button')),
+      );
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   testWidgets('fresh and completed paintings have no Continue shortcut', (
     tester,
