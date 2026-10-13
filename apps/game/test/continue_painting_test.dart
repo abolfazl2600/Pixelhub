@@ -42,7 +42,8 @@ Future<void> loadProgress() => Future<void>.delayed(Duration.zero);
 void main() {
   test(
     'last opened incomplete picture survives recreation and falls back',
-    () async {      final store = MemoryPreferences();
+    () async {
+      final store = MemoryPreferences();
       final first = fixture();
       final second = anotherLevel('second');
       await store.write(partiallyPainted(first));
@@ -80,7 +81,7 @@ void main() {
       expect(reopened.continueLevel?.id, first.id);
       reopened.updateProgress(PaintingSession(first).snapshot);
       expect(reopened.continueLevel, isNull);
-  },
+    },
   );
 
   test('deleted, unavailable, and mismatched artwork cannot appear', () async {
@@ -198,7 +199,9 @@ void main() {
   });
 
   for (final viewport in [const Size(360, 780), const Size(1024, 768)]) {
-    testWidgets('Continue card fits viewport $viewport in Persian', (tester) async {
+    testWidgets('Continue card fits viewport $viewport in Persian', (
+      tester,
+    ) async {
       tester.view.devicePixelRatio = 1;
       tester.view.physicalSize = viewport;
       addTearDown(tester.view.reset);
@@ -218,7 +221,10 @@ void main() {
       repository.requests.single.complete(level);
       await tester.pumpAndSettle();
       expect(find.text('ادامه نقاشی'), findsOneWidget);
-      expect(find.byKey(const ValueKey('continue-painting-card')), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('continue-painting-card')),
+        findsOneWidget,
+      );
       await tester.ensureVisible(
         find.byKey(const ValueKey('continue-painting-button')),
       );
