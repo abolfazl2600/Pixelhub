@@ -120,8 +120,9 @@ void main() {
       await tester.tap(find.text('English'));
       await tester.pumpAndSettle();
       expect(find.text('App language'), findsOneWidget);
-      GoRouter.of(tester.element(find.byType(ProfileScreen)))
-          .go('/painting/sunflower');
+      GoRouter.of(
+        tester.element(find.byType(ProfileScreen)),
+      ).go('/painting/sunflower');
       await tester.pumpAndSettle();
       expect(find.text('Colors'), findsOneWidget);
       expect(find.text('Sunflower'), findsOneWidget);
@@ -148,8 +149,9 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('فارسی'));
       await tester.pumpAndSettle();
-      GoRouter.of(tester.element(find.byType(ProfileScreen)))
-          .go('/painting/sunflower');
+      GoRouter.of(
+        tester.element(find.byType(ProfileScreen)),
+      ).go('/painting/sunflower');
       await tester.pumpAndSettle();
       expect(find.text('رنگ‌ها'), findsOneWidget);
       expect(storage.language, 'fa');
