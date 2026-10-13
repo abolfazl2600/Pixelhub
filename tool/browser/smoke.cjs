@@ -198,7 +198,14 @@ async function main() {
     const preview = Buffer.from(
       'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9Y9nYAAAAASUVORK5CYII=',
       'base64');
+    const remoteRequests = [];
+    page.on('console', message => {
+      if (message.text().includes('Online picture download failed:')) {
+        console.log('Browser content diagnostic:',message.text());
+      }
+    });
     await page.route(onlineBase+'**', async route => {
+      remoteRequests.push(route.request().url());
       const uri = new URL(route.request().url());
       if(uri.pathname.endsWith('/catalog.json')) {
         return route.fulfill({status:200,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:remoteCatalog});
@@ -214,6 +221,10 @@ async function main() {
     await page.goto(base+'#/gallery'); await ready();
     await page.getByRole('button',{name:'دریافت تصویر',exact:true}).waitFor();
     await page.getByRole('button',{name:'دریافت تصویر',exact:true}).click();
+    await page.waitForTimeout(1800);
+    console.log('Online test requests:',remoteRequests);
+    console.log('Online test download failed:',
+      await page.getByText('دریافت یا ذخیره این تصویر کامل نشد. دوباره تلاش کنید.',{exact:true}).count());
     // SliverGrid is lazy: downloaded images are appended after 40 bundled
     // levels, so their gallery cards are not mounted while viewing the top.
     await page.getByText('فعلاً تصویر جدیدی برای دریافت وجود ندارد.',{exact:true}).waitFor();
