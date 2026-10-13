@@ -41,6 +41,11 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                   IconButton(
+                    tooltip: s.settings,
+                    icon: const Icon(Icons.settings_outlined),
+                    onPressed: () => context.push('/settings'),
+                  ),
+                  IconButton(
                     tooltip: s.profile,
                     icon: const Icon(Icons.person_outline_rounded),
                     onPressed: () => context.push('/profile'),
@@ -48,11 +53,6 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 24),
-              Align(
-                alignment: AlignmentDirectional.centerStart,
-                child: PreviewBadge(label: s.demoBadge),
-              ),
-              const SizedBox(height: 16),
               Text(
                 s.headline,
                 style: const TextStyle(
@@ -119,11 +119,6 @@ class HomeScreen extends StatelessWidget {
                     onPressed: () => context.push('/import'),
                     icon: const Icon(Icons.add_photo_alternate_outlined),
                     label: Text(s.importPhoto),
-                  ),
-                  TextButton.icon(
-                    onPressed: () => context.push('/settings'),
-                    icon: const Icon(Icons.settings_outlined),
-                    label: Text(s.settings),
                   ),
                 ],
               ),
