@@ -1,0 +1,68 @@
+{
+  "flower": {
+    "motion": "sway",
+    "region": [
+      0.15,
+      0.08,
+      0.85,
+      0.52
+    ]
+  },
+  "tulip": {
+    "motion": "sway",
+    "region": [
+      0.18,
+      0.1,
+      0.82,
+      0.56
+    ]
+  },
+  "cactus": {
+    "motion": "sway",
+    "region": [
+      0.12,
+      0.08,
+      0.88,
+      0.72
+    ]
+  },
+  "mountain": {
+    "motion": "float",
+    "region": [
+      0.64,
+      0.1,
+      0.89,
+      0.35
+    ]
+  },
+  "leaf": {
+    "motion": "sway",
+    "region": [
+      0.16,
+      0.08,
+      0.84,
+      0.81
+    ]
+  },
+  "mushroom": {
+    "motion": "pulse",
+    "region": [
+      0.12,
+      0.15,
+      0.88,
+      0.52
+    ]
+  },
+  "apple": {
+    "motion": "float"
+  },
+  "cherry": {
+    "motion": "sway"
+  },
+  "watermelon": {
+    "motion": "float"
+  },
+  "butterfly": {
+    "motion": "flap"
+  }
+}

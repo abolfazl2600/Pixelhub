@@ -11,13 +11,17 @@ void main() {
   test('bundled animation catalog matches immutable paintings', () async {
     final levels = await AssetLevelRepository().loadLevels();
     final byId = {for (final level in levels) level.id: level};
-    final source = await rootBundle.loadString('assets/animations/catalog.json');
+    final source = await rootBundle.loadString(
+      'assets/animations/catalog.json',
+    );
     final catalog = jsonDecode(source) as Map<String, dynamic>;
     expect(catalog, isNotEmpty);
     for (final entry in catalog.entries) {
       final level = byId[entry.key]!;
       final original = List<int>.of(level.cells);
-      final raw = await rootBundle.loadString('assets/animations/${entry.value}');
+      final raw = await rootBundle.loadString(
+        'assets/animations/${entry.value}',
+      );
       final animation = PixelAnimation.fromJson(
         jsonDecode(raw) as Map<String, Object?>,
         level,

@@ -15,6 +15,8 @@ Recipes live in `tool/animation_batches/`; each batch records up to ten pictures
 | --- | --- | --- |
 | Bundled 01 | sunflower, heart, rainbow, moon, tree, star, gem, cat, house, planet | flower/tree sway, heartbeat, light glints, stars, rotation, eye blink |
 
+| Bundled 02 | flower, tulip, cactus, mountain, leaf, mushroom, apple, cherry, watermelon, butterfly | petal/leaf sway, drifting sun, cap stretch, fruit bob, wing flap |
+
 CI and Pages results must be checked before describing a batch as verified or
 published. Online animation assets are generated during Pages publication and
 must remain independent of the immutable released paintings.
