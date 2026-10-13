@@ -1,0 +1,122 @@
+{
+  "online-iran-abstract-brickwork": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "3324fd4e549ace433fd110f660e6ded6265a4fbec964838d6ae4253c47ef35b8",
+    "animationChecksum": "2f8185137f4f6d6c1e9759dafd0cd065e6ad22359ec1365b349bc4e1697cb39b"
+  },
+  "online-iran-abstract-iwan": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "1c6081da93a390eaeeac8ae83e638824ec1ae05105400026b37322e141bfbf8b",
+    "animationChecksum": "dad36580b1f0f94e656280d9b723bd9beff8bfd1b2825f6c181841f122ba4176"
+  },
+  "online-iran-blue-mosque-tabriz": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "1e57b38d22cd9d5c7fc437d7188e2c7cc6fd1e638afff6c18b5e241c6908a7f6",
+    "animationChecksum": "dc5951154b2bc6ffda76a9f5b3d0c20163d324fd37b151071c7b2f756a496c82"
+  },
+  "online-iran-khaju-bridge": {
+    "motion": "ripple",
+    "region": [
+      0.05,
+      0.65,
+      0.95,
+      0.95
+    ],
+    "version": 1,
+    "checksum": "9823c5d0dc53b86b92427185c98a5fe226d69ba985363ba6a49839884abdfa23",
+    "animationChecksum": "1e47a0e31e66bed356886e2380a83258900ae53475947e043df7ced4007c205a"
+  },
+  "online-iran-ali-qapu": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "c7d9c85da6cb80c5c1e0e5cf6f32a72707df28e97da1bd379f42fbdc964123f4",
+    "animationChecksum": "4f0af4dd342db981a6701993560a45e8e6b9e5a57bc84c5d3deb491617d82a08"
+  },
+  "online-iran-chehel-sotoun": {
+    "motion": "ripple",
+    "region": [
+      0.05,
+      0.65,
+      0.95,
+      0.95
+    ],
+    "version": 1,
+    "checksum": "e3f960b308a1eb8c91f268ee4dd2defc2013d05ce9397bc5433447070784bd88",
+    "animationChecksum": "8c8fcef7ca812dde07d503e1525b16394940c39ba46ef6539001d3d1cac1ded0"
+  },
+  "online-iran-shah-cheragh": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "5026baf7428df29898e04f888aceac1a5c68fcd74061f7eaabd5ae1bd0a47e1c",
+    "animationChecksum": "e19213fb96aa9294a6f6c8e6df034210b1c0e172c07ab99bee2afe99a24a8297"
+  },
+  "online-iran-fin-garden": {
+    "motion": "ripple",
+    "region": [
+      0.05,
+      0.65,
+      0.95,
+      0.95
+    ],
+    "version": 1,
+    "checksum": "e86f85bedd4ebbfb8976839c2a892c32b2bbde3d677ba3f02348ecaac93eabe1",
+    "animationChecksum": "59fe31d418e6318f96423c8803620f1dca26bf2c93ba7e56e138f4321cdae912"
+  },
+  "online-iran-eram-garden": {
+    "motion": "sway",
+    "region": [
+      0.02,
+      0.34,
+      0.28,
+      0.83
+    ],
+    "version": 1,
+    "checksum": "39288a208df76534f03a8cca74132221b5ead19c9e6d56fa587322b68d3cc451",
+    "animationChecksum": "f96830437b0c2848fe6118db568079d7567ec09da9d4ddec491319293567eee9"
+  },
+  "online-iran-masuleh-village": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "571b075965265bcefdac690eaea483935eed3e167534a45d3731f5fe3048f0b0",
+    "animationChecksum": "19b450c71e63a8bf76f10a030af42ed8281b7ea405270d338d454c1f8855a60f"
+  }
+}
