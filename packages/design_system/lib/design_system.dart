@@ -1,4 +1,5 @@
-import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatform;
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform;
 import 'package:flutter/material.dart';
 
 abstract final class PixelTokens {
@@ -84,9 +85,9 @@ class MobileFrame extends StatelessWidget {
               ? MediaQuery(
                   // A centered layout needs the content's actual viewport
                   // width, not the wider surrounding browser window.
-                  data: MediaQuery.of(context).copyWith(
-                    size: Size(width, constraints.maxHeight),
-                  ),
+                  data: MediaQuery.of(
+                    context,
+                  ).copyWith(size: Size(width, constraints.maxHeight)),
                   child: child,
                 )
               : child,
