@@ -1,0 +1,86 @@
+{
+  "online-playful-rubber-duck": {
+    "motion": "float",
+    "version": 1,
+    "checksum": "bc1ceeed58068f4f37315db0b133b7dd7c304965f1fc311099dbf007b5c603de",
+    "animationChecksum": "59996609ce207fdf65033f07a874913b5114b882e00a696ea0a431cbfd554046"
+  },
+  "online-playful-teddy-bear": {
+    "motion": "blink",
+    "version": 1,
+    "checksum": "0dd131f65011b1fde60a0ef95e8b624e0246cc8cb5c597efebd50b6f77ec18f2",
+    "animationChecksum": "3753ddc8fea3f67a040000a2e2a09ab09cdf4dbc456cd1446d0f0c329ddc4e15"
+  },
+  "online-playful-rainbow-yo-yo": {
+    "motion": "spin",
+    "version": 1,
+    "checksum": "c7438d1a1537096fbe4b4fc5c03ed6041cd9506e9aad5bd12fd05f6b4cc82b14",
+    "animationChecksum": "32268cf24dae464bf1a403574a8a6eed0db315e87fd1837cc7c2f09a0e08cd52"
+  },
+  "online-playful-paper-kite": {
+    "motion": "sway",
+    "version": 1,
+    "checksum": "840dec1156a57e5e13d9b6aa2825665f25744c6dec53da08bbc3267fc54ec34f",
+    "animationChecksum": "80594db1fbe07cae1b69230c32ddd3975f56c036995abcb3a65f77145425cb5a"
+  },
+  "online-playful-smiling-moon": {
+    "motion": "float",
+    "version": 1,
+    "checksum": "33c68186593270dda3bc4815be8b1b57aff824a5bc95f0da042d85ab087ab1d8",
+    "animationChecksum": "7f61c5e7d5e6727b007477e0fc118de845b0517f95e40a96d8ec7443ba8ee955"
+  },
+  "online-playful-star-buddy": {
+    "motion": "spin",
+    "version": 1,
+    "checksum": "d9b80def6a3fc589630ce96116f89112dc723b402da673809b7c8f9991777532",
+    "animationChecksum": "ebce6ccecde3c08b9b53900e10aeaf2f40d921e83fbb06af2c461df039f5288a"
+  },
+  "online-playful-neon-jellyfish": {
+    "motion": "sway",
+    "region": [
+      0.19,
+      0.57,
+      0.81,
+      0.89
+    ],
+    "version": 1,
+    "checksum": "84b4e0d8a6da52b6987038da3fd7cf9a9a26786d6331f71ae98a57a08f816115",
+    "animationChecksum": "7c97b1076db353c0d98b4bf2431b4383f117944717c98774c142dd63cda03b7e"
+  },
+  "online-playful-candy-land": {
+    "motion": "sway",
+    "region": [
+      0.1,
+      0.08,
+      0.9,
+      0.58
+    ],
+    "version": 1,
+    "checksum": "aa9753402e6a441c0648db62ac208148ee5656dd1fabb447a4c2391b5188ab9c",
+    "animationChecksum": "30454745eac2a1a1cece0aab057fdceb846e565d9f98e56015b7777874be65fc"
+  },
+  "online-balloon": {
+    "motion": "sway",
+    "region": [
+      0.16,
+      0.05,
+      0.82,
+      0.85
+    ],
+    "version": 1,
+    "checksum": "0ced5d70d2760ce49d9448f81d573d14856b0954b3ffaf74629ef1fb21dc84db",
+    "animationChecksum": "cb84140f6ada008aa7dfca776ad4c02b69eaad0edd8d994203cb4bc3b65975e7"
+  },
+  "online-tulip": {
+    "motion": "sway",
+    "region": [
+      0.16,
+      0.12,
+      0.85,
+      0.59
+    ],
+    "version": 1,
+    "checksum": "d98b67c663842128eaa807791381afc41f4be56d2b15ca6e84a97fc5c5707140",
+    "animationChecksum": "4ce41834ad67261bf71b52e8d9dcb624e3f91f872b741faac0c6c504dfdd7ff7"
+  }
+}
