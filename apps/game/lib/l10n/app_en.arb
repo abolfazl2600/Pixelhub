@@ -139,6 +139,8 @@
   "exportError": "The export could not be created; please retry.",
   "deleteArtwork": "Delete personal picture",
   "deleteArtworkMessage": "This picture and its progress will be removed from this device. This cannot be undone.",
+  "removeDownloadedArtwork": "Remove downloaded picture",
+  "removeDownloadedArtworkMessage": "The downloaded picture, its category, and its progress will be removed from this device. You can download it again later.",
   "delete": "Delete",
   "about": "About",
   "aboutMessage": "A calm pixel-coloring game with original pictures and your personal photos. Persian and English, without an account or ads.",

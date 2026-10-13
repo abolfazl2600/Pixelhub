@@ -86,9 +86,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     );
     _online.addListener(() {
       if (_online.isLoaded) _library.setDownloadedOnline(_online.downloaded);
-      _library.setOnlineCategories({
-        for (final picture in _online.pictures) picture.id: picture.category,
-      });
+      _library.setOnlineCategories(_online.categories);
     });
     unawaited(_online.loadDownloaded());
     _bootstrap = BootstrapController(widget.repository);
@@ -226,9 +224,15 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       await controller.flush();
     }
     try {
-      await _library.delete(level);
+      if (level.id.startsWith('online-')) {
+        await _online.removeDownloaded(level.id);
+        await _library.forgetDownloadedOnline(level);
+      } else {
+        await _library.delete(level);
+      }
     } finally {
-      if (!_library.library.artworks.any((art) => art.level.id == level.id)) {
+      if (level.id.startsWith('online-') ||
+          !_library.library.artworks.any((art) => art.level.id == level.id)) {
         _sessions.remove(key)?.dispose();
       }
     }

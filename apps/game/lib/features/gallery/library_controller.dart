@@ -210,6 +210,23 @@ class LibraryController extends ChangeNotifier {
     await repository.removeProgress(level);
   });
 
+  Future<void> forgetDownloadedOnline(LevelDefinition level) =>
+      _mutate(() async {
+        if (!level.id.startsWith('online-')) {
+          throw StateError('Only downloaded online levels can be forgotten.');
+        }
+        final next = ArtworkLibrary(
+          artworks: library.artworks,
+          favorites: library.favorites.where((id) => id != level.id),
+        );
+        await repository.writeLibrary(next);
+        library = next;
+        progress.remove(level.id);
+        damagedProgress.remove(level.id);
+        _revisions[level.id] = (_revisions[level.id] ?? 0) + 1;
+        await repository.removeProgress(level);
+      });
+
   Future<void> clear() => _mutate(() async {
     ++_generation;
     await repository.clearPixelhubData();

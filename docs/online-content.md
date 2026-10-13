@@ -15,6 +15,16 @@ files on `main`. A standard `git clone` does **not** download Release assets.
   identity/version/size/checksum, and stores it under its own device key.
 - Downloaded pictures appear in the normal gallery, work without a connection,
   keep per-picture local progress and survive application restarts.
+- The category of each downloaded picture is stored alongside its level ID in
+  local preferences. Gallery category filtering works after a full offline
+  restart, without loading the remote catalog. Legacy downloads without
+  category metadata remain playable (falling back to `patterns` if unknown)
+  and receive their category automatically after a successful online catalog
+  refresh. The painting's immutable JSON and saved progress are not modified.
+- Removing a downloaded picture removes its local JSON, saved category, and
+  progress. Clearing application data removes all `pixelhub.*` preferences,
+  including downloaded category metadata. Neither operation removes the
+  published online picture from the remote catalog.
 - Failed connectivity leaves bundled and previously downloaded levels usable.
 - Browser localStorage and device storage have quotas; failed writes are
   reported. This initial adapter caps locally downloaded levels at 1000.
