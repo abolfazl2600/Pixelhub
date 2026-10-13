@@ -1,11 +1,13 @@
 const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
+const crypto = require('node:crypto');
 const path = require('node:path');
 
 async function main() {
   const base = process.env.PIXELHUB_BASE_URL || 'http://127.0.0.1:8080/Pixelhub/';
   const output = process.env.PIXELHUB_SMOKE_OUTPUT || path.join(__dirname, 'artifacts');
+  const onlineBase = 'https://abolfazl2600.github.io/Pixelhub/online/';
   await fs.mkdir(output, {recursive:true});
   const browser = await chromium.launch({headless:true, executablePath:process.env.CHROMIUM_PATH || undefined,
     args:['--no-sandbox','--enable-unsafe-swiftshader']});
@@ -16,7 +18,7 @@ async function main() {
     function watch(p) {
       p.on('pageerror', e => pageErrors.push(e.message));
       p.on('requestfailed', r => failedRequests.push(r.url()));
-      p.on('request', r => { const u=new URL(r.url()); if(u.protocol.startsWith('http') && u.origin!==new URL(base).origin) externalRequests.push(u.origin); });
+      p.on('request', r => { const u=new URL(r.url()); if(u.protocol.startsWith('http') && u.origin!==new URL(base).origin && !u.href.startsWith(onlineBase)) externalRequests.push(u.origin); });
     }
     watch(page);
     const start = () => page.getByRole('button',{name:/شروع.*رنگ‌آمیزی|Start.*coloring/});
@@ -176,12 +178,53 @@ async function main() {
     await page.getByRole('button',{name:'English',exact:true}).waitFor();
     await back().click();
 
+    // Exercise cross-platform HTTP loading in the browser. All online responses
+    // are mocked: the test never depends on public GitHub Pages availability.
+    console.log('Browser: online catalog and opt-in download');
+    const remoteLevel = {...level, levelId:'online-smoke-test', levelVersion:1,
+      titles:{fa:'تصویر آنلاین آزمایشی',en:'Online browser sample'}};
+    const canonical = [remoteLevel.schemaVersion, remoteLevel.levelId,
+      remoteLevel.levelVersion, remoteLevel.titles.fa, remoteLevel.titles.en,
+      remoteLevel.width, remoteLevel.height, remoteLevel.palette, remoteLevel.cells];
+    remoteLevel.checksum = crypto.createHash('sha256')
+      .update(JSON.stringify(canonical)).digest('hex');
+    const levelPayload = Buffer.from(JSON.stringify(remoteLevel),'utf8');
+    const remoteCatalog = JSON.stringify({schemaVersion:1,pictures:[{
+      id:remoteLevel.levelId,version:1,title:remoteLevel.titles.fa,
+      titleEn:remoteLevel.titles.en,category:'objects',
+      width:remoteLevel.width,height:remoteLevel.height,
+      bytes:levelPayload.length,checksum:remoteLevel.checksum,
+    }]});
+    const preview = Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9Y9nYAAAAASUVORK5CYII=',
+      'base64');
+    await page.route(onlineBase+'**', async route => {
+      const uri = new URL(route.request().url());
+      if(uri.pathname.endsWith('/catalog.json')) {
+        return route.fulfill({status:200,contentType:'application/json',body:remoteCatalog});
+      }
+      if(uri.pathname.endsWith('/levels/online-smoke-test-v1.json')) {
+        return route.fulfill({status:200,contentType:'application/json',body:levelPayload});
+      }
+      if(uri.pathname.endsWith('/previews/online-smoke-test-v1.png')) {
+        return route.fulfill({status:200,contentType:'image/png',body:preview});
+      }
+      return route.fulfill({status:404,body:'Not found'});
+    });
+    await page.goto(base+'#/gallery'); await ready();
+    await page.getByRole('button',{name:'دریافت تصویر',exact:true}).waitFor();
+    await page.getByRole('button',{name:'دریافت تصویر',exact:true}).click();
+    await page.getByRole('button',{name:'دریافت تصویر',exact:true}).waitFor({state:'hidden'});
+    await page.getByText('تصویر آنلاین آزمایشی',{exact:true}).waitFor();
+    await page.goto(base+'#/painting/online-smoke-test');
+    await ready(); await board().waitFor();
+
     assert.deepEqual(pageErrors,[]); assert.deepEqual(failedRequests,[]); assert.deepEqual(externalRequests,[]);
     console.log(JSON.stringify({defaultPersian:'passed',englishAndLanguageRestore:'passed',
       fastStroke:'passed',wrongColor:'passed',undoRemoved:'passed',resetConfirmation:'passed',
       persistentProgressAfterPageRecreationAndRefresh:'passed',completion:'passed',resetGeneration:'passed',
       browserHistory:'passed',paint32_64_128:'passed',largeGridZoomPan:'passed',responsiveDesktop:'passed',responsiveTablet:'passed',shortHeight:'passed',
-      runtimeRequests:'local only',pageErrors,screenshots:output},null,2));
+      onlineCatalogAndDownload:'passed',runtimeRequests:'local and approved online catalog',pageErrors,screenshots:output},null,2));
   } finally {await browser.close();}
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});
