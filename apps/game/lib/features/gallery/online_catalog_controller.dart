@@ -122,7 +122,8 @@ class OnlineCatalogController extends ChangeNotifier {
   /// Use package:http instead of Flutter's NetworkAssetBundle: on Web the
   /// latter constructs dart:io HttpClient, which is unsupported in browsers.
   /// http.get picks BrowserClient on Web and IOClient on Android.
-  Future<String> _loadRemote(String path, {
+  Future<String> _loadRemote(
+    String path, {
     required Duration timeout,
     required int maxBytes,
   }) async {
