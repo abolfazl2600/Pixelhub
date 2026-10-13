@@ -1,0 +1,92 @@
+{
+  "online-object-headphones": {
+    "motion": "pulse",
+    "version": 1,
+    "checksum": "b5ff5eabe8df0846a29f28ad42efb029f53fc9fad5a2e8ec312ae15fec9bfb92",
+    "animationChecksum": "ed85dcd661cac2eb7d545d23cc1f06caa9e72e4fa488479ad0e6cbf6aa5d8017"
+  },
+  "online-object-electric-guitar": {
+    "motion": "sway",
+    "version": 1,
+    "checksum": "4a09e30b78bf77d5fa1acec301106f67789bb8c1203b93464286d6c3e3c3ff1a",
+    "animationChecksum": "ce9d9d2a62a77e4716ca8e5a67e0070228d75dc9a80c93afae5c664897f61451"
+  },
+  "online-object-retro-radio": {
+    "motion": "glimmer",
+    "region": [
+      0.57,
+      0.24,
+      0.89,
+      0.75
+    ],
+    "version": 1,
+    "checksum": "9200d07e81864da0a31bb0dd917ad78b8c63533fc5a451c4e3a471f97adcf240",
+    "animationChecksum": "b71da9f805ab36953417ea066872017c94ecf511cca2ffd7f4705768290df9e7"
+  },
+  "online-object-desk-lamp": {
+    "motion": "glimmer",
+    "region": [
+      0.18,
+      0.15,
+      0.7,
+      0.63
+    ],
+    "version": 1,
+    "checksum": "e4e9bedd9a3064e145aeda785aa3f7ce546d1c03f2ffb68f0627f4c6e61a7e25",
+    "animationChecksum": "e4f292f09e1971613addcf052ceb7c687409cd866ccd9a94b72a444a3daea8b1"
+  },
+  "online-object-porcelain-teapot": {
+    "motion": "sway",
+    "region": [
+      0.11,
+      0.3,
+      0.87,
+      0.84
+    ],
+    "version": 1,
+    "checksum": "8e3134673922934afe5b7d593156d8a6ff18d305da6a917f6f83da6721ec144b",
+    "animationChecksum": "19e5132fb017b86234168499ceb1bc35dba7c84583a44d77b40c0dd39b49365a"
+  },
+  "online-object-rainbow-umbrella": {
+    "motion": "sway",
+    "region": [
+      0.1,
+      0.12,
+      0.9,
+      0.51
+    ],
+    "version": 1,
+    "checksum": "dec88b112f65663ab840a99967add0c3e959e667bcd9c21577011da51c19b2ce",
+    "animationChecksum": "9eb3583fcafc3f02fd7d4cdbfa0e02894a0dbddfdef5697ad46528b75c69f496"
+  },
+  "online-object-backpack": {
+    "motion": "float",
+    "version": 1,
+    "checksum": "d0437823c26f987650895c898d8f472d486e5afc5e9159be91347a73396d82be",
+    "animationChecksum": "d62c018d07d3d8ba1dc554be958897f24e4aaddb7450438edaeb43204c83c0b4"
+  },
+  "online-object-running-sneaker": {
+    "motion": "float",
+    "version": 1,
+    "checksum": "5f1fbcb62a2b7d91edb47d29c3d19c96533d9afe07e23abb69b32785b3b091a6",
+    "animationChecksum": "a0b8740fd0386e6cc256fd34407abd1a2259d70bbe22fb7be8d07367e00274fe"
+  },
+  "online-object-city-bicycle": {
+    "motion": "float",
+    "version": 1,
+    "checksum": "7ed6a940e09102fc41f60671b8b90cd99f88c907ce83fc5bb11831473001f0ef",
+    "animationChecksum": "79515c77669f233997ae5cc543a870d13e0487bdb0e630e1fc1cd47b2b7035c3"
+  },
+  "online-object-sailboat": {
+    "motion": "float",
+    "region": [
+      0.08,
+      0.14,
+      0.91,
+      0.84
+    ],
+    "version": 1,
+    "checksum": "9611b91a014ae202b8d94d0ba0f65a91e7d52567d1f2859ae994fa4c824c7d8e",
+    "animationChecksum": "e4ed3214eba2d684663a9cb456de0f553bf76d961f301230ad70c2a015f1d62d"
+  }
+}

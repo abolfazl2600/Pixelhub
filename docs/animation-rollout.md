@@ -29,6 +29,7 @@ Recipes live in `tool/animation_batches/`; each batch records up to ten pictures
 | Online 10 | landscape-moonlit-night, landscape-flower-valley, classic-birth-venus, classic-creation-adam, classic-last-supper, classic-school-athens, classic-night-watch, classic-milkmaid, classic-las-meninas, classic-third-may | glimmer, ripple, sway |
 | Online 11 | classic-liberty-leading, classic-wanderer-fog, classic-fighting-temeraire, classic-hay-wain, classic-impression-sunrise, classic-water-lilies, classic-moulin-galette, classic-grande-jatte, classic-klimt-kiss, classic-card-players | glimmer, ripple, sway |
 | Online 12 | classic-wheatfield-crows, classic-sleeping-gypsy, mona-lisa, starry-night, the-scream, sunflowers, girl-pearl, great-wave, object-alarm-clock, object-vintage-camera | glimmer, pulse, ripple, sway |
+| Online 13 | object-headphones, object-electric-guitar, object-retro-radio, object-desk-lamp, object-porcelain-teapot, object-rainbow-umbrella, object-backpack, object-running-sneaker, object-city-bicycle, object-sailboat | float, glimmer, pulse, sway |
 
 CI and Pages results must be checked before describing a batch as verified or
 published. Online animation assets are generated during Pages publication and
