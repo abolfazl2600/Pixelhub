@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:persistence/persistence.dart';
@@ -11,6 +12,7 @@ import 'package:pixelhub/features/gallery/online_catalog_controller.dart';
 import 'package:pixelhub/l10n/generated/app_localizations.dart';
 
 import 'bootstrap_test.dart' show fixture;
+import 'online_categories_test.dart' show onlineFixture, serverFor;
 
 MockClient catalogClient() {
   final entries = [
@@ -105,6 +107,77 @@ void main() {
       scrollable: find.byType(Scrollable).first,
     );
     expect(find.text('اشیا آنلاین'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+
+  testWidgets('downloaded online picture opens painting immediately', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(390, 900);
+    addTearDown(tester.view.reset);
+    final level = onlineFixture('online-gallery-direct-open');
+    final client = serverFor(level);
+    addTearDown(client.close);
+    final store = MemoryPreferences();
+    final library = LibraryController(store, store);
+    addTearDown(library.dispose);
+    library.setCatalog([fixture()], {});
+    await library.load();
+    final online = OnlineCatalogController(
+      store,
+      client: client,
+      baseUrl: Uri.parse('https://example.test/online/'),
+    );
+    addTearDown(online.dispose);
+    online.addListener(() {
+      if (online.isLoaded) library.setDownloadedOnline(online.downloaded);
+      library.setOnlineCategories(online.categories);
+    });
+    await online.loadDownloaded();
+
+    final router = GoRouter(
+      initialLocation: '/gallery',
+      routes: [
+        GoRoute(
+          path: '/gallery',
+          builder: (context, state) => ListenableBuilder(
+            listenable: library,
+            builder: (context, _) =>
+                GalleryScreen(library: library, online: online),
+          ),
+        ),
+        GoRoute(
+          path: '/painting/:id',
+          builder: (context, state) => Scaffold(
+            body: Text('Painting ${state.pathParameters['id']}'),
+          ),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp.router(
+        routerConfig: router,
+        locale: const Locale('fa'),
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+      ),
+    );
+    await tester.pumpAndSettle();
+    final downloadKey = ValueKey('online-download-${level.id}');
+    await tester.scrollUntilVisible(
+      find.byKey(downloadKey),
+      280,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.byKey(downloadKey));
+    await tester.pumpAndSettle();
+    expect(online.downloaded.map((value) => value.id), contains(level.id));
+    expect(find.text('Painting ${level.id}'), findsOneWidget);
+    expect(router.routeInformationProvider.value.uri.path, '/painting/${level.id}');
     expect(tester.takeException(), isNull);
   });
 
