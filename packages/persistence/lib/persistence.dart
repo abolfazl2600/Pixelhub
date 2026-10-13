@@ -78,6 +78,7 @@ final class LocalPreferences
     implements
         ProgressRepository,
         PreferencesRepository,
+        RecentArtworkRepository,
         ArtworkRepository,
         ProgressSyncOutboxRepository,
         OnlineLevelStorage {
@@ -289,6 +290,27 @@ final class LocalPreferences
   Future<void> writeLanguage(String language) =>
       _enqueue(() => _preferences.setString('pixelhub.language', language));
 
+  @override
+  Future<String?> readRecentArtworkId() async {
+    await _writes;
+    final id = await _preferences.getString('pixelhub.recentArtwork.v1');
+    return id != null && RegExp(r'^[a-z0-9-]+$').hasMatch(id) ? id : null;
+  }
+
+  @override
+  Future<void> writeRecentArtworkId(String id) {
+    if (!RegExp(r'^[a-z0-9-]+$').hasMatch(id)) {
+      return Future<void>.error(const FormatException('Invalid artwork ID.'));
+    }
+    return _enqueue(
+      () => _preferences.setString('pixelhub.recentArtwork.v1', id),
+    );
+  }
+
+  @override
+  Future<void> clearRecentArtworkId() =>
+      _enqueue(() => _preferences.remove('pixelhub.recentArtwork.v1'));
+
   Future<void> _enqueue(Future<void> Function() operation) {
     final result = _writes.then((_) => operation());
     _writes = result.catchError((Object _) {});
@@ -335,11 +357,13 @@ final class MemoryPreferences
     implements
         ProgressRepository,
         PreferencesRepository,
+        RecentArtworkRepository,
         ArtworkRepository,
         ProgressSyncOutboxRepository,
         OnlineLevelStorage {
   final Map<String, ProgressSnapshot> _records = {};
   String? language;
+  String? recentArtworkId;
   ArtworkLibrary _library = ArtworkLibrary();
   final Map<String, ProgressSyncOutbox> _outboxes = {};
   final Map<String, LevelDefinition> _downloads = {};
@@ -427,6 +451,22 @@ final class MemoryPreferences
   }
 
   @override
+  Future<String?> readRecentArtworkId() async => recentArtworkId;
+
+  @override
+  Future<void> writeRecentArtworkId(String id) async {
+    if (!RegExp(r'^[a-z0-9-]+$').hasMatch(id)) {
+      throw const FormatException('Invalid artwork ID.');
+    }
+    recentArtworkId = id;
+  }
+
+  @override
+  Future<void> clearRecentArtworkId() async {
+    recentArtworkId = null;
+  }
+
+  @override
   Future<ArtworkLibrary> readLibrary() async => _library;
   @override
   Future<void> writeLibrary(ArtworkLibrary library) async {
@@ -446,5 +486,6 @@ final class MemoryPreferences
     _downloadCategories.clear();
     _library = ArtworkLibrary();
     language = null;
+    recentArtworkId = null;
   }
 }
