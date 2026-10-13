@@ -28,7 +28,6 @@ final class PaintingSession {
   final LevelDefinition level;
   final Uint8List _bits;
   final List<int> _remaining;
-  final List<List<int>> _undo = [];
   List<int>? _stroke;
   int _selectedColor = 0;
   int completedCount = 0;
@@ -39,7 +38,6 @@ final class PaintingSession {
   int get selectedColor => _selectedColor;
 
   bool get isComplete => completedCount == level.cells.length;
-  bool get canUndo => _undo.isNotEmpty;
   double get fraction => completedCount / level.cells.length;
   bool isCompleted(int index) => _bits[index ~/ 8] & (1 << (index % 8)) != 0;
 
@@ -56,11 +54,6 @@ final class PaintingSession {
   }
 
   void endStroke() {
-    final stroke = _stroke;
-    if (stroke != null && stroke.isNotEmpty) {
-      _undo.add(stroke);
-      if (_undo.length > 50) _undo.removeAt(0);
-    }
     _stroke = null;
   }
 
@@ -123,7 +116,7 @@ final class PaintingSession {
   }
 
   /// Paint up to [maxCells] unfinished cells matching the selected color.
-  /// All affected cells are one undoable stroke. No network or wallet needed.
+  /// Paints matching cells locally without undo history or wallet charges.
   int paintBurst({int maxCells = 5}) {
     if (maxCells < 1 || maxCells > 64) {
       throw RangeError.range(maxCells, 1, 64, 'maxCells');
@@ -155,16 +148,8 @@ final class PaintingSession {
     return true;
   }
 
-  bool undo() {
-    endStroke();
-    if (_undo.isEmpty) return false;
-    _erase(_undo.removeLast());
-    return true;
-  }
-
   void reset() {
     _stroke = null;
-    _undo.clear();
     _bits.fillRange(0, _bits.length, 0);
     _remaining.fillRange(0, _remaining.length, 0);
     for (final color in level.cells) {

@@ -18,12 +18,9 @@ void main() {
     session.endStroke();
     expect(session.completedCount, 1);
     expect(session.remaining, [1, 2]);
-    expect(session.undo(), isTrue);
-    expect(session.completedCount, 0);
-    expect(session.remaining, [2, 2]);
   });
 
-  test('fast drag interpolates 128 cells and undoes as one stroke', () {
+  test('fast drag interpolates 128 cells consistently', () {
     final level = LevelDefinition(
       id: 'line',
       title: 'خط',
@@ -39,9 +36,7 @@ void main() {
     expect(session.paintLine(0, 0, 127, 0), 128);
     session.endStroke();
     expect(session.isComplete, isTrue);
-    expect(session.undo(), isTrue);
-    expect(session.completedCount, 0);
-    expect(session.canUndo, isFalse);
+    expect(session.completedCount, 128);
   });
 
   test(
@@ -60,7 +55,6 @@ void main() {
       expect(session.generation, 1);
       expect(session.revision, greaterThan(previousRevision));
       expect(session.completedCount, 0);
-      expect(session.canUndo, isFalse);
     },
   );
 
@@ -106,15 +100,13 @@ void main() {
     );
   });
 
-  test('random paint/undo/reset operations never violate count invariants', () {
+  test('random paint and reset operations preserve count invariants', () {
     final session = PaintingSession(fixture());
     final random = Random(2600);
     for (var i = 0; i < 1000; i++) {
-      switch (random.nextInt(5)) {
+      switch (random.nextInt(4)) {
         case 0:
           session.reset();
-        case 1:
-          session.undo();
         default:
           session.selectColor(random.nextInt(2));
           session.beginStroke();
@@ -129,7 +121,7 @@ void main() {
       expect(session.remaining.every((value) => value >= 0), isTrue);
     }
   });
-  test('burst paints at most five matching cells as one undoable stroke', () {
+  test('burst paints a limited number of matching cells', () {
     final level = LevelDefinition(
       id: 'bomb-test',
       title: 'بمب',
@@ -144,10 +136,8 @@ void main() {
     final session = PaintingSession(level);
     expect(session.paintBurst(), 5);
     expect(session.completedCount, 5);
-    expect(session.canUndo, isTrue);
-    expect(session.undo(), isTrue);
-    expect(session.completedCount, 0);
     expect(session.paintBurst(maxCells: 3), 3);
+    expect(session.completedCount, 8);
     expect(() => session.paintBurst(maxCells: 0), throwsRangeError);
   });
 }

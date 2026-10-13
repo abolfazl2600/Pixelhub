@@ -81,32 +81,31 @@ void main() {
     const Size(800, 360),
     const Size(1440, 900),
   ]) {
-    testWidgets(
-      'full viewport frame at $viewport, safe scroll and back',
-      (tester) async {
-        tester.view.devicePixelRatio = 1;
-        tester.view.physicalSize = viewport;
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
-        await pumpAssetApp(tester);
-        final frame = find.byKey(const ValueKey('mobile-frame'));
-        final width = viewport.width;
-        expect(tester.getSize(frame).width, width);
-        expect(tester.getTopLeft(frame).dx, (viewport.width - width) / 2);
-        await tester.scrollUntilVisible(
-          find.byKey(const ValueKey('open-preview')),
-          200,
-        );
-        await tester.tap(find.byKey(const ValueKey('open-preview')));
-        await tester.pumpAndSettle();
-        await tester.scrollUntilVisible(
-          find.byKey(const ValueKey('color-5')),
-          200,
-        );
-        expect(tester.takeException(), isNull);
-        expect(tester.getSize(frame).width, width);
-      },
-    );
+    testWidgets('full viewport frame at $viewport, safe scroll and back', (
+      tester,
+    ) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = viewport;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await pumpAssetApp(tester);
+      final frame = find.byKey(const ValueKey('mobile-frame'));
+      final width = viewport.width;
+      expect(tester.getSize(frame).width, width);
+      expect(tester.getTopLeft(frame).dx, (viewport.width - width) / 2);
+      await tester.scrollUntilVisible(
+        find.byKey(const ValueKey('open-preview')),
+        200,
+      );
+      await tester.tap(find.byKey(const ValueKey('open-preview')));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.byKey(const ValueKey('color-5')),
+        200,
+      );
+      expect(tester.takeException(), isNull);
+      expect(tester.getSize(frame).width, width);
+    });
   }
 
   testWidgets('direct painting route restores the local asset', (tester) async {

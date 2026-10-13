@@ -231,13 +231,12 @@ class _GalleryScreenState extends State<GalleryScreen> {
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 96),
                 sliver: SliverGrid.builder(
-                  gridDelegate:
-                      const SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 540,
-                        mainAxisExtent: 176,
-                        mainAxisSpacing: 12,
-                        crossAxisSpacing: 12,
-                      ),
+                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: 540,
+                    mainAxisExtent: 176,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                  ),
                   itemCount: levels.length,
                   itemBuilder: (context, index) {
                     final level = levels[index];

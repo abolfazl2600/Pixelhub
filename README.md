@@ -6,7 +6,7 @@ Pixelhub is a shared Flutter pixel-coloring game for Android and Web. V3 adds a 
 
 Pick one of 40 original bundled pictures, then **Start / resume coloring**. Choose a numbered color and tap or drag over matching cells. A fast stroke fills the intervening matching cells. Wrong colors never count.
 
-Use **Move / zoom** to pan, pinch with two fingers to zoom, or use the zoom/fit buttons. Pinching does not paint. The user-facing Undo action has been removed; Reset still requires confirmation. The engine keeps internal reversible stroke tracking for gesture cancellation and backward compatibility. A completion screen appears after every cell is colored, including background color 1.
+Use **Move / zoom** to pan, pinch with two fingers to zoom, or use the zoom/fit buttons. Pinching does not paint. Undo history is no longer retained in the painting engine; Reset still requires confirmation. An in-progress touch stroke can still be cancelled to avoid accidental multi-touch marks. The engine keeps internal reversible stroke tracking for gesture cancellation and backward compatibility. A completion screen appears after every cell is colored, including background color 1.
 
 Use **English** / **فارسی** in the header to switch language. Text, direction, numbers, image titles and dialogs update together; the choice is remembered. A fresh installation starts in Persian regardless of the device/browser language.
 
@@ -95,7 +95,7 @@ The browser suite covers both languages, real localStorage writes, wrong-color r
 
 - `packages/level_schema`: schema 2, immutable levels and canonical SHA-256 validation.
 - `packages/game_domain`: versioned progress bitsets and repository ports.
-- `packages/painting_engine`: shared pure Dart stroke/undo/completion engine.
+- `packages/painting_engine`: shared pure Dart stroke/interpolation/completion engine; no Undo history.
 - `packages/persistence`: bundled catalog and platform storage adapters.
 - `packages/design_system`: shared tokens, theme and mobile frame.
 - `apps/game`: localization, state, renderer and screens.

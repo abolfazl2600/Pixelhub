@@ -116,10 +116,7 @@ void main() {
       expect(controller.hintIndex, isNull);
       await controller.flush();
       expect(controller.session!.completedCount, 2);
-      expect(controller.session!.canUndo, isTrue);
-      controller.undo();
-      await controller.flush();
-      expect(controller.session!.completedCount, 0);
+      expect(controller.session!.completedCount, 2);
       controller.showHint();
       controller.reset();
       await controller.flush();

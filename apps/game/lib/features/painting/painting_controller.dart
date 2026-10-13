@@ -107,13 +107,6 @@ class PaintingController extends ChangeNotifier {
     if (session!.cancelStroke()) _changed();
   }
 
-  void undo() {
-    if (session!.undo()) {
-      hintIndex = null;
-      _changed();
-    }
-  }
-
   /// Called only after an explicit reset confirmation, including damaged saves.
   void reset() {
     session ??= PaintingSession(level);

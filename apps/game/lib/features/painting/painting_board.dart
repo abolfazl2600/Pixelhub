@@ -161,7 +161,12 @@ class _PaintingBoardState extends State<PaintingBoard> {
     children: [
       LayoutBuilder(
         builder: (context, constraints) {
-          _size = constraints.maxWidth;
+          // Avoid an enormous square board on wide/landscape tablets.
+          // The surrounding screen still uses the entire viewport.
+          _size = math.min(
+            constraints.maxWidth,
+            math.max(280.0, MediaQuery.sizeOf(context).height * 0.76),
+          );
           return Semantics(
             label: context.strings.canvasLabel,
             identifier: 'painting-board',
