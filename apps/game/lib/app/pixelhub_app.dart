@@ -80,7 +80,9 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       _progress,
     );
     _online = OnlineCatalogController(
-      preferences is OnlineLevelStorage ? preferences : MemoryPreferences(),
+      preferences is OnlineLevelStorage
+          ? preferences as OnlineLevelStorage
+          : MemoryPreferences(),
     );
     _online.addListener(() {
       if (_online.isLoaded) _library.setDownloadedOnline(_online.downloaded);
