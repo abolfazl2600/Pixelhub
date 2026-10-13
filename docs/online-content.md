@@ -586,6 +586,65 @@ Generate the new archive outside the tracked tree:
 Once published, never change the bytes or identifiers of this Release; a
 redesign requires a fresh ID and its own new immutable Release.
 
+## Twenty new Iranian landmarks, neighborhoods, landscapes and crafts (64×64)
+
+`tool/online_iranian_mix_20_pack.py` contains twenty **independently
+drawn, original 64×64 pixel-art coloring pictures**, rather than copies
+of historic photos or previous online levels. The collection combines
+additional Iranian architectural landmarks, natural scenery, craftwork,
+traditional music and seasonal ceremonies.
+
+| Stable level ID | فارسی | English | Public category |
+| --- | --- | --- | --- |
+| `online-iran-blue-mosque-tabriz` | مسجد کبود تبریز | Blue Mosque of Tabriz | `patterns` |
+| `online-iran-khaju-bridge` | پل خواجو | Khaju Bridge | `patterns` |
+| `online-iran-ali-qapu` | عمارت عالی‌قاپو | Ali Qapu Palace | `patterns` |
+| `online-iran-chehel-sotoun` | کاخ چهل‌ستون | Chehel Sotoun Palace | `patterns` |
+| `online-iran-shah-cheragh` | شاه‌چراغ | Shah Cheragh Shrine | `patterns` |
+| `online-iran-fin-garden` | باغ فین کاشان | Fin Garden | `nature` |
+| `online-iran-eram-garden` | باغ ارم شیراز | Eram Garden | `nature` |
+| `online-iran-masuleh-village` | خانه‌های ماسوله | Masuleh Village | `patterns` |
+| `online-iran-kandovan` | روستای کندوان | Kandovan Village | `patterns` |
+| `online-iran-lut-kaluts` | کلوت‌های کویر لوت | Lut Desert Kaluts | `nature` |
+| `online-iran-anzali-lagoon` | تالاب انزلی | Anzali Lagoon | `nature` |
+| `online-iran-damavand` | قله دماوند | Mount Damavand | `nature` |
+| `online-iran-persian-carpet` | فرش ایرانی | Persian Carpet Medallion | `patterns` |
+| `online-iran-minakari-plate` | بشقاب میناکاری | Minakari Plate | `objects` |
+| `online-iran-khatam-box` | جعبه خاتم‌کاری | Khatamkari Box | `objects` |
+| `online-iran-samovar-tea` | سماور و استکان چای | Samovar and Tea Glass | `objects` |
+| `online-iran-santur` | سنتور | Santur | `objects` |
+| `online-iran-tombak` | تنبک | Tombak Drum | `objects` |
+| `online-iran-haft-sin` | سفره هفت‌سین | Haft-Seen Table | `objects` |
+| `online-iran-yalda-pomegranate` | انار شب یلدا | Yalda Pomegranate | `objects` |
+
+Every image has `schemaVersion: 2`, `levelVersion: 1`, a bilingual
+title, distinct identifier, a numbered 64×64 grid, checksum, and a
+PNG preview. Existing published artworks and local painting progress
+are not changed. Architecture and carpet motifs deliberately use the
+legacy `patterns` category; natural landscapes use `nature`; crafts and
+cultural objects use `objects`. These values remain compatible with
+old online clients even though the current gallery renders some old
+architecture under its own visual filter.
+
+The Pages workflow publishes these illustrations through the immutable
+[`pixelhub-content-iranian-mix-20-v1`](https://github.com/abolfazl2600/Pixelhub/releases/tag/pixelhub-content-iranian-mix-20-v1)
+Release after a **successful Web CI run on `main`**, provided that
+Release does not already exist. Its generated `content.zip` contains
+20 schema-v2 JSON levels, 20 PNG previews, and a `catalog.json`.
+Generated assets belong to the Release, **not the Git repository or
+APK/AAB**. Online clients can download the paintings individually
+and retain them offline.
+
+The expected aggregate catalog total becomes **175** online images,
+up from 155, once all content packs exist and GitHub Pages deploys.
+Committing source code alone does not establish that the Release is
+public or that the deployed catalog already contains these entries.
+Confirm publication via the Pages workflow and live catalog endpoint.
+
+To generate the Release-only asset outside the working tree:
+`python3 tool/online_iranian_mix_20_pack.py /tmp/content.zip`.
+Never overwrite the immutable v1 art; future improvements need a new ID.
+
 ## Publish more pictures
 
 1. Create one or more schema-v2 level JSON files with unique `online-...`
