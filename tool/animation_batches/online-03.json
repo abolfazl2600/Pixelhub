@@ -1,0 +1,100 @@
+{
+  "online-toucan": {
+    "motion": "flap",
+    "region": [
+      0.24,
+      0.5,
+      0.6,
+      0.79
+    ],
+    "version": 1,
+    "checksum": "b006a66d4288f71792e2e60fbf8af1676d29e7ea4cbca9e52140b9f54278897d",
+    "animationChecksum": "f7efcc89338d6c7181f935ba9b1a0e22a3ce3b28af80752f2bc840716417c263"
+  },
+  "online-peacock": {
+    "motion": "flap",
+    "region": [
+      0.1,
+      0.1,
+      0.91,
+      0.76
+    ],
+    "version": 1,
+    "checksum": "90892ed926c14d278ea11173eb6d4a6dc3dfcab827b367137dfccf1607ecfefc",
+    "animationChecksum": "85baab04709fc000536e4259e8c394d4a5270633eb0f1306be50a2991e6c33d1"
+  },
+  "online-hedgehog": {
+    "motion": "blink",
+    "version": 1,
+    "checksum": "519b8400b5a21e7140a492418ef3db0aa1b8a0af531faca85b99570cfa36fbfb",
+    "animationChecksum": "ae0dd178c569e6611d668fafa7188529ad78e12cf76682a51af53c2d180e4adb"
+  },
+  "online-raccoon": {
+    "motion": "blink",
+    "version": 1,
+    "checksum": "70d0b2b2eb6d053d885dbc782d68c24fb2865d17baf4d5b10c320568bb6bbed5",
+    "animationChecksum": "c9bf95d7a26c2bf57d009033f1c2ed349475d699f92fcb45bb612ecc9d01960d"
+  },
+  "online-sloth": {
+    "motion": "sway",
+    "region": [
+      0.16,
+      0.21,
+      0.84,
+      0.88
+    ],
+    "version": 1,
+    "checksum": "aeea9879b911c26243c4d41d5610296b608f08f7494d002d0c297cc0c9a34f24",
+    "animationChecksum": "3f3f86707210883addeda5b8db1c471997283408c8557f0bc6d59a6586b5a78e"
+  },
+  "online-seal": {
+    "motion": "float",
+    "version": 1,
+    "checksum": "95654da4930ccbdf29ca0fdfcbf6cb370349561f647283e7f1b45672e068c35e",
+    "animationChecksum": "0289331b0fa46d54e5ccccfc57e8139d4bafe574c61f71709a4e90c0282ad14f"
+  },
+  "online-whale": {
+    "motion": "float",
+    "version": 1,
+    "checksum": "d55942f2f367f03c59c93d6720c08737d5794b7800dbe693a9e52db061f465c1",
+    "animationChecksum": "53fc714fd94c3a3b9bf0ecca3107927503f48f4ce809736a4766fb721e591c86"
+  },
+  "online-shark": {
+    "motion": "float",
+    "version": 1,
+    "checksum": "497e0136dc757ecd2d00295f700c09877e22d717cece461ac4d6bc8d78caf545",
+    "animationChecksum": "1744cd0c38c50c775d5e72db54f5b1bcbfa600958bc7a03f667e255b8d9a96e4"
+  },
+  "online-frog": {
+    "motion": "blink",
+    "eyes": [
+      [
+        0.31,
+        0.29,
+        0.07,
+        0.07
+      ],
+      [
+        0.7,
+        0.29,
+        0.07,
+        0.07
+      ]
+    ],
+    "version": 1,
+    "checksum": "e2b622f46cb546929d4784b771aa086f00551b3bcc555d67e67f44d8f38603e7",
+    "animationChecksum": "c078125070bfcd09d1346f60480952197442184b6127c86c30004bf787be6508"
+  },
+  "online-chameleon": {
+    "motion": "sway",
+    "region": [
+      0.1,
+      0.5,
+      0.59,
+      0.8
+    ],
+    "version": 1,
+    "checksum": "587cefad8d6652fdff71ca71043d0857db08d5e6c152411606ea43e54a0c4308",
+    "animationChecksum": "93f9d9aa9766d99cb9873570474c5f9f1a2855dc7f61469b0c6eb310a0dcebdd"
+  }
+}
