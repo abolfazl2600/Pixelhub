@@ -232,6 +232,20 @@ jobs:
               --notes "Twenty original 48x48 lighthearted coloring levels including smiling sun, rainbow cloud, heart, clover, friendly ghost, monster, UFO, magic wand, party hat, birthday cake, popcorn, bubble tea, rubber duck, teddy bear, yo-yo, kite, smiling moon, cute star, neon jellyfish and candy land. Numbered bilingual JSON grids and PNG previews are immutable Release-only assets; not bundled in Android or tracked in Git." \
               --latest=false
           fi
+      - name: Publish twenty original Iranian heritage and cultural paintings
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-iranian-mix-20-v1 >/dev/null 2>&1; then
+            python3 tool/online_iranian_mix_20_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-iranian-mix-20-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: 20 original Iranian art and culture coloring pictures" \
+              --notes "Twenty hand-authored 64x64 bilingual color-by-number levels covering Blue Mosque Tabriz, Khaju Bridge, Ali Qapu, Chehel Sotoun, Shah Cheragh, Fin and Eram gardens, Masuleh and Kandovan, Lut kaluts, Anzali lagoon, Damavand, Persian carpet, minakari, khatamkari, samovar, santur, tombak, Haft-Seen and Yalda. Immutable JSON levels, PNG previews and catalog are Release-only assets, not bundled into APK." \
+              --latest=false
+          fi
       - name: Download release packs and assemble online catalog
         env:
           GH_TOKEN: ${{ github.token }}
