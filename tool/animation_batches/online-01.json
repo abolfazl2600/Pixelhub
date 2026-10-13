@@ -1,0 +1,140 @@
+{
+  "online-lion": {
+    "motion": "blink",
+    "eyes": [
+      [
+        0.375,
+        0.5,
+        0.07,
+        0.08
+      ],
+      [
+        0.625,
+        0.5,
+        0.07,
+        0.08
+      ]
+    ],
+    "version": 1,
+    "checksum": "f701127d9696872aeb11ab77111fa1fbafedfd02868dbc4995118e6f00991cc9",
+    "animationChecksum": "35f3b39e00f17c13659c66dfa20642cfa322d38c51197241d58edc4df127ea5a"
+  },
+  "online-elephant": {
+    "motion": "sway",
+    "region": [
+      0.73,
+      0.43,
+      0.96,
+      0.85
+    ],
+    "version": 1,
+    "checksum": "8e3632595f227022ecc6d9814a434a25ac0aa046d942f2919f59022420c731e3",
+    "animationChecksum": "e7f17f2150a1a42ad418f7effa8a06c15bcff9834b300ed2c470538fc3566637"
+  },
+  "online-giraffe": {
+    "motion": "sway",
+    "region": [
+      0.57,
+      0.02,
+      0.85,
+      0.42
+    ],
+    "version": 1,
+    "checksum": "d2844257f01d80382ab7660c34426d2e36aa9c1d2811daefeee024f82dbfd19c",
+    "animationChecksum": "8cc1e350217c272d39413bfa9cb5fa6e1274e09c48ed92ff12fc3e8f868e6521"
+  },
+  "online-penguin": {
+    "motion": "blink",
+    "eyes": [
+      [
+        0.35,
+        0.31,
+        0.07,
+        0.06
+      ],
+      [
+        0.65,
+        0.31,
+        0.07,
+        0.06
+      ]
+    ],
+    "version": 1,
+    "checksum": "8f332480315aea531b2559a7ac55b8763ccc7a6995c542609886d3cee272ddcd",
+    "animationChecksum": "4016efb7eaee0045cf673f266976283305b938bba50c65f12b1f51c5e37b725c"
+  },
+  "online-dolphin": {
+    "motion": "float",
+    "region": [
+      0.07,
+      0.2,
+      0.93,
+      0.8
+    ],
+    "version": 1,
+    "checksum": "5244eca6121544eb90d30dfcefe0c05911dd7deac4678c913c43afaca9406009",
+    "animationChecksum": "3e8d3ec489bf109f510db730b537a49fa89386187d74df630826edb51cfa38a1"
+  },
+  "online-koala": {
+    "motion": "blink",
+    "eyes": [
+      [
+        0.36,
+        0.52,
+        0.07,
+        0.07
+      ],
+      [
+        0.64,
+        0.52,
+        0.07,
+        0.07
+      ]
+    ],
+    "version": 1,
+    "checksum": "be6783dc58bfbf490b80e0fb9d455ccca27e00ad77aac0f0495b7a38ee34c68f",
+    "animationChecksum": "228e3de2dffdaf0e4aee9a7f08d6fd1531668835c1303b8c21ae98ca894a3f31"
+  },
+  "online-flamingo": {
+    "motion": "flap",
+    "region": [
+      0.22,
+      0.43,
+      0.69,
+      0.68
+    ],
+    "version": 1,
+    "checksum": "b43b2aaef075876319937d05ed72ac44f4a8fab41a5e20003a746875fe05ef3e",
+    "animationChecksum": "fc2a6107daa19f4d967b96cf695f626b2cd9e86354b90eaf6052ed52aca8dc60"
+  },
+  "online-octopus": {
+    "motion": "sway",
+    "region": [
+      0.1,
+      0.55,
+      0.9,
+      0.9
+    ],
+    "version": 1,
+    "checksum": "16a6f0fbc3ea5cb059515c4283d21f44d7cb17d4e03c882f608ded04a05930cf",
+    "animationChecksum": "76b68c5ae516df2f6e4fe58276db3978a5f2f81056a6ee2a17e03d348051a33c"
+  },
+  "online-deer": {
+    "motion": "blink",
+    "version": 1,
+    "checksum": "3c707729ac928f3fe1f662fc39d51bd106a7f61841ff5aa48166c295b7b943a9",
+    "animationChecksum": "3d31d54bde24e089f1d749d2fadafc296e0fabccf07bd6641c2133ac2d8dfae4"
+  },
+  "online-parrot": {
+    "motion": "flap",
+    "region": [
+      0.13,
+      0.44,
+      0.55,
+      0.78
+    ],
+    "version": 1,
+    "checksum": "1390da6b26679ecb147f659ab0886c9b6c178b6509a5426367b4e6c98a9b89c5",
+    "animationChecksum": "7c87bde3619d6f32f68cdccb46826cf7c8913ec69e0b5beef0da301932f738b3"
+  }
+}

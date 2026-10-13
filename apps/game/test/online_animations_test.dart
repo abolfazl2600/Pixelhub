@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
@@ -153,6 +154,76 @@ void main() {
       },
     );
   }
+
+  test('refresh adds frames to an existing download without fetching pixels', () async {
+    final level = onlineFixture('online-existing-animation');
+    final store = MemoryPreferences();
+    await store.saveDownloadedLevel(level, category: 'nature');
+    final body = jsonEncode({
+      'schemaVersion': 1,
+      'levelId': level.id,
+      'levelVersion': level.contentVersion,
+      'levelChecksum': level.checksum,
+      'frameDurationMs': 150,
+      'frames': [
+        {'changes': <Object>[]},
+        {
+          'changes': [
+            [0, 1],
+          ],
+        },
+      ],
+    });
+    final paths = <String>[];
+    final metadata = jsonEncode({
+      'schemaVersion': 1,
+      'pictures': [
+        {
+          'id': level.id,
+          'version': level.contentVersion,
+          'title': level.title,
+          'titleEn': level.titleEn,
+          'category': 'nature',
+          'width': level.width,
+          'height': level.height,
+          'bytes': utf8.encode(jsonEncode(level.toJson())).length,
+          'checksum': level.checksum,
+          'animation': {
+            'bytes': utf8.encode(body).length,
+            'sha256': sha256.convert(utf8.encode(body)).toString(),
+            'frameCount': 2,
+          },
+        },
+      ],
+    });
+    final client = MockClient((request) async {
+      paths.add(request.url.path);
+      return http.Response.bytes(
+        utf8.encode(request.url.path.endsWith('catalog.json') ? metadata : body),
+        200,
+      );
+    });
+    addTearDown(client.close);
+    final online = OnlineCatalogController(store, client: client);
+    addTearDown(online.dispose);
+    await online.loadDownloaded();
+    final saved = Completer<void>();
+    online.addListener(() {
+      if (online.animations.containsKey(level.id) && !saved.isCompleted) {
+        saved.complete();
+      }
+    });
+    await online.checkForUpdates();
+    await saved.future.timeout(const Duration(seconds: 5));
+    expect(paths.where((path) => path.contains('/levels/')), isEmpty);
+    expect(online.available, isEmpty);
+    expect(online.downloaded.single.checksum, level.checksum);
+    final offline = OnlineCatalogController(store);
+    addTearDown(offline.dispose);
+    await offline.loadDownloaded();
+    expect(offline.animations[level.id]!.frameCount, 2);
+    expect(offline.downloaded.single.cells, level.cells);
+  });
 
   test('tampered animation rejects entire online download', () async {
     final level = onlineFixture('online-animation-tampered');

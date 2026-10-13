@@ -52,7 +52,11 @@ def animation(level, recipe):
         elif motion == "blink" and index in [3, 4]:
             for x, y in selected:
                 nx, ny = (x + .5) / w, (y + .5) / h
-                if (.29 <= nx <= .42 or .58 <= nx <= .71) and .38 <= ny <= .55:
+                eyes = recipe.get("eyes")
+                inside = any(((nx - cx) / rx) ** 2 + ((ny - cy) / ry) ** 2 <= 1
+                             for cx, cy, rx, ry in eyes) if eyes else (
+                    (.29 <= nx <= .42 or .58 <= nx <= .71) and .38 <= ny <= .55)
+                if inside:
                     r, g, b = palette[original[y * w + x]]
                     if max(r, g, b) < 110:
                         above = original[max(0, y - max(1, h // 32)) * w + x]

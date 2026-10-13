@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
@@ -137,6 +138,7 @@ class OnlineCatalogController extends ChangeNotifier {
   final Map<String, LevelDefinition> _downloaded = {};
   final Map<String, String> _downloadedCategories = {};
   final Map<String, PixelAnimation> _animations = {};
+  final Set<String> _pendingAnimations = {};
   List<OnlinePicture> pictures = [];
   OnlineCatalogStatus status = OnlineCatalogStatus.idle;
   bool isLoaded = false;
@@ -182,6 +184,73 @@ class OnlineCatalogController extends ChangeNotifier {
       throw const FormatException('Online content is too large.');
     }
     return utf8.decode(response.bodyBytes, allowMalformed: false);
+  }
+
+  Future<PixelAnimation> _fetchAnimation(
+    OnlinePicture picture,
+    LevelDefinition level,
+  ) async {
+    final info = picture.animation!;
+    if (storage is! OnlineAnimationStorage) {
+      throw StateError('Animation storage is unavailable.');
+    }
+    final source = await _loadRemote(
+      'animations/${picture.stem}.json',
+      timeout: const Duration(seconds: 25),
+      maxBytes: 2 * 1024 * 1024,
+    );
+    final payload = utf8.encode(source);
+    if (payload.length != info.bytes ||
+        sha256.convert(payload).toString() != info.sha256) {
+      throw const FormatException('Animation integrity check failed.');
+    }
+    final decoded = jsonDecode(source);
+    if (decoded is! Map<String, dynamic>) {
+      throw const FormatException('Invalid animation file.');
+    }
+    final animation = PixelAnimation.fromJson(decoded, level);
+    if (animation.frameCount != info.frameCount) {
+      throw const FormatException('Animation frame count mismatch.');
+    }
+    return animation;
+  }
+
+  Future<void> _backfillAnimations(List<OnlinePicture> catalog) async {
+    if (storage is! OnlineAnimationStorage) return;
+    final pending = catalog.where((picture) {
+      final level = _downloaded[picture.id];
+      return picture.animation != null &&
+          !_animations.containsKey(picture.id) &&
+          !_pendingAnimations.contains(picture.id) &&
+          level != null &&
+          level.contentVersion == picture.version &&
+          level.checksum == picture.checksum;
+    }).toList();
+    Future<void> worker() async {
+      while (!_disposed && pending.isNotEmpty) {
+        final picture = pending.removeLast();
+        final level = _downloaded[picture.id];
+        if (level == null || !_pendingAnimations.add(picture.id)) continue;
+        try {
+          final animation = await _fetchAnimation(picture, level);
+          if (_disposed || _downloaded[level.id] != level) continue;
+          final animationStorage = storage as OnlineAnimationStorage;
+          await animationStorage.saveDownloadedAnimation(level, animation);
+          if (_downloaded[level.id] != level) {
+            await animationStorage.removeDownloadedAnimation(level.id);
+            continue;
+          }
+          if (_disposed) return;
+          _animations[level.id] = animation;
+          _notify();
+        } on Object {
+          // Keep existing paintings playable and retry on the next refresh.
+        } finally {
+          _pendingAnimations.remove(picture.id);
+        }
+      }
+    }
+    await Future.wait([for (var i = 0; i < 3; i++) worker()]);
   }
 
   Future<void> loadDownloaded() async {
@@ -272,6 +341,7 @@ class OnlineCatalogController extends ChangeNotifier {
       if (_disposed) return;
       pictures = List.unmodifiable(result);
       status = OnlineCatalogStatus.ready;
+      unawaited(_backfillAnimations(result));
       // Upgrade legacy downloads only when an authoritative catalog is
       // available. Failure to write metadata must not hide online pictures.
       for (final picture in result) {
@@ -321,28 +391,7 @@ class OnlineCatalogController extends ChangeNotifier {
       }
       PixelAnimation? animation;
       if (picture.animation != null) {
-        final info = picture.animation!;
-        if (storage is! OnlineAnimationStorage) {
-          throw StateError('Animation storage is unavailable.');
-        }
-        final frameSource = await _loadRemote(
-          'animations/${picture.stem}.json',
-          timeout: const Duration(seconds: 25),
-          maxBytes: 2 * 1024 * 1024,
-        );
-        final payload = utf8.encode(frameSource);
-        if (payload.length != info.bytes ||
-            sha256.convert(payload).toString() != info.sha256) {
-          throw const FormatException('Animation integrity check failed.');
-        }
-        final decodedAnimation = jsonDecode(frameSource);
-        if (decodedAnimation is! Map<String, dynamic>) {
-          throw const FormatException('Invalid animation file.');
-        }
-        animation = PixelAnimation.fromJson(decodedAnimation, level);
-        if (animation.frameCount != info.frameCount) {
-          throw const FormatException('Animation frame count mismatch.');
-        }
+        animation = await _fetchAnimation(picture, level);
         await (storage as OnlineAnimationStorage).saveDownloadedAnimation(
           level,
           animation,

@@ -117,6 +117,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     _routeChanges = Listenable.merge([
       _bootstrap,
       _library,
+      _online,
       _bundledAnimations,
     ]);
     _router = GoRouter(

@@ -274,6 +274,8 @@ jobs:
             --jq '.[] | select(.isDraft == false and .isPrerelease == false and (.tagName | startswith("pixelhub-content-"))) | .tagName')
           python3 tool/online_release.py assemble \
             "$RUNNER_TEMP/pixelhub-release-packs" site/online
+      - name: Add checksum-bound animation companions to existing pictures
+        run: python3 tool/publish_animation_companions.py site/online
       - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
         with:

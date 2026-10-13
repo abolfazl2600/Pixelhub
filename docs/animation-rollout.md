@@ -21,6 +21,8 @@ Recipes live in `tool/animation_batches/`; each batch records up to ten pictures
 
 | Bundled 04 | ufo, comet, sun, snowflake, umbrella, cup, book, kite, sailboat, diamond | hovering, drift, rotation, wind, steam, page flap, kite sway, boat bob, sparkles |
 
+| Online 01 | lion, elephant, giraffe, penguin, dolphin, koala, flamingo, octopus, deer, parrot | eye blinks, trunk/neck sway, wings, swimming, tentacles |
+
 CI and Pages results must be checked before describing a batch as verified or
 published. Online animation assets are generated during Pages publication and
 must remain independent of the immutable released paintings.
