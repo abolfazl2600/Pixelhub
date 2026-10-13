@@ -14,14 +14,11 @@ Recipes live in `tool/animation_batches/`; each batch records up to ten pictures
 | Batch | Pictures | Motions |
 | --- | --- | --- |
 | Bundled 01 | sunflower, heart, rainbow, moon, tree, star, gem, cat, house, planet | flower/tree sway, heartbeat, light glints, stars, rotation, eye blink |
-
 | Bundled 02 | flower, tulip, cactus, mountain, leaf, mushroom, apple, cherry, watermelon, butterfly | petal/leaf sway, drifting sun, cap stretch, fruit bob, wing flap |
-
 | Bundled 03 | bird, fish, turtle, fox, bunny, owl, dog, bee, rocket, saturn | wings, swimming/walking bob, eye blinks, flutter, exhaust flicker, rotating rings |
-
 | Bundled 04 | ufo, comet, sun, snowflake, umbrella, cup, book, kite, sailboat, diamond | hovering, drift, rotation, wind, steam, page flap, kite sway, boat bob, sparkles |
-
 | Online 01 | lion, elephant, giraffe, penguin, dolphin, koala, flamingo, octopus, deer, parrot | eye blinks, trunk/neck sway, wings, swimming, tentacles |
+| Online 02 | fox, wolf, brown-bear, zebra, tiger, cheetah, kangaroo, hippopotamus, rhinoceros, crocodile | blink, sway |
 
 CI and Pages results must be checked before describing a batch as verified or
 published. Online animation assets are generated during Pages publication and

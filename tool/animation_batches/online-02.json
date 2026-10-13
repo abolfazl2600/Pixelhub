@@ -1,0 +1,116 @@
+{
+  "online-fox": {
+    "motion": "blink",
+    "version": 1,
+    "checksum": "d6957074da31bffc7c08fe43c6ff56266c34776a9293342f4082a764e9fdf263",
+    "animationChecksum": "aeec99509462ccbf823938d45454389c85ddc2ce23439568414bafa286821b2e"
+  },
+  "online-wolf": {
+    "motion": "blink",
+    "eyes": [
+      [
+        0.35,
+        0.54,
+        0.07,
+        0.07
+      ],
+      [
+        0.65,
+        0.54,
+        0.07,
+        0.07
+      ]
+    ],
+    "version": 1,
+    "checksum": "a452d5d4cf57e37f2bef604653f3b1feacd2c9691143a2d01a41ee53c35e4f6e",
+    "animationChecksum": "0da783326f3a2ed70f647b04c3603ac771d72ed21934e8ef4833a8926963ebc7"
+  },
+  "online-brown-bear": {
+    "motion": "blink",
+    "eyes": [
+      [
+        0.33,
+        0.57,
+        0.07,
+        0.07
+      ],
+      [
+        0.67,
+        0.57,
+        0.07,
+        0.07
+      ]
+    ],
+    "version": 1,
+    "checksum": "8dcdaf1846a2c42316acbe3c9d45eae616a731f2f411aa12c8bb7bc7acd3ac6c",
+    "animationChecksum": "c67b46f393a46cfc67de2b015aa91227b43947a41b87a73fae83322c960b09e8"
+  },
+  "online-zebra": {
+    "motion": "blink",
+    "version": 1,
+    "checksum": "efedef8ed485a7e9dbf19a5faae86a516ce889747df0c4515422e57561b8b48d",
+    "animationChecksum": "e41577ae1df82bed3f97dc330453b946830991ad3142fcd008f96651271659e6"
+  },
+  "online-tiger": {
+    "motion": "blink",
+    "version": 1,
+    "checksum": "6f74d4f9818e9d9227b9e44a40c8af50250926fac1ac7b12113bb349f82db7f0",
+    "animationChecksum": "e9039b2f6f98bcd313a30f3882799865a3315835c8c70ca77ab6d6d78f99e157"
+  },
+  "online-cheetah": {
+    "motion": "blink",
+    "version": 1,
+    "checksum": "391df13032bd0c09d70648810cfdca56aa13d7a22718fd6299b85e45ed86cce1",
+    "animationChecksum": "81fa583926ca2276e8ba7ff96f53f10fbcefaca37d4d80d6638c15af7a7ce2b8"
+  },
+  "online-kangaroo": {
+    "motion": "sway",
+    "region": [
+      0.18,
+      0.03,
+      0.82,
+      0.34
+    ],
+    "version": 1,
+    "checksum": "fdf1f642a46958fcb136fd872aca27c19eca24f2e2ecd5b8fbc9d477d6c78890",
+    "animationChecksum": "bb4793067de8a899dcc8e64bec8a996ff08483d6bdd4e6f2ce548081f2920b7e"
+  },
+  "online-hippopotamus": {
+    "motion": "blink",
+    "version": 1,
+    "checksum": "07086849da825bbf144199117c6b7197668c9fd8ee175f52286f678ee6f56e9b",
+    "animationChecksum": "801fda78d553eee4cc564574a7a4401b18be4e0ebe8b74241387d63a08b72be4"
+  },
+  "online-rhinoceros": {
+    "motion": "sway",
+    "region": [
+      0.04,
+      0.19,
+      0.32,
+      0.54
+    ],
+    "version": 1,
+    "checksum": "55297a5551aaee718d5984a6e811e6cacf675e3fc823515bbca5e74f96ccd535",
+    "animationChecksum": "d11743b54dc5fec5a665bbb798d9380b80bdeec6041c9a6d81fbb3ac61edc37d"
+  },
+  "online-crocodile": {
+    "motion": "blink",
+    "eyes": [
+      [
+        0.24,
+        0.34,
+        0.07,
+        0.07
+      ],
+      [
+        0.75,
+        0.34,
+        0.07,
+        0.07
+      ]
+    ],
+    "version": 1,
+    "checksum": "12fdab2bc5cbbbee4b04d3c054dfe9b4a547aafc1862a4e6fbf8c620282762a2",
+    "animationChecksum": "8138b70423a0d24b6c1307da8223be2dea1c9dcc300de4fb62a601aae01f7a1a"
+  }
+}
