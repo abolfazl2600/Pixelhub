@@ -225,9 +225,10 @@ async function main() {
     console.log('Online test requests:',remoteRequests);
     console.log('Online test download failed:',
       await page.getByText('دریافت یا ذخیره این تصویر کامل نشد. دوباره تلاش کنید.',{exact:true}).count());
-    // SliverGrid is lazy: downloaded images are appended after 40 bundled
-    // levels, so their gallery cards are not mounted while viewing the top.
-    await page.getByText('فعلاً تصویر جدیدی برای دریافت وجود ندارد.',{exact:true}).waitFor();
+    // The gallery is lazy and its status panel may scroll out of view.
+    // Confirm the user-approved level was actually written to browser storage.
+    await page.waitForFunction(() => Object.keys(localStorage).some(
+      key => key.includes('pixelhub.online.level.online-smoke-test')));
     await page.goto(base+'#/painting/online-smoke-test');
     await ready(); await board().waitFor();
 
