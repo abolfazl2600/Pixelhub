@@ -120,6 +120,19 @@ jobs:
               --notes "Six original simplified color-by-number interpretations: Mona Lisa, The Starry Night, The Scream, Sunflowers, Girl with a Pearl Earring and The Great Wave. Numbered JSON levels and PNG previews are downloadable Release assets, not tracked source files." \
               --latest=false
           fi
+      - name: Publish detailed Starry Night replacement content only
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-starry-night-detailed-1-v1 >/dev/null 2>&1; then
+            python3 tool/online_starry_night_replacement_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-starry-night-detailed-1-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" --title "PixelHub online content: detailed Starry Night" \
+              --notes "Immutable replacement content only. Old version remains archived but is retired from the public catalog; no application release or version bump." \
+              --latest=false
+          fi
       - name: Publish ten new original animal pictures outside git
         if: github.event_name == 'workflow_run'
         env:

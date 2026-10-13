@@ -754,6 +754,60 @@ CDN without changing saved level IDs.
 - Web downloaded files currently use per-level browser storage, which is quota
   limited; Android likewise has a local 1000-level safety limit.
 - Downloaded IDs remain hidden from the online download list; new pictures
-  always use new IDs. There is no per-picture update or migration flow.
+  always use new IDs. A deliberately narrow `retiredIds` hint is supported for
+  replacing obsolete art, but there is no generic per-picture update flow.
 - Public GitHub Releases/Pages have their own fair-use, size and bandwidth
   limits. Move distribution to a dedicated CDN when traffic justifies it.
+
+## Issue #23: artwork quality corrections without an application release (October 2026)
+
+Six bundled paintings have been redrawn **in their existing file paths with
+their existing stable IDs**. They are: `planet` (128×128, fully redesigned
+recognizable world and orbital ring), `tree` (32×32, organic foliage/trunk),
+`star` (32×32, five-point silhouette instead of a plus sign), `gem` (64×64,
+distinct faceted gemstone), `mountain` (increased from 16×16 to 32×32 with
+snow peaks and depth), and `owl` (increased from 16×16 to 32×32 with large eyes,
+ear tufts and feathers). Their corresponding `animations/*-v1.json` files
+were rebuilt against the new checksums, and each has a visible highlight
+pose that returns to the base pixels.
+
+**Bundled content cannot be hot-swapped on already installed Android
+binaries.** Replacing it in the repository changes future builds and the
+next verified Web deployment only. This issue intentionally does not bump
+`pubspec.yaml` version or trigger a new Android release. Existing Android
+installations retain their former six built-in paintings until a future
+app update; prior saved progress for these six may reset on that update
+because their checksums changed. No data migration is required.
+
+The original published 32×32 `online-starry-night` is an immutable Release
+asset. It is **not overwritten**: `tool/online_starry_night_replacement_pack.py`
+generates a new, hand-drawn **80×80** painting with layered sky strokes,
+double spirals, luminous stars, crescent moon, village, church and cypress.
+It is published as a content-only Release named
+`pixelhub-content-starry-night-detailed-1-v1` and has the internal ID
+`online-classic-starry-night-detailed`, but retains the existing bilingual gallery
+title and category. No app release/version bump is involved. The publisher
+keeps old immutable file URLs intact and **excludes the old ID from the
+public catalog**, with `retiredIds: ["online-starry-night"]` in the refreshed
+catalog. It refuses publication if the replacement is missing. The new file
+path guarantees that immutable edge caches cannot return the obsolete grid.
+
+Updated Web/newly built app clients validate `retiredIds` and, after a
+successful catalog fetch, remove a locally downloaded obsolete ID, including
+its progress and animation, before exposing the replacement. A failed or
+malformed catalog never deletes downloaded art. **Previously distributed
+Android APKs cannot read this new retirement hint**, so a user who already
+downloaded the original Starry Night on an old binary may temporarily see
+both their old local copy and the new online listing until they remove their
+old download or install a future app update. This limitation is intrinsic to
+the no-new-APK requirement and is not silently concealed.
+
+Audit scope: the remaining bundled and online painting IDs/definitions were
+left unchanged unless they were among the seven specified references. This
+avoids introducing accidental new duplicates or losing unrelated saved
+work. New content availability still depends on a successful
+`Checks and Web artifacts` workflow, content-only Release publication,
+`Publish verified Web artifact` assembly, and Pages deployment. The
+regression suite checks all six redraw checksums and animation companions,
+the 80×80 online grid, correct replacement catalog behavior and preservation
+of original archived content.

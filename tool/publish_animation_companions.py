@@ -17,6 +17,7 @@ def publish(destination, batch_dir=None):
     catalog_path = destination / 'catalog.json'
     catalog = json.loads(catalog_path.read_text('utf-8'))
     by_id = {item['id']: item for item in catalog['pictures']}
+    retired = set(catalog.get('retiredIds', []))
     seen = set()
     count = 0
     for batch in sorted(batch_dir.glob('online-*.json')):
@@ -27,11 +28,24 @@ def publish(destination, batch_dir=None):
             if ident in seen:
                 raise ValueError(f'Duplicate animation recipe: {ident}')
             seen.add(ident)
-            item = by_id[ident]
-            if 'animation' in item:
-                raise ValueError(f'Existing animation must remain immutable: {ident}')
+            item = by_id.get(ident)
+            if item is None:
+                # A retired painting is hidden from the new public catalog,
+                # but its immutable level and original animation companion
+                # remain available to clients with older catalog metadata.
+                if ident not in retired:
+                    raise ValueError(f'Unknown online animation target: {ident}')
+                archived = destination / f'levels/{ident}-v1.json'
+                level = json.loads(archived.read_text('utf-8'))
+                item = {'version': level['levelVersion'],
+                        'checksum': level['checksum']}
+            else:
+                if 'animation' in item:
+                    raise ValueError(f'Existing animation must remain immutable: {ident}')
+                stem = f"{ident}-v{item['version']}"
+                level = json.loads(
+                    (destination / f'levels/{stem}.json').read_text('utf-8'))
             stem = f"{ident}-v{item['version']}"
-            level = json.loads((destination / f'levels/{stem}.json').read_text('utf-8'))
             if (recipe['checksum'] != item['checksum'] or
                     recipe['version'] != item['version'] or
                     checksum(level) != item['checksum']):
@@ -53,7 +67,8 @@ def publish(destination, batch_dir=None):
             if target.exists() and target.read_bytes() != data:
                 raise ValueError(f'Refusing to replace an animation: {ident}')
             target.write_bytes(data)
-            item['animation'] = metadata
+            if ident in by_id:
+                item['animation'] = metadata
             count += 1
     catalog_path.write_bytes(compact(catalog))
     print(f'Published {count} additive animation companions; original paintings unchanged.')

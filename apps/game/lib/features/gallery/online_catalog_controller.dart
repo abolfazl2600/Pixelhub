@@ -342,6 +342,34 @@ class OnlineCatalogController extends ChangeNotifier {
         }
         result.add(entry);
       }
+      // Purge retired online downloads only after complete catalog validation.
+      // Current native binaries ignore the optional hint until an app update.
+      final retirement = json['retiredIds'];
+      if (retirement != null && retirement is! List) {
+        throw const FormatException('Invalid retired online IDs.');
+      }
+      final retired = <String>{};
+      for (final id in (retirement as List? ?? const [])) {
+        if (id is! String ||
+            !RegExp(r'^online-[a-z0-9-]{1,64}$').hasMatch(id) ||
+            id != 'online-starry-night' ||
+            !ids.contains('online-classic-starry-night-detailed') ||
+            ids.contains(id) ||
+            !retired.add(id)) {
+          throw const FormatException('Invalid retired online picture ID.');
+        }
+      }
+      if (_disposed) return;
+      for (final id in retired) {
+        if (_disposed) return;
+        if (_downloaded.containsKey(id)) {
+          try {
+            await removeDownloaded(id);
+          } on Object {
+            // Retry on the next valid catalog fetch.
+          }
+        }
+      }
       if (_disposed) return;
       pictures = List.unmodifiable(result);
       status = OnlineCatalogStatus.ready;
