@@ -152,8 +152,16 @@ async function main() {
     await page.screenshot({path:path.join(output,'planet-zoom.png')});
     await page.setViewportSize({width:1440,height:900}); await page.goto(base); await ready();
     const action=await start().boundingBox();
-    assert(action && action.x>=0 && action.x+action.width<=1440 && action.width>430);
+    assert(action && action.x>=280 && action.x+action.width<=1160 &&
+      action.width>430 && action.width<880,
+      'desktop content must be centered inside the 880px frame');
     await page.screenshot({path:path.join(output,'home-desktop.png')});
+    await page.setViewportSize({width:1024,height:768}); await page.goto(base); await ready();
+    const tabletAction=await start().boundingBox();
+    assert(tabletAction && tabletAction.width>action.width &&
+      tabletAction.x>=0 && tabletAction.x+tabletAction.width<=1024,
+      'tablet-sized view must use the full available width');
+    await page.screenshot({path:path.join(output,'home-tablet.png')});
     await page.setViewportSize({width:800,height:360}); await page.goto(base); await ready();
     await start().click(); await back().click(); await start().waitFor();
     await page.getByRole('button',{name:'فارسی',exact:true}).click(); await page.reload(); await ready();
@@ -163,7 +171,7 @@ async function main() {
     console.log(JSON.stringify({defaultPersian:'passed',englishAndLanguageRestore:'passed',
       fastStroke:'passed',wrongColor:'passed',undoRemoved:'passed',resetConfirmation:'passed',
       persistentProgressAfterPageRecreationAndRefresh:'passed',completion:'passed',resetGeneration:'passed',
-      browserHistory:'passed',paint32_64_128:'passed',largeGridZoomPan:'passed',responsiveDesktop:'passed',shortHeight:'passed',
+      browserHistory:'passed',paint32_64_128:'passed',largeGridZoomPan:'passed',responsiveDesktop:'passed',responsiveTablet:'passed',shortHeight:'passed',
       runtimeRequests:'local only',pageErrors,screenshots:output},null,2));
   } finally {await browser.close();}
 }
