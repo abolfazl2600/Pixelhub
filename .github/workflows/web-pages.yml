@@ -218,6 +218,20 @@ jobs:
               --notes "Thirty original 48x48 color-by-number objects including camera, headphones, guitar, radio, bicycle, sailboat, microscope, robot, typewriter, globe and treasure chest. Bilingual level JSON and PNG previews are Release-only assets, not bundled into Android." \
               --latest=false
           fi
+      - name: Publish twenty original playful coloring pictures outside git
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-playful-20-v1 >/dev/null 2>&1; then
+            python3 tool/online_playful_20_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-playful-20-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: twenty playful pixel-art coloring pictures" \
+              --notes "Twenty original 48x48 lighthearted coloring levels including smiling sun, rainbow cloud, heart, clover, friendly ghost, monster, UFO, magic wand, party hat, birthday cake, popcorn, bubble tea, rubber duck, teddy bear, yo-yo, kite, smiling moon, cute star, neon jellyfish and candy land. Numbered bilingual JSON grids and PNG previews are immutable Release-only assets; not bundled in Android or tracked in Git." \
+              --latest=false
+          fi
       - name: Download release packs and assemble online catalog
         env:
           GH_TOKEN: ${{ github.token }}
