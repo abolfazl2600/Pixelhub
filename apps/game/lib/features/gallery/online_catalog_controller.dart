@@ -184,6 +184,13 @@ class OnlineCatalogController extends ChangeNotifier {
     }
   }
 
+  void clearDownloaded() {
+    _downloaded.clear();
+    pictures = [];
+    status = OnlineCatalogStatus.idle;
+    _notify();
+  }
+
   @override
   void dispose() {
     _disposed = true;
