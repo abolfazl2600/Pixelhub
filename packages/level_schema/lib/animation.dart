@@ -23,8 +23,12 @@ final class PixelAnimation {
     }
     final duration = json['frameDurationMs'];
     final rawFrames = json['frames'];
-    if (duration is! int || duration < 60 || duration > 2000 ||
-        rawFrames is! List || rawFrames.isEmpty || rawFrames.length > 60) {
+    if (duration is! int ||
+        duration < 60 ||
+        duration > 2000 ||
+        rawFrames is! List ||
+        rawFrames.isEmpty ||
+        rawFrames.length > 60) {
       throw const FormatException('Invalid animation timing or frame count.');
     }
     final frames = <List<PixelChange>>[];
@@ -35,14 +39,19 @@ final class PixelAnimation {
       final changes = <PixelChange>[];
       final seen = <int>{};
       for (final entry in raw['changes'] as List) {
-        if (entry is! List || entry.length != 2 ||
-            entry[0] is! int || entry[1] is! int) {
+        if (entry is! List ||
+            entry.length != 2 ||
+            entry[0] is! int ||
+            entry[1] is! int) {
           throw const FormatException('Malformed animation pixel.');
         }
         final at = entry[0] as int;
         final color = entry[1] as int;
-        if (at < 0 || at >= level.cells.length ||
-            color < 0 || color >= level.palette.length || !seen.add(at)) {
+        if (at < 0 ||
+            at >= level.cells.length ||
+            color < 0 ||
+            color >= level.palette.length ||
+            !seen.add(at)) {
           throw const FormatException('Invalid animation pixel.');
         }
         changes.add(PixelChange(at, color));
@@ -67,7 +76,8 @@ final class PixelAnimation {
   int get frameCount => frames.length;
 
   List<int> pixelsFor(LevelDefinition level, int frameIndex) {
-    if (level.id != levelId || level.contentVersion != levelVersion ||
+    if (level.id != levelId ||
+        level.contentVersion != levelVersion ||
         level.checksum != levelChecksum) {
       throw const FormatException('Animation belongs to another picture.');
     }
@@ -86,7 +96,11 @@ final class PixelAnimation {
     'frameDurationMs': frameDurationMs,
     'frames': [
       for (final frame in frames)
-        {'changes': [for (final change in frame) [change.index, change.color]]},
+        {
+          'changes': [
+            for (final change in frame) [change.index, change.color],
+          ],
+        },
     ],
   };
 }

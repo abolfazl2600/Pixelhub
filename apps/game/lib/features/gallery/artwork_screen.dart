@@ -101,7 +101,10 @@ class ArtworkScreen extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(24),
                 child: library.isComplete(level) && animation != null
-                    ? CompletedArtworkPreview(level: level, animation: animation)
+                    ? CompletedArtworkPreview(
+                        level: level,
+                        animation: animation,
+                      )
                     : PixelArtPreview(level: level),
               ),
               const SizedBox(height: 20),

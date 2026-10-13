@@ -343,7 +343,8 @@ class OnlineCatalogController extends ChangeNotifier {
           throw const FormatException('Animation frame count mismatch.');
         }
         await (storage as OnlineAnimationStorage).saveDownloadedAnimation(
-          level, animation,
+          level,
+          animation,
         );
       }
       try {
@@ -351,8 +352,9 @@ class OnlineCatalogController extends ChangeNotifier {
       } on Object {
         if (animation != null) {
           try {
-            await (storage as OnlineAnimationStorage)
-                .removeDownloadedAnimation(level.id);
+            await (storage as OnlineAnimationStorage).removeDownloadedAnimation(
+              level.id,
+            );
           } on Object {
             // Orphan sidecars are ignored until the level is available.
           }

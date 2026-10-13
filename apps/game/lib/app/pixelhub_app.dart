@@ -55,7 +55,9 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
   late final PreferencesRepository _preferences;
   late final LibraryController _library;
   late final OnlineCatalogController _online;
-  final ValueNotifier<PixelAnimation?> _sunflowerAnimation = ValueNotifier(null);
+  final ValueNotifier<PixelAnimation?> _sunflowerAnimation = ValueNotifier(
+    null,
+  );
   bool _sunflowerRequested = false;
   late final LocalDiagnostics _diagnostics;
   late final Listenable _routeChanges;
@@ -176,7 +178,9 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
 
   Future<void> _loadSunflowerAnimation() async {
     try {
-      final levels = _bootstrap.levels.where((level) => level.id == 'sunflower');
+      final levels = _bootstrap.levels.where(
+        (level) => level.id == 'sunflower',
+      );
       if (levels.isEmpty) return;
       final raw = await rootBundle.loadString(
         'assets/animations/sunflower-v2.json',

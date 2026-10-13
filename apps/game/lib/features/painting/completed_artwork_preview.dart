@@ -49,12 +49,16 @@ class _CompletedArtworkPreviewState extends State<CompletedArtworkPreview> {
     _timer?.cancel();
     _timer = null;
     final animation = widget.animation;
-    if (!_animated || animation == null || animation.frameCount < 2 ||
-        MediaQuery.disableAnimationsOf(context) || !TickerMode.of(context)) {
+    if (!_animated ||
+        animation == null ||
+        animation.frameCount < 2 ||
+        MediaQuery.disableAnimationsOf(context) ||
+        !TickerMode.of(context)) {
       return;
     }
-    _timer = Timer.periodic(Duration(milliseconds: animation.frameDurationMs),
-        (_) {
+    _timer = Timer.periodic(Duration(milliseconds: animation.frameDurationMs), (
+      _,
+    ) {
       if (mounted) {
         setState(() => _frame = (_frame + 1) % animation.frameCount);
       }
@@ -88,11 +92,7 @@ class _CompletedArtworkPreviewState extends State<CompletedArtworkPreview> {
             aspectRatio: widget.level.width / widget.level.height,
             child: CustomPaint(
               key: const ValueKey('animation-frame'),
-              painter: _AnimationPainter(
-                widget.level,
-                animation,
-                _frame,
-              ),
+              painter: _AnimationPainter(widget.level, animation, _frame),
             ),
           )
         else
@@ -162,6 +162,5 @@ class _AnimationPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _AnimationPainter old) =>
-      old.frame != frame || old.level != level ||
-      old.animation != animation;
+      old.frame != frame || old.level != level || old.animation != animation;
 }
