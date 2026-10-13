@@ -273,6 +273,7 @@ void main() {
       expect(controller.available.single.id, replacement.id);
       await controller.download(controller.available.single);
       expect(controller.downloaded.single.id, replacement.id);
+      expect(controller.categories[replacement.id], 'masterpieces');
       expect(await store.readDownloadedLevels(), hasLength(1));
     },
   );
