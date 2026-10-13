@@ -120,6 +120,20 @@ jobs:
               --notes "Six original simplified color-by-number interpretations: Mona Lisa, The Starry Night, The Scream, Sunflowers, Girl with a Pearl Earring and The Great Wave. Numbered JSON levels and PNG previews are downloadable Release assets, not tracked source files." \
               --latest=false
           fi
+      - name: Publish ten new original animal pictures outside git
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-animals-10-v1 >/dev/null 2>&1; then
+            python3 tool/online_animals_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-animals-10-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: 10 colorful animal coloring pictures" \
+              --notes "Ten original animal pixel-art levels (lion, elephant, giraffe, penguin, dolphin, koala, flamingo, octopus, deer and parrot). Each bilingual color-by-number JSON and PNG preview is a downloadable Release asset, not bundled in APK or tracked in git." \
+              --latest=false
+          fi
       - name: Download release packs and assemble online catalog
         env:
           GH_TOKEN: ${{ github.token }}

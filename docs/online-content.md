@@ -147,6 +147,39 @@ Generate the package outside the repository with
 `python3 tool/online_masterworks_pack.py /tmp/content.zip`. Once published,
 do not overwrite version 1 files; improvements require a new level version.
 
+## Ten new animals: original pixel-art collection
+
+The source file `tool/online_animals_pack.py` contains reproducible drawing
+instructions for **10 additional original animal pictures**. The GitHub Pages
+workflow creates the immutable Release
+[`pixelhub-content-animals-10-v1`](https://github.com/abolfazl2600/Pixelhub/releases/tag/pixelhub-content-animals-10-v1)
+after a successful main-branch Web CI run. Its `content.zip` contains
+ten schema-v2 color-by-number JSON levels, ten tiny PNG previews and bilingual
+catalog metadata. No level assets are committed to Git or bundled in Android.
+
+| ID | فارسی | English | Canvas |
+| --- | --- | --- | --- |
+| `online-lion` | شیر طلایی | Golden Lion | 32×32 |
+| `online-elephant` | فیل مهربان | Gentle Elephant | 32×32 |
+| `online-giraffe` | زرافه خال‌دار | Spotted Giraffe | 32×32 |
+| `online-penguin` | پنگوئن برفی | Snowy Penguin | 24×24 |
+| `online-dolphin` | دلفین بازیگوش | Playful Dolphin | 32×32 |
+| `online-koala` | کوآلای خواب‌آلود | Sleepy Koala | 24×24 |
+| `online-flamingo` | فلامینگوی صورتی | Pink Flamingo | 32×32 |
+| `online-octopus` | اختاپوس بنفش | Purple Octopus | 32×32 |
+| `online-deer` | گوزن جنگلی | Forest Deer | 32×32 |
+| `online-parrot` | طوطی رنگارنگ | Colorful Parrot | 32×32 |
+
+All ten entries use the already-supported `animals` category, unique IDs and
+level version 1, so existing clients do not require an APK rebuild. The
+previous 25 online levels are preserved. **35 total pictures** is the
+expected catalog count after all five Release packs exist and GitHub Pages
+has deployed successfully; a source commit alone does not verify publication.
+
+To generate outside the repository:
+`python3 tool/online_animals_pack.py /tmp/content.zip`.
+Never overwrite version 1 after publication.
+
 ## Publish more pictures
 
 1. Create one or more schema-v2 level JSON files with unique `online-...`
