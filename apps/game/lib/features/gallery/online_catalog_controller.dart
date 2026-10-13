@@ -224,7 +224,8 @@ class OnlineCatalogController extends ChangeNotifier {
       await storage.saveDownloadedLevel(level);
       if (_disposed) return;
       _downloaded[level.id] = level;
-    } on Object {
+    } on Object catch (error) {
+      debugPrint('Online picture download failed: $error');
       if (!_disposed) failedDownloadId = picture.id;
     } finally {
       downloadingId = null;
