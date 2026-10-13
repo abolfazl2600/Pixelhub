@@ -75,6 +75,31 @@ class ImmutableOnlineReleaseTests(unittest.TestCase):
     def catalog(self):
         return json.loads((self.output / "catalog.json").read_text("utf-8"))
 
+    def test_animation_sidecar_is_published_and_validated(self):
+        from online_animated_sunflower_pack import ID, build
+
+        pack = self.packs / "pixelhub-content-animation-test-v1" / "content.zip"
+        pack.parent.mkdir(parents=True, exist_ok=True)
+        build(pack)
+        assemble(self.packs, self.output)
+        entry = next(item for item in self.catalog()["pictures"] if item["id"] == ID)
+        self.assertEqual(entry["animation"]["frameCount"], 8)
+        animation_path = self.output / f"animations/{ID}-v1.json"
+        self.assertTrue(animation_path.exists())
+        contents = json.loads(animation_path.read_text("utf-8"))
+        self.assertEqual(len(contents["frames"]), 8)
+
+        with zipfile.ZipFile(pack) as archive:
+            data = {name: archive.read(name) for name in archive.namelist()}
+        catalog = json.loads(data["catalog.json"])
+        catalog["pictures"][0]["animation"]["sha256"] = "0" * 64
+        data["catalog.json"] = compact(catalog)
+        with zipfile.ZipFile(pack, "w", zipfile.ZIP_DEFLATED) as archive:
+            for name, blob in data.items():
+                archive.writestr(name, blob)
+        with self.assertRaisesRegex(ValueError, "animation digest"):
+            assemble(self.packs, self.output)
+
     def test_distinct_ids_allow_similar_designs_and_retain_both(self):
         original = "online-landmark-tower"
         remake = "online-landmark-tower-redesigned"
