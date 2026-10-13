@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show TargetPlatform, debugDefaultTargetPlatformOverride;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:persistence/persistence.dart';
@@ -107,6 +108,42 @@ void main() {
       expect(tester.getSize(frame).width, width);
     });
   }
+
+  testWidgets('desktop is capped, but tablets still use the whole viewport', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    debugDefaultTargetPlatformOverride = TargetPlatform.linux;
+    addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    addTearDown(tester.view.reset);
+
+    tester.view.physicalSize = const Size(1440, 900);
+    await pumpAssetApp(tester);
+
+    final frame = find.byKey(const ValueKey('mobile-frame'));
+    expect(tester.getSize(frame).width, 880);
+    expect(tester.getTopLeft(frame).dx, 280);
+    expect(
+      MediaQuery.sizeOf(tester.element(find.byKey(const ValueKey('home-scroll'))))
+          .width,
+      880,
+    );
+    expect(tester.takeException(), isNull);
+
+    // Even on a desktop, a tablet-sized window is never letterboxed.
+    tester.view.physicalSize = const Size(1024, 768);
+    await tester.pumpAndSettle();
+    expect(tester.getSize(frame).width, 1024);
+    expect(tester.getTopLeft(frame).dx, 0);
+
+    // A large mobile/tablet device remains full width, even in landscape.
+    debugDefaultTargetPlatformOverride = TargetPlatform.android;
+    tester.view.physicalSize = const Size(1366, 1024);
+    await tester.pumpAndSettle();
+    expect(tester.getSize(frame).width, 1366);
+    expect(tester.getTopLeft(frame).dx, 0);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('direct painting route restores the local asset', (tester) async {
     await pumpAssetApp(tester, initialRoute: '/painting');
