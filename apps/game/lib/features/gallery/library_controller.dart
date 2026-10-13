@@ -45,6 +45,12 @@ class LibraryController extends ChangeNotifier {
   }
 
   void setDownloadedOnline(List<LevelDefinition> levels) {
+    if (onlineLevels.length == levels.length &&
+        onlineLevels.every((current) => levels.any(
+          (incoming) => incoming.id == current.id &&
+              incoming.contentVersion == current.contentVersion &&
+              incoming.checksum == current.checksum,
+        ))) return;
     onlineLevels = levels.where(
       (level) => !catalog.any((original) => original.id == level.id),
     ).toList(growable: false);
