@@ -1,0 +1,122 @@
+{
+  "online-classic-wheatfield-crows": {
+    "motion": "glimmer",
+    "region": [
+      0.02,
+      0.05,
+      0.98,
+      0.39
+    ],
+    "version": 1,
+    "checksum": "e8a6ea503c9987d53109f085d65afd1133516ab894215f9990c1833bd63b898e",
+    "animationChecksum": "06d2e6f58986ba3aa093282f9d7dcd7bab77294acbfb8911b298cbdbbc37ea83"
+  },
+  "online-classic-sleeping-gypsy": {
+    "motion": "glimmer",
+    "region": [
+      0.02,
+      0.05,
+      0.98,
+      0.39
+    ],
+    "version": 1,
+    "checksum": "731b1650613af58bd7667612fa69db693121dd46ba7a4da7a004b6beaef3e7b6",
+    "animationChecksum": "9550fa106593ff25f000f59000bac34e0355e660e1271acf441f0c2191e35937"
+  },
+  "online-mona-lisa": {
+    "motion": "glimmer",
+    "region": [
+      0.32,
+      0.31,
+      0.67,
+      0.75
+    ],
+    "version": 1,
+    "checksum": "8bbc8d98f38ad39eef176bde34a01edee9daf26341ed2db02ebc6e9aa3221ae0",
+    "animationChecksum": "5f373207a93b3e43ad3d5c43a7a7fb01c36c0a415fa381c5314353faae802b1c"
+  },
+  "online-starry-night": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.05,
+      0.9,
+      0.6
+    ],
+    "version": 1,
+    "checksum": "e382209125fb4fca171d3f0f25bd8fbd78a6f1f645064ad7fcbe44550e50b9a4",
+    "animationChecksum": "3b6339a2d53da35f4277f277a8ef6451567383f6f07211a5c1954ee8275f53b4"
+  },
+  "online-the-scream": {
+    "motion": "ripple",
+    "region": [
+      0.66,
+      0.3,
+      0.95,
+      0.8
+    ],
+    "version": 1,
+    "checksum": "fd8e85daba4e0327f830634f198f4cae24d00cdd1761c8324052f22d3f63a7c2",
+    "animationChecksum": "58b5955b6bdfafff30797210080bca8821cf36e98706b801689cb1cb3ed0afb5"
+  },
+  "online-sunflowers": {
+    "motion": "sway",
+    "region": [
+      0.1,
+      0.04,
+      0.9,
+      0.58
+    ],
+    "version": 1,
+    "checksum": "6f55ca5c7954cb4dcbdf14a3b5223a8a1d7203903c9efe87897828f5f4d58899",
+    "animationChecksum": "4f081b5ba455aa8a94f5c88367555f46f27183976a332f95f8fa4764a8230de9"
+  },
+  "online-girl-pearl": {
+    "motion": "glimmer",
+    "region": [
+      0.6,
+      0.49,
+      0.75,
+      0.75
+    ],
+    "version": 1,
+    "checksum": "229881da0bb9fd390d4358fc34945c35c06b4bde348bb418747b14ae4a36475b",
+    "animationChecksum": "e41ec796136c3103a784e4cec9e5bd53b481222f244ef2d28688a12e95c5e2b0"
+  },
+  "online-great-wave": {
+    "motion": "ripple",
+    "region": [
+      0.02,
+      0.35,
+      0.98,
+      0.91
+    ],
+    "version": 1,
+    "checksum": "2f12c87e0ab267ec4758e44e9c48a79d11d1710b81f50ecb4bedfb860a9271e3",
+    "animationChecksum": "7b800f6f9e969ccb0c30d3e8b771d0f3676d8e8e42a391a0656da45868db556a"
+  },
+  "online-object-alarm-clock": {
+    "motion": "sway",
+    "region": [
+      0.18,
+      0.1,
+      0.82,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "6f1e82085d5e3ace04ee2dfe2e3a0e211e134726c5c6b76f38bc1040d444ad61",
+    "animationChecksum": "952ec5c1973d014e8731371cf5cf58c1d7d4a31e7a872c17bfe20f7758556c82"
+  },
+  "online-object-vintage-camera": {
+    "motion": "pulse",
+    "region": [
+      0.24,
+      0.3,
+      0.6,
+      0.68
+    ],
+    "version": 1,
+    "checksum": "b199e2211495d4f3bf4328934a5c15c50d6ab818e7d48ac0dc1c720bc93a7168",
+    "animationChecksum": "d4b77d36aeda7b6f9d9140121120e23c053e96d0f1bab79318a0cb841d4ead29"
+  }
+}
