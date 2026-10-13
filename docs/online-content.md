@@ -39,6 +39,36 @@ them alongside the independently built Web application under `/Pixelhub/online/`
 The sample only becomes publicly available **after the Pages job completes**.
 GitHub Pages must use **Settings → Pages → Build and deployment → GitHub Actions**.
 
+## Six-design collection (October 2026)
+
+The repository now includes reproducible design instructions in
+`tool/online_starter_pack.py`. After a **successful Web CI run on main**, the
+Pages workflow creates a separate Release named
+[`pixelhub-content-starter-6-v1`](https://github.com/abolfazl2600/Pixelhub/releases/tag/pixelhub-content-starter-6-v1)
+if it does not already exist, attaching one generated `content.zip` with
+six schema-v2 numbered level JSON files, six small PNG previews and a pack
+catalog. The files are generated in the runner, **not committed to main**:
+
+| Stable level ID | فارسی | English | Category | Canvas |
+| --- | --- | --- | --- | --- |
+| `online-tulip` | لاله صورتی | Pink Tulip | nature | 16×16 |
+| `online-mushroom` | قارچ جنگلی | Forest Mushroom | nature | 16×16 |
+| `online-cat-face` | صورت گربه | Cat Face | animals | 24×24 |
+| `online-watermelon` | قاچ هندوانه | Watermelon Slice | objects | 16×16 |
+| `online-rocket` | موشک کوچک | Little Rocket | space | 24×24 |
+| `online-butterfly` | پروانه بنفش | Purple Butterfly | animals | 24×24 |
+
+The existing `online-balloon` sample remains a separate Release. Once both
+Release packs have been assembled and Pages deployment has **actually
+completed successfully**, the aggregated online catalog should list seven
+pictures. A code push alone does not mean the new pack is published. Users
+who have the online-gallery-enabled app can then discover the pictures by
+opening Gallery and download each on demand.
+
+To author the pack without adding binaries to Git history:
+`python3 tool/online_starter_pack.py /tmp/content.zip`. Do not modify a
+published pack in place or reuse version 1 for different pixel data.
+
 ## Publish more pictures
 
 1. Create one or more schema-v2 level JSON files with unique `online-...`
