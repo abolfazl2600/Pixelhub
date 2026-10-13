@@ -36,21 +36,46 @@ final class OnlinePicture {
     final checksum = value['checksum'];
     if (id is! String ||
         !RegExp(r'^online-[a-z0-9-]{1,64}$').hasMatch(id) ||
-        version is! int || version < 1 || version > 100000 ||
-        title is! String || title.isEmpty || title.length > 100 ||
-        titleEn is! String || titleEn.isEmpty || titleEn.length > 100 ||
+        version is! int ||
+        version < 1 ||
+        version > 100000 ||
+        title is! String ||
+        title.isEmpty ||
+        title.length > 100 ||
+        titleEn is! String ||
+        titleEn.isEmpty ||
+        titleEn.length > 100 ||
         category is! String ||
-        !{'nature', 'animals', 'objects', 'patterns', 'space'}.contains(category) ||
-        width is! int || width < 1 || width > 256 ||
-        height is! int || height < 1 || height > 256 ||
-        bytes is! int || bytes < 1 || bytes > 262144 ||
-        checksum is! String || !RegExp(r'^[a-f0-9]{64}$').hasMatch(checksum)) {
+        !{
+          'nature',
+          'animals',
+          'objects',
+          'patterns',
+          'space',
+        }.contains(category) ||
+        width is! int ||
+        width < 1 ||
+        width > 256 ||
+        height is! int ||
+        height < 1 ||
+        height > 256 ||
+        bytes is! int ||
+        bytes < 1 ||
+        bytes > 262144 ||
+        checksum is! String ||
+        !RegExp(r'^[a-f0-9]{64}$').hasMatch(checksum)) {
       throw const FormatException('Invalid online picture entry.');
     }
     return OnlinePicture._(
-      id: id, version: version, title: title, titleEn: titleEn,
-      category: category, width: width, height: height,
-      bytes: bytes, checksum: checksum,
+      id: id,
+      version: version,
+      title: title,
+      titleEn: titleEn,
+      category: category,
+      width: width,
+      height: height,
+      bytes: bytes,
+      checksum: checksum,
     );
   }
 
@@ -70,7 +95,7 @@ final class OnlinePicture {
 
 class OnlineCatalogController extends ChangeNotifier {
   OnlineCatalogController(this.storage, {Uri? baseUrl})
-      : _baseUrl = baseUrl ?? Uri.parse(onlineContentRoot);
+    : _baseUrl = baseUrl ?? Uri.parse(onlineContentRoot);
 
   final OnlineLevelStorage storage;
   final Uri _baseUrl;
@@ -83,9 +108,9 @@ class OnlineCatalogController extends ChangeNotifier {
   bool _disposed = false;
 
   List<LevelDefinition> get downloaded => List.unmodifiable(_downloaded.values);
-  List<OnlinePicture> get available => pictures.where(
-    (picture) => !_downloaded.containsKey(picture.id),
-  ).toList(growable: false);
+  List<OnlinePicture> get available => pictures
+      .where((picture) => !_downloaded.containsKey(picture.id))
+      .toList(growable: false);
 
   Uri previewUrl(OnlinePicture picture) =>
       _baseUrl.resolve('previews/${picture.stem}.png');
@@ -115,13 +140,15 @@ class OnlineCatalogController extends ChangeNotifier {
     try {
       final cacheBuster = DateTime.now().millisecondsSinceEpoch;
       final bundle = NetworkAssetBundle(_baseUrl);
-      final source = await bundle.loadString('catalog.json?v=$cacheBuster')
+      final source = await bundle
+          .loadString('catalog.json?v=$cacheBuster')
           .timeout(const Duration(seconds: 12));
       if (utf8.encode(source).length > 4 * 1024 * 1024) {
         throw const FormatException('Catalog too large.');
       }
       final json = jsonDecode(source);
-      if (json is! Map<String, dynamic> || json['schemaVersion'] != 1 ||
+      if (json is! Map<String, dynamic> ||
+          json['schemaVersion'] != 1 ||
           json['pictures'] is! List) {
         throw const FormatException('Invalid online catalog.');
       }
@@ -136,7 +163,8 @@ class OnlineCatalogController extends ChangeNotifier {
           throw const FormatException('Invalid picture.');
         }
         final entry = OnlinePicture.fromJson(value);
-        if (!ids.add(entry.id)) throw const FormatException('Duplicate picture.');
+        if (!ids.add(entry.id))
+          throw const FormatException('Duplicate picture.');
         result.add(entry);
       }
       if (_disposed) return;
@@ -156,7 +184,8 @@ class OnlineCatalogController extends ChangeNotifier {
     _notify();
     try {
       final bundle = NetworkAssetBundle(_baseUrl);
-      final source = await bundle.loadString('levels/${picture.stem}.json')
+      final source = await bundle
+          .loadString('levels/${picture.stem}.json')
           .timeout(const Duration(seconds: 25));
       if (utf8.encode(source).length != picture.bytes) {
         throw const FormatException('Download length mismatch.');
