@@ -115,7 +115,6 @@ void main() {
   ) async {
     tester.view.devicePixelRatio = 1;
     debugDefaultTargetPlatformOverride = TargetPlatform.linux;
-    addTearDown(() => debugDefaultTargetPlatformOverride = null);
     addTearDown(tester.view.reset);
 
     tester.view.physicalSize = const Size(1440, 900);
@@ -138,6 +137,8 @@ void main() {
     expect(tester.getSize(frame).width, 1024);
     expect(tester.getTopLeft(frame).dx, 0);
 
+    // Flutter checks foundation debug overrides before tearDown callbacks run.
+    debugDefaultTargetPlatformOverride = null;
     expect(tester.takeException(), isNull);
   });
 
@@ -146,8 +147,6 @@ void main() {
   ) async {
     tester.view.devicePixelRatio = 1;
     tester.view.physicalSize = const Size(1366, 1024);
-    debugDefaultTargetPlatformOverride = TargetPlatform.android;
-    addTearDown(() => debugDefaultTargetPlatformOverride = null);
     addTearDown(tester.view.reset);
 
     await pumpAssetApp(tester);
