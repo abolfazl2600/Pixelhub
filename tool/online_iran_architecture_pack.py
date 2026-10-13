@@ -5,14 +5,15 @@ This script authors drawings in source code, not repository-bundled level assets
 Web CI publishes an immutable content.zip Release holding bilingual schema-v2
 levels, numbered painting cells, their checksums, and miniature PNG previews.
 
-The Azadi Tower keeps its existing level ID and increases its version to 2.
+The Azadi v2 is an archived, pre-policy exception. Reproduce only the
+existing Release; all future redesigns need fresh IDs and levelVersion 1.
 """
 import math
 import pathlib
 import sys
 import zipfile
 
-from online_release import checksum, compact, png
+from online_release import checksum, compact, png, validate_archived_azadi_pack_manifest
 from online_starter_pack import Sprite
 
 
@@ -541,6 +542,7 @@ def create_pack(destination):
         })
         assets[f"levels/{stem}.json"] = payload
         assets[f"previews/{stem}.png"] = png(level)
+    validate_archived_azadi_pack_manifest(manifest)
     target = pathlib.Path(destination)
     target.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(target, "w", compression=zipfile.ZIP_DEFLATED) as pack:

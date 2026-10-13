@@ -7,11 +7,13 @@ Usage:
 
 Only zip assets attached to pixelhub-content-* Releases are published.
 No generated level/preview file is added to the git working tree.
+New pictures have unique IDs and levelVersion 1. No content updates by ID.
 """
 import hashlib
 import json
 import math
 import pathlib
+import re
 import struct
 import sys
 import zipfile
@@ -66,6 +68,49 @@ def png(level):
     return (b"\x89PNG\r\n\x1a\n" +
             chunk(b"IHDR", struct.pack(">2I5B", width, height, 8, 6, 0, 0, 0)) +
             chunk(b"IDAT", zlib.compress(scanlines, 9)) + chunk(b"IEND", b""))
+
+
+# The *only* historical exception, published before immutable-ID policy.
+# Both released ZIPs remain untouched. The original v1 and redesigned v2
+# assets retain their existing paths and checksums so prior downloads work.
+LEGACY_AZADI_ID = "online-iran-azadi-tower"
+LEGACY_AZADI_V1 = ("pixelhub-content-iran-landmarks-10-v1", 1)
+LEGACY_AZADI_V2 = ("pixelhub-content-iran-z-architecture-11-v1", 2)
+
+
+def valid_online_id(ident):
+    return isinstance(ident, str) and re.fullmatch(
+        r"online-[a-z0-9-]{1,64}", ident
+    ) is not None
+
+
+def validate_new_pack_manifest(pictures):
+    """Require a fresh, single-publication ID and levelVersion=1 per entry.
+
+    Cross-Release ID uniqueness is enforced by assemble(), which reads every
+    published pack; a standalone generator cannot know remote Release IDs.
+    """
+    seen = set()
+    for item in pictures:
+        ident = item["id"]
+        version = item["version"]
+        if not valid_online_id(ident):
+            raise ValueError(f"Invalid new online content ID: {ident}")
+        if type(version) is not int or version != 1:
+            raise ValueError(f"New picture must have levelVersion 1: {ident}")
+        if ident in seen:
+            raise ValueError(f"Duplicate online content ID in pack: {ident}")
+        seen.add(ident)
+
+
+def validate_archived_azadi_pack_manifest(pictures):
+    """Reproduce the existing v2 Release, never use it for new designs."""
+    legacy = [item for item in pictures if item["id"] == LEGACY_AZADI_ID]
+    if len(legacy) != 1 or legacy[0]["version"] != 2:
+        raise ValueError("Archived Azadi pack must contain only the legacy v2")
+    validate_new_pack_manifest(
+        [item for item in pictures if item["id"] != LEGACY_AZADI_ID]
+    )
 
 
 def sample(destination):
@@ -127,6 +172,7 @@ def sample(destination):
         "category": "objects", "width": side, "height": side,
         "bytes": len(blob), "checksum": level["checksum"],
     }
+    validate_new_pack_manifest([item])
     target = pathlib.Path(destination)
     target.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(target, "w", compression=zipfile.ZIP_DEFLATED) as archive:
@@ -140,6 +186,7 @@ def assemble(pack_dir, output_dir):
     destination = pathlib.Path(output_dir)
     destination.mkdir(parents=True, exist_ok=True)
     images = {}
+    origins = {}
     for pack in sorted(root.glob("*/content.zip")):
         with zipfile.ZipFile(pack) as archive:
             manifest = json.loads(archive.read("catalog.json"))
@@ -148,9 +195,25 @@ def assemble(pack_dir, output_dir):
             for item in manifest["pictures"]:
                 ident = item["id"]
                 version = item["version"]
-                if not (ident.startswith("online-") and
-                        all(c in "abcdefghijklmnopqrstuvwxyz0123456789-" for c in ident)):
-                    raise ValueError("Invalid online content ID")
+                if not valid_online_id(ident):
+                    raise ValueError(f"Invalid online content ID: {ident}")
+                origin = (pack.parent.name, version)
+                previous = origins.get(ident)
+                if ident == LEGACY_AZADI_ID and origin not in (
+                    LEGACY_AZADI_V1, LEGACY_AZADI_V2
+                ):
+                    raise ValueError(f"Reserved historical online ID: {ident}")
+                if previous is not None:
+                    # Do not permit upgrades, even to higher levelVersion.
+                    # Preserve exactly the one pre-policy Azadi v1->v2 pair.
+                    if not (ident == LEGACY_AZADI_ID and
+                            previous == LEGACY_AZADI_V1 and
+                            origin == LEGACY_AZADI_V2):
+                        raise ValueError(f"Duplicate online content ID: {ident}")
+                elif type(version) is not int or version != 1:
+                    raise ValueError(
+                        f"New picture must have levelVersion 1: {ident}"
+                    )
                 stem = f"{ident}-v{version}"
                 level_path = f"levels/{stem}.json"
                 preview_path = f"previews/{stem}.png"
@@ -171,10 +234,8 @@ def assemble(pack_dir, output_dir):
                     not preview.startswith(b"\x89PNG\r\n\x1a\n") or
                     len(body) > 262144):
                     raise ValueError(f"Invalid level or preview: {ident}")
-                previous = images.get(ident)
-                if previous is not None and version <= previous["version"]:
-                    raise ValueError(f"Level ID reused without a version increase: {ident}")
                 images[ident] = item
+                origins[ident] = origin
                 for name, payload in ((level_path, body), (preview_path, preview)):
                     file = destination / name
                     file.parent.mkdir(parents=True, exist_ok=True)

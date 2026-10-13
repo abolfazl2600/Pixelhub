@@ -10,7 +10,7 @@ import pathlib
 import sys
 import zipfile
 
-from online_release import checksum, compact, png
+from online_release import checksum, compact, png, validate_new_pack_manifest
 from online_starter_pack import Sprite
 
 
@@ -798,6 +798,7 @@ def create_pack(destination):
         })
         files[f"levels/{stem}.json"] = encoded
         files[f"previews/{stem}.png"] = png(level)
+    validate_new_pack_manifest(catalog)
     output = pathlib.Path(destination)
     output.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as bundle:
