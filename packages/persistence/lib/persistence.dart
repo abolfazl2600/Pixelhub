@@ -276,7 +276,8 @@ final class MemoryPreferences
         ProgressRepository,
         PreferencesRepository,
         ArtworkRepository,
-        ProgressSyncOutboxRepository {
+        ProgressSyncOutboxRepository,
+        OnlineLevelStorage {
   final Map<String, ProgressSnapshot> _records = {};
   String? language;
   ArtworkLibrary _library = ArtworkLibrary();
