@@ -244,9 +244,14 @@ async function main() {
     // Confirm the user-approved level was actually written to browser storage.
     await page.waitForFunction(() => Object.keys(localStorage).some(
       key => key.includes('pixelhub.online.level.online-smoke-test')));
-    // Downloading a card starts painting directly, without a second action.
+    // The download is persisted before the router finishes its transition.
+    // Wait for the browser URL instead of reading it during that transition.
+    await page.waitForFunction(
+      () => location.hash === '#/painting/online-smoke-test',
+      null,
+      {timeout:15000}
+    );
     await board().waitFor();
-    assert.equal(new URL(page.url()).hash,'#/painting/online-smoke-test');
 
     assert.deepEqual(pageErrors,[]); assert.deepEqual(failedRequests,[]); assert.deepEqual(externalRequests,[]);
     console.log(JSON.stringify({defaultPersian:'passed',englishAndLanguageRestore:'passed',
