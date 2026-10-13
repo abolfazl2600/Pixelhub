@@ -2,7 +2,6 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../app/language_button.dart';
 import '../../core/local_diagnostics.dart';
 import '../../core/pixel_art_preview.dart';
 import '../../l10n/strings.dart';
@@ -13,14 +12,12 @@ import 'painting_controller.dart';
 class PaintingPreviewScreen extends StatefulWidget {
   const PaintingPreviewScreen({
     required this.controller,
-    required this.onLanguageToggle,
     required this.diagnostics,
     super.key,
   });
   static const route = '/painting';
   final PaintingController controller;
   final LocalDiagnostics diagnostics;
-  final VoidCallback onLanguageToggle;
   @override
   State<PaintingPreviewScreen> createState() => _PaintingPreviewScreenState();
 }
@@ -124,7 +121,6 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
           title,
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
         ),
-        actions: [LanguageButton(onToggle: widget.onLanguageToggle)],
       );
       if (controller.status == PaintingStatus.loading) {
         return Scaffold(

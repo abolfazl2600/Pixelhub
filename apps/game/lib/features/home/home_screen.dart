@@ -3,30 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:level_schema/level_schema.dart';
 
-import '../../app/language_button.dart';
 import '../../core/pixel_art_preview.dart';
 import '../../l10n/strings.dart';
 import '../gallery/library_controller.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({
     required this.levels,
     required this.library,
-    required this.onLanguageToggle,
     super.key,
   });
   final List<LevelDefinition> levels;
   final LibraryController library;
-  final VoidCallback onLanguageToggle;
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
 
-class _HomeScreenState extends State<HomeScreen> {
-  late String _selectedId = widget.levels.first.id;
   @override
   Widget build(BuildContext context) {
-    final level = widget.levels.firstWhere((level) => level.id == _selectedId);
+    final level = levels.firstWhere(
+      (item) => item.id == 'sunflower',
+      orElse: () => levels.first,
+    );
     final s = context.strings;
     return Scaffold(
       body: SafeArea(
@@ -54,7 +49,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: const Icon(Icons.person_outline_rounded),
                     onPressed: () => context.push('/profile'),
                   ),
-                  LanguageButton(onToggle: widget.onLanguageToggle),
                 ],
               ),
               const SizedBox(height: 24),
@@ -96,11 +90,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Text(
                           s.homeCompleted(
                             context.digits(
-                              widget.library.levels
-                                  .where(widget.library.isComplete)
+                              library.levels
+                                  .where(library.isComplete)
                                   .length,
                             ),
-                            context.digits(widget.library.levels.length),
+                            context.digits(library.levels.length),
                           ),
                         ),
                       ),
@@ -113,27 +107,31 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              DropdownButtonFormField<String>(
-                key: const ValueKey('level-picker'),
-                initialValue: _selectedId,
-                isExpanded: true,
-                decoration: InputDecoration(
-                  labelText: s.choosePicture,
-                  border: const OutlineInputBorder(),
-                ),
-                items: [
-                  for (final item in widget.levels)
-                    DropdownMenuItem(
-                      value: item.id,
-                      child: Text(
-                        '${item.titleFor(context.isPersian ? 'fa' : 'en')} · ${context.digits(item.width)} × ${context.digits(item.height)}',
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: () => context.push('/gallery'),
+                    icon: const Icon(Icons.grid_view_rounded),
+                    label: Text(s.gallery),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: () => context.push('/my-gallery'),
+                    icon: const Icon(Icons.collections_outlined),
+                    label: Text(s.myGallery),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: () => context.push('/import'),
+                    icon: const Icon(Icons.add_photo_alternate_outlined),
+                    label: Text(s.importPhoto),
+                  ),
+                  TextButton.icon(
+                    onPressed: () => context.push('/settings'),
+                    icon: const Icon(Icons.settings_outlined),
+                    label: Text(s.settings),
+                  ),
                 ],
-                onChanged: (value) {
-                  if (value != null) setState(() => _selectedId = value);
-                },
               ),
               const SizedBox(height: 24),
               Container(
@@ -165,47 +163,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       label: Text(s.startPainting),
                     ),
                   ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  OutlinedButton.icon(
-                    onPressed: () => context.push('/gallery'),
-                    icon: const Icon(Icons.grid_view_rounded),
-                    label: Text(s.gallery),
-                  ),
-                  OutlinedButton.icon(
-                    onPressed: () => context.push('/my-gallery'),
-                    icon: const Icon(Icons.collections_outlined),
-                    label: Text(s.myGallery),
-                  ),
-                  OutlinedButton.icon(
-                    onPressed: () => context.push('/import'),
-                    icon: const Icon(Icons.add_photo_alternate_outlined),
-                    label: Text(s.importPhoto),
-                  ),
-                  TextButton.icon(
-                    onPressed: () => context.push('/settings'),
-                    icon: const Icon(Icons.settings_outlined),
-                    label: Text(s.settings),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              Text(
-                s.offlineNote,
-                style: const TextStyle(color: PixelTokens.muted, height: 1.8),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                s.storageNote,
-                style: const TextStyle(
-                  color: PixelTokens.muted,
-                  fontSize: 12,
-                  height: 1.8,
                 ),
               ),
             ],

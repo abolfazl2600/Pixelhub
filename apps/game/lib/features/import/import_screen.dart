@@ -7,7 +7,6 @@ import 'package:game_domain/game_domain.dart';
 import 'package:go_router/go_router.dart';
 import 'package:level_schema/level_schema.dart';
 
-import '../../app/language_button.dart';
 import '../../core/pixel_art_preview.dart';
 import '../../l10n/strings.dart';
 import '../gallery/library_controller.dart';
@@ -16,11 +15,9 @@ import 'photo_converter.dart';
 class ImportScreen extends StatefulWidget {
   const ImportScreen({
     required this.library,
-    required this.onLanguageToggle,
     super.key,
   });
   final LibraryController library;
-  final VoidCallback onLanguageToggle;
   @override
   State<ImportScreen> createState() => _ImportScreenState();
 }
@@ -205,7 +202,6 @@ class _ImportScreenState extends State<ImportScreen> {
             icon: const Icon(Icons.arrow_back),
           ),
           title: Text(s.importPhoto),
-          actions: [LanguageButton(onToggle: widget.onLanguageToggle)],
         ),
         body: SafeArea(
           child: ListView(

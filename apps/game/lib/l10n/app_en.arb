@@ -161,6 +161,7 @@
       }
     }
   },
+  "appLanguage": "App language",
   "profile": "Profile",
   "guestMode": "Guest · local only",
   "localStatsCaption": "Pictures and favorites are stored on this device. Sign-in is coming soon.",

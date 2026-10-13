@@ -7,6 +7,7 @@ import 'package:painting_engine/painting_engine.dart';
 import 'package:level_schema/level_schema.dart';
 import 'package:persistence/persistence.dart';
 import 'package:pixelhub/app/pixelhub_app.dart';
+import 'package:pixelhub/features/profile/profile_screen.dart';
 import 'package:pixelhub/features/painting/painting_controller.dart';
 import 'package:pixelhub/features/painting/painting_preview_screen.dart';
 
@@ -110,7 +111,17 @@ void main() {
         Directionality.of(tester.element(find.byType(PaintingPreviewScreen))),
         TextDirection.rtl,
       );
+      expect(find.text('English'), findsNothing);
+      GoRouter.of(
+        tester.element(find.byType(PaintingPreviewScreen)),
+      ).go('/profile');
+      await tester.pumpAndSettle();
+      expect(find.text('زبان برنامه'), findsOneWidget);
       await tester.tap(find.text('English'));
+      await tester.pumpAndSettle();
+      expect(find.text('App language'), findsOneWidget);
+      GoRouter.of(tester.element(find.byType(ProfileScreen)))
+          .go('/painting/sunflower');
       await tester.pumpAndSettle();
       expect(find.text('Colors'), findsOneWidget);
       expect(find.text('Sunflower'), findsOneWidget);
@@ -131,7 +142,14 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.text('Colors'), findsOneWidget);
+      GoRouter.of(
+        tester.element(find.byType(PaintingPreviewScreen)),
+      ).go('/profile');
+      await tester.pumpAndSettle();
       await tester.tap(find.text('فارسی'));
+      await tester.pumpAndSettle();
+      GoRouter.of(tester.element(find.byType(ProfileScreen)))
+          .go('/painting/sunflower');
       await tester.pumpAndSettle();
       expect(find.text('رنگ‌ها'), findsOneWidget);
       expect(storage.language, 'fa');

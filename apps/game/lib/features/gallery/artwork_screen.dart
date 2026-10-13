@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:level_schema/level_schema.dart';
 
-import '../../app/language_button.dart';
 import '../../core/pixel_art_preview.dart';
 import '../../l10n/strings.dart';
 import 'export_button.dart';
@@ -13,13 +12,11 @@ class ArtworkScreen extends StatelessWidget {
   const ArtworkScreen({
     required this.level,
     required this.library,
-    required this.onLanguageToggle,
     required this.onDelete,
     super.key,
   });
   final LevelDefinition level;
   final LibraryController library;
-  final VoidCallback onLanguageToggle;
   final Future<void> Function(LevelDefinition) onDelete;
 
   Future<void> _delete(BuildContext context) async {
@@ -89,7 +86,6 @@ class ArtworkScreen extends StatelessWidget {
             icon: const Icon(Icons.arrow_back),
           ),
           title: Text(level.titleFor(context.isPersian ? 'fa' : 'en')),
-          actions: [LanguageButton(onToggle: onLanguageToggle)],
         ),
         body: SafeArea(
           child: ListView(

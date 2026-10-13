@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../app/language_button.dart';
 import '../../l10n/strings.dart';
 import '../../platform_adapters/offline_support.dart';
 import '../gallery/library_controller.dart';
@@ -9,12 +8,10 @@ import '../gallery/library_controller.dart';
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({
     required this.library,
-    required this.onLanguageToggle,
     required this.onClear,
     super.key,
   });
   final LibraryController library;
-  final VoidCallback onLanguageToggle;
   final Future<void> Function() onClear;
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -78,9 +75,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             icon: const Icon(Icons.arrow_back),
           ),
           title: Text(s.settings),
-          actions: [
-            if (!_busy) LanguageButton(onToggle: widget.onLanguageToggle),
-          ],
         ),
         body: SafeArea(
           child: ListView(

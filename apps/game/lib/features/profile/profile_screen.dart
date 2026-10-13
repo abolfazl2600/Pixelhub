@@ -31,7 +31,6 @@ class ProfileScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back_rounded),
         ),
         title: Text(s.profile),
-        actions: [LanguageButton(onToggle: onLanguageToggle)],
       ),
       body: SafeArea(
         child: ListenableBuilder(
@@ -64,6 +63,14 @@ class ProfileScreen extends StatelessWidget {
                         Text(s.localStatsCaption),
                       ],
                     ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.language_rounded),
+                    title: Text(s.appLanguage),
+                    trailing: LanguageButton(onToggle: onLanguageToggle),
                   ),
                 ),
                 const SizedBox(height: 18),

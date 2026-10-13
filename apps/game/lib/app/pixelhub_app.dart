@@ -275,7 +275,6 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       if (page == 'gallery' || page == 'my-gallery') {
         return GalleryScreen(
           library: _library,
-          onLanguageToggle: _toggleLanguage,
           personal: page == 'my-gallery',
         );
       }
@@ -289,7 +288,6 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       if (page == 'settings') {
         return SettingsScreen(
           library: _library,
-          onLanguageToggle: _toggleLanguage,
           onClear: _clearLocalData,
         );
       }
@@ -307,14 +305,12 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       if (page == 'import') {
         return ImportScreen(
           library: _library,
-          onLanguageToggle: _toggleLanguage,
         );
       }
       if (id == null) {
         return HomeScreen(
           levels: _bootstrap.levels,
           library: _library,
-          onLanguageToggle: _toggleLanguage,
         );
       }
       final matches = _library.levels.where((level) => level.id == id);
@@ -325,14 +321,12 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
         return ArtworkScreen(
           level: matches.first,
           library: _library,
-          onLanguageToggle: _toggleLanguage,
           onDelete: _deleteArtwork,
         );
       }
       return PaintingPreviewScreen(
         controller: _controller(matches.first),
         diagnostics: _diagnostics,
-        onLanguageToggle: _toggleLanguage,
       );
     },
   );

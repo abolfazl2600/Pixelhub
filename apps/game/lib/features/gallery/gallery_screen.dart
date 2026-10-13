@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:level_schema/level_schema.dart';
 
-import '../../app/language_button.dart';
 import '../../core/pixel_art_preview.dart';
 import '../../l10n/strings.dart';
 import 'library_controller.dart';
@@ -21,12 +20,10 @@ String categoryLabel(BuildContext context, String category) =>
 class GalleryScreen extends StatefulWidget {
   const GalleryScreen({
     required this.library,
-    required this.onLanguageToggle,
     this.personal = false,
     super.key,
   });
   final LibraryController library;
-  final VoidCallback onLanguageToggle;
   final bool personal;
   @override
   State<GalleryScreen> createState() => _GalleryScreenState();
@@ -102,7 +99,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
               onPressed: () => context.push('/profile'),
               icon: const Icon(Icons.person_outline_rounded),
             ),
-            LanguageButton(onToggle: widget.onLanguageToggle),
           ],
         ),
         floatingActionButton: widget.personal
