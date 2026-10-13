@@ -204,6 +204,20 @@ jobs:
               --notes "Twenty new original 64x64 color-by-number homages to historic paintings: Birth of Venus, Creation of Adam, Last Supper, School of Athens, Night Watch, Milkmaid, Las Meninas, Third of May 1808, Liberty Leading the People, Wanderer above the Sea of Fog, Fighting Temeraire, Hay Wain, Impression Sunrise, Water Lilies, Moulin de la Galette, La Grande Jatte, The Kiss, Card Players, Wheatfield with Crows and Sleeping Gypsy. Bilingual JSON grids and PNG previews are Release assets, not bundled in Android or tracked in Git. None duplicate the six earlier masterworks." \
               --latest=false
           fi
+      - name: Publish thirty original object pixel-art pictures outside git
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-objects-30-v1 >/dev/null 2>&1; then
+            python3 tool/online_objects_30_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-objects-30-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: 30 original everyday object pixel-art levels" \
+              --notes "Thirty original 48x48 color-by-number objects including camera, headphones, guitar, radio, bicycle, sailboat, microscope, robot, typewriter, globe and treasure chest. Bilingual level JSON and PNG previews are Release-only assets, not bundled into Android." \
+              --latest=false
+          fi
       - name: Download release packs and assemble online catalog
         env:
           GH_TOKEN: ${{ github.token }}
