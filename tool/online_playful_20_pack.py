@@ -24,6 +24,7 @@ THEMES = {
     "teal": ("FFEBFAFC", "FF57BACA", "FFA6E1E9", "FF397E92"),
     "berry": ("FFFFF2FA", "FFCA76BA", "FFF2BADD", "FF89478C"),
     "navy": ("FFEFF5FF", "FF6385C2", "FFA3B9E9", "FF36558A"),
+    "amber": ("FFFFF7EA", "FFE3A64C", "FFFFD892", "FFAD743E"),
     "lime": ("FFF4FAE9", "FF87B850", "FFC7E58D", "FF557D36"),
 }
 
