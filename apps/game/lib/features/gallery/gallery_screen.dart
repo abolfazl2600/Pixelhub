@@ -55,18 +55,25 @@ class _GalleryScreenState extends State<GalleryScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Row(children: [
-              const Icon(Icons.cloud_download_outlined),
-              const SizedBox(width: 8),
-              Expanded(child: Text(s.onlinePictures,
-                  style: const TextStyle(fontWeight: FontWeight.w700))),
-              TextButton.icon(
-                onPressed: online.status == OnlineCatalogStatus.checking
-                    ? null : online.checkForUpdates,
-                icon: const Icon(Icons.refresh),
-                label: Text(s.checkPictures),
-              ),
-            ]),
+            Row(
+              children: [
+                const Icon(Icons.cloud_download_outlined),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    s.onlinePictures,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: online.status == OnlineCatalogStatus.checking
+                      ? null
+                      : online.checkForUpdates,
+                  icon: const Icon(Icons.refresh),
+                  label: Text(s.checkPictures),
+                ),
+              ],
+            ),
             if (online.status == OnlineCatalogStatus.checking)
               Text(s.checkingPictures),
             if (online.status == OnlineCatalogStatus.error)
@@ -79,38 +86,58 @@ class _GalleryScreenState extends State<GalleryScreen> {
               for (final picture in pending.take(5))
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
-                  child: Row(children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        online.previewUrl(picture).toString(),
-                        width: 56, height: 56, fit: BoxFit.cover,
-                        errorBuilder: (context, error, stack) =>
-                            const SizedBox(width: 56, height: 56,
-                                child: Icon(Icons.image_outlined)),
+                  child: Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          online.previewUrl(picture).toString(),
+                          width: 56,
+                          height: 56,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stack) =>
+                              const SizedBox(
+                                width: 56,
+                                height: 56,
+                                child: Icon(Icons.image_outlined),
+                              ),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(picture.titleFor(context.isPersian ? 'fa' : 'en'),
-                            maxLines: 2, overflow: TextOverflow.ellipsis),
-                        Text('${context.digits(picture.width)} × ${context.digits(picture.height)}',
-                            style: const TextStyle(fontSize: 12)),
-                      ],
-                    )),
-                    FilledButton(
-                      onPressed: online.downloadingId != null
-                          ? null : () => online.download(picture),
-                      child: Text(online.downloadingId == picture.id
-                          ? s.downloadingPicture : s.downloadPicture),
-                    ),
-                  ]),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              picture.titleFor(context.isPersian ? 'fa' : 'en'),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              '${context.digits(picture.width)} × ${context.digits(picture.height)}',
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ),
+                      FilledButton(
+                        onPressed: online.downloadingId != null
+                            ? null
+                            : () => online.download(picture),
+                        child: Text(
+                          online.downloadingId == picture.id
+                              ? s.downloadingPicture
+                              : s.downloadPicture,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               if (online.failedDownloadId != null)
-                Text(s.downloadFailed, style: TextStyle(
-                    color: Theme.of(context).colorScheme.error)),
+                Text(
+                  s.downloadFailed,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
             ],
           ],
         ),
