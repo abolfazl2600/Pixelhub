@@ -1,0 +1,80 @@
+{
+  "online-playful-heart-smile": {
+    "motion": "pulse",
+    "version": 1,
+    "checksum": "c2b37f8fdacd95fecb116f46054a12a84eff27f4e6a94641df756b406aeb5362",
+    "animationChecksum": "8d31a91a71be6dd5080a3108d75dc86c81bbe7f92396e8cfb918fa50cdacecad"
+  },
+  "online-playful-lucky-clover": {
+    "motion": "sway",
+    "version": 1,
+    "checksum": "45799d67e4214e9d6c6b3c775048bae57d39e3f23805cf3c6e09dc5c711edc6b",
+    "animationChecksum": "9e700cbbab112d6d0e4e38ca81d0103124d4a5da83a616c701dd552175408331"
+  },
+  "online-playful-friendly-ghost": {
+    "motion": "float",
+    "version": 1,
+    "checksum": "b334aa9879c43a074e341da6b00872d3d7746abb5de280f8c97e5d0683fae908",
+    "animationChecksum": "8647f4037959fe97a0fd3f000746a615945bbf7beb7a1dfa8b2778edc6d49952"
+  },
+  "online-playful-one-eyed-monster": {
+    "motion": "pulse",
+    "version": 1,
+    "checksum": "e6975d9e997818cab4ef6ccaed6b588796a586618daff8b56cc8ef905ff59a2a",
+    "animationChecksum": "e65f90d4b0deb8165e01bdce4cf8258196772606f781d5939e0ac7b169338b5d"
+  },
+  "online-playful-flying-saucer": {
+    "motion": "float",
+    "version": 1,
+    "checksum": "17de2d65a976a178bf65cb6cbb8d4b2e9518b30e5c85c32a34301d4304fc39b5",
+    "animationChecksum": "e1b49de158bd586d0b4d30fe50d1718bbdc42cf325de51f95ecb90a9c73918d0"
+  },
+  "online-playful-magic-wand": {
+    "motion": "sparkle",
+    "version": 1,
+    "checksum": "4941d9ee10507b116cff72e400b90fe826c358c33a77626d6fcd4a1abeb0baff",
+    "animationChecksum": "eed605cebc743d0bc0d1c24f72a4cec1083c6860a096cbc48f1828b00e69cc2c"
+  },
+  "online-playful-party-hat": {
+    "motion": "sway",
+    "version": 1,
+    "checksum": "5f8f4c18dc4f878e5520573581f8270bf89889cd1dbdc1b639201d150dba65cf",
+    "animationChecksum": "0078170c30f38856b3317e74780bfe3c224c00753a2cf0446da736ae8cd336d1"
+  },
+  "online-playful-birthday-cake": {
+    "motion": "flame",
+    "region": [
+      0.38,
+      0.09,
+      0.61,
+      0.3
+    ],
+    "version": 1,
+    "checksum": "143f4929d5be14ccac272627a64c80649f34174bb77340ef4b00b68a7f710751",
+    "animationChecksum": "283f15c7e8a45e493ae6e16e2f7c7c5bb73b970de4641f38d26ba8214f791ccd"
+  },
+  "online-playful-popcorn-carton": {
+    "motion": "float",
+    "region": [
+      0.18,
+      0.18,
+      0.84,
+      0.45
+    ],
+    "version": 1,
+    "checksum": "31298d0b3c1fe7a0fd88958e60f4167dfb777669d8570062a78d909253d8745e",
+    "animationChecksum": "756bd49fbe14b9ae8b080c2cdd21f62ed68137911777d74aa8651ee3dabb4159"
+  },
+  "online-playful-bubble-tea": {
+    "motion": "sway",
+    "region": [
+      0.33,
+      0.1,
+      0.9,
+      0.44
+    ],
+    "version": 1,
+    "checksum": "299f9873d4f1115b2ddea5afe0c85214b8dfd1e02ebe47471d7b9304d16dcfcd",
+    "animationChecksum": "8dab7ee9e18c008c9b0e8c2b9d8e663d781d229517f73c4e05bb3ffa794488af"
+  }
+}
