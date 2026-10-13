@@ -7,15 +7,18 @@ import '../../l10n/strings.dart';
 import 'export_button.dart';
 import 'gallery_screen.dart';
 import 'library_controller.dart';
+import '../painting/completed_artwork_preview.dart';
 
 class ArtworkScreen extends StatelessWidget {
   const ArtworkScreen({
     required this.level,
     required this.library,
     required this.onDelete,
+    this.animation,
     super.key,
   });
   final LevelDefinition level;
+  final PixelAnimation? animation;
   final LibraryController library;
   final Future<void> Function(LevelDefinition) onDelete;
 
@@ -97,7 +100,9 @@ class ArtworkScreen extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(24),
-                child: PixelArtPreview(level: level),
+                child: library.isComplete(level) && animation != null
+                    ? CompletedArtworkPreview(level: level, animation: animation)
+                    : PixelArtPreview(level: level),
               ),
               const SizedBox(height: 20),
               Text(

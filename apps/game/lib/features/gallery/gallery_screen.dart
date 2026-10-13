@@ -170,6 +170,16 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   '${context.digits(picture.height)}',
                   textAlign: TextAlign.center,
                 ),
+                if (picture.animation != null) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    context.isPersian
+                        ? 'نقاشی متحرک · ${context.digits(picture.animation!.frameCount)} فریم پس از تکمیل'
+                        : 'Animated after completion · ${context.digits(picture.animation!.frameCount)} frames',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ],
                 const SizedBox(height: 16),
                 FilledButton.icon(
                   onPressed: widget.online.downloadingId != null
@@ -337,6 +347,26 @@ class _GalleryScreenState extends State<GalleryScreen> {
                       borderRadius: BorderRadius.circular(10),
                       child: _previewImage(picture),
                     ),
+                    if (picture.animation != null)
+                      PositionedDirectional(
+                        start: 4,
+                        top: 4,
+                        child: Tooltip(
+                          message: context.isPersian
+                              ? 'متحرک پس از تکمیل'
+                              : 'Animated after completion',
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.9),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Padding(
+                              padding: EdgeInsets.all(6),
+                              child: Icon(Icons.motion_photos_on, size: 19),
+                            ),
+                          ),
+                        ),
+                      ),
                     PositionedDirectional(
                       end: 4,
                       top: 4,

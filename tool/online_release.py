@@ -190,6 +190,49 @@ def sample(destination):
         archive.writestr("previews/online-balloon-v1.png", png(level))
 
 
+
+def validated_animation(archive, stem, item, level):
+    """Verify an optional sparse animation before publishing any bytes."""
+    metadata = item.get("animation")
+    if metadata is None:
+        return None
+    if not isinstance(metadata, dict):
+        raise ValueError(f"Invalid animation metadata: {stem}")
+    data_path = f"animations/{stem}.json"
+    body = archive.read(data_path)
+    if (type(metadata.get("bytes")) is not int or
+            not 0 < len(body) <= 2 * 1024 * 1024 or
+            metadata["bytes"] != len(body) or
+            metadata.get("sha256") != hashlib.sha256(body).hexdigest()):
+        raise ValueError(f"Invalid animation digest/size: {stem}")
+    animation = json.loads(body)
+    frames = animation.get("frames")
+    duration = animation.get("frameDurationMs")
+    if (animation.get("schemaVersion") != 1 or
+            animation.get("levelId") != level["levelId"] or
+            animation.get("levelVersion") != level["levelVersion"] or
+            animation.get("levelChecksum") != level["checksum"] or
+            type(duration) is not int or not 60 <= duration <= 2000 or
+            not isinstance(frames, list) or not 1 <= len(frames) <= 60 or
+            type(metadata.get("frameCount")) is not int or
+            metadata["frameCount"] != len(frames)):
+        raise ValueError(f"Invalid animation contents: {stem}")
+    count = level["width"] * level["height"]
+    palette = len(level["palette"])
+    for frame in frames:
+        if not isinstance(frame, dict) or not isinstance(frame.get("changes"), list):
+            raise ValueError(f"Invalid animation frame: {stem}")
+        seen = set()
+        for pair in frame["changes"]:
+            if (not isinstance(pair, list) or len(pair) != 2 or
+                    type(pair[0]) is not int or not 0 <= pair[0] < count or
+                    type(pair[1]) is not int or not 0 <= pair[1] < palette or
+                    pair[0] in seen):
+                raise ValueError(f"Invalid animation pixel: {stem}")
+            seen.add(pair[0])
+    return data_path, body
+
+
 def assemble(pack_dir, output_dir):
     root = pathlib.Path(pack_dir)
     destination = pathlib.Path(output_dir)
@@ -245,9 +288,13 @@ def assemble(pack_dir, output_dir):
                     not preview.startswith(b"\x89PNG\r\n\x1a\n") or
                     len(body) > 262144):
                     raise ValueError(f"Invalid level or preview: {ident}")
+                animation = validated_animation(archive, stem, item, data)
                 images[ident] = item
                 origins[ident] = origin
-                for name, payload in ((level_path, body), (preview_path, preview)):
+                files = [(level_path, body), (preview_path, preview)]
+                if animation is not None:
+                    files.append(animation)
+                for name, payload in files:
                     file = destination / name
                     file.parent.mkdir(parents=True, exist_ok=True)
                     file.write_bytes(payload)

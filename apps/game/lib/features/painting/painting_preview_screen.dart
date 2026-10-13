@@ -3,22 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/local_diagnostics.dart';
-import '../../core/pixel_art_preview.dart';
 import '../../l10n/strings.dart';
 import '../gallery/export_button.dart';
 import 'painting_board.dart';
 import 'painting_controller.dart';
+import 'completed_artwork_preview.dart';
+import 'package:level_schema/level_schema.dart';
 
 class PaintingPreviewScreen extends StatefulWidget {
   const PaintingPreviewScreen({
     required this.controller,
     required this.diagnostics,
+    this.animation,
     this.onOpened,
     super.key,
   });
   static const route = '/painting';
   final PaintingController controller;
   final LocalDiagnostics diagnostics;
+  final PixelAnimation? animation;
   final VoidCallback? onOpened;
   @override
   State<PaintingPreviewScreen> createState() => _PaintingPreviewScreenState();
@@ -172,6 +175,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
       if (session!.isComplete && !_viewResult) {
         return CompletionScreen(
           controller: controller,
+          animation: widget.animation,
           appBar: appBar,
           saveState: _saveState(),
           onView: () => setState(() => _viewResult = true),
@@ -391,6 +395,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
 class CompletionScreen extends StatelessWidget {
   const CompletionScreen({
     required this.controller,
+    this.animation,
     required this.appBar,
     required this.saveState,
     required this.onView,
@@ -398,6 +403,7 @@ class CompletionScreen extends StatelessWidget {
     super.key,
   });
   final PaintingController controller;
+  final PixelAnimation? animation;
   final PreferredSizeWidget appBar;
   final Widget saveState;
   final VoidCallback onView;
@@ -428,7 +434,10 @@ class CompletionScreen extends StatelessWidget {
             const SizedBox(height: 24),
             ClipRRect(
               borderRadius: BorderRadius.circular(24),
-              child: PixelArtPreview(level: controller.level),
+              child: CompletedArtworkPreview(
+                level: controller.level,
+                animation: animation,
+              ),
             ),
             const SizedBox(height: 16),
             saveState,

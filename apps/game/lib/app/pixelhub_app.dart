@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:game_domain/game_domain.dart';
 import 'package:go_router/go_router.dart';
 import 'package:level_schema/level_schema.dart';
@@ -53,6 +55,8 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
   late final PreferencesRepository _preferences;
   late final LibraryController _library;
   late final OnlineCatalogController _online;
+  final ValueNotifier<PixelAnimation?> _sunflowerAnimation = ValueNotifier(null);
+  bool _sunflowerRequested = false;
   late final LocalDiagnostics _diagnostics;
   late final Listenable _routeChanges;
   final Map<String, PaintingController> _sessions = {};
@@ -101,9 +105,17 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
           _diagnostics.recordCatalogLoad(catalogTimer.elapsedMilliseconds);
         }
         _library.setCatalog(_bootstrap.levels, _bootstrap.metadata);
+        if (!_sunflowerRequested) {
+          _sunflowerRequested = true;
+          unawaited(_loadSunflowerAnimation());
+        }
       }
     });
-    _routeChanges = Listenable.merge([_bootstrap, _library]);
+    _routeChanges = Listenable.merge([
+      _bootstrap,
+      _library,
+      _sunflowerAnimation,
+    ]);
     _router = GoRouter(
       initialLocation: widget.initialRoute,
       observers: [LocalNavigationObserver(_diagnostics)],
@@ -161,6 +173,27 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     unawaited(_bootstrap.load());
     unawaited(prepareOfflineApp());
   }
+
+  Future<void> _loadSunflowerAnimation() async {
+    try {
+      final levels = _bootstrap.levels.where((level) => level.id == 'sunflower');
+      if (levels.isEmpty) return;
+      final raw = await rootBundle.loadString(
+        'assets/animations/sunflower-v2.json',
+      );
+      final animation = PixelAnimation.fromJson(
+        jsonDecode(raw) as Map<String, Object?>,
+        levels.first,
+      );
+      if (mounted) _sunflowerAnimation.value = animation;
+    } on Object {
+      // The bundled painting remains available without its optional effect.
+    }
+  }
+
+  PixelAnimation? _animationFor(LevelDefinition level) =>
+      _online.animations[level.id] ??
+      (level.id == 'sunflower' ? _sunflowerAnimation.value : null);
 
   Future<void> _loadLanguage() async {
     try {
@@ -337,11 +370,13 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
         return ArtworkScreen(
           level: matches.first,
           library: _library,
+          animation: _animationFor(matches.first),
           onDelete: _deleteArtwork,
         );
       }
       return PaintingPreviewScreen(
         controller: _controller(matches.first),
+        animation: _animationFor(matches.first),
         diagnostics: _diagnostics,
         onOpened: () => unawaited(_library.markOpened(matches.first)),
       );
@@ -367,6 +402,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     _bootstrap.dispose();
     _library.dispose();
     _online.dispose();
+    _sunflowerAnimation.dispose();
     if (widget.diagnostics == null) _diagnostics.dispose();
     for (final controller in _sessions.values) {
       controller.dispose();

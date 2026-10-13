@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:game_domain/game_domain.dart';
@@ -13,6 +14,34 @@ const onlineContentRoot = 'https://abolfazl2600.github.io/Pixelhub/online/';
 
 enum OnlineCatalogStatus { idle, checking, ready, error }
 
+/// Optional immutable companion downloaded together with a picture.
+final class OnlineAnimationInfo {
+  const OnlineAnimationInfo(this.bytes, this.sha256, this.frameCount);
+
+  factory OnlineAnimationInfo.fromJson(Object? raw) {
+    if (raw is! Map ||
+        raw['bytes'] is! int ||
+        raw['bytes'] < 1 ||
+        raw['bytes'] > 2 * 1024 * 1024 ||
+        raw['sha256'] is! String ||
+        !RegExp(r'^[a-f0-9]{64}$').hasMatch(raw['sha256'] as String) ||
+        raw['frameCount'] is! int ||
+        raw['frameCount'] < 1 ||
+        raw['frameCount'] > 60) {
+      throw const FormatException('Invalid online animation metadata.');
+    }
+    return OnlineAnimationInfo(
+      raw['bytes'] as int,
+      raw['sha256'] as String,
+      raw['frameCount'] as int,
+    );
+  }
+
+  final int bytes;
+  final String sha256;
+  final int frameCount;
+}
+
 final class OnlinePicture {
   OnlinePicture._({
     required this.id,
@@ -24,6 +53,7 @@ final class OnlinePicture {
     required this.height,
     required this.bytes,
     required this.checksum,
+    required this.animation,
   });
 
   factory OnlinePicture.fromJson(Map<String, Object?> value) {
@@ -72,6 +102,9 @@ final class OnlinePicture {
       height: height,
       bytes: bytes,
       checksum: checksum,
+      animation: value['animation'] == null
+          ? null
+          : OnlineAnimationInfo.fromJson(value['animation']),
     );
   }
 
@@ -84,6 +117,7 @@ final class OnlinePicture {
   final int height;
   final int bytes;
   final String checksum;
+  final OnlineAnimationInfo? animation;
 
   String get stem => '$id-v$version';
   String titleFor(String language) => language == 'en' ? titleEn : title;
@@ -101,6 +135,7 @@ class OnlineCatalogController extends ChangeNotifier {
   final bool _ownsClient;
   final Map<String, LevelDefinition> _downloaded = {};
   final Map<String, String> _downloadedCategories = {};
+  final Map<String, PixelAnimation> _animations = {};
   List<OnlinePicture> pictures = [];
   OnlineCatalogStatus status = OnlineCatalogStatus.idle;
   bool isLoaded = false;
@@ -109,6 +144,7 @@ class OnlineCatalogController extends ChangeNotifier {
   bool _disposed = false;
 
   List<LevelDefinition> get downloaded => List.unmodifiable(_downloaded.values);
+  Map<String, PixelAnimation> get animations => Map.unmodifiable(_animations);
 
   /// Online catalog metadata supplements local categories. A downloaded level
   /// must retain its saved category when connectivity is unavailable.
@@ -176,6 +212,18 @@ class OnlineCatalogController extends ChangeNotifier {
         for (final id in _downloaded.keys) {
           final category = historicOnlineArtworkCategory(id);
           if (category != null) _downloadedCategories[id] = category;
+        }
+      }
+      if (storage is OnlineAnimationStorage) {
+        try {
+          _animations.clear();
+          _animations.addAll(
+            await (storage as OnlineAnimationStorage).readDownloadedAnimations(
+              downloaded,
+            ),
+          );
+        } on Object {
+          // Invalid optional frames never hide a painting.
         }
       }
     } on Object {
@@ -270,8 +318,49 @@ class OnlineCatalogController extends ChangeNotifier {
           level.height != picture.height) {
         throw const FormatException('Downloaded level does not match catalog.');
       }
-      await storage.saveDownloadedLevel(level, category: picture.category);
+      PixelAnimation? animation;
+      if (picture.animation != null) {
+        final info = picture.animation!;
+        if (storage is! OnlineAnimationStorage) {
+          throw StateError('Animation storage is unavailable.');
+        }
+        final frameSource = await _loadRemote(
+          'animations/${picture.stem}.json',
+          timeout: const Duration(seconds: 25),
+          maxBytes: 2 * 1024 * 1024,
+        );
+        final payload = utf8.encode(frameSource);
+        if (payload.length != info.bytes ||
+            sha256.convert(payload).toString() != info.sha256) {
+          throw const FormatException('Animation integrity check failed.');
+        }
+        final decodedAnimation = jsonDecode(frameSource);
+        if (decodedAnimation is! Map<String, dynamic>) {
+          throw const FormatException('Invalid animation file.');
+        }
+        animation = PixelAnimation.fromJson(decodedAnimation, level);
+        if (animation.frameCount != info.frameCount) {
+          throw const FormatException('Animation frame count mismatch.');
+        }
+        await (storage as OnlineAnimationStorage).saveDownloadedAnimation(
+          level, animation,
+        );
+      }
+      try {
+        await storage.saveDownloadedLevel(level, category: picture.category);
+      } on Object {
+        if (animation != null) {
+          try {
+            await (storage as OnlineAnimationStorage)
+                .removeDownloadedAnimation(level.id);
+          } on Object {
+            // Orphan sidecars are ignored until the level is available.
+          }
+        }
+        rethrow;
+      }
       if (_disposed) return;
+      if (animation != null) _animations[level.id] = animation;
       _downloaded[level.id] = level;
       _downloadedCategories[level.id] = picture.category;
     } on Object catch (error) {
@@ -288,12 +377,14 @@ class OnlineCatalogController extends ChangeNotifier {
     await storage.removeDownloadedLevel(id);
     _downloaded.remove(id);
     _downloadedCategories.remove(id);
+    _animations.remove(id);
     _notify();
   }
 
   void clearDownloaded() {
     _downloaded.clear();
     _downloadedCategories.clear();
+    _animations.clear();
     pictures = [];
     status = OnlineCatalogStatus.idle;
     _notify();

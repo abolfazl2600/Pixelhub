@@ -81,7 +81,8 @@ final class LocalPreferences
         RecentArtworkRepository,
         ArtworkRepository,
         ProgressSyncOutboxRepository,
-        OnlineLevelStorage {
+        OnlineLevelStorage,
+        OnlineAnimationStorage {
   LocalPreferences({SharedPreferencesAsync? preferences})
     : _preferences = preferences ?? SharedPreferencesAsync();
   final SharedPreferencesAsync _preferences;
@@ -132,6 +133,55 @@ final class LocalPreferences
     }
     return Map.unmodifiable(result);
   }
+
+  @override
+  Future<Map<String, PixelAnimation>> readDownloadedAnimations(
+    List<LevelDefinition> downloaded,
+  ) async {
+    await _writes;
+    final result = <String, PixelAnimation>{};
+    for (final level in downloaded) {
+      if (!level.id.startsWith('online-')) continue;
+      final source = await _preferences.getString(
+        'pixelhub.online.animation.${level.id}',
+      );
+      if (source == null) continue;
+      try {
+        if (utf8.encode(source).length > 2 * 1024 * 1024) continue;
+        final value = jsonDecode(source);
+        if (value is Map<String, Object?>) {
+          result[level.id] = PixelAnimation.fromJson(value, level);
+        }
+      } on Object {
+        // Damaged optional animation must not hide a painting.
+      }
+    }
+    return Map.unmodifiable(result);
+  }
+
+  @override
+  Future<void> saveDownloadedAnimation(
+    LevelDefinition level,
+    PixelAnimation animation,
+  ) => _enqueue(() async {
+    animation.pixelsFor(level, 0);
+    final value = jsonEncode(animation.toJson());
+    if (utf8.encode(value).length > 2 * 1024 * 1024) {
+      throw const FormatException('Animation exceeds local storage limit.');
+    }
+    await _preferences.setString(
+      'pixelhub.online.animation.${level.id}',
+      value,
+    );
+  });
+
+  @override
+  Future<void> removeDownloadedAnimation(String id) => _enqueue(() async {
+    if (!RegExp(r'^online-[a-z0-9-]+$').hasMatch(id)) {
+      throw const FormatException('Invalid animation ID.');
+    }
+    await _preferences.remove('pixelhub.online.animation.$id');
+  });
 
   @override
   Future<void> saveDownloadedLevel(
@@ -192,6 +242,7 @@ final class LocalPreferences
         : (jsonDecode(source) as List<Object?>).cast<String>().toList();
     await _preferences.remove('pixelhub.online.level.$id');
     await _preferences.remove('pixelhub.online.category.$id');
+    await _preferences.remove('pixelhub.online.animation.$id');
     ids.remove(id);
     await _preferences.setString('pixelhub.online.index.v1', jsonEncode(ids));
   });
@@ -360,7 +411,8 @@ final class MemoryPreferences
         RecentArtworkRepository,
         ArtworkRepository,
         ProgressSyncOutboxRepository,
-        OnlineLevelStorage {
+        OnlineLevelStorage,
+        OnlineAnimationStorage {
   final Map<String, ProgressSnapshot> _records = {};
   String? language;
   String? recentArtworkId;
@@ -368,6 +420,31 @@ final class MemoryPreferences
   final Map<String, ProgressSyncOutbox> _outboxes = {};
   final Map<String, LevelDefinition> _downloads = {};
   final Map<String, String> _downloadCategories = {};
+  final Map<String, PixelAnimation> _downloadAnimations = {};
+
+  @override
+  Future<Map<String, PixelAnimation>> readDownloadedAnimations(
+    List<LevelDefinition> downloaded,
+  ) async => Map.unmodifiable({
+    for (final level in downloaded)
+      if (_downloadAnimations.containsKey(level.id))
+        level.id: _downloadAnimations[level.id]!,
+  });
+
+  @override
+  Future<void> saveDownloadedAnimation(
+    LevelDefinition level,
+    PixelAnimation animation,
+  ) async {
+    animation.pixelsFor(level, 0);
+    _downloadAnimations[level.id] = animation;
+  }
+
+  @override
+  Future<void> removeDownloadedAnimation(String id) async {
+    _downloadAnimations.remove(id);
+  }
+
   String _key(String id, int version) => '$id:$version';
 
   @override
@@ -403,6 +480,7 @@ final class MemoryPreferences
   Future<void> removeDownloadedLevel(String id) async {
     _downloads.remove(id);
     _downloadCategories.remove(id);
+    _downloadAnimations.remove(id);
   }
 
   @override
@@ -484,6 +562,7 @@ final class MemoryPreferences
     _outboxes.clear();
     _downloads.clear();
     _downloadCategories.clear();
+    _downloadAnimations.clear();
     _library = ArtworkLibrary();
     language = null;
     recentArtworkId = null;

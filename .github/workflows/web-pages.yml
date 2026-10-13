@@ -246,6 +246,20 @@ jobs:
               --notes "Twenty hand-authored 64x64 bilingual color-by-number levels covering Blue Mosque Tabriz, Khaju Bridge, Ali Qapu, Chehel Sotoun, Shah Cheragh, Fin and Eram gardens, Masuleh and Kandovan, Lut kaluts, Anzali lagoon, Damavand, Persian carpet, minakari, khatamkari, samovar, santur, tombak, Haft-Seen and Yalda. Immutable JSON levels, PNG previews and catalog are Release-only assets, not bundled into APK." \
               --latest=false
           fi
+      - name: Publish animated sunflower as an optional online level
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-animated-sunflower-1-v1 >/dev/null 2>&1; then
+            python3 tool/online_animated_sunflower_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-animated-sunflower-1-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: eight-frame dancing sunflower" \
+              --notes "A new immutable online sunflower picture with eight downloadable frames." \
+              --latest=false
+          fi
       - name: Download release packs and assemble online catalog
         env:
           GH_TOKEN: ${{ github.token }}
