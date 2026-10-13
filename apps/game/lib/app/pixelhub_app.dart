@@ -55,10 +55,11 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
   late final PreferencesRepository _preferences;
   late final LibraryController _library;
   late final OnlineCatalogController _online;
-  final ValueNotifier<PixelAnimation?> _sunflowerAnimation = ValueNotifier(
-    null,
-  );
-  bool _sunflowerRequested = false;
+  final ValueNotifier<Map<String, PixelAnimation>> _bundledAnimations =
+      ValueNotifier({});
+  final Map<String, String> _bundledAnimationFiles = {};
+  final Set<String> _requestedAnimations = {};
+  bool _animationCatalogRequested = false;
   late final LocalDiagnostics _diagnostics;
   late final Listenable _routeChanges;
   final Map<String, PaintingController> _sessions = {};
@@ -107,16 +108,16 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
           _diagnostics.recordCatalogLoad(catalogTimer.elapsedMilliseconds);
         }
         _library.setCatalog(_bootstrap.levels, _bootstrap.metadata);
-        if (!_sunflowerRequested) {
-          _sunflowerRequested = true;
-          unawaited(_loadSunflowerAnimation());
+        if (!_animationCatalogRequested) {
+          _animationCatalogRequested = true;
+          unawaited(_loadAnimationCatalog());
         }
       }
     });
     _routeChanges = Listenable.merge([
       _bootstrap,
       _library,
-      _sunflowerAnimation,
+      _bundledAnimations,
     ]);
     _router = GoRouter(
       initialLocation: widget.initialRoute,
@@ -176,28 +177,51 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     unawaited(prepareOfflineApp());
   }
 
-  Future<void> _loadSunflowerAnimation() async {
+  Future<void> _loadAnimationCatalog() async {
     try {
-      final levels = _bootstrap.levels.where(
-        (level) => level.id == 'sunflower',
-      );
-      if (levels.isEmpty) return;
-      final raw = await rootBundle.loadString(
-        'assets/animations/sunflower-v2.json',
-      );
-      final animation = PixelAnimation.fromJson(
-        jsonDecode(raw) as Map<String, Object?>,
-        levels.first,
-      );
-      if (mounted) _sunflowerAnimation.value = animation;
+      final raw = await rootBundle.loadString('assets/animations/catalog.json');
+      final catalog = jsonDecode(raw) as Map<String, dynamic>;
+      for (final entry in catalog.entries) {
+        final file = entry.value;
+        if (file is String && RegExp(r'^[a-z0-9-]+\.json$').hasMatch(file)) {
+          _bundledAnimationFiles[entry.key] = file;
+        }
+      }
+      if (mounted) _bundledAnimations.value = {};
     } on Object {
-      // The bundled painting remains available without its optional effect.
+      // Optional effects never prevent the still catalog from loading.
     }
   }
 
-  PixelAnimation? _animationFor(LevelDefinition level) =>
-      _online.animations[level.id] ??
-      (level.id == 'sunflower' ? _sunflowerAnimation.value : null);
+  Future<void> _loadBundledAnimation(LevelDefinition level, String file) async {
+    try {
+      final raw = await rootBundle.loadString('assets/animations/$file');
+      final animation = PixelAnimation.fromJson(
+        jsonDecode(raw) as Map<String, Object?>,
+        level,
+      );
+      if (mounted) {
+        _bundledAnimations.value = {
+          ..._bundledAnimations.value,
+          level.id: animation,
+        };
+      }
+    } on Object {
+      // Missing or incompatible frames leave the painting playable.
+    }
+  }
+
+  PixelAnimation? _animationFor(LevelDefinition level) {
+    final online = _online.animations[level.id];
+    if (online != null) return online;
+    final bundled = _bundledAnimations.value[level.id];
+    if (bundled != null) return bundled;
+    final file = _bundledAnimationFiles[level.id];
+    if (file != null && _requestedAnimations.add(level.id)) {
+      unawaited(_loadBundledAnimation(level, file));
+    }
+    return null;
+  }
 
   Future<void> _loadLanguage() async {
     try {
@@ -406,7 +430,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     _bootstrap.dispose();
     _library.dispose();
     _online.dispose();
-    _sunflowerAnimation.dispose();
+    _bundledAnimations.dispose();
     if (widget.diagnostics == null) _diagnostics.dispose();
     for (final controller in _sessions.values) {
       controller.dispose();
