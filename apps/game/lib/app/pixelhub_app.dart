@@ -86,6 +86,9 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     );
     _online.addListener(() {
       if (_online.isLoaded) _library.setDownloadedOnline(_online.downloaded);
+      _library.setOnlineCategories({
+        for (final picture in _online.pictures) picture.id: picture.category,
+      });
     });
     unawaited(_online.loadDownloaded());
     _bootstrap = BootstrapController(widget.repository);
