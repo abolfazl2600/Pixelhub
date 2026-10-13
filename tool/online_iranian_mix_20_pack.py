@@ -82,8 +82,8 @@ def dome(s, x, y, radius, outline=5, fill=4, highlight=6):
     s.ellipse(x, y, radius, radius*.83, outline)
     s.ellipse(x, y+1, radius-2, radius*.73, fill)
     s.ellipse(x-3, y-3, radius*.44, radius*.25, highlight)
-    s.rect(x-radius, y+2, x+radius, y+radius*.85, outline)
-    s.rect(x-radius+1, y+3, x+radius-1, y+radius*.75, fill)
+    s.rect(x-radius, y+2, x+radius, round(y+radius*.85), outline)
+    s.rect(x-radius+1, y+3, x+radius-1, round(y+radius*.75), fill)
     s.line(x, y-radius*.9-4, x, y-radius*.9, 8, radius=.8)
     s.dot(x, round(y-radius*.9-5), 8)
 
