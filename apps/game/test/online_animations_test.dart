@@ -230,6 +230,64 @@ void main() {
     },
   );
 
+  test('repeated refreshes keep frame transfers capped at three', () async {
+    final store = MemoryPreferences();
+    final levels = [
+      for (var i = 0; i < 5; i++) onlineFixture('online-concurrent-$i'),
+    ];
+    for (final level in levels) {
+      await store.saveDownloadedLevel(level, category: 'nature');
+    }
+    final metadata = jsonEncode({
+      'schemaVersion': 1,
+      'pictures': [
+        for (final level in levels)
+          {
+            'id': level.id,
+            'version': level.contentVersion,
+            'title': level.title,
+            'titleEn': level.titleEn,
+            'category': 'nature',
+            'width': level.width,
+            'height': level.height,
+            'bytes': utf8.encode(jsonEncode(level.toJson())).length,
+            'checksum': level.checksum,
+            'animation': {
+              'bytes': 2,
+              'sha256': List.filled(64, 'a').join(),
+              'frameCount': 2,
+            },
+          },
+      ],
+    });
+    final release = Completer<void>();
+    final started = Completer<void>();
+    var transfers = 0;
+    final client = MockClient((request) async {
+      if (request.url.path.endsWith('catalog.json')) {
+        return http.Response.bytes(utf8.encode(metadata), 200);
+      }
+      transfers++;
+      if (transfers == 3 && !started.isCompleted) started.complete();
+      await release.future;
+      return http.Response('{}', 200);
+    });
+    addTearDown(client.close);
+    final online = OnlineCatalogController(store, client: client);
+    addTearDown(() {
+      online.dispose();
+      if (!release.isCompleted) release.complete();
+    });
+    await online.loadDownloaded();
+    await online.checkForUpdates();
+    await started.future.timeout(const Duration(seconds: 5));
+    await online.checkForUpdates();
+    await online.checkForUpdates();
+    expect(transfers, 3);
+    expect(online.status, OnlineCatalogStatus.ready);
+    expect(online.downloaded, hasLength(5));
+  });
+
   test('tampered animation rejects entire online download', () async {
     final level = onlineFixture('online-animation-tampered');
     final levelBody = jsonEncode(level.toJson());

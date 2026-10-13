@@ -139,6 +139,7 @@ class OnlineCatalogController extends ChangeNotifier {
   final Map<String, String> _downloadedCategories = {};
   final Map<String, PixelAnimation> _animations = {};
   final Set<String> _pendingAnimations = {};
+  bool _backfillingAnimations = false;
   List<OnlinePicture> pictures = [];
   OnlineCatalogStatus status = OnlineCatalogStatus.idle;
   bool isLoaded = false;
@@ -216,7 +217,8 @@ class OnlineCatalogController extends ChangeNotifier {
   }
 
   Future<void> _backfillAnimations(List<OnlinePicture> catalog) async {
-    if (storage is! OnlineAnimationStorage) return;
+    if (storage is! OnlineAnimationStorage || _backfillingAnimations) return;
+    _backfillingAnimations = true;
     final pending = catalog.where((picture) {
       final level = _downloaded[picture.id];
       return picture.animation != null &&
@@ -252,6 +254,7 @@ class OnlineCatalogController extends ChangeNotifier {
     }
 
     await Future.wait([for (var i = 0; i < 3; i++) worker()]);
+    _backfillingAnimations = false;
   }
 
   Future<void> loadDownloaded() async {
@@ -305,7 +308,7 @@ class OnlineCatalogController extends ChangeNotifier {
     }
   }
 
-  /// Called on gallery entry, not app startup. Only metadata is fetched.
+  /// Gallery entry fetches metadata, then missing frames for existing downloads.
   Future<void> checkForUpdates() async {
     if (status == OnlineCatalogStatus.checking) return;
     status = OnlineCatalogStatus.checking;
