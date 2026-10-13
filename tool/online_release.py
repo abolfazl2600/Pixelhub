@@ -73,6 +73,12 @@ def png(level):
 # The *only* historical exception, published before immutable-ID policy.
 # Both released ZIPs remain untouched. The original v1 and redesigned v2
 # assets retain their existing paths and checksums so prior downloads work.
+# Old immutable pack remains intact; only the public gallery entry is retired.
+# Replacement ships under a fresh ID because downloaded levels are checksum-bound.
+RETIRED_ONLINE_IDS = {
+    "online-starry-night": "online-starry-night-detailed",
+}
+
 LEGACY_AZADI_ID = "online-iran-azadi-tower"
 LEGACY_AZADI_V1 = ("pixelhub-content-iran-landmarks-10-v1", 1)
 LEGACY_AZADI_V2 = ("pixelhub-content-iran-z-architecture-11-v1", 2)
@@ -289,7 +295,8 @@ def assemble(pack_dir, output_dir):
                     len(body) > 262144):
                     raise ValueError(f"Invalid level or preview: {ident}")
                 animation = validated_animation(archive, stem, item, data)
-                images[ident] = item
+                if ident not in RETIRED_ONLINE_IDS:
+                    images[ident] = item
                 origins[ident] = origin
                 files = [(level_path, body), (preview_path, preview)]
                 if animation is not None:
@@ -298,7 +305,15 @@ def assemble(pack_dir, output_dir):
                     file = destination / name
                     file.parent.mkdir(parents=True, exist_ok=True)
                     file.write_bytes(payload)
-    catalog = {"schemaVersion": 1, "pictures": list(images.values())}
+    # Never expose the old and redesigned artwork side-by-side. Keep old
+    # immutable files available for in-flight legacy downloads.
+    retired = sorted(old for old, replacement in RETIRED_ONLINE_IDS.items()
+                     if old in origins)
+    for old in retired:
+        if RETIRED_ONLINE_IDS[old] not in images:
+            raise ValueError(f"Missing replacement for retired art: {old}")
+    catalog = {"schemaVersion": 1, "pictures": list(images.values()),
+               "retiredIds": retired}
     (destination / "catalog.json").write_bytes(compact(catalog))
     print(f"Published {len(images)} online pictures.")
 
