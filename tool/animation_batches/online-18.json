@@ -9,7 +9,7 @@
     ],
     "version": 1,
     "checksum": "9b65f3f163396d6bde618cf5ef82f5935396893326454919ff3ab5847043717e",
-    "animationChecksum": "d22befd189dfbc9df49cd9c5f8ff3e97f20798f0ce0de84b00ff96dc5e98a944"
+    "animationChecksum": "a9ff7e8badcb8919d81df79f8ea5108c1f6e465032380468ecd62f94b50d7b0c"
   },
   "online-cat-face": {
     "motion": "blink",
@@ -39,6 +39,6 @@
     "motion": "flap",
     "version": 1,
     "checksum": "108ac270539bf5eeb1adff8e896f0e3b3985cbc7aedb1894706b86054095131f",
-    "animationChecksum": "fc59cc8443ca80967602867432f780bb52fdfb44c7af7540d8f283f75205f7ac"
+    "animationChecksum": "0e8f7063f5edb18c086207e9c8488867815ecc14a5f048c19818cb66693ce653"
   }
 }

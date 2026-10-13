@@ -9,7 +9,7 @@
     ],
     "version": 1,
     "checksum": "b006a66d4288f71792e2e60fbf8af1676d29e7ea4cbca9e52140b9f54278897d",
-    "animationChecksum": "f7efcc89338d6c7181f935ba9b1a0e22a3ce3b28af80752f2bc840716417c263"
+    "animationChecksum": "e7b47acbe93c771022dc22b98f40392a0aecf667d555c27da8e87a90bc72449d"
   },
   "online-peacock": {
     "motion": "flap",
@@ -21,7 +21,7 @@
     ],
     "version": 1,
     "checksum": "90892ed926c14d278ea11173eb6d4a6dc3dfcab827b367137dfccf1607ecfefc",
-    "animationChecksum": "85baab04709fc000536e4259e8c394d4a5270633eb0f1306be50a2991e6c33d1"
+    "animationChecksum": "bdab21343e269b66f154a1a7b7d724b5f87193700f14c0c27d9e0834d6ce9f2c"
   },
   "online-hedgehog": {
     "motion": "blink",

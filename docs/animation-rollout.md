@@ -6,6 +6,10 @@ starts and ends on the original image. Still-image controls and reduced-motion
 preferences remain supported. Bundled sidecars load only when opening their
 painting; the startup catalog contains paths rather than frame grids.
 
+Scaling and rotation use inverse pixel sampling to preserve solid silhouettes
+without transparent gaps. Online recipes pin the final animation SHA-256 before
+first publication.
+
 Recipes live in `tool/animation_batches/`; each batch records up to ten pictures.
 `tool/pixel_animation_recipes.py` renders deterministic independent sparse frames.
 

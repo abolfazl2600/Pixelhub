@@ -29,26 +29,35 @@ def animation(level, recipe):
         if pose and motion in {"sway", "float", "pulse", "flap", "spin"}:
             for x, y in selected:
                 cells[y * w + x] = 0
-            for x, y in selected:
-                px, py = x, y
-                amplitude = max(1, round(w / 48))
-                if motion == "sway":
-                    px += round(pose * amplitude * (y1 - (y + .5) / h) / max(.1, y1 - y0))
-                elif motion == "float":
-                    py += round(pose * max(1, h / 64))
-                elif motion == "pulse":
-                    scale = 1 + pose * .065
-                    px = round(w * .5 + (x - w * .5) * scale)
-                    py = round(h * .5 + (y - h * .5) * scale)
-                elif motion == "flap":
-                    px = round(w * .5 + (x - w * .5) * (1 - abs(pose) * .12))
-                else:
-                    angle = pose * .055
-                    dx, dy = x - w * .5, y - h * .5
-                    px = round(w * .5 + dx * math.cos(angle) - dy * math.sin(angle))
-                    py = round(h * .5 + dx * math.sin(angle) + dy * math.cos(angle))
-                if 0 <= px < w and 0 <= py < h:
-                    cells[py * w + px] = original[y * w + x]
+            if motion in {"pulse", "flap", "spin"}:
+                # Inverse sampling fills every destination pixel. Forward
+                # scaling/rotation leaves holes between enlarged source cells.
+                cx, cy = w * .5, h * .5
+                scale = 1 + pose * .065 if motion == "pulse" else 1 - abs(pose) * .12
+                angle = -pose * .055
+                for y in range(h):
+                    for x in range(w):
+                        dx, dy = x - cx, y - cy
+                        if motion == "spin":
+                            sx = round(cx + dx * math.cos(angle) - dy * math.sin(angle))
+                            sy = round(cy + dx * math.sin(angle) + dy * math.cos(angle))
+                        else:
+                            sx = round(cx + dx / scale)
+                            sy = round(cy + dy / scale) if motion == "pulse" else y
+                        if (0 <= sx < w and 0 <= sy < h and
+                                x0 <= (sx + .5) / w <= x1 and
+                                y0 <= (sy + .5) / h <= y1 and original[sy * w + sx] != 0):
+                            cells[y * w + x] = original[sy * w + sx]
+            else:
+                for x, y in selected:
+                    px, py = x, y
+                    if motion == "sway":
+                        px += round(pose * max(1, round(w / 48)) *
+                                    (y1 - (y + .5) / h) / max(.1, y1 - y0))
+                    else:
+                        py += round(pose * max(1, h / 64))
+                    if 0 <= px < w and 0 <= py < h:
+                        cells[py * w + px] = original[y * w + x]
         elif motion == "blink" and index in [3, 4]:
             for x, y in selected:
                 nx, ny = (x + .5) / w, (y + .5) / h

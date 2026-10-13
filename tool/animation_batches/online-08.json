@@ -105,7 +105,7 @@
     ],
     "version": 1,
     "checksum": "83894eb72f7aef159af1c6dde54d640d5292fc045cccc974c7019b063fa45fe6",
-    "animationChecksum": "b267bfe7e6285b6dc2b04009c8dd6b879c3f64c4c4b4fa5b486e22ea3429d8c6"
+    "animationChecksum": "6f82b9f38f75eaad3a9ef6d6377fd6af6a6c35a8e3dabc372aea52020e06f384"
   },
   "online-iran-tombak": {
     "motion": "pulse",
@@ -117,6 +117,6 @@
     ],
     "version": 1,
     "checksum": "ad7d26d57010ccd6db5f4e350fe02bd74a6074ae36af9fc57ac82c2762ed7ada",
-    "animationChecksum": "06f51c88127148f5794ba882a924440143a89148c4345492aa996f5302339c41"
+    "animationChecksum": "8d9827bac125169a5bb45fd45843b79dda503aaca2501afc1eb0298603ec1735"
   }
 }

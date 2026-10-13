@@ -65,6 +65,25 @@ class AnimationCompanionTests(unittest.TestCase):
             self.assertTrue(any(frame['changes'] for frame in frames))
             self.assertEqual(data, compact(animation(level, recipes[item['id']])))
 
+    def test_transformed_solid_shapes_have_no_sampling_holes(self):
+        from online_release import checksum
+        level = {'schemaVersion': 2, 'levelId': 'online-solid', 'levelVersion': 1,
+                 'titles': {'fa': 'آزمایش', 'en': 'Solid'}, 'width': 32, 'height': 32,
+                 'palette': ['FFFFFFFF', 'FF223344'],
+                 'cells': [int(8 <= x < 24 and 8 <= y < 24)
+                           for y in range(32) for x in range(32)]}
+        level['checksum'] = checksum(level)
+        for motion in ['pulse', 'spin', 'flap']:
+            for frame in animation(level, {'motion': motion})['frames']:
+                pixels = level['cells'][:]
+                for at, color in frame['changes']:
+                    pixels[at] = color
+                for y in range(32):
+                    row = pixels[y * 32:(y + 1) * 32]
+                    occupied = [x for x, color in enumerate(row) if color]
+                    if occupied:
+                        self.assertTrue(all(row[min(occupied):max(occupied) + 1]), motion)
+
     def test_wrong_painting_or_changed_animation_is_rejected(self):
         batches = self.root / 'invalid'
         batches.mkdir(exist_ok=True)

@@ -9,13 +9,13 @@
     ],
     "version": 1,
     "checksum": "3c0bda357e93069de72ec30a800879b62490d235b4fa503f9ce94247763efeb1",
-    "animationChecksum": "51009aa6128c306ac097f95131c53234c5be94c28b5ffa6317447e27c27ab105"
+    "animationChecksum": "5c665e26aae5b95743214826ff8a8376409cc719604126a1392e38085f7750c0"
   },
   "online-object-magnetic-compass": {
     "motion": "spin",
     "version": 1,
     "checksum": "c74711769c0986571c143cea2f291d16b4939a534eb83990d80c770d560a3314",
-    "animationChecksum": "85f1642c1087a18a70072d0d1040c7e608c6a81978ae87474f2725dcd3121024"
+    "animationChecksum": "dfd2862f0c808028d2fa1e11885c3d778f9d74561209b5c6205ac7d4653b1fae"
   },
   "online-object-paint-palette": {
     "motion": "sway",
@@ -33,7 +33,7 @@
     ],
     "version": 1,
     "checksum": "3a216f9cf54cebf5acadd1e3ed63ee97b830a75f192cb4a5fdcffd29dd5cc080",
-    "animationChecksum": "c238a5a16153c6c74309638a22ce7327e16fe4ccc7716132149c84cdeb15c9f3"
+    "animationChecksum": "bf027ad98999d32a736266df18bcebb93fdc17a03a7adbb43485de4b34e5dcf8"
   },
   "online-object-birthday-gift": {
     "motion": "flap",
@@ -45,7 +45,7 @@
     ],
     "version": 1,
     "checksum": "8c9016d77f3c20cc98cb818f22cb6f7e3243eebcc1994a741878e62c059969d6",
-    "animationChecksum": "822e6388ab5bffcff61834cc6f503df9106c56df27ebbb337caabd07b9b73334"
+    "animationChecksum": "10f4f461ce0f509b31d087aef78af7b5632d9dc34306bca97ab0420b57389b88"
   },
   "online-object-table-fan": {
     "motion": "spin",
@@ -57,7 +57,7 @@
     ],
     "version": 1,
     "checksum": "02447c4d096c8634cfc97e206ff39a12da31419c78cd7f6e12abf5e6da9fbee2",
-    "animationChecksum": "6908ddd99671abf753c1ea510877c2ba3d3152983aceb4147134adf1bc202ce8"
+    "animationChecksum": "ed861a4cddd3da98356149ea25991ad9e3256b812e7a58e73caf491b60444978"
   },
   "online-object-sewing-machine": {
     "motion": "sway",
@@ -81,7 +81,7 @@
     "motion": "spin",
     "version": 1,
     "checksum": "7012432f5a465b46a79383a1400cc32b378c6302548d26445c2ddd6fb97017d0",
-    "animationChecksum": "f19daf4517f2ccb497bb510675104196b89026f4aaaadc84cbafed31fcfc397b"
+    "animationChecksum": "2a7210b436a8f0618ebfaccdfc1cd8577059b73e0085e19075c33901ee4a7b73"
   },
   "online-playful-rainbow-cloud": {
     "motion": "float",

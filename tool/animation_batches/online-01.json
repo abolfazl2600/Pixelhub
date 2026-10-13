@@ -105,7 +105,7 @@
     ],
     "version": 1,
     "checksum": "b43b2aaef075876319937d05ed72ac44f4a8fab41a5e20003a746875fe05ef3e",
-    "animationChecksum": "fc2a6107daa19f4d967b96cf695f626b2cd9e86354b90eaf6052ed52aca8dc60"
+    "animationChecksum": "ba64b0b495493666be5b435acb81c9689bd287fef5e8564251d60316d1e3ce4f"
   },
   "online-octopus": {
     "motion": "sway",
@@ -135,6 +135,6 @@
     ],
     "version": 1,
     "checksum": "1390da6b26679ecb147f659ab0886c9b6c178b6509a5426367b4e6c98a9b89c5",
-    "animationChecksum": "7c87bde3619d6f32f68cdccb46826cf7c8913ec69e0b5beef0da301932f738b3"
+    "animationChecksum": "1b9cf23740084bc68bf5e26d0ffef2dd171f8f9a9114115e952308a8b462b20b"
   }
 }

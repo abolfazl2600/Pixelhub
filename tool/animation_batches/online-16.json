@@ -3,7 +3,7 @@
     "motion": "pulse",
     "version": 1,
     "checksum": "c2b37f8fdacd95fecb116f46054a12a84eff27f4e6a94641df756b406aeb5362",
-    "animationChecksum": "8d31a91a71be6dd5080a3108d75dc86c81bbe7f92396e8cfb918fa50cdacecad"
+    "animationChecksum": "6b61eacd63c5fc315b9ef0687900e83c0d0d4fa35b9d8daaeefc716074780940"
   },
   "online-playful-lucky-clover": {
     "motion": "sway",
@@ -21,7 +21,7 @@
     "motion": "pulse",
     "version": 1,
     "checksum": "e6975d9e997818cab4ef6ccaed6b588796a586618daff8b56cc8ef905ff59a2a",
-    "animationChecksum": "e65f90d4b0deb8165e01bdce4cf8258196772606f781d5939e0ac7b169338b5d"
+    "animationChecksum": "4d3368ed58aa5966a0c6a03a97c90270fd443e41225584aa266e704845c61dad"
   },
   "online-playful-flying-saucer": {
     "motion": "float",
