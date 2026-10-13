@@ -55,7 +55,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
   late final PreferencesRepository _preferences;
   late final LibraryController _library;
   late final OnlineCatalogController _online;
-  PixelAnimation? _sunflowerAnimation;
+  final ValueNotifier<PixelAnimation?> _sunflowerAnimation = ValueNotifier(null);
   bool _sunflowerRequested = false;
   late final LocalDiagnostics _diagnostics;
   late final Listenable _routeChanges;
@@ -111,7 +111,11 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
         }
       }
     });
-    _routeChanges = Listenable.merge([_bootstrap, _library]);
+    _routeChanges = Listenable.merge([
+      _bootstrap,
+      _library,
+      _sunflowerAnimation,
+    ]);
     _router = GoRouter(
       initialLocation: widget.initialRoute,
       observers: [LocalNavigationObserver(_diagnostics)],
@@ -181,7 +185,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
         jsonDecode(raw) as Map<String, Object?>,
         levels.first,
       );
-      if (mounted) setState(() => _sunflowerAnimation = animation);
+      if (mounted) _sunflowerAnimation.value = animation;
     } on Object {
       // The bundled painting remains available without its optional effect.
     }
@@ -189,7 +193,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
 
   PixelAnimation? _animationFor(LevelDefinition level) =>
       _online.animations[level.id] ??
-      (level.id == 'sunflower' ? _sunflowerAnimation : null);
+      (level.id == 'sunflower' ? _sunflowerAnimation.value : null);
 
   Future<void> _loadLanguage() async {
     try {
@@ -398,6 +402,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     _bootstrap.dispose();
     _library.dispose();
     _online.dispose();
+    _sunflowerAnimation.dispose();
     if (widget.diagnostics == null) _diagnostics.dispose();
     for (final controller in _sessions.values) {
       controller.dispose();
