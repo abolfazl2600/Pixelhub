@@ -138,8 +138,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 Align(
                   alignment: AlignmentDirectional.centerEnd,
                   child: TextButton.icon(
-                    onPressed: () =>
-                        setState(() => _onlineVisibleCount += 12),
+                    onPressed: () => setState(() => _onlineVisibleCount += 12),
                     icon: const Icon(Icons.expand_more),
                     label: Text(
                       '${s.onlinePictures} + ${context.digits(pending.length - _onlineVisibleCount)}',
