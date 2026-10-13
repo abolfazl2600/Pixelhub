@@ -115,13 +115,13 @@ void main() {
         final client = MockClient((request) async {
           paths.add(request.url.path);
           if (request.url.path.endsWith('catalog.json')) {
-            return http.Response(metadata, 200);
+            return http.Response.bytes(utf8.encode(metadata), 200);
           }
           if (request.url.path.endsWith('levels/${level.id}-v1.json')) {
-            return http.Response(levelBody, 200);
+            return http.Response.bytes(utf8.encode(levelBody), 200);
           }
           if (request.url.path.endsWith('animations/${level.id}-v1.json')) {
-            return http.Response(animationBody, 200);
+            return http.Response.bytes(utf8.encode(animationBody), 200);
           }
           return http.Response('Not found', 404);
         });
@@ -134,6 +134,8 @@ void main() {
         );
         addTearDown(online.dispose);
         await online.checkForUpdates();
+        expect(online.status, OnlineCatalogStatus.ready);
+        expect(online.available, hasLength(1));
         await online.download(online.available.single);
         expect(online.downloaded.single.id, level.id);
         expect(online.animations[level.id]!.frameCount, count);
@@ -188,18 +190,20 @@ void main() {
     });
     final client = MockClient((request) async {
       if (request.url.path.endsWith('/catalog.json')) {
-        return http.Response(info, 200);
+        return http.Response.bytes(utf8.encode(info), 200);
       }
       if (request.url.path.contains('/levels/')) {
-        return http.Response(levelBody, 200);
+        return http.Response.bytes(utf8.encode(levelBody), 200);
       }
-      return http.Response(body, 200);
+      return http.Response.bytes(utf8.encode(body), 200);
     });
     addTearDown(client.close);
     final store = MemoryPreferences();
     final online = OnlineCatalogController(store, client: client);
     addTearDown(online.dispose);
     await online.checkForUpdates();
+    expect(online.status, OnlineCatalogStatus.ready);
+    expect(online.available, hasLength(1));
     await online.download(online.available.single);
     expect(online.downloaded, isEmpty);
     expect(online.failedDownloadId, level.id);
@@ -256,16 +260,25 @@ void main() {
         supportedLocales: AppLocalizations.supportedLocales,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         home: Scaffold(
-          body: CompletedArtworkPreview(level: level, animation: animation),
+          body: SingleChildScrollView(
+            child: CompletedArtworkPreview(level: level, animation: animation),
+          ),
         ),
       ),
     );
     expect(find.byKey(const ValueKey('animation-frame')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    await tester.ensureVisible(find.byKey(const ValueKey('still-artwork')));
+    await tester.pump();
     await tester.tap(find.byKey(const ValueKey('still-artwork')));
     await tester.pump();
     expect(find.byKey(const ValueKey('animation-frame')), findsNothing);
+    expect(tester.takeException(), isNull);
+    await tester.ensureVisible(find.byKey(const ValueKey('animated-artwork')));
+    await tester.pump();
     await tester.tap(find.byKey(const ValueKey('animated-artwork')));
     await tester.pump();
     expect(find.byKey(const ValueKey('animation-frame')), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }
