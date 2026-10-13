@@ -785,7 +785,7 @@ generates a new, hand-drawn **80×80** painting with layered sky strokes,
 double spirals, luminous stars, crescent moon, village, church and cypress.
 It is published as a content-only Release named
 `pixelhub-content-starry-night-detailed-1-v1` and has the internal ID
-`online-starry-night-detailed`, but retains the existing bilingual gallery
+`online-classic-starry-night-detailed`, but retains the existing bilingual gallery
 title and category. No app release/version bump is involved. The publisher
 keeps old immutable file URLs intact and **excludes the old ID from the
 public catalog**, with `retiredIds: ["online-starry-night"]` in the refreshed
