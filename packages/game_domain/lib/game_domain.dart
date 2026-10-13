@@ -39,6 +39,19 @@ abstract interface class OnlineLevelStorage {
   Future<void> removeDownloadedLevel(String id);
 }
 
+/// Optional persistence for downloaded animation sidecars. Kept separate
+/// from OnlineLevelStorage for backwards-compatible legacy adapters.
+abstract interface class OnlineAnimationStorage {
+  Future<Map<String, PixelAnimation>> readDownloadedAnimations(
+    List<LevelDefinition> downloaded,
+  );
+  Future<void> saveDownloadedAnimation(
+    LevelDefinition level,
+    PixelAnimation animation,
+  );
+  Future<void> removeDownloadedAnimation(String id);
+}
+
 abstract interface class ProgressRepository {
   Future<ProgressSnapshot?> read(LevelDefinition level);
   Future<void> write(ProgressSnapshot progress);
