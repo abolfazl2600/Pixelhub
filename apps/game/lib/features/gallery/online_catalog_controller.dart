@@ -94,11 +94,15 @@ final class OnlinePicture {
 }
 
 class OnlineCatalogController extends ChangeNotifier {
-  OnlineCatalogController(this.storage, {Uri? baseUrl})
-    : _baseUrl = baseUrl ?? Uri.parse(onlineContentRoot);
+  OnlineCatalogController(this.storage, {Uri? baseUrl, http.Client? client})
+    : _baseUrl = baseUrl ?? Uri.parse(onlineContentRoot),
+      _client = client ?? http.Client(),
+      _ownsClient = client == null;
 
   final OnlineLevelStorage storage;
   final Uri _baseUrl;
+  final http.Client _client;
+  final bool _ownsClient;
   final Map<String, LevelDefinition> _downloaded = {};
   final Map<String, String> _downloadedCategories = {};
   List<OnlinePicture> pictures = [];
@@ -137,7 +141,7 @@ class OnlineCatalogController extends ChangeNotifier {
     required int maxBytes,
   }) async {
     final uri = _baseUrl.resolve(path);
-    final response = await http.get(uri).timeout(timeout);
+    final response = await _client.get(uri).timeout(timeout);
     if (response.statusCode != 200) {
       throw FormatException('Online content HTTP ${response.statusCode}.');
     }
@@ -289,6 +293,7 @@ class OnlineCatalogController extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    if (_ownsClient) _client.close();
     super.dispose();
   }
 }
