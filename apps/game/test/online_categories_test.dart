@@ -88,112 +88,122 @@ class LegacyDownloads implements OnlineLevelStorage {
 }
 
 void main() {
-  test('fresh download stores category and a full offline restart restores it',
-      () async {
-    final level = onlineFixture('online-test-lion');
-    final store = MemoryPreferences();
-    final client = serverFor(level);
-    addTearDown(client.close);
+  test(
+    'fresh download stores category and a full offline restart restores it',
+    () async {
+      final level = onlineFixture('online-test-lion');
+      final store = MemoryPreferences();
+      final client = serverFor(level);
+      addTearDown(client.close);
 
-    final online = OnlineCatalogController(
-      store,
-      client: client,
-      baseUrl: Uri.parse('https://example.test/online/'),
-    );
-    addTearDown(online.dispose);
-    await online.checkForUpdates();
-    expect(online.status, OnlineCatalogStatus.ready);
-    expect(online.available, hasLength(1));
-    await online.download(online.available.single);
+      final online = OnlineCatalogController(
+        store,
+        client: client,
+        baseUrl: Uri.parse('https://example.test/online/'),
+      );
+      addTearDown(online.dispose);
+      await online.checkForUpdates();
+      expect(online.status, OnlineCatalogStatus.ready);
+      expect(online.available, hasLength(1));
+      await online.download(online.available.single);
 
-    expect(await store.readDownloadedCategories(), {level.id: 'animals'});
-    expect(online.available, isEmpty);
-    expect(online.downloaded.single.checksum, level.checksum);
+      expect(await store.readDownloadedCategories(), {level.id: 'animals'});
+      expect(online.available, isEmpty);
+      expect(online.downloaded.single.checksum, level.checksum);
 
-    // Reconstruct all controllers without requesting or injecting a catalog.
-    final offline = OnlineCatalogController(
-      store,
-      baseUrl: Uri.parse('https://unreachable.test/online/'),
-    );
-    addTearDown(offline.dispose);
-    await offline.loadDownloaded();
-    expect(offline.pictures, isEmpty);
-    expect(offline.categories[level.id], 'animals');
+      // Reconstruct all controllers without requesting or injecting a catalog.
+      final offline = OnlineCatalogController(
+        store,
+        baseUrl: Uri.parse('https://unreachable.test/online/'),
+      );
+      addTearDown(offline.dispose);
+      await offline.loadDownloaded();
+      expect(offline.pictures, isEmpty);
+      expect(offline.categories[level.id], 'animals');
 
-    final library = LibraryController(store, store);
-    addTearDown(library.dispose);
-    library.setDownloadedOnline(offline.downloaded);
-    library.setOnlineCategories(offline.categories);
-    expect(library.levels, hasLength(1));
-    expect(library.category(library.levels.single), 'animals');
-    expect(library.levels.single.checksum, level.checksum);
-  });
+      final library = LibraryController(store, store);
+      addTearDown(library.dispose);
+      library.setDownloadedOnline(offline.downloaded);
+      library.setOnlineCategories(offline.categories);
+      expect(library.levels, hasLength(1));
+      expect(library.category(library.levels.single), 'animals');
+      expect(library.levels.single.checksum, level.checksum);
+    },
+  );
 
-  test('legacy downloads survive offline and are backfilled after reconnection',
-      () async {
-    final level = onlineFixture('online-legacy-lion');
-    final store = LegacyDownloads(level);
-    final offline = OnlineCatalogController(store);
-    await offline.loadDownloaded();
-    expect(offline.downloaded.single.id, level.id);
-    final library = LibraryController(MemoryPreferences(), MemoryPreferences());
-    addTearDown(library.dispose);
-    library.setDownloadedOnline(offline.downloaded);
-    library.setOnlineCategories(offline.categories);
-    expect(library.category(level), 'patterns');
-    offline.dispose();
+  test(
+    'legacy downloads survive offline and are backfilled after reconnection',
+    () async {
+      final level = onlineFixture('online-legacy-lion');
+      final store = LegacyDownloads(level);
+      final offline = OnlineCatalogController(store);
+      await offline.loadDownloaded();
+      expect(offline.downloaded.single.id, level.id);
+      final library = LibraryController(
+        MemoryPreferences(),
+        MemoryPreferences(),
+      );
+      addTearDown(library.dispose);
+      library.setDownloadedOnline(offline.downloaded);
+      library.setOnlineCategories(offline.categories);
+      expect(library.category(level), 'patterns');
+      offline.dispose();
 
-    final client = serverFor(level);
-    addTearDown(client.close);
-    final connected = OnlineCatalogController(
-      store,
-      client: client,
-      baseUrl: Uri.parse('https://example.test/online/'),
-    );
-    await connected.loadDownloaded();
-    await connected.checkForUpdates();
-    expect(connected.status, OnlineCatalogStatus.ready);
-    expect(store.savedCategories[level.id], 'animals');
-    expect(connected.available, isEmpty);
-    connected.dispose();
+      final client = serverFor(level);
+      addTearDown(client.close);
+      final connected = OnlineCatalogController(
+        store,
+        client: client,
+        baseUrl: Uri.parse('https://example.test/online/'),
+      );
+      await connected.loadDownloaded();
+      await connected.checkForUpdates();
+      expect(connected.status, OnlineCatalogStatus.ready);
+      expect(store.savedCategories[level.id], 'animals');
+      expect(connected.available, isEmpty);
+      connected.dispose();
 
-    final restored = OnlineCatalogController(store);
-    addTearDown(restored.dispose);
-    await restored.loadDownloaded();
-    library.setDownloadedOnline(restored.downloaded);
-    library.setOnlineCategories(restored.categories);
-    expect(library.category(level), 'animals');
-    expect(restored.downloaded.single.checksum, level.checksum);
-  });
+      final restored = OnlineCatalogController(store);
+      addTearDown(restored.dispose);
+      await restored.loadDownloaded();
+      library.setDownloadedOnline(restored.downloaded);
+      library.setOnlineCategories(restored.categories);
+      expect(library.category(level), 'animals');
+      expect(restored.downloaded.single.checksum, level.checksum);
+    },
+  );
 
-  test('removing a download clears its category and permits redownload',
-      () async {
-    final level = onlineFixture('online-test-owl');
-    final store = MemoryPreferences();
-    await store.saveDownloadedLevel(level, category: 'animals');
-    final controller = OnlineCatalogController(store);
-    addTearDown(controller.dispose);
-    await controller.loadDownloaded();
-    expect(controller.categories[level.id], 'animals');
-    await controller.removeDownloaded(level.id);
-    expect(controller.downloaded, isEmpty);
-    expect(controller.categories, isEmpty);
-    expect(await store.readDownloadedLevels(), isEmpty);
-    expect(await store.readDownloadedCategories(), isEmpty);
-  });
+  test(
+    'removing a download clears its category and permits redownload',
+    () async {
+      final level = onlineFixture('online-test-owl');
+      final store = MemoryPreferences();
+      await store.saveDownloadedLevel(level, category: 'animals');
+      final controller = OnlineCatalogController(store);
+      addTearDown(controller.dispose);
+      await controller.loadDownloaded();
+      expect(controller.categories[level.id], 'animals');
+      await controller.removeDownloaded(level.id);
+      expect(controller.downloaded, isEmpty);
+      expect(controller.categories, isEmpty);
+      expect(await store.readDownloadedLevels(), isEmpty);
+      expect(await store.readDownloadedCategories(), isEmpty);
+    },
+  );
 
-  test('clearing all local data removes downloads and category metadata',
-      () async {
-    final level = onlineFixture('online-test-fox');
-    final store = MemoryPreferences();
-    await store.saveDownloadedLevel(level, category: 'animals');
-    await store.clearPixelhubData();
-    expect(await store.readDownloadedLevels(), isEmpty);
-    expect(await store.readDownloadedCategories(), isEmpty);
-  });
+  test(
+    'clearing all local data removes downloads and category metadata',
+    () async {
+      final level = onlineFixture('online-test-fox');
+      final store = MemoryPreferences();
+      await store.saveDownloadedLevel(level, category: 'animals');
+      await store.clearPixelhubData();
+      expect(await store.readDownloadedLevels(), isEmpty);
+      expect(await store.readDownloadedCategories(), isEmpty);
+    },
+  );
 
-  test('legacy data is not destroyed when catalog cannot be fetched',
-      () async {
+  test('legacy data is not destroyed when catalog cannot be fetched', () async {
     final level = onlineFixture('online-test-existing');
     final store = LegacyDownloads(level);
     final client = MockClient((_) async => http.Response('offline', 503));
