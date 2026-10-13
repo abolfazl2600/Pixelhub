@@ -79,7 +79,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
               : MemoryPreferences()),
       _progress,
       recentArtworkRepository: preferences is RecentArtworkRepository
-          ? preferences
+          ? preferences as RecentArtworkRepository
           : null,
     );
     _online = OnlineCatalogController(
