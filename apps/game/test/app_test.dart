@@ -138,10 +138,20 @@ void main() {
     expect(tester.getSize(frame).width, 1024);
     expect(tester.getTopLeft(frame).dx, 0);
 
-    // A large mobile/tablet device remains full width, even in landscape.
-    debugDefaultTargetPlatformOverride = TargetPlatform.android;
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('large Android tablet stays full-width in landscape', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
     tester.view.physicalSize = const Size(1366, 1024);
-    await tester.pumpAndSettle();
+    debugDefaultTargetPlatformOverride = TargetPlatform.android;
+    addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    addTearDown(tester.view.reset);
+
+    await pumpAssetApp(tester);
+    final frame = find.byKey(const ValueKey('mobile-frame'));
     expect(tester.getSize(frame).width, 1366);
     expect(tester.getTopLeft(frame).dx, 0);
     expect(tester.takeException(), isNull);
