@@ -13,11 +13,13 @@ class PaintingPreviewScreen extends StatefulWidget {
   const PaintingPreviewScreen({
     required this.controller,
     required this.diagnostics,
+    this.onOpened,
     super.key,
   });
   static const route = '/painting';
   final PaintingController controller;
   final LocalDiagnostics diagnostics;
+  final VoidCallback? onOpened;
   @override
   State<PaintingPreviewScreen> createState() => _PaintingPreviewScreenState();
 }
@@ -25,6 +27,18 @@ class PaintingPreviewScreen extends StatefulWidget {
 class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
   bool _moveMode = false;
   bool _viewResult = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _recordOpen();
+  }
+
+  void _recordOpen() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) widget.onOpened?.call();
+    });
+  }
 
   void _bomb() {
     final count = widget.controller.useBomb();
@@ -41,6 +55,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
   void didUpdateWidget(PaintingPreviewScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller != widget.controller) {
+      _recordOpen();
       _viewResult = false;
       _moveMode = false;
     }
