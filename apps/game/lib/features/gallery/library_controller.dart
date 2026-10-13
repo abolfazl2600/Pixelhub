@@ -13,6 +13,7 @@ class LibraryController extends ChangeNotifier {
   ArtworkLibrary library = ArtworkLibrary();
   LibraryStatus status = LibraryStatus.loading;
   List<LevelDefinition> catalog = [];
+  List<LevelDefinition> onlineLevels = [];
   Map<String, CatalogMetadata> metadata = {};
   final Map<String, ProgressSnapshot> progress = {};
   final Set<String> damagedProgress = {};
@@ -25,6 +26,7 @@ class LibraryController extends ChangeNotifier {
 
   List<LevelDefinition> get levels => [
     ...catalog,
+    ...onlineLevels,
     ...library.artworks.reversed.map((art) => art.level),
   ];
 
@@ -38,6 +40,14 @@ class LibraryController extends ChangeNotifier {
   ) {
     catalog = levels;
     metadata = details;
+    _notify();
+    unawaited(_readProgress());
+  }
+
+  void setDownloadedOnline(List<LevelDefinition> levels) {
+    onlineLevels = levels.where(
+      (level) => !catalog.any((original) => original.id == level.id),
+    ).toList(growable: false);
     _notify();
     unawaited(_readProgress());
   }
@@ -184,6 +194,7 @@ class LibraryController extends ChangeNotifier {
     ++_generation;
     await repository.clearPixelhubData();
     library = ArtworkLibrary();
+    onlineLevels = [];
     progress.clear();
     damagedProgress.clear();
     _revisions.clear();
