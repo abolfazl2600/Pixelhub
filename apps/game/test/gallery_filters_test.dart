@@ -41,41 +41,38 @@ void main() {
 
   test('a category chip filters undownloaded online pictures', () {
     final source = [animals, objects, masterpiece];
-    expect(
-      matchingOnlinePictures(source, category: 'animals', search: ''),
-      [animals],
-    );
-    expect(
-      matchingOnlinePictures(source, category: 'objects', search: ''),
-      [objects],
-    );
+    expect(matchingOnlinePictures(source, category: 'animals', search: ''), [
+      animals,
+    ]);
+    expect(matchingOnlinePictures(source, category: 'objects', search: ''), [
+      objects,
+    ]);
     expect(
       matchingOnlinePictures(source, category: 'masterpieces', search: ''),
       [masterpiece],
     );
-    expect(
-      matchingOnlinePictures(source, category: 'all', search: ''),
-      source,
-    );
+    expect(matchingOnlinePictures(source, category: 'all', search: ''), source);
     expect(masterpiece.category, 'masterpieces');
   });
 
   test('search matches both languages and combines with category', () {
     final source = [animals, objects, masterpiece];
-    expect(
-      matchingOnlinePictures(source, category: 'all', search: ' FOX '),
-      [animals],
-    );
-    expect(
-      matchingOnlinePictures(source, category: 'all', search: 'صندلی'),
-      [objects],
-    );
+    expect(matchingOnlinePictures(source, category: 'all', search: ' FOX '), [
+      animals,
+    ]);
+    expect(matchingOnlinePictures(source, category: 'all', search: 'صندلی'), [
+      objects,
+    ]);
     expect(
       matchingOnlinePictures(source, category: 'animals', search: 'chair'),
       isEmpty,
     );
     expect(
-      matchingOnlinePictures(source, category: 'masterpieces', search: 'Master'),
+      matchingOnlinePictures(
+        source,
+        category: 'masterpieces',
+        search: 'Master',
+      ),
       [masterpiece],
     );
   });
