@@ -21,6 +21,7 @@ Recipes live in `tool/animation_batches/`; each batch records up to ten pictures
 | Online 02 | fox, wolf, brown-bear, zebra, tiger, cheetah, kangaroo, hippopotamus, rhinoceros, crocodile | blink, sway |
 | Online 03 | toucan, peacock, hedgehog, raccoon, sloth, seal, whale, shark, frog, chameleon | blink, flap, float, sway |
 | Online 04 | panda, bunny, turtle, owl, ice-cream, donut, coffee, cactus, autumn-tree, rain-cloud | blink, float, pulse, steam, sway |
+| Online 05 | saturn, astronaut, iran-persepolis, iran-azadi-tower, iran-milad-tower, iran-imam-mosque, iran-sio-se-pol, iran-nasir-ol-molk, iran-arg-e-bam, iran-hafez-tomb | float, glimmer, ripple, spin |
 
 CI and Pages results must be checked before describing a batch as verified or
 published. Online animation assets are generated during Pages publication and

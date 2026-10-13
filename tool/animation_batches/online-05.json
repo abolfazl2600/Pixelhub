@@ -1,0 +1,116 @@
+{
+  "online-saturn": {
+    "motion": "spin",
+    "region": [
+      0.15,
+      0.3,
+      0.9,
+      0.7
+    ],
+    "version": 1,
+    "checksum": "8ec187d9b608d6b8821eaf75338be4db9f75050d28c36dfb7999a40778c7f480",
+    "animationChecksum": "2f4bcbafebd0e19957921da9471e31ead20433b84737e37acdc9eb1a9b6ffa7a"
+  },
+  "online-astronaut": {
+    "motion": "float",
+    "version": 1,
+    "checksum": "27b5a6376dca08b4972d23d5b8deef19286efc106ee94b430a6d998f02344bbc",
+    "animationChecksum": "6674f31d173c3de0471d45e9406ac15738e37da6157e8ec5210030eb00065e6b"
+  },
+  "online-iran-persepolis": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "eeaacecb2f0afe537c730b2f133e3102a5bf241f0a96434a448a35771c0642b1",
+    "animationChecksum": "66d7c2bdd2b22f0af250ba53ff1f9aedcb347be6cd3cff8f5665c145e5391485"
+  },
+  "online-iran-azadi-tower": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 2,
+    "checksum": "4d856ddca18e4459925cfbeaac110d2e3869393a9adec8d1ff3f7493e0ac6cfc",
+    "animationChecksum": "27a366a22a8df41f87fde64a208199d207f9fac85c1137fd1ebe6accbbba6125"
+  },
+  "online-iran-milad-tower": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "d806a2fc8e73ab3d7d96f271ee7ba8ba8c212c432a7c6e856c890761bfc7533b",
+    "animationChecksum": "b08686e29c566131c360985a16478fbb8a5f6d939c1d9cb32d993c0bacade577"
+  },
+  "online-iran-imam-mosque": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "d55355a93d44be3e9d593f739dca999058e3482a45a44a1e78c54d856340acbf",
+    "animationChecksum": "ce85fcfb7b7fbedf3fa420ef02e4cc628d53142dec4d93b9c5e7068ddfbe5264"
+  },
+  "online-iran-sio-se-pol": {
+    "motion": "ripple",
+    "region": [
+      0.05,
+      0.65,
+      0.95,
+      0.95
+    ],
+    "version": 1,
+    "checksum": "1e81deccc7e16d4c2378d4046e0450f141460931562304ba8aaa2b651601967d",
+    "animationChecksum": "d01453c412c36ffd7805fa61094af2da7216f61e2ba888db34f7681e1f928cc9"
+  },
+  "online-iran-nasir-ol-molk": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "8064817a1659b56229fe672a987ea13e9b976c59bcdd1d83ecd25165fed3a94c",
+    "animationChecksum": "424b9af9aacfebbffb99905442707d6f12b0aab23e7fa272c3af1cd887ff3cf7"
+  },
+  "online-iran-arg-e-bam": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "da987221150f8554582231f3837f18fbb179785567c6667f386fb1e08293411f",
+    "animationChecksum": "52b62ac517de54fe2e82d5a3468c768bac36c9cc0c48dd03a861b038e81162c4"
+  },
+  "online-iran-hafez-tomb": {
+    "motion": "glimmer",
+    "region": [
+      0.12,
+      0.12,
+      0.88,
+      0.82
+    ],
+    "version": 1,
+    "checksum": "be03ba3c8f8bdbe68a364c03439f3d84186e66db535ea5ede2d9e75d22a8c544",
+    "animationChecksum": "522e75033ea70dedac44a7dc5b0d35b7e27db5e64be05b51ef69ffbf7dc37590"
+  }
+}
