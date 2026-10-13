@@ -19,22 +19,23 @@ final class OnlineAnimationInfo {
   const OnlineAnimationInfo(this.bytes, this.sha256, this.frameCount);
 
   factory OnlineAnimationInfo.fromJson(Object? raw) {
-    if (raw is! Map ||
-        raw['bytes'] is! int ||
-        raw['bytes'] < 1 ||
-        raw['bytes'] > 2 * 1024 * 1024 ||
-        raw['sha256'] is! String ||
-        !RegExp(r'^[a-f0-9]{64}$').hasMatch(raw['sha256'] as String) ||
-        raw['frameCount'] is! int ||
-        raw['frameCount'] < 1 ||
-        raw['frameCount'] > 60) {
+    if (raw is! Map) {
       throw const FormatException('Invalid online animation metadata.');
     }
-    return OnlineAnimationInfo(
-      raw['bytes'] as int,
-      raw['sha256'] as String,
-      raw['frameCount'] as int,
-    );
+    final Object? bytes = raw['bytes'];
+    final Object? checksum = raw['sha256'];
+    final Object? frameCount = raw['frameCount'];
+    if (bytes is! int ||
+        bytes < 1 ||
+        bytes > 2 * 1024 * 1024 ||
+        checksum is! String ||
+        !RegExp(r'^[a-f0-9]{64}$').hasMatch(checksum) ||
+        frameCount is! int ||
+        frameCount < 1 ||
+        frameCount > 60) {
+      throw const FormatException('Invalid online animation metadata.');
+    }
+    return OnlineAnimationInfo(bytes, checksum, frameCount);
   }
 
   final int bytes;

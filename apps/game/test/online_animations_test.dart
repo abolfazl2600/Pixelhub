@@ -14,6 +14,60 @@ import 'package:pixelhub/l10n/generated/app_localizations.dart';
 import 'online_categories_test.dart' show onlineFixture;
 
 void main() {
+  group('online animation metadata', () {
+    final checksum = List.filled(64, 'a').join();
+    final valid = <String, Object?>{
+      'bytes': 128,
+      'sha256': checksum,
+      'frameCount': 2,
+    };
+
+    test('accepts inclusive size and frame count limits', () {
+      for (final bytes in [1, 2 * 1024 * 1024]) {
+        for (final frameCount in [1, 60]) {
+          final info = OnlineAnimationInfo.fromJson({
+            ...valid,
+            'bytes': bytes,
+            'frameCount': frameCount,
+          });
+          expect(info.bytes, bytes);
+          expect(info.sha256, checksum);
+          expect(info.frameCount, frameCount);
+        }
+      }
+    });
+
+    test('rejects malformed containers and missing fields', () {
+      for (final raw in <Object?>[null, false, 1, 'invalid', [], {}]) {
+        expect(() => OnlineAnimationInfo.fromJson(raw), throwsFormatException);
+      }
+      for (final field in valid.keys) {
+        final incomplete = Map<String, Object?>.of(valid)..remove(field);
+        expect(
+          () => OnlineAnimationInfo.fromJson(incomplete),
+          throwsFormatException,
+        );
+      }
+    });
+
+    test('rejects invalid field types, ranges and checksums', () {
+      final invalid = <String, List<Object?>>{
+        'bytes': [null, true, '128', 1.5, 0, -1, 2 * 1024 * 1024 + 1],
+        'frameCount': [null, true, '2', 1.5, 0, -1, 61],
+        'sha256': [null, 128, '', checksum.toUpperCase(), '${checksum}a'],
+      };
+      for (final entry in invalid.entries) {
+        for (final value in entry.value) {
+          expect(
+            () => OnlineAnimationInfo.fromJson({...valid, entry.key: value}),
+            throwsFormatException,
+            reason: '${entry.key} must reject $value',
+          );
+        }
+      }
+    });
+  });
+
   for (final count in [1, 2, 14]) {
     test(
       'download $count frames with painting, retain offline, delete',
