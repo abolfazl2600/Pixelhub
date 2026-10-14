@@ -257,6 +257,7 @@ class _GridPainter extends CustomPainter {
   final TransformationController transform;
   final bool persian;
   final (int, int)? cursor;
+  final ArtworkRenderStyle renderStyle;
 
   @override
   void paint(Canvas canvas, Size size) {
