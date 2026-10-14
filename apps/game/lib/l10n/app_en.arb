@@ -238,7 +238,7 @@
   "privacyUpdated": "Last updated: October 12, 2026",
   "privacyIntro": "PixelHub is an offline-first pixel-coloring game. This describes the current Android version, not future account, advertising or purchase features.",
   "privacyPhotos": "If you select a photo, it is processed on your device. The original image and location metadata are not sent to our servers or saved by PixelHub. Only the resulting pixel-art level may be stored locally.",
-  "privacySaves": "Coloring progress, favorites, generated pixel-art levels and language preference are saved locally on your device. They are not synchronized across devices. Guest accounts and cloud backup are not active.",
+  "privacySaves": "Coloring progress, favorites, generated pixel-art levels, language and painting-style preference are saved locally on your device. They are not synchronized across devices. Guest accounts and cloud backup are not active.",
   "privacySharing": "Export and sharing occur only when you choose them. Your selected receiving app or service applies its own privacy policy.",
   "privacyRemote": "PixelHub currently has no advertising SDK, online payments or remote crash-reporting service. Technical error and usage counts are kept in memory for the current session only and are not uploaded.",
   "privacyDelete": "You can delete locally saved game data from Settings > Clear local data, or remove the app and its data. Deletion cannot undo a file you shared with another service.",
