@@ -37,7 +37,10 @@ ArtworkDifficulty difficultyForLevel(LevelDefinition level) =>
     artworkDifficultyFor(
       width: level.width,
       height: level.height,
-      colorCount: level.cells.map((index) => level.palette[index]).toSet().length,
+      colorCount: level.cells
+          .map((index) => level.palette[index])
+          .toSet()
+          .length,
     );
 
 /// Legacy online catalog entries do not include color metadata. New catalogs
