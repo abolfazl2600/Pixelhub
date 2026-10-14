@@ -53,8 +53,17 @@ class _FixturePainter extends CustomPainter {
         );
       }
     }
+    if (renderStyle == ArtworkRenderStyle.canvas) {
+      paintCanvasTexture(
+        canvas,
+        Offset.zero & size,
+        cellWidth: size.width / level.width,
+        cellHeight: size.height / level.height,
+      );
+    }
   }
 
   @override
-  bool shouldRepaint(_FixturePainter oldDelegate) => oldDelegate.level != level;
+  bool shouldRepaint(_FixturePainter oldDelegate) =>
+      oldDelegate.level != level || oldDelegate.renderStyle != renderStyle;
 }
