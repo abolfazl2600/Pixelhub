@@ -16,7 +16,8 @@ LevelDefinition level({
   width: width,
   height: height,
   palette: palette,
-  cells: cells ?? List.generate(width * height, (index) => index % palette.length),
+  cells: cells ??
+      List.generate(width * height, (index) => index % palette.length),
 );
 
 void main() {
@@ -43,7 +44,9 @@ void main() {
     );
   });
 
-  test('uses distinct colors actually used by cells, not unused palette slots', () {
+  test(
+    'uses distinct colors actually used by cells, not unused palette slots',
+    () {
     final artwork = level(
       palette: const [
         0xff000000,
@@ -57,7 +60,9 @@ void main() {
     expect(difficultyForLevel(artwork), ArtworkDifficulty.easy);
   });
 
-  test('online catalog colors are used when present and legacy fallback is stable', () {
+  test(
+    'online catalog colors are used when present and legacy fallback is stable',
+    () {
     expect(
       difficultyForOnlineGrid(width: 16, height: 16, colorCount: 4),
       ArtworkDifficulty.easy,
