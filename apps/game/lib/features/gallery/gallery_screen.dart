@@ -6,6 +6,7 @@ import 'package:level_schema/level_schema.dart';
 import '../../core/pixel_art_preview.dart';
 import '../../l10n/strings.dart';
 import 'artwork_categories.dart';
+import 'artwork_difficulty.dart';
 import 'gallery_filters.dart';
 import 'library_controller.dart';
 import 'online_catalog_controller.dart';
@@ -39,6 +40,7 @@ class GalleryScreen extends StatefulWidget {
 
 class _GalleryScreenState extends State<GalleryScreen> {
   String _category = 'all', _filter = 'all', _search = '';
+  String _difficulty = 'all';
   int _onlineVisibleCount = 6;
 
   @override
@@ -73,6 +75,10 @@ class _GalleryScreenState extends State<GalleryScreen> {
     if (_category != 'all' && library.category(level) != _category) {
       return false;
     }
+    if (_difficulty != 'all' &&
+        difficultyForLevel(level).name != _difficulty) {
+      return false;
+    }
     if (_filter == 'personal' && !level.id.startsWith('private-')) {
       return false;
     }
@@ -98,6 +104,44 @@ class _GalleryScreenState extends State<GalleryScreen> {
         '${level.title} ${level.titleEn} ${library.metadata[level.id]?.tags.join(' ') ?? ''}'
             .toLowerCase()
             .contains(query);
+  }
+
+  String _difficultyLabel(BuildContext context, ArtworkDifficulty difficulty) {
+    final s = context.strings;
+    return switch (difficulty) {
+      ArtworkDifficulty.easy => s.easy,
+      ArtworkDifficulty.medium => s.medium,
+      ArtworkDifficulty.hard => s.hard,
+    };
+  }
+
+  Widget _difficultyBadge(BuildContext context, ArtworkDifficulty difficulty) {
+    final label = _difficultyLabel(context, difficulty);
+    final colors = Theme.of(context).colorScheme;
+    return Semantics(
+      label: '${context.strings.difficulty}: $label',
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: colors.surfaceContainerHighest.withValues(alpha: 0.72),
+          borderRadius: BorderRadius.circular(7),
+          border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.65)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 10,
+              height: 1.2,
+              color: colors.onSurfaceVariant,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _favorite(LevelDefinition level) async {
@@ -294,6 +338,11 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 ],
               ),
               const SizedBox(height: 4),
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: _difficultyBadge(context, difficultyForLevel(level)),
+              ),
+              const SizedBox(height: 4),
               if (count > 0) ...[
                 LinearProgressIndicator(
                   value: count / level.cells.length,
@@ -426,7 +475,27 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 ],
               ),
               const SizedBox(height: 4),
-              Text(s.onlinePictures, style: const TextStyle(fontSize: 11)),
+              Row(
+                children: [
+                  _difficultyBadge(
+                    context,
+                    difficultyForOnlineGrid(
+                      width: picture.width,
+                      height: picture.height,
+                      colorCount: picture.colorCount,
+                    ),
+                  ),
+                  const Spacer(),
+                  Flexible(
+                    child: Text(
+                      s.onlinePictures,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 11),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
@@ -448,6 +517,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
               online.available,
               category: _category,
               search: _search,
+              difficulty: _difficulty,
             );
       final visible = available.take(_onlineVisibleCount).toList();
       const grid = SliverGridDelegateWithMaxCrossAxisExtent(
@@ -517,6 +587,51 @@ class _GalleryScreenState extends State<GalleryScreen> {
                               onSelected: (_) => _selectCategory(category),
                             ),
                         ],
+                      ),
+                      const SizedBox(height: 10),
+                      InputDecorator(
+                        decoration: InputDecoration(
+                          labelText: s.difficulty,
+                          isDense: true,
+                          border: const OutlineInputBorder(),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 4,
+                          ),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            key: const ValueKey('gallery-difficulty-filter'),
+                            value: _difficulty,
+                            isExpanded: true,
+                            items: [
+                              DropdownMenuItem(
+                                value: 'all',
+                                child: Text(s.allDifficulties),
+                              ),
+                              DropdownMenuItem(
+                                value: 'easy',
+                                child: Text(s.easy),
+                              ),
+                              DropdownMenuItem(
+                                value: 'medium',
+                                child: Text(s.medium),
+                              ),
+                              DropdownMenuItem(
+                                value: 'hard',
+                                child: Text(s.hard),
+                              ),
+                            ],
+                            onChanged: (value) {
+                              if (value == null) return;
+                              setState(() {
+                                _difficulty = value;
+                                _onlineVisibleCount =
+                                    _category == 'all' ? 6 : 12;
+                              });
+                            },
+                          ),
+                        ),
                       ),
                       if (widget.personal) ...[
                         const SizedBox(height: 12),
