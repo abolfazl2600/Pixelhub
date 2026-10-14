@@ -227,6 +227,40 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     return null;
   }
 
+  Future<void> _loadArtworkStyle() async {
+    final preferences = _preferences;
+    if (preferences is! ArtworkStylePreferences) return;
+    try {
+      final saved = await preferences.readArtworkStyle();
+      if (mounted && saved != null) {
+        setState(() => _renderStyle = ArtworkRenderStyle.fromStorage(saved));
+      }
+    } on Object {
+      // Missing/corrupt optional preferences safely keep the Pixel default.
+    }
+  }
+
+  Future<void> _setArtworkStyle(ArtworkRenderStyle style) async {
+    if (_renderStyle == style) return;
+    setState(() => _renderStyle = style);
+    final preferences = _preferences;
+    if (preferences is! ArtworkStylePreferences) return;
+    try {
+      await preferences.writeArtworkStyle(style.storageId);
+    } on Object {
+      if (!mounted) return;
+      ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+        SnackBar(
+          content: Text(
+            context.isPersian
+                ? 'ذخیرهٔ سبک نمایش انجام نشد؛ انتخاب فعلی تا بسته‌شدن برنامه فعال می‌ماند.'
+                : 'Could not save the style; the current choice lasts until the app closes.',
+          ),
+        ),
+      );
+    }
+  }
+
   Future<void> _loadLanguage() async {
     try {
       final language = await _preferences.readLanguage();
