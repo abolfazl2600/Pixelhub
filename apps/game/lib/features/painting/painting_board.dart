@@ -246,8 +246,13 @@ class _PaintingBoardState extends State<PaintingBoard> {
 }
 
 class _GridPainter extends CustomPainter {
-  _GridPainter(this.controller, this.transform, this.persian, this.cursor)
-    : super(repaint: Listenable.merge([controller, transform]));
+  _GridPainter(
+    this.controller,
+    this.transform,
+    this.persian,
+    this.cursor,
+    this.renderStyle,
+  ) : super(repaint: Listenable.merge([controller, transform]));
   final PaintingController controller;
   final TransformationController transform;
   final bool persian;
