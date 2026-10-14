@@ -547,6 +547,18 @@ final class MemoryPreferences
   }
 
   @override
+  Future<String?> readArtworkStyle() async =>
+      artworkStyle == 'canvas' || artworkStyle == 'pixel' ? artworkStyle : null;
+
+  @override
+  Future<void> writeArtworkStyle(String value) async {
+    if (value != 'pixel' && value != 'canvas') {
+      throw const FormatException('Invalid artwork style.');
+    }
+    artworkStyle = value;
+  }
+
+  @override
   Future<String?> readRecentArtworkId() async => recentArtworkId;
 
   @override
