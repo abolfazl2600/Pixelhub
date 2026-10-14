@@ -28,6 +28,10 @@ import '../platform_adapters/document_language.dart';
 import '../platform_adapters/offline_support.dart';
 import 'bootstrap_controller.dart';
 
+class _StyleChanges extends ChangeNotifier {
+  void notify() => notifyListeners();
+}
+
 class PixelhubApp extends StatefulWidget {
   const PixelhubApp({
     required this.repository,
@@ -58,7 +62,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
   late final OnlineCatalogController _online;
   final ValueNotifier<Map<String, PixelAnimation>> _bundledAnimations =
       ValueNotifier({});
-  final ChangeNotifier _styleChanges = ChangeNotifier();
+  final _StyleChanges _styleChanges = _StyleChanges();
   final Map<String, String> _bundledAnimationFiles = {};
   final Set<String> _requestedAnimations = {};
   bool _animationCatalogRequested = false;
@@ -239,7 +243,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
         final style = ArtworkRenderStyle.fromStorage(saved);
         if (_renderStyle != style) {
           setState(() => _renderStyle = style);
-          _styleChanges.notifyListeners();
+          _styleChanges.notify();
         }
       }
     } on Object {
@@ -253,7 +257,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     // The active route is rebuilt by _routeChanges, not by this State's
     // setState alone. Notify it so PaintingPreviewScreen and PaintingBoard
     // receive the new render style immediately.
-    _styleChanges.notifyListeners();
+    _styleChanges.notify();
     final preferences = _preferences;
     if (preferences is! ArtworkStylePreferences) return;
     final stylePreferences = preferences as ArtworkStylePreferences;
@@ -385,7 +389,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
         _locale = const Locale('fa');
         _renderStyle = ArtworkRenderStyle.pixel;
       });
-      _styleChanges.notifyListeners();
+      _styleChanges.notify();
     }
     setDocumentLanguage('fa');
   }
