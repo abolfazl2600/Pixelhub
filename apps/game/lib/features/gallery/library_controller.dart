@@ -5,6 +5,7 @@ import 'package:game_domain/game_domain.dart';
 import 'package:level_schema/level_schema.dart';
 
 import 'artwork_categories.dart';
+import 'artwork_economy.dart';
 
 enum LibraryStatus { loading, ready, error }
 
@@ -219,6 +220,45 @@ class LibraryController extends ChangeNotifier {
   bool isComplete(LevelDefinition level) =>
       completed(level) == level.cells.length;
 
+  int get coins => library.coins;
+  int get totalPoints => library.totalPoints;
+
+  bool canPaint(LevelDefinition level) =>
+      alwaysFreeArtwork(level.id) ||
+      library.unlocked.contains(level.id) ||
+      // Preserve access to levels started before the wallet was introduced.
+      (progress[level.id]?.completedCount ?? 0) > 0;
+
+  /// A single serialized library write atomically charges coins and unlocks
+  /// the level. Failed/insufficient purchases never alter the balance.
+  Future<void> unlock(LevelDefinition level) => _mutate(() async {
+    if (canPaint(level)) return;
+    final cost = priceForLevel(level);
+    if (library.coins < cost) {
+      throw StateError('Insufficient coins');
+    }
+    final next = library.copyWith(
+      coins: library.coins - cost,
+      unlocked: {...library.unlocked, level.id},
+    );
+    await repository.writeLibrary(next);
+    library = next;
+  });
+
+  /// Once per level ID, even after reset or app relaunch. A failed wallet
+  /// write can be retried safely without duplicating a reward.
+  Future<void> rewardCompletion(LevelDefinition level) => _mutate(() async {
+    if (library.rewarded.contains(level.id)) return;
+    final reward = rewardForLevel(level);
+    final next = library.copyWith(
+      coins: library.coins + reward,
+      totalPoints: library.totalPoints + reward,
+      rewarded: {...library.rewarded, level.id},
+    );
+    await repository.writeLibrary(next);
+    library = next;
+  });
+
   Future<void> _mutate(
     Future<void> Function() action, {
     bool requireReady = true,
@@ -249,18 +289,14 @@ class LibraryController extends ChangeNotifier {
     if (!favorites.remove(level.id)) {
       favorites.add(level.id);
     }
-    final next = ArtworkLibrary(
-      artworks: library.artworks,
-      favorites: favorites,
-    );
+    final next = library.copyWith(favorites: favorites);
     await repository.writeLibrary(next);
     library = next;
   });
 
   Future<void> add(PrivateArtwork artwork) => _mutate(() async {
-    final next = ArtworkLibrary(
+    final next = library.copyWith(
       artworks: [...library.artworks, artwork],
-      favorites: library.favorites,
     );
     await repository.writeLibrary(next);
     library = next;
@@ -270,7 +306,7 @@ class LibraryController extends ChangeNotifier {
     if (!level.id.startsWith('private-')) {
       throw StateError('Only private artwork can be deleted.');
     }
-    final next = ArtworkLibrary(
+    final next = library.copyWith(
       artworks: library.artworks.where((art) => art.level.id != level.id),
       favorites: library.favorites.where((id) => id != level.id),
     );
@@ -286,8 +322,7 @@ class LibraryController extends ChangeNotifier {
         if (!level.id.startsWith('online-')) {
           throw StateError('Only downloaded online levels can be forgotten.');
         }
-        final next = ArtworkLibrary(
-          artworks: library.artworks,
+        final next = library.copyWith(
           favorites: library.favorites.where((id) => id != level.id),
         );
         await repository.writeLibrary(next);
