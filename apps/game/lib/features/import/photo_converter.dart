@@ -211,7 +211,9 @@ final class _Bucket {
 }
 
 Uint8List renderLevelPng(Map<String, Object> source) {
-  final level = LevelDefinition.fromJson(source);
+  final style = source['renderStyle'] == 'canvas' ? 'canvas' : 'pixel';
+  final levelJson = Map<String, Object>.from(source)..remove('renderStyle');
+  final level = LevelDefinition.fromJson(levelJson);
   final image = img.Image(
     width: level.width,
     height: level.height,
@@ -230,12 +232,32 @@ Uint8List renderLevelPng(Map<String, Object> source) {
     }
   }
   final scale = 1024 ~/ math.max(level.width, level.height);
-  return img.encodePng(
-    img.copyResize(
-      image,
-      width: level.width * scale,
-      height: level.height * scale,
-      interpolation: img.Interpolation.nearest,
-    ),
+  final output = img.copyResize(
+    image,
+    width: level.width * scale,
+    height: level.height * scale,
+    interpolation: img.Interpolation.nearest,
   );
+  if (style == 'canvas') {
+    // A deterministic low-opacity weave, scaled to the final PNG and anchored
+    // to the image origin. Pixel mode remains byte-for-byte legacy rendering.
+    final step = math.max(5, scale ~/ 2);
+    for (var y = 0; y < output.height; y++) {
+      for (var x = 0; x < output.width; x++) {
+        final vertical = x % step == 0;
+        final horizontal = y % step == 0;
+        if (!vertical && !horizontal) continue;
+        final pixel = output.getPixel(x, y);
+        final alpha = vertical && horizontal ? .10 : .055;
+        output.setPixelRgb(
+          x,
+          y,
+          (pixel.r.toDouble() * (1 - alpha) + 91 * alpha).round(),
+          (pixel.g.toDouble() * (1 - alpha) + 69 * alpha).round(),
+          (pixel.b.toDouble() * (1 - alpha) + 44 * alpha).round(),
+        );
+      }
+    }
+  }
+  return img.encodePng(output);
 }

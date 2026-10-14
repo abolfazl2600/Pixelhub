@@ -5,16 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../l10n/strings.dart';
+import 'artwork_render_style.dart';
 import 'painting_controller.dart';
 
 class PaintingBoard extends StatefulWidget {
   const PaintingBoard({
     required this.controller,
     required this.moveMode,
+    this.renderStyle = ArtworkRenderStyle.pixel,
     super.key,
   });
   final PaintingController controller;
   final bool moveMode;
+  final ArtworkRenderStyle renderStyle;
   @override
   State<PaintingBoard> createState() => _PaintingBoardState();
 }
@@ -199,6 +202,7 @@ class _PaintingBoardState extends State<PaintingBoard> {
                           _transform,
                           context.isPersian,
                           _focus.hasFocus ? (_cursorX, _cursorY) : null,
+                          widget.renderStyle,
                         ),
                       ),
                     ),
@@ -242,12 +246,18 @@ class _PaintingBoardState extends State<PaintingBoard> {
 }
 
 class _GridPainter extends CustomPainter {
-  _GridPainter(this.controller, this.transform, this.persian, this.cursor)
-    : super(repaint: Listenable.merge([controller, transform]));
+  _GridPainter(
+    this.controller,
+    this.transform,
+    this.persian,
+    this.cursor,
+    this.renderStyle,
+  ) : super(repaint: Listenable.merge([controller, transform]));
   final PaintingController controller;
   final TransformationController transform;
   final bool persian;
   final (int, int)? cursor;
+  final ArtworkRenderStyle renderStyle;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -304,6 +314,12 @@ class _GridPainter extends CustomPainter {
         }
       }
     }
+    artworkStylePainters[renderStyle]?.call(
+      canvas,
+      Rect.fromLTRB(left * cw, top * ch, right * cw, bottom * ch),
+      cellWidth: cw,
+      cellHeight: ch,
+    );
     final path = Path();
     for (var x = left; x <= right; x++) {
       path.moveTo(x * cw, top * ch);
@@ -351,5 +367,6 @@ class _GridPainter extends CustomPainter {
   bool shouldRepaint(_GridPainter old) =>
       old.controller != controller ||
       old.persian != persian ||
-      old.cursor != cursor;
+      old.cursor != cursor ||
+      old.renderStyle != renderStyle;
 }

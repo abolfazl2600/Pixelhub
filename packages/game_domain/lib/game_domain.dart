@@ -62,6 +62,12 @@ abstract interface class PreferencesRepository {
   Future<void> writeLanguage(String language);
 }
 
+/// Optional, local-only visual preference; never part of painting progress.
+abstract interface class ArtworkStylePreferences {
+  Future<String?> readArtworkStyle();
+  Future<void> writeArtworkStyle(String style);
+}
+
 /// Persist only the identifier of the most recently opened painting.
 abstract interface class RecentArtworkRepository {
   Future<String?> readRecentArtworkId();

@@ -2,12 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:level_schema/level_schema.dart';
 
 import '../l10n/strings.dart';
+import '../features/painting/artwork_render_style.dart';
 
 /// Read-only fixture rendering. No input, painting engine or progress in V1.
 class PixelArtPreview extends StatelessWidget {
-  const PixelArtPreview({required this.level, super.key});
+  const PixelArtPreview({
+    required this.level,
+    this.renderStyle = ArtworkRenderStyle.pixel,
+    super.key,
+  });
 
   final LevelDefinition level;
+  final ArtworkRenderStyle renderStyle;
 
   @override
   Widget build(BuildContext context) => Semantics(
@@ -19,15 +25,16 @@ class PixelArtPreview extends StatelessWidget {
     image: true,
     child: AspectRatio(
       aspectRatio: level.width / level.height,
-      child: CustomPaint(painter: _FixturePainter(level)),
+      child: CustomPaint(painter: _FixturePainter(level, renderStyle)),
     ),
   );
 }
 
 class _FixturePainter extends CustomPainter {
-  _FixturePainter(this.level);
+  _FixturePainter(this.level, this.renderStyle);
 
   final LevelDefinition level;
+  final ArtworkRenderStyle renderStyle;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -46,8 +53,15 @@ class _FixturePainter extends CustomPainter {
         );
       }
     }
+    artworkStylePainters[renderStyle]?.call(
+      canvas,
+      Offset.zero & size,
+      cellWidth: size.width / level.width,
+      cellHeight: size.height / level.height,
+    );
   }
 
   @override
-  bool shouldRepaint(_FixturePainter oldDelegate) => oldDelegate.level != level;
+  bool shouldRepaint(_FixturePainter oldDelegate) =>
+      oldDelegate.level != level || oldDelegate.renderStyle != renderStyle;
 }

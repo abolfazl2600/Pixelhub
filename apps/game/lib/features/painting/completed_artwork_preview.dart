@@ -5,6 +5,7 @@ import 'package:level_schema/level_schema.dart';
 
 import '../../core/pixel_art_preview.dart';
 import '../../l10n/strings.dart';
+import 'artwork_render_style.dart';
 
 /// Shown only after a level is completed. Animation playback does not alter
 /// painting state and is disabled for pictures without a sidecar.
@@ -12,11 +13,13 @@ class CompletedArtworkPreview extends StatefulWidget {
   const CompletedArtworkPreview({
     required this.level,
     this.animation,
+    this.renderStyle = ArtworkRenderStyle.pixel,
     super.key,
   });
 
   final LevelDefinition level;
   final PixelAnimation? animation;
+  final ArtworkRenderStyle renderStyle;
 
   @override
   State<CompletedArtworkPreview> createState() =>
@@ -92,11 +95,16 @@ class _CompletedArtworkPreviewState extends State<CompletedArtworkPreview> {
             aspectRatio: widget.level.width / widget.level.height,
             child: CustomPaint(
               key: const ValueKey('animation-frame'),
-              painter: _AnimationPainter(widget.level, animation, _frame),
+              painter: _AnimationPainter(
+                widget.level,
+                animation,
+                _frame,
+                widget.renderStyle,
+              ),
             ),
           )
         else
-          PixelArtPreview(level: widget.level),
+          PixelArtPreview(level: widget.level, renderStyle: widget.renderStyle),
         if (animation != null) ...[
           const SizedBox(height: 12),
           Wrap(
@@ -130,11 +138,12 @@ class _CompletedArtworkPreviewState extends State<CompletedArtworkPreview> {
 }
 
 class _AnimationPainter extends CustomPainter {
-  _AnimationPainter(this.level, this.animation, this.frame);
+  _AnimationPainter(this.level, this.animation, this.frame, this.renderStyle);
 
   final LevelDefinition level;
   final PixelAnimation animation;
   final int frame;
+  final ArtworkRenderStyle renderStyle;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -158,9 +167,18 @@ class _AnimationPainter extends CustomPainter {
         );
       }
     }
+    artworkStylePainters[renderStyle]?.call(
+      canvas,
+      Offset.zero & size,
+      cellWidth: w,
+      cellHeight: h,
+    );
   }
 
   @override
   bool shouldRepaint(covariant _AnimationPainter old) =>
-      old.frame != frame || old.level != level || old.animation != animation;
+      old.frame != frame ||
+      old.level != level ||
+      old.animation != animation ||
+      old.renderStyle != renderStyle;
 }

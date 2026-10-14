@@ -3,12 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:level_schema/level_schema.dart';
 
 import '../../l10n/strings.dart';
+import '../painting/artwork_render_style.dart';
 import '../../platform_adapters/artwork_export.dart';
 import '../import/photo_converter.dart';
 
 class ExportButton extends StatefulWidget {
-  const ExportButton({required this.level, super.key});
+  const ExportButton({
+    required this.level,
+    this.renderStyle = ArtworkRenderStyle.pixel,
+    super.key,
+  });
   final LevelDefinition level;
+  final ArtworkRenderStyle renderStyle;
   @override
   State<ExportButton> createState() => _ExportButtonState();
 }
@@ -21,7 +27,10 @@ class _ExportButtonState extends State<ExportButton> {
     final level = widget.level;
     setState(() => _busy = true);
     try {
-      final bytes = await compute(renderLevelPng, level.toJson());
+      final bytes = await compute(renderLevelPng, {
+        ...level.toJson(),
+        'renderStyle': widget.renderStyle.storageId,
+      });
       if (!mounted) {
         return;
       }

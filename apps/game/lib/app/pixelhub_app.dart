@@ -21,6 +21,7 @@ import '../features/settings/settings_screen.dart';
 import '../features/settings/privacy_screen.dart';
 import '../features/painting/painting_controller.dart';
 import '../features/painting/painting_preview_screen.dart';
+import '../features/painting/artwork_render_style.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../l10n/strings.dart';
 import '../platform_adapters/document_language.dart';
@@ -64,6 +65,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
   late final Listenable _routeChanges;
   final Map<String, PaintingController> _sessions = {};
   Locale _locale = const Locale('fa');
+  ArtworkRenderStyle _renderStyle = ArtworkRenderStyle.pixel;
   int _languageRevision = 0;
   Future<void> _languageWrites = Future.value();
 
@@ -172,6 +174,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       errorBuilder: (context, state) => _notFound(context),
     );
     unawaited(_loadLanguage());
+    unawaited(_loadArtworkStyle());
     unawaited(_library.loadRecentArtwork());
     unawaited(_library.load());
     unawaited(_bootstrap.load());
@@ -222,6 +225,43 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       unawaited(_loadBundledAnimation(level, file));
     }
     return null;
+  }
+
+  Future<void> _loadArtworkStyle() async {
+    final preferences = _preferences;
+    if (preferences is! ArtworkStylePreferences) return;
+    try {
+      final saved = await preferences.readArtworkStyle();
+      if (mounted && saved != null) {
+        setState(() => _renderStyle = ArtworkRenderStyle.fromStorage(saved));
+      }
+    } on Object {
+      // Missing/corrupt optional preferences safely keep the Pixel default.
+    }
+  }
+
+  Future<void> _setArtworkStyle(ArtworkRenderStyle style) async {
+    if (_renderStyle == style) return;
+    setState(() => _renderStyle = style);
+    final preferences = _preferences;
+    if (preferences is! ArtworkStylePreferences) return;
+    try {
+      await preferences.writeArtworkStyle(style.storageId);
+    } on Object {
+      if (!mounted) return;
+      final routeContext = _router.routerDelegate.navigatorKey.currentContext;
+      if (routeContext != null && routeContext.mounted) {
+        ScaffoldMessenger.maybeOf(routeContext)?.showSnackBar(
+          SnackBar(
+            content: Text(
+              _locale.languageCode == 'fa'
+                  ? 'ذخیرهٔ سبک نمایش انجام نشد؛ انتخاب فعلی تا بسته‌شدن برنامه فعال می‌ماند.'
+                  : 'Could not save the style; the current choice lasts until the app closes.',
+            ),
+          ),
+        );
+      }
+    }
   }
 
   Future<void> _loadLanguage() async {
@@ -319,8 +359,19 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       rethrow;
     }
     _languageRevision++;
+    final stylePreferences = _preferences;
+    if (stylePreferences is ArtworkStylePreferences) {
+      try {
+        await stylePreferences.writeArtworkStyle('pixel');
+      } on Object {
+        // Clear still succeeds if this optional preference cannot be reset.
+      }
+    }
     if (mounted) {
-      setState(() => _locale = const Locale('fa'));
+      setState(() {
+        _locale = const Locale('fa');
+        _renderStyle = ArtworkRenderStyle.pixel;
+      });
     }
     setDocumentLanguage('fa');
   }
@@ -407,6 +458,8 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
         controller: _controller(matches.first),
         animation: _animationFor(matches.first),
         diagnostics: _diagnostics,
+        renderStyle: _renderStyle,
+        onRenderStyleChanged: (style) => unawaited(_setArtworkStyle(style)),
         onOpened: () => unawaited(_library.markOpened(matches.first)),
       );
     },

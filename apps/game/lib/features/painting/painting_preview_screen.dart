@@ -6,6 +6,7 @@ import '../../core/local_diagnostics.dart';
 import '../../l10n/strings.dart';
 import '../gallery/export_button.dart';
 import 'painting_board.dart';
+import 'artwork_render_style.dart';
 import 'painting_controller.dart';
 import 'completed_artwork_preview.dart';
 import 'package:level_schema/level_schema.dart';
@@ -16,6 +17,8 @@ class PaintingPreviewScreen extends StatefulWidget {
     required this.diagnostics,
     this.animation,
     this.onOpened,
+    this.renderStyle = ArtworkRenderStyle.pixel,
+    this.onRenderStyleChanged,
     super.key,
   });
   static const route = '/painting';
@@ -23,6 +26,8 @@ class PaintingPreviewScreen extends StatefulWidget {
   final LocalDiagnostics diagnostics;
   final PixelAnimation? animation;
   final VoidCallback? onOpened;
+  final ArtworkRenderStyle renderStyle;
+  final ValueChanged<ArtworkRenderStyle>? onRenderStyleChanged;
   @override
   State<PaintingPreviewScreen> createState() => _PaintingPreviewScreenState();
 }
@@ -176,6 +181,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
         return CompletionScreen(
           controller: controller,
           animation: widget.animation,
+          renderStyle: widget.renderStyle,
           appBar: appBar,
           saveState: _saveState(),
           onView: () => setState(() => _viewResult = true),
@@ -226,6 +232,24 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                         controller.endStroke();
                         setState(() => _moveMode = true);
                       },
+                    ),
+                    ChoiceChip(
+                      key: const ValueKey('style-pixel'),
+                      avatar: const Icon(Icons.grid_4x4_rounded, size: 18),
+                      label: Text(s.pixelStyle),
+                      selected: widget.renderStyle == ArtworkRenderStyle.pixel,
+                      onSelected: (_) => widget.onRenderStyleChanged?.call(
+                        ArtworkRenderStyle.pixel,
+                      ),
+                    ),
+                    ChoiceChip(
+                      key: const ValueKey('style-canvas'),
+                      avatar: const Icon(Icons.texture_rounded, size: 18),
+                      label: Text(s.canvasStyle),
+                      selected: widget.renderStyle == ArtworkRenderStyle.canvas,
+                      onSelected: (_) => widget.onRenderStyleChanged?.call(
+                        ArtworkRenderStyle.canvas,
+                      ),
                     ),
                     IconButton(
                       tooltip: s.reset,
@@ -288,6 +312,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                   key: ValueKey(controller.level.id),
                   controller: controller,
                   moveMode: _moveMode,
+                  renderStyle: widget.renderStyle,
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -396,6 +421,7 @@ class CompletionScreen extends StatelessWidget {
   const CompletionScreen({
     required this.controller,
     this.animation,
+    this.renderStyle = ArtworkRenderStyle.pixel,
     required this.appBar,
     required this.saveState,
     required this.onView,
@@ -404,6 +430,7 @@ class CompletionScreen extends StatelessWidget {
   });
   final PaintingController controller;
   final PixelAnimation? animation;
+  final ArtworkRenderStyle renderStyle;
   final PreferredSizeWidget appBar;
   final Widget saveState;
   final VoidCallback onView;
@@ -437,12 +464,13 @@ class CompletionScreen extends StatelessWidget {
               child: CompletedArtworkPreview(
                 level: controller.level,
                 animation: animation,
+                renderStyle: renderStyle,
               ),
             ),
             const SizedBox(height: 16),
             saveState,
             const SizedBox(height: 16),
-            ExportButton(level: controller.level),
+            ExportButton(level: controller.level, renderStyle: renderStyle),
             const SizedBox(height: 8),
             FilledButton(
               onPressed: onNext,

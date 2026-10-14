@@ -82,7 +82,8 @@ final class LocalPreferences
         ArtworkRepository,
         ProgressSyncOutboxRepository,
         OnlineLevelStorage,
-        OnlineAnimationStorage {
+        OnlineAnimationStorage,
+        ArtworkStylePreferences {
   LocalPreferences({SharedPreferencesAsync? preferences})
     : _preferences = preferences ?? SharedPreferencesAsync();
   final SharedPreferencesAsync _preferences;
@@ -342,6 +343,25 @@ final class LocalPreferences
       _enqueue(() => _preferences.setString('pixelhub.language', language));
 
   @override
+  Future<String?> readArtworkStyle() async {
+    await _writes;
+    final value = await _preferences.getString('pixelhub.artworkStyle.v1');
+    return value == 'canvas' || value == 'pixel' ? value : null;
+  }
+
+  @override
+  Future<void> writeArtworkStyle(String style) {
+    if (style != 'pixel' && style != 'canvas') {
+      return Future<void>.error(
+        const FormatException('Invalid artwork style.'),
+      );
+    }
+    return _enqueue(
+      () => _preferences.setString('pixelhub.artworkStyle.v1', style),
+    );
+  }
+
+  @override
   Future<String?> readRecentArtworkId() async {
     await _writes;
     final id = await _preferences.getString('pixelhub.recentArtwork.v1');
@@ -412,9 +432,11 @@ final class MemoryPreferences
         ArtworkRepository,
         ProgressSyncOutboxRepository,
         OnlineLevelStorage,
-        OnlineAnimationStorage {
+        OnlineAnimationStorage,
+        ArtworkStylePreferences {
   final Map<String, ProgressSnapshot> _records = {};
   String? language;
+  String? artworkStyle;
   String? recentArtworkId;
   ArtworkLibrary _library = ArtworkLibrary();
   final Map<String, ProgressSyncOutbox> _outboxes = {};
@@ -529,6 +551,18 @@ final class MemoryPreferences
   }
 
   @override
+  Future<String?> readArtworkStyle() async =>
+      artworkStyle == 'canvas' || artworkStyle == 'pixel' ? artworkStyle : null;
+
+  @override
+  Future<void> writeArtworkStyle(String value) async {
+    if (value != 'pixel' && value != 'canvas') {
+      throw const FormatException('Invalid artwork style.');
+    }
+    artworkStyle = value;
+  }
+
+  @override
   Future<String?> readRecentArtworkId() async => recentArtworkId;
 
   @override
@@ -565,6 +599,7 @@ final class MemoryPreferences
     _downloadAnimations.clear();
     _library = ArtworkLibrary();
     language = null;
+    artworkStyle = null;
     recentArtworkId = null;
   }
 }
