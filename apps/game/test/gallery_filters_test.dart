@@ -119,7 +119,7 @@ void main() {
     expect(
       matchingOnlinePictures(
         source,
-        category: 'patterns',
+        category: 'masterpieces',
         search: 'شاهکار',
         difficulty: 'hard',
       ),
