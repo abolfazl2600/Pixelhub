@@ -302,16 +302,8 @@ void main() {
     );
     await tester.pumpAndSettle();
     final downloadKey = ValueKey('online-download-${level.id}');
-    await tester.scrollUntilVisible(
-      find.byKey(downloadKey),
-      280,
-      scrollable: find
-          .descendant(
-            of: find.byType(CustomScrollView),
-            matching: find.byType(Scrollable),
-          )
-          .first,
-    );
+    await tester.ensureVisible(find.byKey(downloadKey));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(downloadKey));
     await tester.pumpAndSettle();
     expect(online.downloaded.map((value) => value.id), contains(level.id));
