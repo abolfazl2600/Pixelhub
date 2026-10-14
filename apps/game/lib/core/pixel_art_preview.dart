@@ -6,9 +6,14 @@ import '../features/painting/artwork_render_style.dart';
 
 /// Read-only fixture rendering. No input, painting engine or progress in V1.
 class PixelArtPreview extends StatelessWidget {
-  const PixelArtPreview({required this.level, super.key});
+  const PixelArtPreview({
+    required this.level,
+    this.renderStyle = ArtworkRenderStyle.pixel,
+    super.key,
+  });
 
   final LevelDefinition level;
+  final ArtworkRenderStyle renderStyle;
 
   @override
   Widget build(BuildContext context) => Semantics(
