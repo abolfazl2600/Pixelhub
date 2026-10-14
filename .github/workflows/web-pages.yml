@@ -339,6 +339,20 @@ jobs:
               --notes "Ten distinct original 64x64 pixel-art interpretations of public-domain paintings, each with a downloadable checksum-bound eight-frame animation. Assets are an immutable Release outside Git and the APK." \
               --latest=false
           fi
+      - name: Publish fifteen animated 64x64 classic paintings
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-animated-classics-64-15-v1 >/dev/null 2>&1; then
+            python3 tool/online_animated_masterworks_64_15_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-animated-classics-64-15-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: fifteen animated 64x64 classic paintings" \
+              --notes "15 distinct original pixel-art homages to public-domain classic paintings. Each 64x64 picture includes a checksum-bound eight-frame online animation companion and bilingual metadata. Assets are immutable Release files and are not bundled in the APK." \
+              --latest=false
+          fi
       - name: Download release packs and assemble online catalog
         env:
           GH_TOKEN: ${{ github.token }}
