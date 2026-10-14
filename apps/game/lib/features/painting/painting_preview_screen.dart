@@ -421,6 +421,7 @@ class CompletionScreen extends StatelessWidget {
   const CompletionScreen({
     required this.controller,
     this.animation,
+    this.renderStyle = ArtworkRenderStyle.pixel,
     required this.appBar,
     required this.saveState,
     required this.onView,
