@@ -14,9 +14,9 @@ int artworkPrice(String id, ArtworkDifficulty difficulty) {
 }
 
 int artworkReward(ArtworkDifficulty difficulty) => switch (difficulty) {
-  ArtworkDifficulty.easy => 15,
-  ArtworkDifficulty.medium => 30,
-  ArtworkDifficulty.hard => 55,
+  ArtworkDifficulty.easy => 40,
+  ArtworkDifficulty.medium => 75,
+  ArtworkDifficulty.hard => 125,
 };
 
 int priceForLevel(LevelDefinition level) =>
