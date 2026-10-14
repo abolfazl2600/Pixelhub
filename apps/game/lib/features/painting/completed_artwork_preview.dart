@@ -5,6 +5,7 @@ import 'package:level_schema/level_schema.dart';
 
 import '../../core/pixel_art_preview.dart';
 import '../../l10n/strings.dart';
+import 'artwork_render_style.dart';
 
 /// Shown only after a level is completed. Animation playback does not alter
 /// painting state and is disabled for pictures without a sidecar.
