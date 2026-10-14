@@ -28,7 +28,8 @@ final class PixelAnimation {
         duration > 2000 ||
         rawFrames is! List ||
         rawFrames.isEmpty ||
-        rawFrames.length > 60) {
+        rawFrames is! List ||
+        rawFrames.isEmpty) {
       throw const FormatException('Invalid animation timing or frame count.');
     }
     final frames = <List<PixelChange>>[];
