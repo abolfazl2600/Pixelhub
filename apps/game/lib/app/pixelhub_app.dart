@@ -230,8 +230,9 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
   Future<void> _loadArtworkStyle() async {
     final preferences = _preferences;
     if (preferences is! ArtworkStylePreferences) return;
+    final stylePreferences = preferences as ArtworkStylePreferences;
     try {
-      final saved = await preferences.readArtworkStyle();
+      final saved = await stylePreferences.readArtworkStyle();
       if (mounted && saved != null) {
         setState(() => _renderStyle = ArtworkRenderStyle.fromStorage(saved));
       }
@@ -245,8 +246,9 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     setState(() => _renderStyle = style);
     final preferences = _preferences;
     if (preferences is! ArtworkStylePreferences) return;
+    final stylePreferences = preferences as ArtworkStylePreferences;
     try {
-      await preferences.writeArtworkStyle(style.storageId);
+      await stylePreferences.writeArtworkStyle(style.storageId);
     } on Object {
       if (!mounted) return;
       final routeContext = _router.routerDelegate.navigatorKey.currentContext;
@@ -359,8 +361,9 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       rethrow;
     }
     _languageRevision++;
-    final stylePreferences = _preferences;
-    if (stylePreferences is ArtworkStylePreferences) {
+    final preferences = _preferences;
+    if (preferences is ArtworkStylePreferences) {
+      final stylePreferences = preferences as ArtworkStylePreferences;
       try {
         await stylePreferences.writeArtworkStyle('pixel');
       } on Object {
