@@ -68,8 +68,7 @@ void main() {
       );
       viewer.transformationController!.value = Matrix4.diagonal3Values(2, 2, 1);
       await tester.pump();
-      final zoomBeforeSwitch = viewer.transformationController!
-          .value
+      final zoomBeforeSwitch = viewer.transformationController!.value
           .getMaxScaleOnAxis();
 
       await tester.ensureVisible(find.byKey(const ValueKey('style-canvas')));
