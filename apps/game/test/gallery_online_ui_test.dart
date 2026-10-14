@@ -214,11 +214,11 @@ void main() {
         find.byKey(const ValueKey('online-picture-online-gallery-test-9')),
         280,
         scrollable: find
-          .descendant(
-            of: find.byType(CustomScrollView),
-            matching: find.byType(Scrollable),
-          )
-          .first,
+            .descendant(
+              of: find.byType(CustomScrollView),
+              matching: find.byType(Scrollable),
+            )
+            .first,
       );
       expect(
         find.byKey(const ValueKey('online-picture-online-gallery-test-9')),
