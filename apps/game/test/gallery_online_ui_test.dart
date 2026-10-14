@@ -23,8 +23,9 @@ MockClient catalogClient() {
         'title': 'طرح آنلاین $i',
         'titleEn': 'Online art $i',
         'category': i < 9 ? 'animals' : 'objects',
-        'width': 16,
-        'height': 16,
+        'width': i < 9 ? 16 : 32,
+        'height': i < 9 ? 16 : 32,
+        'colorCount': 4,
         'bytes': 100,
         'checksum': List.filled(64, 'b').join(),
       },
@@ -109,6 +110,82 @@ void main() {
     expect(find.text('اشیا آنلاین'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets(
+    'difficulty filter composes with the gallery and supports Persian RTL and English LTR',
+    (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(320, 760);
+      addTearDown(tester.view.reset);
+
+      final store = MemoryPreferences();
+      final library = LibraryController(store, store);
+      addTearDown(library.dispose);
+      final flower = fixture();
+      library.setCatalog([flower], {});
+      library.setOnlineCategories({flower.id: 'animals'});
+      await library.load();
+
+      final client = catalogClient();
+      addTearDown(client.close);
+      final online = OnlineCatalogController(
+        store,
+        client: client,
+        baseUrl: Uri.parse('https://example.test/online/'),
+      );
+      addTearDown(online.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('fa'),
+          supportedLocales: AppLocalizations.supportedLocales,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          home: GalleryScreen(library: library, online: online),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('gallery-difficulty-filter')), findsOneWidget);
+      expect(find.text('سختی'), findsOneWidget);
+      expect(find.byKey(const ValueKey('local-picture-sunflower')), findsOneWidget);
+
+      await tester.tap(find.byKey(const ValueKey('gallery-difficulty-filter')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('متوسط').last);
+      await tester.pumpAndSettle();
+
+      // The 2x2 local fixture is Easy. Only 32x32, four-color online entries
+      // remain Medium, proving the filter is applied before online pagination.
+      expect(find.byKey(const ValueKey('local-picture-sunflower')), findsNothing);
+      await tester.scrollUntilVisible(
+        find.byKey(const ValueKey('online-picture-online-gallery-test-9')),
+        280,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(
+        find.byKey(const ValueKey('online-picture-online-gallery-test-9')),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('en'),
+          supportedLocales: AppLocalizations.supportedLocales,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          home: GalleryScreen(library: library, online: online, personal: true),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Difficulty'), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('gallery-difficulty-filter')));
+      await tester.pumpAndSettle();
+      expect(find.text('All difficulties'), findsOneWidget);
+      expect(find.text('Easy'), findsOneWidget);
+      expect(find.text('Medium'), findsOneWidget);
+      expect(find.text('Hard'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets('downloaded online picture opens painting immediately', (
     tester,
