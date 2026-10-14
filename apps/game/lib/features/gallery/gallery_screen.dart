@@ -445,7 +445,10 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 ],
               ),
               const SizedBox(height: 4),
-              Row(
+              Wrap(
+                spacing: 6,
+                runSpacing: 4,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   _difficultyBadge(
                     context,
@@ -455,7 +458,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
                       colorCount: picture.colorCount,
                     ),
                   ),
-                  const Spacer(),
                   Text(
                     s.artworkCost(
                       context.digits(
@@ -523,7 +525,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
       final visible = available.take(_onlineVisibleCount).toList();
       const grid = SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 240,
-        mainAxisExtent: 270,
+        mainAxisExtent: 292,
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
       );
@@ -569,15 +571,16 @@ class _GalleryScreenState extends State<GalleryScreen> {
                         onChanged: _updateSearch,
                       ),
                       const SizedBox(height: 12),
-                      Row(
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 6,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           const Icon(Icons.monetization_on_outlined, size: 20),
-                          const SizedBox(width: 6),
                           Text(
                             '${s.walletCoins}: ${context.digits(library.coins)}',
                             style: const TextStyle(fontWeight: FontWeight.w700),
                           ),
-                          const Spacer(),
                           Text(
                             '${s.walletPoints}: ${context.digits(library.totalPoints)}',
                             style: const TextStyle(fontSize: 12),
