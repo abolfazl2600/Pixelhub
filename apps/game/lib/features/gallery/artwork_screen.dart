@@ -76,9 +76,11 @@ class ArtworkScreen extends StatelessWidget {
       if (!context.mounted) return;
       messenger.showSnackBar(
         SnackBar(
-          content: Text(library.coins < priceForLevel(level)
-              ? context.strings.insufficientCoins
-              : context.strings.coinSaveFailed),
+          content: Text(
+            library.coins < priceForLevel(level)
+                ? context.strings.insufficientCoins
+                : context.strings.coinSaveFailed,
+          ),
         ),
       );
     }
@@ -162,9 +164,7 @@ class ArtworkScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 6),
-              Text(
-                s.artworkReward(context.digits(rewardForLevel(level))),
-              ),
+              Text(s.artworkReward(context.digits(rewardForLevel(level)))),
               const SizedBox(height: 8),
               if (!library.canPaint(level))
                 Text(s.artworkCost(context.digits(priceForLevel(level)))),
@@ -176,7 +176,9 @@ class ArtworkScreen extends StatelessWidget {
                     : library.canPaint(level)
                     ? () => context.go('/painting/${level.id}')
                     : () => _unlock(context),
-                icon: Icon(library.canPaint(level) ? Icons.brush : Icons.lock_open),
+                icon: Icon(
+                  library.canPaint(level) ? Icons.brush : Icons.lock_open,
+                ),
                 label: Text(
                   library.canPaint(level)
                       ? s.startPainting
