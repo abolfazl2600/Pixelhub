@@ -95,7 +95,12 @@ class _CompletedArtworkPreviewState extends State<CompletedArtworkPreview> {
             aspectRatio: widget.level.width / widget.level.height,
             child: CustomPaint(
               key: const ValueKey('animation-frame'),
-              painter: _AnimationPainter(widget.level, animation, _frame),
+              painter: _AnimationPainter(
+                widget.level,
+                animation,
+                _frame,
+                widget.renderStyle,
+              ),
             ),
           )
         else
