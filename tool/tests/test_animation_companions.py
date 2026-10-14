@@ -44,7 +44,6 @@ class AnimationCompanionTests(unittest.TestCase):
         generate_recipes(self.online, self.generated_dir)
         for batch in self.generated_dir.glob('online-*.json'):
             shutil.copy2(batch, self.batch_dir / batch.name)
-        publish(self.online, self.batch_dir)
 
     def test_registered_batches_preserve_pixels_metadata_and_release_animations(self):
         before = {p.relative_to(self.online): p.read_bytes()
