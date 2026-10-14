@@ -174,6 +174,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       errorBuilder: (context, state) => _notFound(context),
     );
     unawaited(_loadLanguage());
+    unawaited(_loadArtworkStyle());
     unawaited(_library.loadRecentArtwork());
     unawaited(_library.load());
     unawaited(_bootstrap.load());
