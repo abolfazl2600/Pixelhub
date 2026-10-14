@@ -34,7 +34,7 @@ void main() {
       expect(rewardForLevel(level), greaterThanOrEqualTo(priceForLevel(level)));
     }
     expect(artworkPrice('abc', ArtworkDifficulty.easy),
-        isNot(artworkPrice('abcd', ArtworkDifficulty.easy)));
+        isNot(artworkPrice('abce', ArtworkDifficulty.easy)));
     expect(alwaysFreeArtwork('sunflower'), isTrue);
     expect(alwaysFreeArtwork('private-own-art'), isTrue);
   });
