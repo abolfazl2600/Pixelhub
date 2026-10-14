@@ -8,8 +8,13 @@ import '../../platform_adapters/artwork_export.dart';
 import '../import/photo_converter.dart';
 
 class ExportButton extends StatefulWidget {
-  const ExportButton({required this.level, super.key});
+  const ExportButton({
+    required this.level,
+    this.renderStyle = ArtworkRenderStyle.pixel,
+    super.key,
+  });
   final LevelDefinition level;
+  final ArtworkRenderStyle renderStyle;
   @override
   State<ExportButton> createState() => _ExportButtonState();
 }
