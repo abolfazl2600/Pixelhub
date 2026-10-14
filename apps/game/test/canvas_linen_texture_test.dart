@@ -21,7 +21,7 @@ void main() {
 
     paintCanvasTexture(
       canvas,
-      const Rect.fromLTWH(0, 0, width, height),
+      const Rect.fromLTWH(0, 0, 120.0, 120.0),
       cellWidth: 6,
       cellHeight: 6,
     );
