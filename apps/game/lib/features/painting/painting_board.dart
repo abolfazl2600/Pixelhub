@@ -12,6 +12,7 @@ class PaintingBoard extends StatefulWidget {
   const PaintingBoard({
     required this.controller,
     required this.moveMode,
+    this.renderStyle = ArtworkRenderStyle.pixel,
     super.key,
   });
   final PaintingController controller;
