@@ -236,7 +236,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                     ChoiceChip(
                       key: const ValueKey('style-pixel'),
                       avatar: const Icon(Icons.grid_4x4_rounded, size: 18),
-                      label: Text(context.isPersian ? 'پیکسلی' : 'Pixel'),
+                      label: Text(s.pixelStyle),
                       selected: widget.renderStyle == ArtworkRenderStyle.pixel,
                       onSelected: (_) => widget.onRenderStyleChanged?.call(
                         ArtworkRenderStyle.pixel,
