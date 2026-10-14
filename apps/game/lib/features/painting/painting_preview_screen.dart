@@ -232,6 +232,24 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                         setState(() => _moveMode = true);
                       },
                     ),
+                    ChoiceChip(
+                      key: const ValueKey('style-pixel'),
+                      avatar: const Icon(Icons.grid_4x4_rounded, size: 18),
+                      label: Text(context.isPersian ? 'پیکسلی' : 'Pixel'),
+                      selected: widget.renderStyle == ArtworkRenderStyle.pixel,
+                      onSelected: (_) => widget.onRenderStyleChanged?.call(
+                        ArtworkRenderStyle.pixel,
+                      ),
+                    ),
+                    ChoiceChip(
+                      key: const ValueKey('style-canvas'),
+                      avatar: const Icon(Icons.texture_rounded, size: 18),
+                      label: Text(context.isPersian ? 'بوم نقاشی' : 'Canvas'),
+                      selected: widget.renderStyle == ArtworkRenderStyle.canvas,
+                      onSelected: (_) => widget.onRenderStyleChanged?.call(
+                        ArtworkRenderStyle.canvas,
+                      ),
+                    ),
                     IconButton(
                       tooltip: s.reset,
                       onPressed: _reset,
