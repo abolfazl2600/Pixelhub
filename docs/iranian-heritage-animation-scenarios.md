@@ -4,9 +4,9 @@ This collection adds 23 immutable online coloring levels. Each animation is an
 optional checksum-bound companion; it never modifies the base artwork or saved
 painting progress. The published loop uses 12 frames at 150 ms per frame (1.8 s)
 and returns to the original pixels in the first and last frame. Motion is
-palette-only and intentionally subtle. The current renderer caps a sidecar at
-60 frames; these scenarios use 12-frame loops, and can be refined with more
-frames in a future compatible schema update.
+palette-only and intentionally subtle. The renderer has no arbitrary frame-count cap; sidecar size remains bounded by
+the existing 2 MiB online-animation limit. These initial scenarios use 12-frame
+loops and can be refined with more frames without changing the base artwork.
 
 | ID | Static composition | Animation storyboard |
 | --- | --- | --- |
