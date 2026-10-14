@@ -33,8 +33,7 @@ void paintCanvasTexture(
   const spacing = 6.0;
   final strength = opacity.clamp(0.0, 0.4).toDouble();
 
-  final glaze = Paint()
-    ..color = Color.fromRGBO(239, 224, 198, strength * .30);
+  final glaze = Paint()..color = Color.fromRGBO(239, 224, 198, strength * .30);
   final threadShadow = Paint()
     ..isAntiAlias = false
     ..strokeWidth = .95
@@ -109,10 +108,7 @@ void paintCanvasTexture(
     for (var xi = xStart; xi <= xEnd; xi++) {
       final x = xi * spacing;
       if ((xi + yi).isEven) {
-        canvas.drawRect(
-          Rect.fromLTWH(x + .2, y + 1.1, 2.5, .95),
-          raisedKnot,
-        );
+        canvas.drawRect(Rect.fromLTWH(x + .2, y + 1.1, 2.5, .95), raisedKnot);
       } else {
         canvas.drawRect(
           Rect.fromLTWH(x + 1.15, y + .2, .95, 2.5),
