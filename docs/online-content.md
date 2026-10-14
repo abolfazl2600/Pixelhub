@@ -853,9 +853,9 @@ Existing paintings and user progress are unchanged.
 | Charging Battery | باتری شارژی | Charge meter fills |
 | Wi-Fi Signal | علامت وای‌فای | Signal waves pulse |
 | Notification Bell | زنگ اعلان | Bell rings |
-| Love Letter | نامه عاشقانه | Floating heart |
+| Puzzle Piece | قطعه پازل | Interlocking sparkle |
 | Pixel Pointer | اشاره‌گر پیکسلی | Click sparkle |
-| Glowing Candle | شمع روشن | Flickering flame |
+| Gumball Machine | دستگاه آدامس | Candy ball drops |
 | Watering Can | آبپاش کوچک | Falling drops |
 | Mailbox | صندوق نامه | Raising flag |
 | Little Padlock | قفل کوچک | Opening shackle |
