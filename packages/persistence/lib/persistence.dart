@@ -343,6 +343,21 @@ final class LocalPreferences
       _enqueue(() => _preferences.setString('pixelhub.language', language));
 
   @override
+  Future<String?> readArtworkStyle() async {
+    await _writes;
+    final value = await _preferences.getString('pixelhub.artworkStyle.v1');
+    return value == 'canvas' || value == 'pixel' ? value : null;
+  }
+
+  @override
+  Future<void> writeArtworkStyle(String style) {
+    if (style != 'pixel' && style != 'canvas') {
+      return Future<void>.error(const FormatException('Invalid artwork style.'));
+    }
+    return _enqueue(() => _preferences.setString('pixelhub.artworkStyle.v1', style));
+  }
+
+  @override
   Future<String?> readRecentArtworkId() async {
     await _writes;
     final id = await _preferences.getString('pixelhub.recentArtwork.v1');
