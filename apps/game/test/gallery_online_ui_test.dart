@@ -144,9 +144,15 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.byKey(const ValueKey('gallery-difficulty-filter')), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('gallery-difficulty-filter')),
+        findsOneWidget,
+      );
       expect(find.text('سختی'), findsOneWidget);
-      expect(find.byKey(const ValueKey('local-picture-sunflower')), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('local-picture-sunflower')),
+        findsOneWidget,
+      );
 
       await tester.tap(find.byKey(const ValueKey('gallery-difficulty-filter')));
       await tester.pumpAndSettle();
@@ -155,7 +161,10 @@ void main() {
 
       // The 2x2 local fixture is Easy. Only 32x32, four-color online entries
       // remain Medium, proving the filter is applied before online pagination.
-      expect(find.byKey(const ValueKey('local-picture-sunflower')), findsNothing);
+      expect(
+        find.byKey(const ValueKey('local-picture-sunflower')),
+        findsNothing,
+      );
       await tester.scrollUntilVisible(
         find.byKey(const ValueKey('online-picture-online-gallery-test-9')),
         280,
