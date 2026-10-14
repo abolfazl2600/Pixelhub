@@ -110,6 +110,7 @@ class ImmutableOnlineReleaseTests(unittest.TestCase):
         self.assertEqual(self.catalog()["schemaVersion"], 1)
         self.assertEqual({x["id"] for x in pictures}, {original, remake})
         self.assertEqual({x["version"] for x in pictures}, {1})
+        self.assertEqual({x["colorCount"] for x in pictures}, {2})
         self.assertTrue((self.output / f"levels/{original}-v1.json").exists())
         self.assertTrue((self.output / f"levels/{remake}-v1.json").exists())
 

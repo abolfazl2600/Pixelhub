@@ -7,14 +7,18 @@ OnlinePicture picture(
   required String category,
   required String title,
   required String titleEn,
+  int width = 16,
+  int height = 16,
+  int? colorCount,
 }) => OnlinePicture.fromJson({
   'id': id,
   'version': 1,
   'title': title,
   'titleEn': titleEn,
   'category': category,
-  'width': 16,
-  'height': 16,
+  'width': width,
+  'height': height,
+  if (colorCount != null) 'colorCount': colorCount,
   'bytes': 128,
   'checksum': List.filled(64, 'a').join(),
 });
@@ -31,12 +35,18 @@ void main() {
     category: 'objects',
     title: 'صندلی',
     titleEn: 'Chair',
+    width: 32,
+    height: 32,
+    colorCount: 4,
   );
   final masterpiece = picture(
     'online-classic-canvas-filter',
     category: 'patterns',
     title: 'شاهکار',
     titleEn: 'Masterpiece',
+    width: 32,
+    height: 32,
+    colorCount: 5,
   );
 
   test('a category chip filters undownloaded online pictures', () {
@@ -74,6 +84,50 @@ void main() {
         search: 'Master',
       ),
       [masterpiece],
+    );
+  });
+
+  test('difficulty filtering composes with category and bilingual search', () {
+    final source = [animals, objects, masterpiece];
+    expect(
+      matchingOnlinePictures(
+        source,
+        category: 'all',
+        search: '',
+        difficulty: 'easy',
+      ),
+      [animals],
+    );
+    expect(
+      matchingOnlinePictures(
+        source,
+        category: 'all',
+        search: 'chair',
+        difficulty: 'medium',
+      ),
+      [objects],
+    );
+    expect(
+      matchingOnlinePictures(
+        source,
+        category: 'animals',
+        search: 'fox',
+        difficulty: 'hard',
+      ),
+      isEmpty,
+    );
+    expect(
+      matchingOnlinePictures(
+        source,
+        category: 'patterns',
+        search: 'شاهکار',
+        difficulty: 'hard',
+      ),
+      [masterpiece],
+    );
+    expect(
+      matchingOnlinePictures(source, category: 'all', search: ''),
+      source,
     );
   });
 

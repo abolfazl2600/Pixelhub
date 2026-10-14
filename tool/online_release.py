@@ -296,7 +296,12 @@ def assemble(pack_dir, output_dir):
                     raise ValueError(f"Invalid level or preview: {ident}")
                 animation = validated_animation(archive, stem, item, data)
                 if ident not in RETIRED_ONLINE_IDS:
-                    images[ident] = item
+                    # Catalog-only metadata: the immutable level ZIP and its
+                    # checksum stay unchanged, while the gallery can classify
+                    # online cards before downloading their level JSON.
+                    catalog_item = dict(item)
+                    catalog_item["colorCount"] = len(set(data["cells"]))
+                    images[ident] = catalog_item
                 origins[ident] = origin
                 files = [(level_path, body), (preview_path, preview)]
                 if animation is not None:
