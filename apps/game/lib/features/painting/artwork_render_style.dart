@@ -24,7 +24,7 @@ void paintCanvasTexture(
   double opacity = .075,
 }) {
   if (bounds.isEmpty) return;
-  final spacing = (ui.lerpDouble(3.5, 7.0, (cellWidth / 28).clamp(0, 1))!)
+  final spacing = (ui.lerpDouble(3.5, 7.0, (cellWidth / 28).clamp(0.0, 1.0).toDouble())!)
       .clamp(2.5, 7.0);
   final minor = Paint()
     ..isAntiAlias = false
