@@ -464,6 +464,7 @@ class CompletionScreen extends StatelessWidget {
               child: CompletedArtworkPreview(
                 level: controller.level,
                 animation: animation,
+                renderStyle: renderStyle,
               ),
             ),
             const SizedBox(height: 16),
