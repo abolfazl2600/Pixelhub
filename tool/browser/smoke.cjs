@@ -176,22 +176,36 @@ async function main() {
       // Painting near the extreme top-left is unreliable on very dense
       // mobile grids. Aim at an interior cell, explicitly selecting its
       // actual palette number so changing artwork colors doesn't break CI.
-      const x=Math.floor(dimension/4), y=Math.floor(dimension/4);
-      const color=picture.cells[y*dimension+x];
-      console.log('Browser: sample cell',id,x,y,color);
-      await page.getByRole('button',{name:new RegExp(`^Color ${color+1},`)}).click();
-      await scrollTop();
-      const current=await boardBox();
-      await page.mouse.click(
-        current.x+current.width*(x+0.5)/dimension,
-        current.y+current.height*(y+0.5)/dimension
-      );
-      await page.waitForFunction(id=>{
-        const k=Object.keys(localStorage).find(k=>k.includes('pixelhub.progress.v1.'+id+'.1'));
-        if(!k)return false;
-        let value=JSON.parse(localStorage[k]);if(typeof value==='string')value=JSON.parse(value);
-        return value.completedCount===1;
-      },id);
+      const focusX=Math.floor(dimension/4), focusY=Math.floor(dimension/4);
+      let painted = false;
+      // The center of a dense 64/128 grid pixel can be only 2-6 device
+      // pixels wide. Try several interior coordinates rather than depending
+      // on one subpixel hit after scrolling and Flutter semantics rebuilds.
+      for (const [dx,dy] of [[0,0],[1,0],[0,1],[-1,0],[2,1],[0,2]]) {
+        const x=focusX+dx, y=focusY+dy;
+        const color=picture.cells[y*dimension+x];
+        console.log('Browser: sample cell',id,x,y,color);
+        await page.getByRole('button',{name:new RegExp(`^Color ${color+1},`)}).click();
+        await scrollTop();
+        const current=await boardBox();
+        await page.mouse.click(
+          current.x+current.width*(x+0.5)/dimension,
+          current.y+current.height*(y+0.5)/dimension
+        );
+        try {
+          await page.waitForFunction(id=>{
+            const k=Object.keys(localStorage).find(key=>key.includes('pixelhub.progress.v1.'+id+'.1'));
+            if(!k)return false;
+            let value=JSON.parse(localStorage[k]);
+            if(typeof value==='string')value=JSON.parse(value);
+            return value.completedCount>=1;
+          },id,{timeout:2500});
+          painted=true;break;
+        } catch (error) {
+          if (!(error instanceof Error && error.name==='TimeoutError'))throw error;
+        }
+      }
+      assert(painted, `a cell in ${id} must be saved after purchasing the artwork`);
     }
 
     // A large level exercises zoom/culling without introducing a desktop layout.
