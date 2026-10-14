@@ -16,8 +16,8 @@ LevelDefinition level({
   width: width,
   height: height,
   palette: palette,
-  cells: cells ??
-      List.generate(width * height, (index) => index % palette.length),
+  cells:
+      cells ?? List.generate(width * height, (index) => index % palette.length),
 );
 
 void main() {
@@ -47,35 +47,37 @@ void main() {
   test(
     'uses distinct colors actually used by cells, not unused palette slots',
     () {
-    final artwork = level(
-      palette: const [
-        0xff000000,
-        0xffffffff,
-        0xffff0000,
-        0xff00ff00,
-        0xff0000ff,
-      ],
-      cells: List.generate(256, (index) => index.isEven ? 0 : 1),
-    );
-    expect(difficultyForLevel(artwork), ArtworkDifficulty.easy);
-  });
+      final artwork = level(
+        palette: const [
+          0xff000000,
+          0xffffffff,
+          0xffff0000,
+          0xff00ff00,
+          0xff0000ff,
+        ],
+        cells: List.generate(256, (index) => index.isEven ? 0 : 1),
+      );
+      expect(difficultyForLevel(artwork), ArtworkDifficulty.easy);
+    },
+  );
 
   test(
     'online catalog colors are used when present and legacy fallback is stable',
     () {
-    expect(
-      difficultyForOnlineGrid(width: 16, height: 16, colorCount: 4),
-      ArtworkDifficulty.easy,
-    );
-    expect(
-      difficultyForOnlineGrid(width: 16, height: 16),
-      ArtworkDifficulty.easy,
-    );
-    expect(
-      difficultyForOnlineGrid(width: 32, height: 32),
-      ArtworkDifficulty.medium,
-    );
-  });
+      expect(
+        difficultyForOnlineGrid(width: 16, height: 16, colorCount: 4),
+        ArtworkDifficulty.easy,
+      );
+      expect(
+        difficultyForOnlineGrid(width: 16, height: 16),
+        ArtworkDifficulty.easy,
+      );
+      expect(
+        difficultyForOnlineGrid(width: 32, height: 32),
+        ArtworkDifficulty.medium,
+      );
+    },
+  );
 
   test('rejects invalid grid metadata', () {
     expect(
