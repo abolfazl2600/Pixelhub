@@ -26,6 +26,8 @@ class PaintingPreviewScreen extends StatefulWidget {
   final LocalDiagnostics diagnostics;
   final PixelAnimation? animation;
   final VoidCallback? onOpened;
+  final ArtworkRenderStyle renderStyle;
+  final ValueChanged<ArtworkRenderStyle>? onRenderStyleChanged;
   @override
   State<PaintingPreviewScreen> createState() => _PaintingPreviewScreenState();
 }
