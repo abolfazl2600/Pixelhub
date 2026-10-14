@@ -430,6 +430,7 @@ class CompletionScreen extends StatelessWidget {
   });
   final PaintingController controller;
   final PixelAnimation? animation;
+  final ArtworkRenderStyle renderStyle;
   final PreferredSizeWidget appBar;
   final Widget saveState;
   final VoidCallback onView;
