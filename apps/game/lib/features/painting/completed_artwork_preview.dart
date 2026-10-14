@@ -138,11 +138,12 @@ class _CompletedArtworkPreviewState extends State<CompletedArtworkPreview> {
 }
 
 class _AnimationPainter extends CustomPainter {
-  _AnimationPainter(this.level, this.animation, this.frame);
+  _AnimationPainter(this.level, this.animation, this.frame, this.renderStyle);
 
   final LevelDefinition level;
   final PixelAnimation animation;
   final int frame;
+  final ArtworkRenderStyle renderStyle;
 
   @override
   void paint(Canvas canvas, Size size) {
