@@ -75,8 +75,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
     if (_category != 'all' && library.category(level) != _category) {
       return false;
     }
-    if (_difficulty != 'all' &&
-        difficultyForLevel(level).name != _difficulty) {
+    if (_difficulty != 'all' && difficultyForLevel(level).name != _difficulty) {
       return false;
     }
     if (_filter == 'personal' && !level.id.startsWith('private-')) {
@@ -613,8 +612,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
                               if (value == null) return;
                               setState(() {
                                 _difficulty = value;
-                                _onlineVisibleCount =
-                                    _category == 'all' ? 6 : 12;
+                                _onlineVisibleCount = _category == 'all'
+                                    ? 6
+                                    : 12;
                               });
                             },
                           ),
