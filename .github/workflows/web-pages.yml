@@ -231,6 +231,20 @@ jobs:
               --notes "Thirty original 48x48 color-by-number objects including camera, headphones, guitar, radio, bicycle, sailboat, microscope, robot, typewriter, globe and treasure chest. Bilingual level JSON and PNG previews are Release-only assets, not bundled into Android." \
               --latest=false
           fi
+      - name: Publish twenty exact 10x10 object icons
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-objects-mini-20-v1 >/dev/null 2>&1; then
+            python3 tool/online_objects_10_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-objects-mini-20-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: 20 crisp 10x10 object icons" \
+              --notes "Twenty original exact 10x10 color-by-number objects for the Objects category. Every level is authored as 100 discrete cells, with bilingual metadata and nearest-neighbor PNG previews. These immutable online Release assets are not bundled into the app or committed as generated files." \
+              --latest=false
+          fi
       - name: Publish twenty original playful coloring pictures outside git
         if: github.event_name == 'workflow_run'
         env:
