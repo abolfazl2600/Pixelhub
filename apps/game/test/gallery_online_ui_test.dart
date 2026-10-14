@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:persistence/persistence.dart';
+import 'package:pixelhub/core/pixel_art_preview.dart';
 import 'package:pixelhub/features/gallery/gallery_screen.dart';
 import 'package:pixelhub/features/gallery/library_controller.dart';
 import 'package:pixelhub/features/gallery/online_catalog_controller.dart';
@@ -189,20 +190,29 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(
-        find.byKey(const ValueKey('gallery-difficulty-filter')),
-        findsOneWidget,
-      );
+      expect(find.byType(DropdownButton<String>), findsNothing);
       expect(find.text('سختی'), findsOneWidget);
+      for (final difficulty in ['all', 'easy', 'medium', 'hard']) {
+        expect(
+          find.byKey(ValueKey('gallery-difficulty-$difficulty')),
+          findsOneWidget,
+        );
+      }
+      final allDifficultyChip = find.byKey(
+        const ValueKey('gallery-difficulty-all'),
+      );
+      expect(tester.widget<ChoiceChip>(allDifficultyChip).selected, isTrue);
       expect(
         find.byKey(const ValueKey('local-picture-sunflower')),
         findsOneWidget,
       );
 
-      await tester.tap(find.byKey(const ValueKey('gallery-difficulty-filter')));
+      await tester.tap(find.byKey(const ValueKey('gallery-difficulty-medium')));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('متوسط').last);
-      await tester.pumpAndSettle();
+      final mediumDifficultyChip = find.byKey(
+        const ValueKey('gallery-difficulty-medium'),
+      );
+      expect(tester.widget<ChoiceChip>(mediumDifficultyChip).selected, isTrue);
 
       // The 2x2 local fixture is Easy. Only 32x32, four-color online entries
       // remain Medium, proving the filter is applied before online pagination.
@@ -236,15 +246,103 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.text('Difficulty'), findsOneWidget);
-      await tester.tap(find.byKey(const ValueKey('gallery-difficulty-filter')));
-      await tester.pumpAndSettle();
+      expect(find.byType(DropdownButton<String>), findsNothing);
       expect(find.text('All difficulties'), findsOneWidget);
       expect(find.text('Easy'), findsOneWidget);
-      expect(find.text('Medium'), findsNWidgets(2));
+      expect(find.text('Medium'), findsOneWidget);
       expect(find.text('Hard'), findsOneWidget);
+      final englishMediumDifficultyChip = find.byKey(
+        const ValueKey('gallery-difficulty-medium'),
+      );
+      expect(
+        tester.widget<ChoiceChip>(englishMediumDifficultyChip).selected,
+        isTrue,
+      );
+      await tester.tap(find.byKey(const ValueKey('gallery-difficulty-all')));
+      await tester.pumpAndSettle();
+      final englishAllDifficultyChip = find.byKey(
+        const ValueKey('gallery-difficulty-all'),
+      );
+      expect(
+        tester.widget<ChoiceChip>(englishAllDifficultyChip).selected,
+        isTrue,
+      );
+      await tester.tap(find.byKey(const ValueKey('gallery-difficulty-hard')));
+      await tester.pumpAndSettle();
+      final hardDifficultyChip = find.byKey(
+        const ValueKey('gallery-difficulty-hard'),
+      );
+      expect(tester.widget<ChoiceChip>(hardDifficultyChip).selected, isTrue);
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('favorite button below thumbnail', (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(390, 900);
+    addTearDown(tester.view.reset);
+    final store = MemoryPreferences();
+    final library = LibraryController(store, store);
+    addTearDown(library.dispose);
+    final flower = fixture();
+    library.setCatalog([flower], {});
+    await library.load();
+
+    final client = catalogClient();
+    addTearDown(client.close);
+    final online = OnlineCatalogController(
+      store,
+      client: client,
+      baseUrl: Uri.parse('https://example.test/online/'),
+    );
+    addTearDown(online.dispose);
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('fa'),
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        home: GalleryScreen(library: library, online: online),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final card = find.byKey(ValueKey('local-picture-${flower.id}'));
+    final favorite = find.byKey(ValueKey('local-favorite-${flower.id}'));
+    final preview = find.descendant(
+      of: card,
+      matching: find.byType(PixelArtPreview),
+    );
+    expect(card, findsOneWidget);
+    expect(preview, findsOneWidget);
+    expect(favorite, findsOneWidget);
+    await tester.ensureVisible(favorite);
+    await tester.pumpAndSettle();
+
+    // Favoriting is a separate control below the picture's dimensions.
+    expect(
+      tester.getTopLeft(favorite).dy,
+      greaterThanOrEqualTo(tester.getBottomLeft(preview).dy),
+    );
+    expect(
+      find.descendant(
+        of: favorite,
+        matching: find.byIcon(Icons.favorite_border),
+      ),
+      findsOneWidget,
+    );
+
+    await tester.tap(favorite);
+    await tester.pumpAndSettle();
+    expect(library.isFavorite(flower), isTrue);
+    expect(
+      find.descendant(of: favorite, matching: find.byIcon(Icons.favorite)),
+      findsOneWidget,
+    );
+    await tester.tap(favorite);
+    await tester.pumpAndSettle();
+    expect(library.isFavorite(flower), isFalse);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('downloaded online picture opens painting immediately', (
     tester,

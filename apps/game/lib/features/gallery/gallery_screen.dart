@@ -275,43 +275,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: PixelArtPreview(level: level),
-                    ),
-                    PositionedDirectional(
-                      end: 4,
-                      top: 4,
-                      child: Material(
-                        color: Colors.white.withValues(alpha: 0.90),
-                        shape: const CircleBorder(),
-                        child: IconButton(
-                          constraints: const BoxConstraints(
-                            minWidth: 40,
-                            minHeight: 40,
-                          ),
-                          tooltip: library.isFavorite(level)
-                              ? s.removeFavorite
-                              : s.addFavorite,
-                          onPressed:
-                              library.busy ||
-                                  library.status != LibraryStatus.ready
-                              ? null
-                              : () => _favorite(level),
-                          icon: Icon(
-                            library.isFavorite(level)
-                                ? Icons.favorite
-                                : Icons.favorite_border,
-                            size: 20,
-                            color: PixelTokens.green,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: PixelArtPreview(level: level),
                 ),
               ),
               const SizedBox(height: 8),
@@ -339,11 +305,36 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 ],
               ),
               const SizedBox(height: 4),
-              Align(
-                alignment: AlignmentDirectional.centerStart,
-                child: _difficultyBadge(context, difficultyForLevel(level)),
+              Row(
+                children: [
+                  _difficultyBadge(context, difficultyForLevel(level)),
+                  const Spacer(),
+                  IconButton(
+                    key: ValueKey('local-favorite-${level.id}'),
+                    tooltip: library.isFavorite(level)
+                        ? s.removeFavorite
+                        : s.addFavorite,
+                    visualDensity: VisualDensity.compact,
+                    constraints: const BoxConstraints(
+                      minWidth: 36,
+                      minHeight: 36,
+                    ),
+                    padding: EdgeInsets.zero,
+                    onPressed:
+                        library.busy || library.status != LibraryStatus.ready
+                        ? null
+                        : () => _favorite(level),
+                    icon: Icon(
+                      library.isFavorite(level)
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      size: 20,
+                      color: PixelTokens.green,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 2),
               if (count > 0) ...[
                 LinearProgressIndicator(
                   value: count / level.cells.length,
@@ -575,50 +566,33 @@ class _GalleryScreenState extends State<GalleryScreen> {
                         ],
                       ),
                       const SizedBox(height: 10),
-                      InputDecorator(
-                        decoration: InputDecoration(
-                          labelText: s.difficulty,
-                          isDense: true,
-                          border: const OutlineInputBorder(),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 4,
-                          ),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            key: const ValueKey('gallery-difficulty-filter'),
-                            value: _difficulty,
-                            isExpanded: true,
-                            items: [
-                              DropdownMenuItem(
-                                value: 'all',
-                                child: Text(s.allDifficulties),
-                              ),
-                              DropdownMenuItem(
-                                value: 'easy',
-                                child: Text(s.easy),
-                              ),
-                              DropdownMenuItem(
-                                value: 'medium',
-                                child: Text(s.medium),
-                              ),
-                              DropdownMenuItem(
-                                value: 'hard',
-                                child: Text(s.hard),
-                              ),
-                            ],
-                            onChanged: (value) {
-                              if (value == null) return;
-                              setState(() {
-                                _difficulty = value;
+                      Text(
+                        s.difficulty,
+                        style: Theme.of(context).textTheme.labelMedium,
+                      ),
+                      const SizedBox(height: 6),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 4,
+                        children: [
+                          for (final entry in <String, String>{
+                            'all': s.allDifficulties,
+                            'easy': s.easy,
+                            'medium': s.medium,
+                            'hard': s.hard,
+                          }.entries)
+                            ChoiceChip(
+                              key: ValueKey('gallery-difficulty-${entry.key}'),
+                              label: Text(entry.value),
+                              selected: _difficulty == entry.key,
+                              onSelected: (_) => setState(() {
+                                _difficulty = entry.key;
                                 _onlineVisibleCount = _category == 'all'
                                     ? 6
                                     : 12;
-                              });
-                            },
-                          ),
-                        ),
+                              }),
+                            ),
+                        ],
                       ),
                       if (widget.personal) ...[
                         const SizedBox(height: 12),
