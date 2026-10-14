@@ -342,10 +342,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   style: const TextStyle(fontSize: 11),
                 )
               else if (library.library.unlocked.contains(level.id))
-                Text(
-                  s.artworkOwned,
-                  style: const TextStyle(fontSize: 11),
-                ),
+                Text(s.artworkOwned, style: const TextStyle(fontSize: 11)),
               const SizedBox(height: 2),
               if (count > 0) ...[
                 LinearProgressIndicator(
@@ -461,14 +458,16 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   const Spacer(),
                   Text(
                     s.artworkCost(
-                      context.digits(artworkPrice(
-                        picture.id,
-                        difficultyForOnlineGrid(
-                          width: picture.width,
-                          height: picture.height,
-                          colorCount: picture.colorCount,
+                      context.digits(
+                        artworkPrice(
+                          picture.id,
+                          difficultyForOnlineGrid(
+                            width: picture.width,
+                            height: picture.height,
+                            colorCount: picture.colorCount,
+                          ),
                         ),
-                      )),
+                      ),
                     ),
                     style: const TextStyle(fontSize: 10),
                   ),
