@@ -18,7 +18,7 @@ OnlinePicture picture(
   'category': category,
   'width': width,
   'height': height,
-  if (colorCount != null) 'colorCount': colorCount,
+  'colorCount': ?colorCount,
   'bytes': 128,
   'checksum': List.filled(64, 'a').join(),
 });
