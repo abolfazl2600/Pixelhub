@@ -470,7 +470,7 @@ class CompletionScreen extends StatelessWidget {
             const SizedBox(height: 16),
             saveState,
             const SizedBox(height: 16),
-            ExportButton(level: controller.level),
+            ExportButton(level: controller.level, renderStyle: renderStyle),
             const SizedBox(height: 8),
             FilledButton(
               onPressed: onNext,
