@@ -25,7 +25,7 @@ void paintCanvasTexture(
 }) {
   if (bounds.isEmpty) return;
   final cellScale = ((cellWidth + cellHeight) / 56).clamp(0.0, 1.0).toDouble();
-  final spacing = ui.lerpDouble(3.5, 7.0, cellScale)!.clamp(2.5, 7.0);
+  final spacing = ui.lerpDouble(3.5, 7.0, cellScale)!.clamp(2.5, 7.0).toDouble();
   final minor = Paint()
     ..isAntiAlias = false
     ..strokeWidth = .45
