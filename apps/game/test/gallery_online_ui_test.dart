@@ -92,6 +92,36 @@ void main() {
       hasLength(9),
     );
 
+    final firstOnlineCard = find.byKey(
+      const ValueKey('online-picture-online-gallery-test-0'),
+    );
+    final firstDownloadButton = find.byKey(
+      const ValueKey('online-download-online-gallery-test-0'),
+    );
+    await tester.scrollUntilVisible(
+      firstDownloadButton,
+      250,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(firstOnlineCard, findsOneWidget);
+    expect(firstDownloadButton, findsOneWidget);
+    final image = find.descendant(
+      of: firstOnlineCard,
+      matching: find.byType(Image),
+    );
+    expect(image, findsOneWidget);
+    expect(
+      tester.getTopLeft(firstDownloadButton).dy,
+      greaterThanOrEqualTo(tester.getBottomLeft(image).dy),
+    );
+    expect(
+      find.descendant(
+        of: firstOnlineCard,
+        matching: find.text('تصاویر آنلاین'),
+      ),
+      findsNothing,
+    );
+
     // Changing the chip resets pagination and the local empty state.
     await tester.drag(find.byType(CustomScrollView), const Offset(0, 2000));
     await tester.pumpAndSettle();
