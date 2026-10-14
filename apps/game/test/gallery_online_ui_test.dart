@@ -198,12 +198,10 @@ void main() {
           findsOneWidget,
         );
       }
-      expect(
-        tester.widget<ChoiceChip>(
-          find.byKey(const ValueKey('gallery-difficulty-all')),
-        ).selected,
-        isTrue,
+      final allDifficultyChip = find.byKey(
+        const ValueKey('gallery-difficulty-all'),
       );
+      expect(tester.widget<ChoiceChip>(allDifficultyChip).selected, isTrue);
       expect(
         find.byKey(const ValueKey('local-picture-sunflower')),
         findsOneWidget,
@@ -211,12 +209,10 @@ void main() {
 
       await tester.tap(find.byKey(const ValueKey('gallery-difficulty-medium')));
       await tester.pumpAndSettle();
-      expect(
-        tester.widget<ChoiceChip>(
-          find.byKey(const ValueKey('gallery-difficulty-medium')),
-        ).selected,
-        isTrue,
+      final mediumDifficultyChip = find.byKey(
+        const ValueKey('gallery-difficulty-medium'),
       );
+      expect(tester.widget<ChoiceChip>(mediumDifficultyChip).selected, isTrue);
 
       // The 2x2 local fixture is Easy. Only 32x32, four-color online entries
       // remain Medium, proving the filter is applied before online pagination.
@@ -255,27 +251,24 @@ void main() {
       expect(find.text('Easy'), findsOneWidget);
       expect(find.text('Medium'), findsOneWidget);
       expect(find.text('Hard'), findsOneWidget);
+      final englishAllDifficultyChip = find.byKey(
+        const ValueKey('gallery-difficulty-all'),
+      );
       expect(
-        tester.widget<ChoiceChip>(
-          find.byKey(const ValueKey('gallery-difficulty-all')),
-        ).selected,
+        tester.widget<ChoiceChip>(englishAllDifficultyChip).selected,
         isTrue,
       );
       await tester.tap(find.byKey(const ValueKey('gallery-difficulty-hard')));
       await tester.pumpAndSettle();
-      expect(
-        tester.widget<ChoiceChip>(
-          find.byKey(const ValueKey('gallery-difficulty-hard')),
-        ).selected,
-        isTrue,
+      final hardDifficultyChip = find.byKey(
+        const ValueKey('gallery-difficulty-hard'),
       );
+      expect(tester.widget<ChoiceChip>(hardDifficultyChip).selected, isTrue);
       expect(tester.takeException(), isNull);
     },
   );
 
-  testWidgets('favorite action is beneath thumbnail and toggles without navigation', (
-    tester,
-  ) async {
+  testWidgets('favorite button below thumbnail', (tester) async {
     tester.view.devicePixelRatio = 1;
     tester.view.physicalSize = const Size(390, 900);
     addTearDown(tester.view.reset);
