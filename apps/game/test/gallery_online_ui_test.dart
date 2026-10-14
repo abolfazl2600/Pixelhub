@@ -240,7 +240,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('All difficulties'), findsOneWidget);
       expect(find.text('Easy'), findsOneWidget);
-      expect(find.text('Medium'), findsOneWidget);
+      expect(find.text('Medium'), findsNWidgets(2));
       expect(find.text('Hard'), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
