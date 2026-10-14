@@ -65,6 +65,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
   late final Listenable _routeChanges;
   final Map<String, PaintingController> _sessions = {};
   Locale _locale = const Locale('fa');
+  ArtworkRenderStyle _renderStyle = ArtworkRenderStyle.pixel;
   int _languageRevision = 0;
   Future<void> _languageWrites = Future.value();
 
