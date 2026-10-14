@@ -369,5 +369,6 @@ class _GridPainter extends CustomPainter {
   bool shouldRepaint(_GridPainter old) =>
       old.controller != controller ||
       old.persian != persian ||
-      old.cursor != cursor;
+      old.cursor != cursor ||
+      old.renderStyle != renderStyle;
 }
