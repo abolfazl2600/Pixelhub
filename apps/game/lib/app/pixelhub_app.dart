@@ -356,8 +356,19 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       rethrow;
     }
     _languageRevision++;
+    final stylePreferences = _preferences;
+    if (stylePreferences is ArtworkStylePreferences) {
+      try {
+        await stylePreferences.writeArtworkStyle('pixel');
+      } on Object {
+        // Clear still succeeds if this optional preference cannot be reset.
+      }
+    }
     if (mounted) {
-      setState(() => _locale = const Locale('fa'));
+      setState(() {
+        _locale = const Locale('fa');
+        _renderStyle = ArtworkRenderStyle.pixel;
+      });
     }
     setDocumentLanguage('fa');
   }
