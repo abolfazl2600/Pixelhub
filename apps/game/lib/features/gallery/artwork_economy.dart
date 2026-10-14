@@ -5,7 +5,10 @@ import 'artwork_difficulty.dart';
 /// Local earned coins only: no billing, ads or network dependency.
 /// Different paintings of the same difficulty can still have different prices.
 int artworkPrice(String id, ArtworkDifficulty difficulty) {
-  final hash = id.codeUnits.fold<int>(0, (sum, unit) => (sum * 31 + unit) % 997);
+  final hash = id.codeUnits.fold<int>(
+    0,
+    (sum, unit) => (sum * 31 + unit) % 997,
+  );
   return switch (difficulty) {
     ArtworkDifficulty.easy => 20 + (hash % 4) * 5,
     ArtworkDifficulty.medium => 45 + (hash % 5) * 5,
