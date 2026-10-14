@@ -504,8 +504,8 @@ def animated_cells(level, motion, phase):
 
     if motion == "traffic-light":
         # A real traffic light sequence: top -> middle -> bottom -> middle.
-        active = [2, 2, 5, 8, 8, 5, 2, 2][phase]
-        for y in (2, 5, 8):
+        active = [2, 2, 4, 6, 6, 4, 2, 2][phase]
+        for y in (2, 4, 6):
             dot(5, y, 4 if y == active else 5)
             dot(6, y, 3 if y == active else 2)
     elif motion == "battery-charge":
