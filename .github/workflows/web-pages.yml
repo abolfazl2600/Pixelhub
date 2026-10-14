@@ -325,6 +325,20 @@ jobs:
             python3 tool/online_animated_12_pack.py "$RUNNER_TEMP/content.zip"
             gh release create pixelhub-content-animated-mini-12-20-v1 "$RUNNER_TEMP/content.zip" --target "$TARGET_SHA" --title "PixelHub: 20 animated 12x12 mini pictures" --notes "Twenty unique 12x12 bilingual online pictures. Each includes an eight-frame, 180 ms downloadable animation sidecar, numbered level, and PNG preview. Assets live in an immutable Release outside the app bundle." --latest=false
           fi
+      - name: Publish ten animated 64x64 classic paintings
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-animated-masterworks-64-10-v1 >/dev/null 2>&1; then
+            python3 tool/online_animated_masterworks_64_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-animated-masterworks-64-10-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: ten original animated 64x64 classic paintings" \
+              --notes "Ten distinct original 64x64 pixel-art interpretations of public-domain paintings, each with a downloadable checksum-bound eight-frame animation. Assets are an immutable Release outside Git and the APK." \
+              --latest=false
+          fi
       - name: Download release packs and assemble online catalog
         env:
           GH_TOKEN: ${{ github.token }}
