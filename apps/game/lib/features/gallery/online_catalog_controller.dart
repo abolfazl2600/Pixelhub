@@ -52,6 +52,7 @@ final class OnlinePicture {
     required this.category,
     required this.width,
     required this.height,
+    required this.colorCount,
     required this.bytes,
     required this.checksum,
     required this.animation,
@@ -65,6 +66,7 @@ final class OnlinePicture {
     final category = value['category'];
     final width = value['width'];
     final height = value['height'];
+    final colorCount = value['colorCount'];
     final bytes = value['bytes'];
     final checksum = value['checksum'];
     if (id is! String ||
@@ -86,6 +88,8 @@ final class OnlinePicture {
         height is! int ||
         height < 1 ||
         height > 256 ||
+        (colorCount != null &&
+            (colorCount is! int || colorCount < 1 || colorCount > 48)) ||
         bytes is! int ||
         bytes < 1 ||
         bytes > 262144 ||
@@ -101,6 +105,7 @@ final class OnlinePicture {
       category: displayArtworkCategory(id, category),
       width: width,
       height: height,
+      colorCount: colorCount is int ? colorCount : null,
       bytes: bytes,
       checksum: checksum,
       animation: value['animation'] == null
@@ -116,6 +121,7 @@ final class OnlinePicture {
   final String category;
   final int width;
   final int height;
+  final int? colorCount;
   final int bytes;
   final String checksum;
   final OnlineAnimationInfo? animation;
