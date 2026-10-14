@@ -84,9 +84,11 @@ final class ArtworkLibrary {
         totalPoints > 1000000000 ||
         this.unlocked.length > 5000 ||
         this.rewarded.length > 5000 ||
-        [...this.favorites, ...this.unlocked, ...this.rewarded].any(
-          (id) => !RegExp(r'^[a-z0-9-]+$').hasMatch(id),
-        )) {
+        [
+          ...this.favorites,
+          ...this.unlocked,
+          ...this.rewarded,
+        ].any((id) => !RegExp(r'^[a-z0-9-]+$').hasMatch(id))) {
       throw const FormatException('Invalid artwork library.');
     }
   }
