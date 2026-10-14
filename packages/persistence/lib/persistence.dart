@@ -432,6 +432,7 @@ final class MemoryPreferences
         ArtworkStylePreferences {
   final Map<String, ProgressSnapshot> _records = {};
   String? language;
+  String? artworkStyle;
   String? recentArtworkId;
   ArtworkLibrary _library = ArtworkLibrary();
   final Map<String, ProgressSyncOutbox> _outboxes = {};
