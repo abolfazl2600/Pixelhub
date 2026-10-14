@@ -1,5 +1,3 @@
-import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
 
 /// Presentation-only styles. Never serialize this value into artwork JSON.
