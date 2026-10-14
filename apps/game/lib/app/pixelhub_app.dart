@@ -249,15 +249,19 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       await preferences.writeArtworkStyle(style.storageId);
     } on Object {
       if (!mounted) return;
-      ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-        SnackBar(
-          content: Text(
-            context.isPersian
-                ? 'ذخیرهٔ سبک نمایش انجام نشد؛ انتخاب فعلی تا بسته‌شدن برنامه فعال می‌ماند.'
-                : 'Could not save the style; the current choice lasts until the app closes.',
+      final routeContext =
+          _router.routerDelegate.navigatorKey.currentContext;
+      if (routeContext != null && routeContext.mounted) {
+        ScaffoldMessenger.maybeOf(routeContext)?.showSnackBar(
+          SnackBar(
+            content: Text(
+              _locale.languageCode == 'fa'
+                  ? 'ذخیرهٔ سبک نمایش انجام نشد؛ انتخاب فعلی تا بسته‌شدن برنامه فعال می‌ماند.'
+                  : 'Could not save the style; the current choice lasts until the app closes.',
+            ),
           ),
-        ),
-      );
+        );
+      }
     }
   }
 
