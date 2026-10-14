@@ -53,6 +53,28 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ],
               ),
+              Card(
+                color: PixelTokens.lemon,
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.monetization_on_outlined),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '${s.walletCoins}: ${context.digits(library.coins)}',
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                      ),
+                      Text(
+                        '${s.walletPoints}: ${context.digits(library.totalPoints)}',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               const SizedBox(height: 24),
               Text(
                 s.headline,
