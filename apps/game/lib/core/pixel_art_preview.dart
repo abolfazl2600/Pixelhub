@@ -25,7 +25,7 @@ class PixelArtPreview extends StatelessWidget {
     image: true,
     child: AspectRatio(
       aspectRatio: level.width / level.height,
-      child: CustomPaint(painter: _FixturePainter(level)),
+      child: CustomPaint(painter: _FixturePainter(level, renderStyle)),
     ),
   );
 }
