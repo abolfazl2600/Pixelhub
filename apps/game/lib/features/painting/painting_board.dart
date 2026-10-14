@@ -17,6 +17,7 @@ class PaintingBoard extends StatefulWidget {
   });
   final PaintingController controller;
   final bool moveMode;
+  final ArtworkRenderStyle renderStyle;
   @override
   State<PaintingBoard> createState() => _PaintingBoardState();
 }
