@@ -27,7 +27,10 @@ class _ExportButtonState extends State<ExportButton> {
     final level = widget.level;
     setState(() => _busy = true);
     try {
-      final bytes = await compute(renderLevelPng, level.toJson());
+      final bytes = await compute(renderLevelPng, {
+        ...level.toJson(),
+        'renderStyle': renderStyle.storageId,
+      });
       if (!mounted) {
         return;
       }
