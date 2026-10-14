@@ -181,6 +181,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
         return CompletionScreen(
           controller: controller,
           animation: widget.animation,
+          renderStyle: widget.renderStyle,
           appBar: appBar,
           saveState: _saveState(),
           onView: () => setState(() => _viewResult = true),
