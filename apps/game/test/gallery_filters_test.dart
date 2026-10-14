@@ -125,10 +125,7 @@ void main() {
       ),
       [masterpiece],
     );
-    expect(
-      matchingOnlinePictures(source, category: 'all', search: ''),
-      source,
-    );
+    expect(matchingOnlinePictures(source, category: 'all', search: ''), source);
   });
 
   test('the visible slice is calculated after filtering', () {
