@@ -84,10 +84,12 @@ void main() {
     await tester.scrollUntilVisible(
       find.byKey(const ValueKey('online-gallery-section')),
       300,
-      scrollable: find.descendant(
-        of: find.byType(CustomScrollView),
-        matching: find.byType(Scrollable),
-      ).first,
+      scrollable: find
+          .descendant(
+            of: find.byType(CustomScrollView),
+            matching: find.byType(Scrollable),
+          )
+          .first,
     );
     expect(find.text('جانوران آنلاین'), findsOneWidget);
     expect(
@@ -104,10 +106,12 @@ void main() {
     await tester.scrollUntilVisible(
       firstDownloadButton,
       250,
-      scrollable: find.descendant(
-        of: find.byType(CustomScrollView),
-        matching: find.byType(Scrollable),
-      ).first,
+      scrollable: find
+          .descendant(
+            of: find.byType(CustomScrollView),
+            matching: find.byType(Scrollable),
+          )
+          .first,
     );
     expect(firstOnlineCard, findsOneWidget);
     expect(firstDownloadButton, findsOneWidget);
@@ -140,10 +144,12 @@ void main() {
     await tester.scrollUntilVisible(
       find.byKey(const ValueKey('online-gallery-section')),
       300,
-      scrollable: find.descendant(
-        of: find.byType(CustomScrollView),
-        matching: find.byType(Scrollable),
-      ).first,
+      scrollable: find
+          .descendant(
+            of: find.byType(CustomScrollView),
+            matching: find.byType(Scrollable),
+          )
+          .first,
     );
     expect(find.text('اشیا آنلاین'), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -208,10 +214,12 @@ void main() {
     await tester.scrollUntilVisible(
       find.byKey(downloadKey),
       280,
-      scrollable: find.descendant(
-        of: find.byType(CustomScrollView),
-        matching: find.byType(Scrollable),
-      ).first,
+      scrollable: find
+          .descendant(
+            of: find.byType(CustomScrollView),
+            matching: find.byType(Scrollable),
+          )
+          .first,
     );
     await tester.tap(find.byKey(downloadKey));
     await tester.pumpAndSettle();
