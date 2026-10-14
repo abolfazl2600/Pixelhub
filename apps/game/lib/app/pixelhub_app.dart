@@ -444,6 +444,8 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
         controller: _controller(matches.first),
         animation: _animationFor(matches.first),
         diagnostics: _diagnostics,
+        renderStyle: _renderStyle,
+        onRenderStyleChanged: (style) => unawaited(_setArtworkStyle(style)),
         onOpened: () => unawaited(_library.markOpened(matches.first)),
       );
     },
