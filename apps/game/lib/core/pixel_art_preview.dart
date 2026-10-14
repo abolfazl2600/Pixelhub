@@ -31,9 +31,10 @@ class PixelArtPreview extends StatelessWidget {
 }
 
 class _FixturePainter extends CustomPainter {
-  _FixturePainter(this.level);
+  _FixturePainter(this.level, this.renderStyle);
 
   final LevelDefinition level;
+  final ArtworkRenderStyle renderStyle;
 
   @override
   void paint(Canvas canvas, Size size) {
