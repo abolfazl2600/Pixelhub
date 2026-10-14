@@ -58,7 +58,7 @@ PICTURES = [
         "..........", ".xxxxxxxx.", ".xaaaaaax.", ".xxaaaaxx.",
         ".xxxaxxxx.", ".xxxxaxxx.", ".xxxxxaax.", ".xxxxxxxx.",
         ".xxxxxxxx.", ".........."]),
-    ("gift-box", "جعبه هدیه", "جعبه هدیه", "purple", [
+    ("gift-box", "جعبه هدیه", "Gift Box", "purple", [
         "...xx.....", "..xbbx....", ".xxxxxxx..", ".xaxxxax..",
         ".xaxxxax..", ".xxxxxxxx.", ".xaxxxax..", ".xaxxxax..",
         ".xxxxxxxx.", ".........."]),
