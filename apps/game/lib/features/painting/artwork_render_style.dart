@@ -21,11 +21,11 @@ void paintCanvasTexture(
   Rect bounds, {
   required double cellWidth,
   required double cellHeight,
-  double opacity = .075,
+  double opacity = .04,
 }) {
   if (bounds.isEmpty) return;
-  final spacing = (ui.lerpDouble(3.5, 7.0, (cellWidth / 28).clamp(0.0, 1.0).toDouble())!)
-      .clamp(2.5, 7.0);
+  final cellScale = ((cellWidth + cellHeight) / 56).clamp(0.0, 1.0).toDouble();
+  final spacing = ui.lerpDouble(3.5, 7.0, cellScale)!.clamp(2.5, 7.0);
   final minor = Paint()
     ..isAntiAlias = false
     ..strokeWidth = .45
