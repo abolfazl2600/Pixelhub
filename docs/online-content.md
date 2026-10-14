@@ -927,3 +927,49 @@ After successful main CI, the Pages workflow publishes the
 and assembles the online catalog. Verify the Release and successful Pages
 deployment before claiming public availability. No existing release assets,
 artwork IDs, download checksums or progress are replaced.
+
+## Fifteen new animated 64×64 classic paintings
+
+The reproducible generator `tool/online_animated_masterworks_64_15_pack.py`
+creates fifteen new independently authored 64×64 color-by-number paintings.
+Artwork instructions are maintained in
+`tool/online_animated_masterworks_64_15_designs.py`. Painting scans and
+generated grids/previews are not committed or bundled into the application.
+
+| ID suffix | فارسی | English | Animated detail |
+| --- | --- | --- | --- |
+| primavera | بهار | Primavera | flowers and petals |
+| tower-babel | برج بابل | The Tower of Babel | illuminated tiers and moving clouds |
+| hunters-snow | شکارچیان در برف | Hunters in the Snow | falling snow and frozen pond |
+| ophelia | اوفلیا | Ophelia | river ripples and floating blossoms |
+| lady-shalott | بانوی شالوت | The Lady of Shalott | candles and moving water |
+| olympia | المپیا | Olympia | curtain lighting and flowers |
+| luncheon-grass | ناهار روی چمنزار | Luncheon on the Grass | dappled sunlight |
+| childs-bath | حمام کودک | The Child's Bath | rippling bathwater |
+| boating-party | مهمانی قایق‌سواری | The Boating Party | boat rocking and water shimmer |
+| ballet-class | کلاس باله | The Ballet Class | tutu and studio light |
+| blue-dancers | رقصندگان آبی | Blue Dancers | shimmering blue tutus |
+| view-delft | نمای دلفت | View of Delft | canal reflections and clouds |
+| astronomer | ستاره‌شناس | The Astronomer | window light on celestial globe |
+| irises | زنبق‌ها | Irises | swaying iris petals |
+| red-vineyard | تاکستان سرخ | The Red Vineyard | sunlit vines and reflected light |
+
+Every picture uses a **previously unused** immutable ID with
+`online-classic-animated64-` prefix and `levelVersion: 1`. Levels are
+exactly 4096 cells with bilingual titles and individual palettes.
+The published category remains the legacy-compatible `patterns`, and the
+existing `online-classic-*` overlay presents them in `masterpieces`.
+Each painting includes a downloadable checksum-bound sidecar with eight
+independently delta-coded animation frames at 180 ms. Original completed
+artwork and user painting progress are never overwritten; animations work
+offline after downloading and only play on completed paintings.
+
+A successful main CI triggers the Pages publication workflow to create the
+immutable `pixelhub-content-animated-classics-64-15-v1` GitHub Release
+and aggregate its `content.zip` into the online catalog. New content
+availability requires a completed successful Release/Pages deployment.
+
+Build/test:
+
+    python3 tool/online_animated_masterworks_64_15_pack.py /tmp/content.zip
+    python3 -m unittest discover -s tool/tests -p 'test_online_animated_masterworks_64_15_pack.py' -v
