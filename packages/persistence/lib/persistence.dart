@@ -82,7 +82,8 @@ final class LocalPreferences
         ArtworkRepository,
         ProgressSyncOutboxRepository,
         OnlineLevelStorage,
-        OnlineAnimationStorage {
+        OnlineAnimationStorage,
+        ArtworkStylePreferences {
   LocalPreferences({SharedPreferencesAsync? preferences})
     : _preferences = preferences ?? SharedPreferencesAsync();
   final SharedPreferencesAsync _preferences;
