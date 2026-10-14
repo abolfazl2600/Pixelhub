@@ -53,14 +53,12 @@ class _FixturePainter extends CustomPainter {
         );
       }
     }
-    if (renderStyle == ArtworkRenderStyle.canvas) {
-      paintCanvasTexture(
-        canvas,
-        Offset.zero & size,
-        cellWidth: size.width / level.width,
-        cellHeight: size.height / level.height,
-      );
-    }
+    artworkStylePainters[renderStyle]?.call(
+      canvas,
+      Offset.zero & size,
+      cellWidth: size.width / level.width,
+      cellHeight: size.height / level.height,
+    );
   }
 
   @override
