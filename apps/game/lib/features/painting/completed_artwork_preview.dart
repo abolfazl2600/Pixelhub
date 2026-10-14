@@ -13,11 +13,13 @@ class CompletedArtworkPreview extends StatefulWidget {
   const CompletedArtworkPreview({
     required this.level,
     this.animation,
+    this.renderStyle = ArtworkRenderStyle.pixel,
     super.key,
   });
 
   final LevelDefinition level;
   final PixelAnimation? animation;
+  final ArtworkRenderStyle renderStyle;
 
   @override
   State<CompletedArtworkPreview> createState() =>
