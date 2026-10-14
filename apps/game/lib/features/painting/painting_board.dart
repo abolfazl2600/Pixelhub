@@ -202,6 +202,7 @@ class _PaintingBoardState extends State<PaintingBoard> {
                           _transform,
                           context.isPersian,
                           _focus.hasFocus ? (_cursorX, _cursorY) : null,
+                          widget.renderStyle,
                         ),
                       ),
                     ),
