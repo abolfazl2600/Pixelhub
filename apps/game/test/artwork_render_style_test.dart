@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:image/image.dart' as img;
 import 'package:level_schema/level_schema.dart';
 import 'package:persistence/persistence.dart';
 import 'package:pixelhub/features/import/photo_converter.dart';
 import 'package:pixelhub/features/painting/artwork_render_style.dart';
-import 'package:image/image.dart' as img;
 
 LevelDefinition _level() => LevelDefinition(
   id: 'sunflower',
@@ -18,40 +18,52 @@ LevelDefinition _level() => LevelDefinition(
 );
 
 void main() {
-  test('style preferences are local, persistent, and fail safely to Pixel', () async {
-    final storage = MemoryPreferences();
-    expect(await storage.readArtworkStyle(), isNull);
-    expect(ArtworkRenderStyle.fromStorage(await storage.readArtworkStyle()),
-        ArtworkRenderStyle.pixel);
+  test(
+    'style preferences are local, persistent, and fail safely to Pixel',
+    () async {
+      final storage = MemoryPreferences();
+      expect(await storage.readArtworkStyle(), isNull);
+      expect(
+        ArtworkRenderStyle.fromStorage(await storage.readArtworkStyle()),
+        ArtworkRenderStyle.pixel,
+      );
 
-    await storage.writeArtworkStyle('canvas');
-    expect(await storage.readArtworkStyle(), 'canvas');
-    expect(ArtworkRenderStyle.fromStorage(await storage.readArtworkStyle()),
-        ArtworkRenderStyle.canvas);
+      await storage.writeArtworkStyle('canvas');
+      expect(await storage.readArtworkStyle(), 'canvas');
+      expect(
+        ArtworkRenderStyle.fromStorage(await storage.readArtworkStyle()),
+        ArtworkRenderStyle.canvas,
+      );
 
-    storage.artworkStyle = 'unknown-corrupt-value';
-    expect(await storage.readArtworkStyle(), isNull);
-    expect(ArtworkRenderStyle.fromStorage(await storage.readArtworkStyle()),
-        ArtworkRenderStyle.pixel);
-    await expectLater(
-      storage.writeArtworkStyle('watercolor'),
-      throwsFormatException,
-    );
-  });
+      storage.artworkStyle = 'unknown-corrupt-value';
+      expect(await storage.readArtworkStyle(), isNull);
+      expect(
+        ArtworkRenderStyle.fromStorage(await storage.readArtworkStyle()),
+        ArtworkRenderStyle.pixel,
+      );
+      await expectLater(
+        storage.writeArtworkStyle('watercolor'),
+        throwsFormatException,
+      );
+    },
+  );
 
-  test('PNG export keeps legacy Pixel output and applies Canvas weave only on opt-in', () {
-    final level = _level().toJson();
-    final pixel = renderLevelPng({...level, 'renderStyle': 'pixel'});
-    final canvas = renderLevelPng({...level, 'renderStyle': 'canvas'});
-    expect(pixel, isNotEmpty);
-    expect(canvas, isNotEmpty);
-    expect(canvas, isNot(equals(pixel)));
+  test(
+    'PNG export keeps legacy Pixel output and applies Canvas weave only on opt-in',
+    () {
+      final level = _level().toJson();
+      final pixel = renderLevelPng({...level, 'renderStyle': 'pixel'});
+      final canvas = renderLevelPng({...level, 'renderStyle': 'canvas'});
+      expect(pixel, isNotEmpty);
+      expect(canvas, isNotEmpty);
+      expect(canvas, isNot(equals(pixel)));
 
-    final pixelImage = img.decodePng(pixel)!;
-    final canvasImage = img.decodePng(canvas)!;
-    expect(canvasImage.width, pixelImage.width);
-    expect(canvasImage.height, pixelImage.height);
-    expect(pixelImage.width, 1024);
-    expect(pixelImage.height, 1024);
-  });
+      final pixelImage = img.decodePng(pixel)!;
+      final canvasImage = img.decodePng(canvas)!;
+      expect(canvasImage.width, pixelImage.width);
+      expect(canvasImage.height, pixelImage.height);
+      expect(pixelImage.width, 1024);
+      expect(pixelImage.height, 1024);
+    },
+  );
 }
