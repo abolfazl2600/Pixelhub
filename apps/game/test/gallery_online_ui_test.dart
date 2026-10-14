@@ -85,12 +85,52 @@ void main() {
     await tester.scrollUntilVisible(
       find.byKey(const ValueKey('online-gallery-section')),
       300,
-      scrollable: find.byType(Scrollable).first,
+      scrollable: find
+          .descendant(
+            of: find.byType(CustomScrollView),
+            matching: find.byType(Scrollable),
+          )
+          .first,
     );
     expect(find.text('جانوران آنلاین'), findsOneWidget);
     expect(
       online.available.where((art) => art.category == 'animals'),
       hasLength(9),
+    );
+
+    final firstOnlineCard = find.byKey(
+      const ValueKey('online-picture-online-gallery-test-0'),
+    );
+    final firstDownloadButton = find.byKey(
+      const ValueKey('online-download-online-gallery-test-0'),
+    );
+    await tester.scrollUntilVisible(
+      firstDownloadButton,
+      250,
+      scrollable: find
+          .descendant(
+            of: find.byType(CustomScrollView),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    expect(firstOnlineCard, findsOneWidget);
+    expect(firstDownloadButton, findsOneWidget);
+    final image = find.descendant(
+      of: firstOnlineCard,
+      matching: find.byType(Image),
+    );
+    expect(image, findsOneWidget);
+    expect(
+      tester.getTopLeft(firstDownloadButton).dy,
+      greaterThanOrEqualTo(tester.getBottomLeft(image).dy),
+    );
+    expect(
+      find.descendant(
+        of: firstOnlineCard,
+        matching: find.text('تصاویر آنلاین'),
+      ),
+      findsNothing,
     );
 
     // Changing the chip resets pagination and the local empty state.
@@ -105,7 +145,12 @@ void main() {
     await tester.scrollUntilVisible(
       find.byKey(const ValueKey('online-gallery-section')),
       300,
-      scrollable: find.byType(Scrollable).first,
+      scrollable: find
+          .descendant(
+            of: find.byType(CustomScrollView),
+            matching: find.byType(Scrollable),
+          )
+          .first,
     );
     expect(find.text('اشیا آنلاین'), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -168,7 +213,12 @@ void main() {
       await tester.scrollUntilVisible(
         find.byKey(const ValueKey('online-picture-online-gallery-test-9')),
         280,
-        scrollable: find.byType(Scrollable).first,
+        scrollable: find
+            .descendant(
+              of: find.byType(CustomScrollView),
+              matching: find.byType(Scrollable),
+            )
+            .first,
       );
       expect(
         find.byKey(const ValueKey('online-picture-online-gallery-test-9')),
@@ -190,7 +240,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('All difficulties'), findsOneWidget);
       expect(find.text('Easy'), findsOneWidget);
-      expect(find.text('Medium'), findsOneWidget);
+      expect(find.text('Medium'), findsNWidgets(2));
       expect(find.text('Hard'), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
@@ -252,11 +302,11 @@ void main() {
     );
     await tester.pumpAndSettle();
     final downloadKey = ValueKey('online-download-${level.id}');
-    await tester.scrollUntilVisible(
-      find.byKey(downloadKey),
-      280,
-      scrollable: find.byType(Scrollable).first,
+    await tester.drag(
+      find.byType(CustomScrollView).first,
+      const Offset(0, -500),
     );
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(downloadKey));
     await tester.pumpAndSettle();
     expect(online.downloaded.map((value) => value.id), contains(level.id));

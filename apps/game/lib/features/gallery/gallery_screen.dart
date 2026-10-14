@@ -75,8 +75,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
     if (_category != 'all' && library.category(level) != _category) {
       return false;
     }
-    if (_difficulty != 'all' &&
-        difficultyForLevel(level).name != _difficulty) {
+    if (_difficulty != 'all' && difficultyForLevel(level).name != _difficulty) {
       return false;
     }
     if (_filter == 'personal' && !level.id.startsWith('private-')) {
@@ -418,37 +417,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
                           ),
                         ),
                       ),
-                    PositionedDirectional(
-                      end: 4,
-                      top: 4,
-                      child: Material(
-                        color: Colors.white.withValues(alpha: 0.90),
-                        shape: const CircleBorder(),
-                        child: IconButton(
-                          key: ValueKey('online-download-${picture.id}'),
-                          tooltip: s.downloadPicture,
-                          constraints: const BoxConstraints(
-                            minWidth: 40,
-                            minHeight: 40,
-                          ),
-                          icon: downloading
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Icon(
-                                  Icons.cloud_download_outlined,
-                                  size: 22,
-                                ),
-                          onPressed: widget.online.downloadingId != null
-                              ? null
-                              : () => _downloadAndPaint(picture),
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -488,15 +456,31 @@ class _GalleryScreenState extends State<GalleryScreen> {
                     ),
                   ),
                   const Spacer(),
-                  Flexible(
-                    child: Text(
-                      s.onlinePictures,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 11),
-                    ),
-                  ),
                 ],
+              ),
+              const SizedBox(height: 2),
+              Align(
+                alignment: AlignmentDirectional.centerEnd,
+                child: IconButton(
+                  key: ValueKey('online-download-${picture.id}'),
+                  tooltip: s.downloadPicture,
+                  visualDensity: VisualDensity.compact,
+                  constraints: const BoxConstraints(
+                    minWidth: 36,
+                    minHeight: 36,
+                  ),
+                  padding: EdgeInsets.zero,
+                  icon: downloading
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.cloud_download_outlined, size: 22),
+                  onPressed: widget.online.downloadingId != null
+                      ? null
+                      : () => _downloadAndPaint(picture),
+                ),
               ),
             ],
           ),
@@ -524,7 +508,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
       final visible = available.take(_onlineVisibleCount).toList();
       const grid = SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 240,
-        mainAxisExtent: 246,
+        mainAxisExtent: 270,
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
       );
@@ -628,8 +612,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
                               if (value == null) return;
                               setState(() {
                                 _difficulty = value;
-                                _onlineVisibleCount =
-                                    _category == 'all' ? 6 : 12;
+                                _onlineVisibleCount = _category == 'all'
+                                    ? 6
+                                    : 12;
                               });
                             },
                           ),
