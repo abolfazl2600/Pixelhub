@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:level_schema/level_schema.dart';
 
 import '../l10n/strings.dart';
+import '../features/painting/artwork_render_style.dart';
 
 /// Read-only fixture rendering. No input, painting engine or progress in V1.
 class PixelArtPreview extends StatelessWidget {
