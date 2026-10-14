@@ -886,3 +886,44 @@ Build and test:
 
 The source change alone is not proof of a live release. Confirm successful
 main CI and Pages deployment and check `/Pixelhub/online/catalog.json`.
+
+## Ten animated 64x64 public-domain masterpieces
+
+New authoring source `tool/online_animated_masterworks_64_pack.py` creates
+ten independently drawn, **exactly 64×64** color-by-number interpretations.
+The source does not embed or resize painting scans. The generator writes
+a **release-only immutable** `content.zip` containing bilingual JSON levels,
+PNG previews, downloadable checksum-bound animation companions, and
+bilingual `animation-scenarios.json`. Pictures keep `levelVersion: 1` and
+fresh IDs prefixed `online-classic-animated64-`, which the client displays
+in the `masterpieces` gallery using its existing category overlay. The
+legacy online catalog value remains `patterns` for older client support.
+
+| New ID suffix | Persian title | Original painting | Artist | Animation |
+| --- | --- | --- | --- | --- |
+| whistlers-mother | مادر ویسلر | Whistler's Mother | James McNeill Whistler | Curtain shimmer |
+| arnolfini-portrait | پرتره آرنولفینی | The Arnolfini Portrait | Jan van Eyck | Mirror and chandelier glow |
+| bedroom-arles | اتاق خواب در آرل | The Bedroom in Arles | Vincent van Gogh | Window light |
+| cafe-terrace-night | تراس کافه در شب | Café Terrace at Night | Vincent van Gogh | Stars and lamps |
+| almond-blossoms | شکوفه‌های بادام | Almond Blossoms | Vincent van Gogh | Moving petals |
+| the-gleaners | خوشه‌چینان | The Gleaners | Jean-François Millet | Wheat shimmer |
+| the-swing | تاب | The Swing | Jean-Honoré Fragonard | Rope and dress |
+| woman-parasol | زن با چتر آفتابی | Woman with a Parasol | Claude Monet | Clouds and umbrella |
+| lady-ermine | بانویی با قاقم | Lady with an Ermine | Leonardo da Vinci | Ermine blinking |
+| bar-folies-bergere | بار در فولی‌برژر | A Bar at the Folies-Bergère | Édouard Manet | Mirror/bottle glimmer |
+
+All paintings have eight 180 ms frames described as sparse replacements
+from the original completed still, not incremental changes. Original
+numbered grids and progress are never mutated. The existing animation
+download and completed-painting viewer work offline after download.
+
+To generate locally:
+
+    python3 tool/online_animated_masterworks_64_pack.py /tmp/content.zip
+    python3 -m unittest discover -s tool/tests -p 'test_online_animated_masterworks_64_pack.py' -v
+
+After successful main CI, the Pages workflow publishes the
+`pixelhub-content-animated-masterworks-64-10-v1` GitHub Release, if absent,
+and assembles the online catalog. Verify the Release and successful Pages
+deployment before claiming public availability. No existing release assets,
+artwork IDs, download checksums or progress are replaced.
