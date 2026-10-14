@@ -59,12 +59,34 @@ void main() {
       await tester.pumpAndSettle();
       final completedBeforeSwitch = controller.session!.completedCount;
       expect(completedBeforeSwitch, greaterThan(0));
+      controller.selectColor(1);
+      controller.showHint();
+      final selectedBeforeSwitch = controller.session!.selectedColor;
+      final hintBeforeSwitch = controller.hintIndex;
+      final viewer = tester.widget<InteractiveViewer>(
+        find.byType(InteractiveViewer),
+      );
+      viewer.transformationController!.value = Matrix4.diagonal3Values(2, 2, 1);
+      await tester.pump();
+      final zoomBeforeSwitch = viewer.transformationController!
+          .value
+          .getMaxScaleOnAxis();
 
       await tester.ensureVisible(find.byKey(const ValueKey('style-canvas')));
       await tester.tap(find.byKey(const ValueKey('style-canvas')));
       await tester.pumpAndSettle();
       expect(storage.artworkStyle, 'canvas');
       expect(controller.session!.completedCount, completedBeforeSwitch);
+      expect(controller.session!.selectedColor, selectedBeforeSwitch);
+      expect(controller.hintIndex, hintBeforeSwitch);
+      expect(
+        tester
+            .widget<InteractiveViewer>(find.byType(InteractiveViewer))
+            .transformationController!
+            .value
+            .getMaxScaleOnAxis(),
+        zoomBeforeSwitch,
+      );
       expect(
         tester.widget<PaintingBoard>(find.byType(PaintingBoard)).renderStyle,
         ArtworkRenderStyle.canvas,
