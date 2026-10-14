@@ -251,6 +251,15 @@ void main() {
       expect(find.text('Easy'), findsOneWidget);
       expect(find.text('Medium'), findsOneWidget);
       expect(find.text('Hard'), findsOneWidget);
+      final englishMediumDifficultyChip = find.byKey(
+        const ValueKey('gallery-difficulty-medium'),
+      );
+      expect(
+        tester.widget<ChoiceChip>(englishMediumDifficultyChip).selected,
+        isTrue,
+      );
+      await tester.tap(find.byKey(const ValueKey('gallery-difficulty-all')));
+      await tester.pumpAndSettle();
       final englishAllDifficultyChip = find.byKey(
         const ValueKey('gallery-difficulty-all'),
       );
