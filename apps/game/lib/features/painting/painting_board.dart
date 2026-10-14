@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../l10n/strings.dart';
+import 'artwork_render_style.dart';
 import 'painting_controller.dart';
 
 class PaintingBoard extends StatefulWidget {
