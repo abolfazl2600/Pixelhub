@@ -49,7 +49,7 @@ class AnimationCompanionTests(unittest.TestCase):
         before = {p.relative_to(self.online): p.read_bytes()
                   for p in self.online.rglob('*') if p.is_file()}
         catalog_before = json.loads(before[Path('catalog.json')])
-        publish(self.online)
+        publish(self.online, self.batch_dir)
         after = json.loads((self.online / 'catalog.json').read_text())
         for path, body in before.items():
             if path != Path('catalog.json'):
