@@ -6,6 +6,7 @@ import '../../core/local_diagnostics.dart';
 import '../../l10n/strings.dart';
 import '../gallery/export_button.dart';
 import 'painting_board.dart';
+import 'artwork_render_style.dart';
 import 'painting_controller.dart';
 import 'completed_artwork_preview.dart';
 import 'package:level_schema/level_schema.dart';
