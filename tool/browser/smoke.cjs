@@ -134,8 +134,15 @@ async function main() {
     // Browser-only wallet fixture: the integration test checks multiple
     // purchases in succession without needing to finish a 128x128 picture.
     // This does not grant coins to real users or modify application code.
-    await page.waitForFunction(() => Object.keys(localStorage).some(
-      k => k.includes('pixelhub.library.v1')));
+    await page.waitForFunction(() => {
+      const key = Object.keys(localStorage).find(
+        k => k.includes('pixelhub.library.v1'));
+      if (!key) return false;
+      let library = JSON.parse(localStorage[key]);
+      if (typeof library === 'string') library = JSON.parse(library);
+      return Array.isArray(library.rewarded) &&
+        library.rewarded.includes('sunflower');
+    });
     await page.evaluate(() => {
       const key = Object.keys(localStorage).find(
         k => k.includes('pixelhub.library.v1'));
@@ -293,7 +300,9 @@ async function main() {
       null,
       {timeout:15000}
     );
-    const onlineUnlock=page.getByRole('button',{name:/Unlock for [0-9]+ coins/});
+    const onlineUnlock=page.getByRole('button',{
+      name:/Unlock for [0-9]+ coins|باز کردن با [۰-۹]+ سکه/
+    });
     await onlineUnlock.waitFor();
     await onlineUnlock.click();
     await board().waitFor();
