@@ -309,10 +309,10 @@ jobs:
         run: |
           if ! gh release view pixelhub-content-abstract-mini-10-v1 >/dev/null 2>&1; then
             python3 tool/online_abstract_8_pack.py "$RUNNER_TEMP/content.zip"
-            gh release create pixelhub-content-abstract-mini-10-v1 "$RUNNER_TEMP/content.zip" \\
-              --target "$TARGET_SHA" \\
-              --title "PixelHub: ten animated 8x8 abstract patterns" \\
-              --notes "Ten original exact 8x8 abstract patterns with bilingual metadata, crisp PNG previews, documented animation scenarios, and eight-frame loopable companions. Immutable online Release assets; not bundled in the app or committed as generated art." \\
+            gh release create pixelhub-content-abstract-mini-10-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: ten animated 8x8 abstract patterns" \
+              --notes "Ten original exact 8x8 abstract patterns with bilingual metadata, crisp PNG previews, documented animation scenarios, and eight-frame loopable companions. Immutable online Release assets; not bundled in the app or committed as generated art." \
               --latest=false
           fi
       - name: Download release packs and assemble online catalog
