@@ -124,7 +124,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
         decoration: BoxDecoration(
           color: colors.surfaceContainerHighest.withValues(alpha: 0.72),
           borderRadius: BorderRadius.circular(7),
-          border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.65)),
+          border: Border.all(
+            color: colors.outlineVariant.withValues(alpha: 0.65),
+          ),
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
