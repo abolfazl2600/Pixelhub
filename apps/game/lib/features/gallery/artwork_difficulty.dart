@@ -3,11 +3,7 @@ import 'dart:math' as math;
 import 'package:level_schema/level_schema.dart';
 
 /// A display-only estimate; it is never written to artwork or progress data.
-enum ArtworkDifficulty {
-  easy,
-  medium,
-  hard,
-}
+enum ArtworkDifficulty { easy, medium, hard }
 
 /// Scores the actual grid and the number of distinct colors used by its cells.
 ///
