@@ -248,5 +248,20 @@
   "privacyContact": "Questions: https://github.com/abolfazl2600/Pixelhub/issues . This is a public issue tracker; do not post personal information or private photos there.",
   "privacyOnlineLink": "Public privacy policy URL",
   "privacyCopyLink": "Copy policy link",
-  "privacyLinkCopied": "Policy link copied."
+  "privacyLinkCopied": "Policy link copied.",
+  "walletCoins": "My coins",
+  "walletPoints": "Total points",
+  "artworkCost": "Price: {value} coins",
+  "@artworkCost": {"placeholders": {"value": {"type": "String"}}},
+  "artworkReward": "Completion reward: {value} coins and points",
+  "@artworkReward": {"placeholders": {"value": {"type": "String"}}},
+  "unlockArtwork": "Unlock for {value} coins",
+  "@unlockArtwork": {"placeholders": {"value": {"type": "String"}}},
+  "insufficientCoins": "Not enough coins. Complete unlocked paintings to earn more.",
+  "artworkUnlocked": "Painting unlocked!",
+  "artworkFree": "Free",
+  "artworkOwned": "Owned",
+  "walletExplanation": "The sunflower and personal paintings are free. Earn coins and points once for each completed picture. Spend coins to unlock paintings; there are no real-money purchases.",
+  "coinSaveFailed": "Could not save the coins or purchase. Please retry.",
+  "walletInitial": "Starting gift: 120 coins"
 }
