@@ -311,6 +311,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                   key: ValueKey(controller.level.id),
                   controller: controller,
                   moveMode: _moveMode,
+                  renderStyle: widget.renderStyle,
                 ),
                 const SizedBox(height: 8),
                 Text(
