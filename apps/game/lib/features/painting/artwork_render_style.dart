@@ -24,10 +24,9 @@ void paintCanvasTexture(
   double opacity = .04,
 }) {
   if (bounds.isEmpty) return;
-  final cellScale = ((cellWidth + cellHeight) / 56)
-      .clamp(0.0, 1.0)
-      .toDouble();
-  final spacing = ui.lerpDouble(3.5, 7.0, cellScale)!
+  final cellScale = ((cellWidth + cellHeight) / 56).clamp(0.0, 1.0).toDouble();
+  final spacing = ui
+      .lerpDouble(3.5, 7.0, cellScale)!
       .clamp(2.5, 7.0)
       .toDouble();
   final minor = Paint()
@@ -43,11 +42,7 @@ void paintCanvasTexture(
   final firstX = (bounds.left / spacing).floor() * spacing;
   final firstY = (bounds.top / spacing).floor() * spacing;
   for (var x = firstX; x <= bounds.right; x += spacing) {
-    canvas.drawLine(
-      Offset(x, bounds.top),
-      Offset(x, bounds.bottom),
-      minor,
-    );
+    canvas.drawLine(Offset(x, bounds.top), Offset(x, bounds.bottom), minor);
     canvas.drawLine(
       Offset(x + spacing * .28, bounds.top),
       Offset(x + spacing * .28, bounds.bottom),
@@ -55,11 +50,7 @@ void paintCanvasTexture(
     );
   }
   for (var y = firstY; y <= bounds.bottom; y += spacing) {
-    canvas.drawLine(
-      Offset(bounds.left, y),
-      Offset(bounds.right, y),
-      minor,
-    );
+    canvas.drawLine(Offset(bounds.left, y), Offset(bounds.right, y), minor);
     canvas.drawLine(
       Offset(bounds.left, y + spacing * .28),
       Offset(bounds.right, y + spacing * .28),
@@ -70,12 +61,13 @@ void paintCanvasTexture(
 }
 
 /// Registry makes adding future rendering looks independent of level data.
-typedef ArtworkStylePainter = void Function(
-  Canvas canvas,
-  Rect bounds, {
-  required double cellWidth,
-  required double cellHeight,
-});
+typedef ArtworkStylePainter =
+    void Function(
+      Canvas canvas,
+      Rect bounds, {
+      required double cellWidth,
+      required double cellHeight,
+    });
 
 final Map<ArtworkRenderStyle, ArtworkStylePainter> artworkStylePainters = {
   ArtworkRenderStyle.canvas: paintCanvasTexture,
