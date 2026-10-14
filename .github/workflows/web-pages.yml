@@ -259,6 +259,20 @@ jobs:
               --notes "Twenty hand-authored 64x64 bilingual color-by-number levels covering Blue Mosque Tabriz, Khaju Bridge, Ali Qapu, Chehel Sotoun, Shah Cheragh, Fin and Eram gardens, Masuleh and Kandovan, Lut kaluts, Anzali lagoon, Damavand, Persian carpet, minakari, khatamkari, samovar, santur, tombak, Haft-Seen and Yalda. Immutable JSON levels, PNG previews and catalog are Release-only assets, not bundled into APK." \
               --latest=false
           fi
+      - name: Publish 23 Iranian heritage, landscape and culture paintings
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-iranian-heritage-23-v1 >/dev/null 2>&1; then
+            python3 tool/online_iranian_heritage_23_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-iranian-heritage-23-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: 23 Iranian heritage and nature coloring pictures" \
+              --notes "Twenty-three new bilingual 64x64 coloring levels: Pasargadae and Cyrus's Tomb, Chogha Zanbil, Saadi and Ferdowsi tombs, Soltaniyeh Dome, Karim Khan Citadel, Dowlatabad Garden, Borujerdi and Tabatabaei houses, Vank Cathedral, Falak-ol-Aflak Castle, Tabriz Bazaar, Yazd Jameh Mosque, Gonbad-e Qabus, Naqsh-e Rostam, Iranian landscape, traditional courtyard, Persian leopard, village daily life, Taq-e Bostan, Behistun, Shahr-e Sukhteh and Sheikh Lotfollah Mosque. Immutable level JSON and PNG previews are Release assets." \
+              --latest=false
+          fi
       - name: Publish animated sunflower as an optional online level
         if: github.event_name == 'workflow_run'
         env:
@@ -287,6 +301,8 @@ jobs:
             --jq '.[] | select(.isDraft == false and .isPrerelease == false and (.tagName | startswith("pixelhub-content-"))) | .tagName')
           python3 tool/online_release.py assemble \
             "$RUNNER_TEMP/pixelhub-release-packs" site/online
+      - name: Generate checksum-bound recipes for new Iranian heritage animations
+        run: python3 tool/online_iranian_heritage_23_pack.py recipes site/online tool/animation_batches
       - name: Add checksum-bound animation companions to existing pictures
         run: python3 tool/publish_animation_companions.py site/online
       - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
