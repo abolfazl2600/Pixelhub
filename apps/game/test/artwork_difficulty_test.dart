@@ -50,7 +50,7 @@ void main() {
       final artwork = level(
         palette: const [
           0xff000000,
-          0xffffffff,
+          0xff000000,
           0xffff0000,
           0xff00ff00,
           0xff0000ff,
