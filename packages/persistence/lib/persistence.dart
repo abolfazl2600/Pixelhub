@@ -595,6 +595,7 @@ final class MemoryPreferences
     _downloadAnimations.clear();
     _library = ArtworkLibrary();
     language = null;
+    artworkStyle = null;
     recentArtworkId = null;
   }
 }
