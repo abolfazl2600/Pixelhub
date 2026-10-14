@@ -337,9 +337,9 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
             // Wallet ledger is durable and idempotent across resets/restarts.
             if (controller.session!.isComplete &&
                 controller.saveStatus == SaveStatus.saved) {
-              unawaited(_library.rewardCompletion(level).catchError(
-                (Object _) {},
-              ));
+              unawaited(
+                _library.rewardCompletion(level).catchError((Object _) {}),
+              );
             }
           }
         });
