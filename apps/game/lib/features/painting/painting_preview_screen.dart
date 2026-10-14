@@ -17,6 +17,8 @@ class PaintingPreviewScreen extends StatefulWidget {
     required this.diagnostics,
     this.animation,
     this.onOpened,
+    this.renderStyle = ArtworkRenderStyle.pixel,
+    this.onRenderStyleChanged,
     super.key,
   });
   static const route = '/painting';
