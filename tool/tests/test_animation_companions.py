@@ -4,6 +4,7 @@ import importlib
 import json
 from pathlib import Path
 import re
+import shutil
 import sys
 import tempfile
 import unittest
@@ -12,6 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from online_release import assemble, sample
 from pixel_animation_recipes import ROOT, animation, compact
 from publish_animation_companions import publish
+from online_iranian_heritage_23_pack import generate_recipes
 
 
 class AnimationCompanionTests(unittest.TestCase):
@@ -34,12 +36,20 @@ class AnimationCompanionTests(unittest.TestCase):
     def setUp(self):
         self.online = self.root / self.id().split('.')[-1]
         assemble(self.packs, self.online)
+        self.batch_dir = self.root / (self.id().split('.')[-1] + '-batches')
+        self.batch_dir.mkdir(parents=True, exist_ok=True)
+        for batch in (ROOT / 'tool/animation_batches').glob('online-*.json'):
+            shutil.copy2(batch, self.batch_dir / batch.name)
+        self.generated_dir = self.root / (self.id().split('.')[-1] + '-generated')
+        generate_recipes(self.online, self.generated_dir)
+        for batch in self.generated_dir.glob('online-*.json'):
+            shutil.copy2(batch, self.batch_dir / batch.name)
 
     def test_registered_batches_preserve_pixels_metadata_and_release_animations(self):
         before = {p.relative_to(self.online): p.read_bytes()
                   for p in self.online.rglob('*') if p.is_file()}
         catalog_before = json.loads(before[Path('catalog.json')])
-        publish(self.online)
+        publish(self.online, self.batch_dir)
         after = json.loads((self.online / 'catalog.json').read_text())
         for path, body in before.items():
             if path != Path('catalog.json'):
@@ -48,6 +58,10 @@ class AnimationCompanionTests(unittest.TestCase):
         for batch in (ROOT / 'tool/animation_batches').glob('online-*.json'):
             entries = json.loads(batch.read_text())
             self.assertTrue(1 <= len(entries) <= 10)
+            self.assertFalse(set(recipes) & set(entries))
+            recipes.update(entries)
+        for batch in self.generated_dir.glob('online-*.json'):
+            entries = json.loads(batch.read_text())
             self.assertFalse(set(recipes) & set(entries))
             recipes.update(entries)
         original = {p['id']: p for p in catalog_before['pictures']}

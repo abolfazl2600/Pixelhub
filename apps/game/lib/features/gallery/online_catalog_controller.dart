@@ -32,8 +32,7 @@ final class OnlineAnimationInfo {
         checksum is! String ||
         !RegExp(r'^[a-f0-9]{64}$').hasMatch(checksum) ||
         frameCount is! int ||
-        frameCount < 1 ||
-        frameCount > 60) {
+        frameCount < 1) {
       throw const FormatException('Invalid online animation metadata.');
     }
     return OnlineAnimationInfo(bytes, checksum, frameCount);
