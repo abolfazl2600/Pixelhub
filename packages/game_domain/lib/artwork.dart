@@ -85,7 +85,8 @@ final class ArtworkLibrary {
         this.unlocked.length > 5000 ||
         this.rewarded.length > 5000 ||
         [...this.favorites, ...this.unlocked, ...this.rewarded].any(
-          (id) => !RegExp(r'^[a-z0-9-]+
+          (id) => !RegExp(r'^[a-z0-9-]+$').hasMatch(id),
+        )) {
       throw const FormatException('Invalid artwork library.');
     }
   }
