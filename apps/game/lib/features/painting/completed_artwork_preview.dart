@@ -99,7 +99,7 @@ class _CompletedArtworkPreviewState extends State<CompletedArtworkPreview> {
             ),
           )
         else
-          PixelArtPreview(level: widget.level),
+          PixelArtPreview(level: widget.level, renderStyle: widget.renderStyle),
         if (animation != null) ...[
           const SizedBox(height: 12),
           Wrap(
