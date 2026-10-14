@@ -21,6 +21,7 @@ import '../features/settings/settings_screen.dart';
 import '../features/settings/privacy_screen.dart';
 import '../features/painting/painting_controller.dart';
 import '../features/painting/painting_preview_screen.dart';
+import '../features/painting/artwork_render_style.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../l10n/strings.dart';
 import '../platform_adapters/document_language.dart';
