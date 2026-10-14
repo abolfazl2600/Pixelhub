@@ -70,25 +70,13 @@ void main() {
       // These probes are inside solid-color cells (not at palette boundaries).
       final lightRecess = canvasImage.getPixel(120, 120);
       final lightRaised = canvasImage.getPixel(121, 121);
-      expect(
-        lightRaised.r.toInt() - lightRecess.r.toInt(),
-        greaterThan(40),
-      );
+      expect(lightRaised.r.toInt() - lightRecess.r.toInt(), greaterThan(40));
       final darkRecess = canvasImage.getPixel(768, 120);
       final darkRaised = canvasImage.getPixel(769, 121);
-      expect(
-        darkRaised.r.toInt() - darkRecess.r.toInt(),
-        greaterThan(35),
-      );
+      expect(darkRaised.r.toInt() - darkRecess.r.toInt(), greaterThan(35));
       // Plain pixel output is still flat: its same-cell pixels are identical.
-      expect(
-        pixelImage.getPixel(120, 120).r,
-        pixelImage.getPixel(121, 121).r,
-      );
-      expect(
-        pixelImage.getPixel(768, 120).r,
-        pixelImage.getPixel(769, 121).r,
-      );
+      expect(pixelImage.getPixel(120, 120).r, pixelImage.getPixel(121, 121).r);
+      expect(pixelImage.getPixel(768, 120).r, pixelImage.getPixel(769, 121).r);
 
       // The procedural weave is stable across exports, with no extra asset.
       expect(
