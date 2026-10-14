@@ -295,9 +295,7 @@ class LibraryController extends ChangeNotifier {
   });
 
   Future<void> add(PrivateArtwork artwork) => _mutate(() async {
-    final next = library.copyWith(
-      artworks: [...library.artworks, artwork],
-    );
+    final next = library.copyWith(artworks: [...library.artworks, artwork]);
     await repository.writeLibrary(next);
     library = next;
   });
