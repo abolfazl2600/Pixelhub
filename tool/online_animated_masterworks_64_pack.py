@@ -14,7 +14,7 @@ from online_release import checksum, compact, png, validate_new_pack_manifest
 from online_starter_pack import Sprite
 
 SIDE = 64
-PREFIX = "online-animated-classic-64-"
+PREFIX = "online-classic-animated64-"
 FRAME_DURATION_MS = 180
 
 
