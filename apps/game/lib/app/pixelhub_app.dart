@@ -58,6 +58,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
   late final OnlineCatalogController _online;
   final ValueNotifier<Map<String, PixelAnimation>> _bundledAnimations =
       ValueNotifier({});
+  final ChangeNotifier _styleChanges = ChangeNotifier();
   final Map<String, String> _bundledAnimationFiles = {};
   final Set<String> _requestedAnimations = {};
   bool _animationCatalogRequested = false;
@@ -121,6 +122,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       _library,
       _online,
       _bundledAnimations,
+      _styleChanges,
     ]);
     _router = GoRouter(
       initialLocation: widget.initialRoute,
@@ -234,7 +236,11 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     try {
       final saved = await stylePreferences.readArtworkStyle();
       if (mounted && saved != null) {
-        setState(() => _renderStyle = ArtworkRenderStyle.fromStorage(saved));
+        final style = ArtworkRenderStyle.fromStorage(saved);
+        if (_renderStyle != style) {
+          setState(() => _renderStyle = style);
+          _styleChanges.notifyListeners();
+        }
       }
     } on Object {
       // Missing/corrupt optional preferences safely keep the Pixel default.
@@ -244,6 +250,10 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
   Future<void> _setArtworkStyle(ArtworkRenderStyle style) async {
     if (_renderStyle == style) return;
     setState(() => _renderStyle = style);
+    // The active route is rebuilt by _routeChanges, not by this State's
+    // setState alone. Notify it so PaintingPreviewScreen and PaintingBoard
+    // receive the new render style immediately.
+    _styleChanges.notifyListeners();
     final preferences = _preferences;
     if (preferences is! ArtworkStylePreferences) return;
     final stylePreferences = preferences as ArtworkStylePreferences;
@@ -375,6 +385,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
         _locale = const Locale('fa');
         _renderStyle = ArtworkRenderStyle.pixel;
       });
+      _styleChanges.notifyListeners();
     }
     setDocumentLanguage('fa');
   }
@@ -484,6 +495,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _router.dispose();
+    _styleChanges.dispose();
     _bootstrap.dispose();
     _library.dispose();
     _online.dispose();
