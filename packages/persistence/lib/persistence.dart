@@ -352,9 +352,13 @@ final class LocalPreferences
   @override
   Future<void> writeArtworkStyle(String style) {
     if (style != 'pixel' && style != 'canvas') {
-      return Future<void>.error(const FormatException('Invalid artwork style.'));
+      return Future<void>.error(
+        const FormatException('Invalid artwork style.'),
+      );
     }
-    return _enqueue(() => _preferences.setString('pixelhub.artworkStyle.v1', style));
+    return _enqueue(
+      () => _preferences.setString('pixelhub.artworkStyle.v1', style),
+    );
   }
 
   @override
