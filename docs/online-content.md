@@ -811,3 +811,29 @@ work. New content availability still depends on a successful
 regression suite checks all six redraw checksums and animation companions,
 the 80×80 online grid, correct replacement catalog behavior and preservation
 of original archived content.
+
+
+## Ten animated abstract patterns on an exact 8×8 grid
+
+The reproducible generator `tool/online_abstract_8_pack.py` defines ten simple,
+distinct abstract patterns: Color Orbit, Geometric Wave, Pixel Bloom, Color
+Spiral, Floating Bars, Shimmer Diamond, Cross Weave, Pixel Burst, Concentric
+Ripple, and Pixel Kaleidoscope. Each artwork is exactly 8×8 (64 discrete cells),
+uses the existing `patterns` category, has Persian/English titles and a crisp
+PNG preview, and includes an eight-frame animation sidecar.
+
+Each design has its own written motion scenario in the generated
+`animation-scenarios.json` (also inside the immutable Release ZIP). Motion is
+limited to controlled accent-color changes; cell geometry and the original
+numbered level remain fixed. Frames use 180 ms timing and a symmetric looping
+sequence. The sidecars are checksum-bound to their exact level, downloaded with
+the picture, and remain available offline after download.
+
+After a successful main Web CI run, Pages workflow creates the immutable
+`pixelhub-content-abstract-mini-10-v1` Release and aggregates its catalog,
+previews, levels, and animation sidecars into the online gallery. Source code
+being merged is not proof of public availability: confirm the Pages workflow
+and the deployed `/Pixelhub/online/catalog.json` before announcing release.
+
+Generate a pack locally with:
+`python3 tool/online_abstract_8_pack.py /tmp/content.zip`.
