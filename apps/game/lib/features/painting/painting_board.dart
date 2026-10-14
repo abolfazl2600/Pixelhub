@@ -319,7 +319,7 @@ class _GridPainter extends CustomPainter {
       Rect.fromLTRB(left * cw, top * ch, right * cw, bottom * ch),
       cellWidth: cw,
       cellHeight: ch,
-    )
+    );
     final path = Path();
     for (var x = left; x <= right; x++) {
       path.moveTo(x * cw, top * ch);
