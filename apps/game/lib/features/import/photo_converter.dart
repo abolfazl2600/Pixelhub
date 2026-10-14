@@ -211,7 +211,9 @@ final class _Bucket {
 }
 
 Uint8List renderLevelPng(Map<String, Object> source) {
-  final level = LevelDefinition.fromJson(source);
+  final style = source['renderStyle'] == 'canvas' ? 'canvas' : 'pixel';
+  final levelJson = Map<String, Object>.from(source)..remove('renderStyle');
+  final level = LevelDefinition.fromJson(levelJson);
   final image = img.Image(
     width: level.width,
     height: level.height,
