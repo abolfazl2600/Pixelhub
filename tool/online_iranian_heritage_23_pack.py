@@ -41,13 +41,13 @@ SCENES = [
     ("online-iran-yazd-jameh-mosque", "مسجد جامع یزد", "Yazd Jameh Mosque", "patterns", "yazd", "glimmer", [0.15, 0.12, 0.85, 0.42]),
     ("online-iran-gonbad-qabus", "گنبد قابوس", "Gonbad-e Qabus Tower", "patterns", "gonbad", "sparkle", [0.03, 0.04, 0.97, 0.22]),
     ("online-iran-naqsh-e-rostam", "نقش رستم", "Naqsh-e Rostam", "patterns", "naqsh", "sparkle", [0.03, 0.04, 0.97, 0.22]),
-    ("online-iran-nature-landscape", "چشم‌انداز کوهستانی ایران", "Iranian Mountain Landscape", "nature", "landscape", "ripple", [0.04, 0.57, 0.96, 0.86]),
-    ("online-iran-traditional-architecture", "حیاط خانه سنتی ایرانی", "Traditional Iranian Courtyard", "patterns", "traditional", "sway", [0.06, 0.62, 0.94, 0.96]),
-    ("online-iran-native-wildlife", "پلنگ ایرانی در زیستگاه طبیعی", "Persian Leopard in Its Habitat", "animals", "wildlife", "sway", [0.03, 0.68, 0.97, 0.98]),
-    ("online-iran-regional-daily-life", "زندگی روزمره در روستای ایرانی", "Daily Life in an Iranian Village", "objects", "daily", "steam", [0.25, 0.12, 0.75, 0.42]),
+    ("online-iran-nature-landscape", "چشم‌انداز کوهستانی ایران", "Iranian Mountain Landscape", "nature", "landscape", "ripple", [0.04, 0.89, 0.96, 0.98]),
+    ("online-iran-traditional-architecture", "حیاط خانه سنتی ایرانی", "Traditional Iranian Courtyard", "patterns", "traditional", "sway", [0.03, 0.62, 0.17, 0.96]),
+    ("online-iran-native-wildlife", "پلنگ ایرانی در زیستگاه طبیعی", "Persian Leopard in Its Habitat", "animals", "wildlife", "sway", [0.03, 0.68, 0.22, 0.98]),
+    ("online-iran-regional-daily-life", "زندگی روزمره در روستای ایرانی", "Daily Life in an Iranian Village", "objects", "daily", "sparkle", [0.03, 0.04, 0.97, 0.24]),
     ("online-iran-taq-e-bostan", "نقش‌برجسته‌های طاق بستان", "Taq-e Bostan Rock Reliefs", "patterns", "taq", "glimmer", [0.18, 0.22, 0.82, 0.65]),
     ("online-iran-behistun-inscription", "کتیبه و نقش‌برجسته بیستون", "Behistun Inscription and Relief", "patterns", "behistun", "sparkle", [0.03, 0.04, 0.97, 0.22]),
-    ("online-iran-shahr-e-sukhteh", "محوطه باستانی شهر سوخته", "Shahr-e Sukhteh Archaeological Site", "nature", "shahr", "sway", [0.04, 0.72, 0.96, 0.98]),
+    ("online-iran-shahr-e-sukhteh", "محوطه باستانی شهر سوخته", "Shahr-e Sukhteh Archaeological Site", "nature", "shahr", "sparkle", [0.03, 0.04, 0.97, 0.25]),
     ("online-iran-sheikh-lotfollah-mosque", "مسجد شیخ لطف‌الله", "Sheikh Lotfollah Mosque", "patterns", "sheikh", "glimmer", [0.18, 0.18, 0.82, 0.55]),
 ]
 
