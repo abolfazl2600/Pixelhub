@@ -428,7 +428,8 @@ final class MemoryPreferences
         ArtworkRepository,
         ProgressSyncOutboxRepository,
         OnlineLevelStorage,
-        OnlineAnimationStorage {
+        OnlineAnimationStorage,
+        ArtworkStylePreferences {
   final Map<String, ProgressSnapshot> _records = {};
   String? language;
   String? recentArtworkId;
