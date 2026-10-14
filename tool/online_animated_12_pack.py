@@ -114,23 +114,23 @@ ARTWORKS = json.loads(r'''[
     ]
   },
   {
-    "slug": "love-envelope",
-    "fa": "نامه عاشقانه",
-    "en": "Love Letter",
+    "slug": "puzzle-piece",
+    "fa": "قطعه پازل",
+    "en": "Puzzle Piece",
     "category": "objects",
-    "theme": "pink",
+    "theme": "mint",
     "rows": [
-      "............",
-      "............",
-      "..########..",
-      "..#*....*#..",
-      "..##*..*##..",
-      "..#o#**#o#..",
+      "....####....",
+      "...#oooo#...",
       "..#oo##oo#..",
+      "..#oo**oo#..",
+      "###oo**oo###",
+      "#oooooooooo#",
+      "#oooooooooo#",
+      "###oooooo###",
       "..#oooooo#..",
       "..#oooooo#..",
-      "..########..",
-      "............",
+      "...######...",
       "............"
     ]
   },
@@ -156,23 +156,23 @@ ARTWORKS = json.loads(r'''[
     ]
   },
   {
-    "slug": "little-candle",
-    "fa": "شمع روشن",
-    "en": "Glowing Candle",
+    "slug": "gumball-machine",
+    "fa": "دستگاه آدامس",
+    "en": "Gumball Machine",
     "category": "objects",
-    "theme": "sunset",
+    "theme": "pink",
     "rows": [
-      ".....*......",
-      "....***.....",
-      "....*+*.....",
-      ".....*......",
-      "....####....",
-      "....#oo#....",
-      "....#oo#....",
-      "....#oo#....",
-      "....#oo#....",
-      "....#oo#....",
       "...######...",
+      "..#oooooo#..",
+      ".#oo**oo**#.",
+      ".#oo*ooo*o#.",
+      ".#oooooooo#.",
+      "..########..",
+      "....####....",
+      "...#oooo#...",
+      "...#o==o#...",
+      "...######...",
+      "....####....",
       "............"
     ]
   },
@@ -510,9 +510,9 @@ def animated_cells(level, motion, phase):
             dot(6, y, 3 if y == active else 2)
     elif motion == "battery-charge":
         # Charging bar grows from left to right, then drains for a clean loop.
-        width = [0, 2, 4, 6, 7, 6, 4, 2][phase]
+        width = [0, 1, 3, 5, 6, 5, 3, 1][phase]
         rect(3, 4, 3 + width - 1, 7, 4)
-        dot(3 + min(width, 6), 5, 3)
+        dot(3 + min(width, 5), 5, 3)
     elif motion == "wifi-signal":
         for y, dots in ((2, range(2, 10)), (4, range(3, 9)),
                         (6, range(4, 8)), (8, range(5, 7))):
@@ -529,12 +529,15 @@ def animated_cells(level, motion, phase):
             points(((0, 3), (11, 3)), 5)
         if swing >= 3:
             points(((1, 7), (10, 7)), 3)
-    elif motion == "love-envelope":
-        # A tiny heart rises out of the sealed envelope.
-        y = 3 - min(swing, 3)
-        points(((5, y), (6, y), (5, y - 1), (6, y - 1)), 4)
+    elif motion == "puzzle-piece":
+        # The missing tab snaps into place as edges flash.
+        dot(8, 3, 4 if swing >= 2 else 3)
+        if swing >= 1:
+            points(((9, 4), (10, 4)), 4)
+        if swing >= 2:
+            points(((3, 5), (8, 5)), 5)
         if swing >= 3:
-            points(((4, 1), (7, 1)), 3)
+            points(((5, 2), (6, 2)), 3)
     elif motion == "pixel-pointer":
         # Click: gold press point with expanding corner sparkles.
         dot(7, 6, 4)
@@ -544,13 +547,15 @@ def animated_cells(level, motion, phase):
             points(((10, 4), (10, 8)), 3)
         if swing >= 3:
             points(((7, 2), (10, 2)), 5)
-    elif motion == "little-candle":
-        # Flame flickers left/right, glowing softly on the candle body.
-        dot(5, 1, 0)
-        dot(5 + (-1 if phase % 2 else 1), 1, 4)
-        dot(5, 2, blink)
+    elif motion == "gumball-machine":
+        # Candies light up one after another; one falls into the dispenser.
+        dot(4 + phase % 3, 3, blink)
+        if swing >= 1:
+            points(((7, 4), (4, 2)), 4)
+        if swing >= 2:
+            points(((5, 8), (6, 8)), 5)
         if swing >= 3:
-            points(((3, 2), (8, 2)), 3)
+            points(((5, 10), (6, 10)), 4)
     elif motion == "watering-can":
         # Water droplets fall from the spout into a little puddle.
         y = 7 + (phase % 4)
@@ -655,9 +660,9 @@ SCENARIOS = {
     "battery-charge": ("نوار باتری شارژ و خالی می‌شود.", "The battery fills and drains."),
     "wifi-signal": ("سیگنال به شکل موجی تقویت می‌شود.", "Wi-Fi waves radiate out."),
     "ringing-bell": ("زنگ با خطوط لرزش صدا می‌دهد.", "The bell vibrates and rings."),
-    "love-envelope": ("قلب کوچکی از نامه بالا می‌رود.", "A little heart floats out of the letter."),
+    "puzzle-piece": ("لبه‌های قطعه پازل در زمان جاافتادن می‌درخشند.", "The puzzle piece snaps into place with a sparkle."),
     "pixel-pointer": ("اشاره‌گر با جرقه‌ای کلیک می‌کند.", "A click ripple appears at the pointer."),
-    "little-candle": ("شعله شمع به‌آرامی می‌لرزد.", "The candle flame flickers."),
+    "gumball-machine": ("توپک‌های رنگی از دستگاه پایین می‌آیند.", "Colorful candy balls cycle and drop."),
     "watering-can": ("چند قطره آب از آبپاش می‌چکد.", "Water droplets drip from the can."),
     "mailbox": ("پرچم صندوق بالا می‌رود.", "The mailbox flag rises."),
     "tiny-padlock": ("قفل باز و دوباره بسته می‌شود.", "The padlock briefly unlocks."),
