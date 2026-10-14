@@ -245,7 +245,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                     ChoiceChip(
                       key: const ValueKey('style-canvas'),
                       avatar: const Icon(Icons.texture_rounded, size: 18),
-                      label: Text(context.isPersian ? 'بوم نقاشی' : 'Canvas'),
+                      label: Text(s.canvasStyle),
                       selected: widget.renderStyle == ArtworkRenderStyle.canvas,
                       onSelected: (_) => widget.onRenderStyleChanged?.call(
                         ArtworkRenderStyle.canvas,
