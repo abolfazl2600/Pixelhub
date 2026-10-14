@@ -32,8 +32,8 @@ PICTURES = [
         "....xxx...", ".....x...."]),
     ("star", "ستاره زرد", "Yellow Star", "yellow", [
         ".....x....", "....xxx...", "....xbx...", "xxxxxxxxxx",
-        ".xxxxxxxx.", "..xxxxxx..", "..xx..xx...", ".xx....xx..",
-        ".x......x..", ".........."]),
+        ".xxxxxxxx.", "..xxxxxx..", "..xx..xx..", ".xx....xx.",
+        ".x......x.", ".........."]),
     ("apple-leaf", "سیب با برگ", "Apple with Leaf", "red", [
         "....bb....", "...bbb....", "....x.....", "..xxxxxx..",
         ".xxaaaaxx.", "xxaaaaaaxx", "xxaaaaaaxx", ".xxaaaaxx.",
@@ -44,43 +44,43 @@ PICTURES = [
         "..xxaaxx..", "...xxxx..."]),
     ("banana", "موز زرد", "Yellow Banana", "yellow", [
         "..........", ".......xx.", ".....xxaa.", "...xxaaax.",
-        ".xxaaaxxx.", "xxaaaxxx...", ".xxaxxx....",
-        "..xxxx.....", "..........", ".........."]),
+        ".xxaaaxxx.", "xxaaaxxx..", ".xxaxxx...",
+        "..xxxx....", "..........", ".........."]),
     ("gold-key", "کلید طلایی", "Golden Key", "yellow", [
         "..........", "..xxxx....", ".xxbbxx...", ".xxbbxx...",
-        "..xxxx....", "...x......", "...x.xx....",
-        "...xxxx....", "...x.xx....", "...x......"]),
+        "..xxxx....", "...x......", "...x.xx...",
+        "...xxxx...", "...x.xx...", "...x......"]),
     ("balloon-bouquet", "دسته بادکنک‌ها", "Balloon Bouquet", "red", [
         "..xx..xx..", ".xaxxxax..", "xaaaaxxx..", ".xaxxxxx..",
-        "..xx.x.....", "...xx......", "...x.......", "...x.......",
-        "..x.x......", ".xx..xx...."]),
+        "..xx.x....", "...xx.....", "...x......", "...x......",
+        "..x.x.....", ".xx..xx..."]),
     ("envelope", "پاکت نامه", "Envelope", "blue", [
         "..........", ".xxxxxxxx.", ".xaaaaaax.", ".xxaaaaxx.",
         ".xxxaxxxx.", ".xxxxaxxx.", ".xxxxxaax.", ".xxxxxxxx.",
         ".xxxxxxxx.", ".........."]),
     ("gift-box", "جعبه هدیه", "جعبه هدیه", "purple", [
-        "...xx.....", "..xbbx.....", ".xxxxxxx..", ".xaxxxax..",
+        "...xx.....", "..xbbx....", ".xxxxxxx..", ".xaxxxax..",
         ".xaxxxax..", ".xxxxxxxx.", ".xaxxxax..", ".xaxxxax..",
         ".xxxxxxxx.", ".........."]),
     ("ice-cream-bar", "بستنی چوبی", "Ice Cream Bar", "pink", [
-        "..........", "...xxxx...", "..xaaaax...", "..xabbax...",
-        "..xaaaax...", "..xabbax...", "..xaaaax...", "...xxxx...",
-        "....xx.....", "....xx....."]),
+        "..........", "...xxxx...", "..xaaaax..", "..xabbax..",
+        "..xaaaax..", "..xabbax..", "..xaaaax..", "...xxxx...",
+        "....xx....", "....xx...."]),
     ("strawberry", "توت‌فرنگی", "Strawberry", "red", [
         "...bb.....", "..bxxb....", ".xxxxxxx..", ".xaxaxaxx.",
         "xxaxaxaxxx", "xxaaaaaaxx", ".xxaaaaxx.", "..xxaxx...", "...xxx....",
         ".........."]),
     ("carrot", "هویج", "Carrot", "orange", [
         "....bb....", "...bbb....", "....x.....", "...xx.....",
-        "..xxax....", "..xxaaxx...", "...xxaxx..", "...xxax....",
-        "....xx.....", ".....x...."]),
+        "..xxax....", "..xxaaxx..", "...xxaxx..", "...xxax...",
+        "....xx....", ".....x...."]),
     ("umbrella", "چتر", "Umbrella", "blue", [
         "...xxxx...", "..xbbbxx..", ".xbbbbbbx.", "xxxxxxxxxx",
-        "...x..x....", "...x..x....", "...x.......",
-        "...xxxx....", "..........", ".........."]),
+        "...x..x...", "...x..x...", "...x......",
+        "...xxxx...", "..........", ".........."]),
     ("coffee-cup", "فنجان", "Coffee Cup", "teal", [
         "....xx....", "...xbx....", "...xbx....", "..xxxxxx..",
-        ".xaaaaaax.", ".xaaaaaax.x", ".xaaaaaaxxx",
+        ".xaaaaaax.", ".xaaaaaax.", ".xaaaaaaxx",
         "..xxxxxx..", "...xxxx...", ".........."]),
     ("candle", "شمع روشن", "Lit Candle", "yellow", [
         "....b.....", "...bxb....", "....b.....", "....x.....",
@@ -88,24 +88,24 @@ PICTURES = [
         "...xxxx...", ".........."]),
     ("sprinkle-donut", "دونات رنگی", "Sprinkle Donut", "pink", [
         "..xxxxxx..", ".xaaaaaax.", "xxabaaaaxx", "xxaaaxabxx",
-        "xxaaxxaaax", "xxaaaaaaxx", ".xaaaaxaxx.", "..xxxxxx..",
+        "xxaaxxaaax", "xxaaaaaaxx", ".xaaaaxaxx", "..xxxxxx..",
         "..........", ".........."]),
     ("wrapped-candy", "آبنبات کاغذپیچ", "Wrapped Candy", "purple", [
-        "..........", "...xx..xx..", "..xaxxxax..", ".xxaaaxxx..",
-        "xxaabbbaxx.", ".xxaaaxxx..", "..xaxxxax..",
-        "...xx..xx..", "..........", ".........."]),
+        "..........", "...xx..xx.", "..xaxxxax.", ".xxaaaxxx.",
+        "xxaabbbaxx", ".xxaaaxxx.", "..xaxxxax.",
+        "...xx..xx.", "..........", ".........."]),
     ("whole-watermelon", "هندوانه کامل", "Whole Watermelon", "green", [
-        "..........", "...xxxx...", "..xaaaaax..", ".xaaaaaaxx.",
-        "xxaabaaaaxx", "xxaaaabaxx.", ".xxaaaaxx..",
-        "..xxxxxx...", "...xx......", ".........."]),
+        "..........", "...xxxx...", "..xaaaaax.", ".xaaaaaaxx",
+        "xxaabaaaax", "xxaaaabaxx", ".xxaaaaxx.",
+        "..xxxxxx..", "...xx.....", ".........."]),
     ("light-bulb", "لامپ", "Light Bulb", "yellow", [
-        "....xxxx...", "...xaaaax..", "..xaaaaaax.", "..xaaaaaax.",
-        "..xaaaaaax.", "...xaaaax..", "....xxxx...", ".....xx....",
-        "....xxxx...", "....xxxx..."]),
+        "....xxxx..", "...xaaaax.", "..xaaaaaax", "..xaaaaaax",
+        "..xaaaaaax", "...xaaaax.", "....xxxx..", ".....xx...",
+        "....xxxx..", "....xxxx.."]),
     ("cupcake", "کاپ‌کیک", "Cupcake", "purple", [
-        "....xxxx...", "...xbbbxx..", "..xbbbbbx..", ".xxabbbaxx.",
-        ".xxxxxxxxx.", "...xxxx....", "..xaaaaax..",
-        "..xaaaaax..", "...xxxx....", ".........."]),
+        "....xxxx..", "...xbbbxx.", "..xbbbbbx.", ".xxabbbaxx",
+        ".xxxxxxxxx", "...xxxx...", "..xaaaaax.",
+        "..xaaaaax.", "...xxxx...", ".........."]),
 ]
 
 
