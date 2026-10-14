@@ -167,14 +167,12 @@ class _AnimationPainter extends CustomPainter {
         );
       }
     }
-    if (renderStyle == ArtworkRenderStyle.canvas) {
-      paintCanvasTexture(
-        canvas,
-        Offset.zero & size,
-        cellWidth: w,
-        cellHeight: h,
-      );
-    }
+    artworkStylePainters[renderStyle]?.call(
+      canvas,
+      Offset.zero & size,
+      cellWidth: w,
+      cellHeight: h,
+    );
   }
 
   @override
