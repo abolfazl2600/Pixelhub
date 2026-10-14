@@ -315,6 +315,16 @@ jobs:
               --notes "Ten original exact 8x8 abstract patterns with bilingual metadata, crisp PNG previews, documented animation scenarios, and eight-frame loopable companions. Immutable online Release assets; not bundled in the app or committed as generated art." \
               --latest=false
           fi
+      - name: Publish twenty animated 12x12 online mini pictures
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-animated-mini-12-20-v1 >/dev/null 2>&1; then
+            python3 tool/online_animated_12_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-animated-mini-12-20-v1 "$RUNNER_TEMP/content.zip" --target "$TARGET_SHA" --title "PixelHub: 20 animated 12x12 mini pictures" --notes "Twenty unique 12x12 bilingual online pictures. Each includes an eight-frame, 180 ms downloadable animation sidecar, numbered level, and PNG preview. Assets live in an immutable Release outside the app bundle." --latest=false
+          fi
       - name: Download release packs and assemble online catalog
         env:
           GH_TOKEN: ${{ github.token }}
