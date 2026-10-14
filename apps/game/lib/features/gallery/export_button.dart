@@ -29,7 +29,7 @@ class _ExportButtonState extends State<ExportButton> {
     try {
       final bytes = await compute(renderLevelPng, {
         ...level.toJson(),
-        'renderStyle': renderStyle.storageId,
+        'renderStyle': widget.renderStyle.storageId,
       });
       if (!mounted) {
         return;
