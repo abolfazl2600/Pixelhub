@@ -508,7 +508,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
       final visible = available.take(_onlineVisibleCount).toList();
       const grid = SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 240,
-        mainAxisExtent: 246,
+        mainAxisExtent: 270,
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
       );
