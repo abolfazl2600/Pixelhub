@@ -249,8 +249,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       await preferences.writeArtworkStyle(style.storageId);
     } on Object {
       if (!mounted) return;
-      final routeContext =
-          _router.routerDelegate.navigatorKey.currentContext;
+      final routeContext = _router.routerDelegate.navigatorKey.currentContext;
       if (routeContext != null && routeContext.mounted) {
         ScaffoldMessenger.maybeOf(routeContext)?.showSnackBar(
           SnackBar(
