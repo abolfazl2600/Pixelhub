@@ -23,9 +23,9 @@ void main() {
       'frameCount': 2,
     };
 
-    test('accepts inclusive size and frame count limits', () {
+    test('accepts frame counts above the legacy cap', () {
       for (final bytes in [1, 2 * 1024 * 1024]) {
-        for (final frameCount in [1, 60]) {
+        for (final frameCount in [1, 60, 120]) {
           final info = OnlineAnimationInfo.fromJson({
             ...valid,
             'bytes': bytes,
@@ -54,7 +54,7 @@ void main() {
     test('rejects invalid field types, ranges and checksums', () {
       final invalid = <String, List<Object?>>{
         'bytes': [null, true, '128', 1.5, 0, -1, 2 * 1024 * 1024 + 1],
-        'frameCount': [null, true, '2', 1.5, 0, -1, 61],
+        'frameCount': [null, true, '2', 1.5, 0, -1],
         'sha256': [null, 128, '', checksum.toUpperCase(), '${checksum}a'],
       };
       for (final entry in invalid.entries) {
