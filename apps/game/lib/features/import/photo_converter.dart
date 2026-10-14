@@ -239,22 +239,63 @@ Uint8List renderLevelPng(Map<String, Object> source) {
     interpolation: img.Interpolation.nearest,
   );
   if (style == 'canvas') {
-    // A deterministic low-opacity weave, scaled to the final PNG and anchored
-    // to the image origin. Pixel mode remains byte-for-byte legacy rendering.
-    final step = math.max(5, scale ~/ 2);
+    // Match the on-screen six-pixel linen pitch. Layer a warm fabric glaze,
+    // dark thread recesses, bright raised yarns and alternating knots directly
+    // onto the exported raster. This is purely visual and does not change the
+    // source level, its checksums, or pixel-style PNG bytes.
+    const pitch = 6;
     for (var y = 0; y < output.height; y++) {
+      final h = y % pitch;
       for (var x = 0; x < output.width; x++) {
-        final vertical = x % step == 0;
-        final horizontal = y % step == 0;
-        if (!vertical && !horizontal) continue;
-        final pixel = output.getPixel(x, y);
-        final alpha = vertical && horizontal ? .10 : .055;
+        final v = x % pitch;
+        final original = output.getPixel(x, y);
+        var red = original.r.toDouble();
+        var green = original.g.toDouble();
+        var blue = original.b.toDouble();
+
+        // Warm absorbent linen base.
+        red = red * .928 + 239 * .072;
+        green = green * .928 + 224 * .072;
+        blue = blue * .928 + 198 * .072;
+
+        final shadow = (v == 0 ? .22 : 0.0) + (h == 0 ? .22 : 0.0);
+        if (shadow > 0) {
+          red = red * (1 - shadow) + 78 * shadow;
+          green = green * (1 - shadow) + 57 * shadow;
+          blue = blue * (1 - shadow) + 38 * shadow;
+        }
+
+        final highlight = (v == 1 ? .21 : 0.0) + (h == 1 ? .21 : 0.0);
+        if (highlight > 0) {
+          red = red * (1 - highlight) + 255 * highlight;
+          green = green * (1 - highlight) + 251 * highlight;
+          blue = blue * (1 - highlight) + 230 * highlight;
+        }
+
+        if (v == 2 || h == 2) {
+          red = red * .955 + 112 * .045;
+          green = green * .955 + 82 * .045;
+          blue = blue * .955 + 55 * .045;
+        }
+
+        // Interlaced yarn: neighboring crossings alternate raised and recessed.
+        if (v == 1 && h == 1) {
+          final raised = ((x ~/ pitch) + (y ~/ pitch)).isEven;
+          final accent = raised ? .16 : .12;
+          final accentRed = raised ? 255 : 88;
+          final accentGreen = raised ? 253 : 68;
+          final accentBlue = raised ? 239 : 46;
+          red = red * (1 - accent) + accentRed * accent;
+          green = green * (1 - accent) + accentGreen * accent;
+          blue = blue * (1 - accent) + accentBlue * accent;
+        }
+
         output.setPixelRgb(
           x,
           y,
-          (pixel.r.toDouble() * (1 - alpha) + 91 * alpha).round(),
-          (pixel.g.toDouble() * (1 - alpha) + 69 * alpha).round(),
-          (pixel.b.toDouble() * (1 - alpha) + 44 * alpha).round(),
+          red.round().clamp(0, 255),
+          green.round().clamp(0, 255),
+          blue.round().clamp(0, 255),
         );
       }
     }
