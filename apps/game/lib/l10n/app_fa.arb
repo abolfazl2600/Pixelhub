@@ -248,5 +248,20 @@
   "privacyContact": "پرسش‌ها: https://github.com/abolfazl2600/Pixelhub/issues . این صفحه عمومی است؛ عکس شخصی یا اطلاعات حساس خود را در آن منتشر نکنید.",
   "privacyOnlineLink": "نشانی عمومی سیاست حریم خصوصی",
   "privacyCopyLink": "کپی لینک سیاست",
-  "privacyLinkCopied": "لینک سیاست کپی شد."
+  "privacyLinkCopied": "لینک سیاست کپی شد.",
+  "walletCoins": "سکه‌های من",
+  "walletPoints": "امتیاز کل",
+  "artworkCost": "قیمت: {value} سکه",
+  "@artworkCost": {"placeholders": {"value": {"type": "String"}}},
+  "artworkReward": "پاداش تکمیل: {value} سکه و امتیاز",
+  "@artworkReward": {"placeholders": {"value": {"type": "String"}}},
+  "unlockArtwork": "باز کردن با {value} سکه",
+  "@unlockArtwork": {"placeholders": {"value": {"type": "String"}}},
+  "insufficientCoins": "سکه کافی ندارید؛ با تکمیل نقاشی‌های بازشده سکه بگیرید.",
+  "artworkUnlocked": "نقاشی باز شد!",
+  "artworkFree": "رایگان",
+  "artworkOwned": "خریداری‌شده",
+  "walletExplanation": "نقاشی آفتابگردان و طرح‌های شخصی رایگان‌اند. با تکمیل هر اثر فقط یک‌بار سکه و امتیاز می‌گیرید. سکه‌ها برای بازکردن نقاشی‌ها هستند و خرید پولی ندارند.",
+  "coinSaveFailed": "ذخیره سکه یا خرید انجام نشد. دوباره تلاش کنید.",
+  "walletInitial": "هدیه شروع: ۱۲۰ سکه"
 }
