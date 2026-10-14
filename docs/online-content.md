@@ -837,3 +837,52 @@ and the deployed `/Pixelhub/online/catalog.json` before announcing release.
 
 Generate a pack locally with:
 `python3 tool/online_abstract_8_pack.py /tmp/content.zip`.
+
+## Twenty animated 12×12 online mini pictures
+
+The `tool/online_animated_12_pack.py` generator authors **20 new** and
+independently drawn 12×12 color-by-number mini pictures. It produces a
+single immutable `pixelhub-content-animated-mini-12-20-v1` Release asset,
+`content.zip`, through the Pages publication workflow after successful main
+CI. Generated assets are not bundled with the app or committed to the repo.
+Existing paintings and user progress are unchanged.
+
+| English | فارسی | Animation |
+| --- | --- | --- |
+| Traffic Light | چراغ راهنمایی | Traffic lights change |
+| Charging Battery | باتری شارژی | Charge meter fills |
+| Wi-Fi Signal | علامت وای‌فای | Signal waves pulse |
+| Notification Bell | زنگ اعلان | Bell rings |
+| Puzzle Piece | قطعه پازل | Interlocking sparkle |
+| Pixel Pointer | اشاره‌گر پیکسلی | Click sparkle |
+| Gumball Machine | دستگاه آدامس | Candy ball drops |
+| Watering Can | آبپاش کوچک | Falling drops |
+| Mailbox | صندوق نامه | Raising flag |
+| Little Padlock | قفل کوچک | Opening shackle |
+| Mini Joystick | جوی‌استیک | Tilting handle |
+| Singing Microphone | میکروفون آواز | Sound waves |
+| Snow Globe | گوی برفی | Falling snow |
+| Camping Tent | چادر شبانه | Twinkling stars |
+| Satellite Dish | بشقاب ماهواره‌ای | Radiating signal |
+| Fish Bowl | تنگ ماهی | Swimming fish |
+| Lighthouse Beam | فانوس دریایی | Sweeping beam |
+| Spinning Top | فرفره چرخان | Wobble and sparkles |
+| Little Snail | حلزون کوچولو | Antenna wiggle |
+| Color Pinwheel | فرفره رنگی | Rotating blade highlights |
+
+All pictures have **144 numbered cells**, six ARGB palette entries,
+Persian/English labels, unique `online-mini12-*` IDs and `levelVersion: 1`.
+The legacy-compatible categories are `objects`, `animals`, `nature` and
+`space`. Animation companions provide exactly eight frames (180 ms each),
+computed as palette-index patches relative to the unchanged base picture
+and bound to its checksum. The first frame has no changes. Playback starts
+after the picture is completed and is replayable offline. A bilingual
+`animation-scenarios.json` describes each motion.
+
+Build and test:
+
+    python3 tool/online_animated_12_pack.py /tmp/content.zip
+    python3 -m unittest discover -s tool/tests -p 'test_online_animated_12_pack.py' -v
+
+The source change alone is not proof of a live release. Confirm successful
+main CI and Pages deployment and check `/Pixelhub/online/catalog.json`.
