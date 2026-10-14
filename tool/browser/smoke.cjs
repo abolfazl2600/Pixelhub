@@ -131,9 +131,38 @@ async function main() {
     await page.getByRole('button',{name:'Start over',exact:true}).last().click(); await saved(0);
     assert.equal((await record()).generation,1);
 
+    // Browser-only wallet fixture: the integration test checks multiple
+    // purchases in succession without needing to finish a 128x128 picture.
+    // This does not grant coins to real users or modify application code.
+    await page.waitForFunction(() => Object.keys(localStorage).some(
+      k => k.includes('pixelhub.library.v1')));
+    await page.evaluate(() => {
+      const key = Object.keys(localStorage).find(
+        k => k.includes('pixelhub.library.v1'));
+      let library = JSON.parse(localStorage[key]);
+      const nested = typeof library === 'string';
+      if (nested) library = JSON.parse(library);
+      if (!Array.isArray(library.rewarded) ||
+          !library.rewarded.includes('sunflower')) {
+        throw Error('Sunflower completion should pay out exactly once');
+      }
+      library.coins = 750;
+      localStorage.setItem(
+        key,
+        JSON.stringify(nested ? JSON.stringify(library) : library),
+      );
+    });
+    await page.reload(); await ready();
+
     // Paint a real cell in each required size, using actual browser storage.
     for (const id of ['rainbow','gem','planet']) {
-      await page.goto(base+'#/painting/'+id); await ready(); await board().waitFor();
+      await page.goto(base+'#/painting/'+id); await ready();
+      // Direct links to locked pictures must show the purchase flow, not a
+      // paintable board. Buy once and verify the board is then accessible.
+      const unlock = page.getByRole('button',{name:/Unlock for [0-9]+ coins/});
+      await unlock.waitFor();
+      await unlock.click();
+      await board().waitFor();
       await scrollTop();
       const dimension={rainbow:32,gem:64,planet:128}[id];
       const picture=(await (await page.request.get(base+`assets/assets/levels/${id}.json`)).json());
@@ -197,6 +226,7 @@ async function main() {
     // Exercise cross-platform HTTP loading in the browser. All online responses
     // are mocked: the test never depends on public GitHub Pages availability.
     console.log('Browser: online catalog and opt-in download');
+    await page.setViewportSize({width:390,height:1000});
     const remoteLevel = {...level, levelId:'online-smoke-test', levelVersion:1,
       titles:{fa:'تصویر آنلاین آزمایشی',en:'Online browser sample'}};
     const canonical = [remoteLevel.schemaVersion, remoteLevel.levelId,
@@ -263,6 +293,9 @@ async function main() {
       null,
       {timeout:15000}
     );
+    const onlineUnlock=page.getByRole('button',{name:/Unlock for [0-9]+ coins/});
+    await onlineUnlock.waitFor();
+    await onlineUnlock.click();
     await board().waitFor();
 
     assert.deepEqual(pageErrors,[]); assert.deepEqual(failedRequests,[]); assert.deepEqual(externalRequests,[]);
