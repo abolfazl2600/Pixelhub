@@ -395,6 +395,20 @@ jobs:
               --notes "Twenty original compact bilingual 10x10 pixel flag color-by-number levels, including Iran, France, Germany, Italy, Russia, Ukraine, Netherlands, Poland, Japan, Turkey, United States, United Kingdom, Canada, Brazil, India, China, Sweden, Norway, Finland and Switzerland. Each flag has a checksum-bound JSON grid and PNG preview. Published as immutable Release-only online content, not bundled into the APK." \
               --latest=false
           fi
+      - name: Publish twenty-five 35x35 country flags as online-only pictures
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-country-flags-35-25-v1 >/dev/null 2>&1; then
+            python3 tool/online_flags_35_25_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-country-flags-35-25-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: 25 new 35x35 country flags" \
+              --notes "Twenty-five entirely new bilingual 35x35 pixel-art country flags, complementing the first twenty 10x10 flags without duplicating any country: Spain, Portugal, Belgium, Austria, Denmark, Greece, Ireland, Czechia, Slovakia, Hungary, Romania, Bulgaria, Croatia, Serbia, South Korea, Australia, New Zealand, Mexico, Argentina, Chile, Colombia, Peru, South Africa, Egypt and Saudi Arabia. Each level includes a color-by-number JSON grid and a lossless PNG preview. Complex seals and lettering are simplified for small pixel art. Immutable Release-only content; app and prior downloads remain untouched." \
+              --latest=false
+          fi
       - name: Download release packs and assemble online catalog
         env:
           GH_TOKEN: ${{ github.token }}
