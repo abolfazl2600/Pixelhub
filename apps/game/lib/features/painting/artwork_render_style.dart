@@ -64,9 +64,7 @@ void paintCanvasTexture(
         ..lineTo(x + 4.5, y + 3.15 + shift);
       // Small slubs resemble paint catching the high points of real linen.
       if (seed.isEven) {
-        grain.addOval(
-          Rect.fromLTWH(x + 2.65 + shift, y + 2.85, 1.1, .7),
-        );
+        grain.addOval(Rect.fromLTWH(x + 2.65 + shift, y + 2.85, 1.1, .7));
       }
     }
   }
