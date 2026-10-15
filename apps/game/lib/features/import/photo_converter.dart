@@ -292,7 +292,7 @@ Uint8List renderLevelPng(Map<String, Object> source) {
             (v == 0 && (over ? h <= 4 : h <= 5) ? .32 : 0.0) +
             (h == 0 && (over ? v <= 5 : v <= 4) ? .18 : 0.0);
         if (shadow > 0) {
-          final factor = shadow.clamp(0.0, .48);
+          final factor = shadow.clamp(0.0, .48).toDouble();
           red = red * (1 - factor) + 64 * factor;
           green = green * (1 - factor) + 47 * factor;
           blue = blue * (1 - factor) + 39 * factor;
@@ -304,7 +304,7 @@ Uint8List renderLevelPng(Map<String, Object> source) {
                 ? .22
                 : 0.0);
         if (highlight > 0) {
-          final factor = highlight.clamp(0.0, .49);
+          final factor = highlight.clamp(0.0, .49).toDouble();
           red = red * (1 - factor) + 255 * factor;
           green = green * (1 - factor) + 251 * factor;
           blue = blue * (1 - factor) + 231 * factor;
