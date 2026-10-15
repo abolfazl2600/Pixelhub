@@ -451,6 +451,20 @@ jobs:
               --notes "15 new bilingual, hand-authored 70x70 pixel-art country landmark coloring levels: Belem Tower, Pena Palace, Prague Astronomical Clock, Charles Bridge, Hungarian Parliament, Edinburgh Castle, Milan Cathedral, Blue Mosque, Galata Tower, Borobudur, Prambanan, Shwedagon Pagoda, Wat Arun, Gateway of India and Hassan II Mosque. No repeats from prior 50x50 and 80x80 landmark packs. All JSON levels and PNG previews are immutable Release-only assets outside the Android application; old IDs and user progress are unchanged." \
               --latest=false
           fi
+      - name: Publish remade UK Turkey Iran flags and 90x90 Mona Lisa
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-requested-remakes-4-v1 >/dev/null 2>&1; then
+            python3 tool/online_requested_remakes_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-requested-remakes-4-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: redesigned flags and detailed Mona Lisa" \
+              --notes "Four fresh immutable online paintings: UK flag 30x30, Turkey flag 40x40, Iran flag 40x40, Mona Lisa 90x90. Older picture IDs are retired from the public gallery without altering any historical release or migrating user data." \
+              --latest=false
+          fi
       - name: Download release packs and assemble online catalog
         env:
           GH_TOKEN: ${{ github.token }}
