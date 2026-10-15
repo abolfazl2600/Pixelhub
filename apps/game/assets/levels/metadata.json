@@ -220,13 +220,6 @@
       "sun"
     ]
   },
-  "snowflake": {
-    "category": "patterns",
-    "tags": [
-      "patterns",
-      "snowflake"
-    ]
-  },
   "umbrella": {
     "category": "objects",
     "tags": [
@@ -267,6 +260,14 @@
     "tags": [
       "patterns",
       "diamond"
+    ]
+  },
+  "lighthouse": {
+    "category": "objects",
+    "tags": [
+      "objects",
+      "lighthouse",
+      "seascape"
     ]
   }
 }

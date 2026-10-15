@@ -156,15 +156,15 @@ def render(kind, n):
                 a=i*math.pi/6
                 c.line((.5+.29*math.cos(a),.5+.29*math.sin(a)),(.5+.40*math.cos(a),.5+.40*math.sin(a)),.017,3)
             c.ellipse(.5,.5,.24,.24,3)
-    elif kind == 'snowflake':
-        for i in range(6):
-            a=i*math.pi/3
-            b=(.5+.35*math.cos(a),.5+.35*math.sin(a))
-            c.line((.5,.5),b,.023,5)
-            for delta in [-.7,.7]:
-                p=(.5+.23*math.cos(a),.5+.23*math.sin(a))
-                q=(p[0]-.11*math.cos(a+delta),p[1]-.11*math.sin(a+delta))
-                c.line(p,q,.017,5)
+    elif kind == 'lighthouse':
+        c.rect(.00,.57,1,.43,5)
+        c.polygon([(.16,.95),(.20,.72),(.68,.72),(.83,.95)],1)
+        c.polygon([(.36,.75),(.39,.31),(.61,.31),(.65,.75)],0)
+        for yy in (.40,.56,.68):
+            c.rect(.39,yy,.22,.055,2)
+        c.rect(.40,.24,.20,.08,1)
+        c.rect(.42,.20,.16,.07,3)
+        c.polygon([(.40,.22),(.50,.12),(.60,.22)],2)
     elif kind == 'umbrella':
         c.line((.5,.38),(.5,.80),.025,1); c.ellipse(.43,.80,.09,.09,1); c.ellipse(.43,.77,.045,.07,0)
         c.ellipse(.5,.43,.35,.28,2); c.rect(.12,.44,.76,.13,0)
@@ -209,7 +209,7 @@ ITEMS = [
  ('dog','سگ','Dog','animals'),('bee','زنبور','Bee','animals'),
  ('rocket','موشک','Rocket','space'),('saturn','زحل','Saturn','space'),
  ('ufo','بشقاب پرنده','Flying saucer','space'),('comet','دنباله‌دار','Comet','space'),
- ('sun','خورشید','Sun','space'),('snowflake','دانهٔ برف','Snowflake','patterns'),
+ ('sun','خورشید','Sun','space'),('lighthouse','فانوس دریایی','Lighthouse at Sunset','objects'),
  ('umbrella','چتر','Umbrella','objects'),('cup','فنجان','Cup','objects'),
  ('book','کتاب','Book','objects'),('kite','بادبادک','Kite','objects'),
  ('sailboat','قایق بادبانی','Sailboat','objects'),('diamond','الماس','Diamond','patterns')]
@@ -221,7 +221,7 @@ CATEGORIES = {'sunflower':'nature','heart':'patterns','rainbow':'nature','moon':
               'tree':'nature','star':'space','gem':'patterns','cat':'animals','house':'objects','planet':'space'}
 metadata = {key: {'category': value, 'tags': [value]} for key, value in CATEGORIES.items()}
 for i, (name, fa, en, category) in enumerate(ITEMS):
-    size = 32 if i % 3 else 16
+    size = 60 if name == 'lighthouse' else (32 if i % 3 else 16)
     cells = render(name, size)
     used = sorted(set(cells))
     palette = [PALETTE[v] for v in used]
