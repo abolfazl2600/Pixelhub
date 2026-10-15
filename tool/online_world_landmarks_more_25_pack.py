@@ -147,11 +147,14 @@ def step_pyramid(s, x, top, bottom, half=28, color=3):
 
 def scenery(s, kind):
     s.rect(0, 0, 79, 79, 0)
-    water = {"louvre", "mont", "gateway", "cn", "petronas",
-             "lotus", "sheikh", "dome", "hagia"}
-    night = {"taipei", "empire", "space"}
-    hills = {"potala", "himeji", "mont", "alhambra"}
-    desert = {"abu", "qutub", "alhambra"}
+    water = {
+        "louvre-pyramid", "mont-saint-michel", "gateway-arch", "cn-tower",
+        "petronas-twin-towers", "lotus-temple", "sheikh-zayed-mosque",
+        "dome-of-the-rock", "hagia-sophia",
+    }
+    night = {"taipei-101", "empire-state-building", "space-needle"}
+    hills = {"potala-palace", "himeji-castle", "mont-saint-michel", "alhambra"}
+    desert = {"abu-simbel", "qutub-minar", "alhambra"}
     if kind in night:
         s.rect(0, 0, 79, 79, 20)
         for x,y in ((7,8),(19,16),(29,6),(52,13),(64,5),(74,23),
