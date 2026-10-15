@@ -17,15 +17,17 @@ class _NativeSoundEffectPlayer implements SoundEffectPlayer {
       );
       await _channel.invokeMethod<void>('load', {
         'name': cue.assetName,
-        'bytes': data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes),
+        'bytes': data.buffer.asUint8List(
+          data.offsetInBytes,
+          data.lengthInBytes,
+        ),
       });
     }
   }
 
   @override
-  Future<void> play(SoundCue cue) => _channel.invokeMethod<void>('play', {
-    'name': cue.assetName,
-  });
+  Future<void> play(SoundCue cue) =>
+      _channel.invokeMethod<void>('play', {'name': cue.assetName});
 
   @override
   void dispose() {}

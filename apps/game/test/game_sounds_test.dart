@@ -44,10 +44,7 @@ void main() {
       sounds.play(SoundCue.paintingCompleted),
       sounds.play(SoundCue.coinsEarned),
     ]);
-    expect(player.played, [
-      SoundCue.paintingCompleted,
-      SoundCue.coinsEarned,
-    ]);
+    expect(player.played, [SoundCue.paintingCompleted, SoundCue.coinsEarned]);
     sounds.dispose();
   });
 }
