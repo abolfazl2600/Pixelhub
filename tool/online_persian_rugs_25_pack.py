@@ -331,7 +331,7 @@ def motif(kind, s):
             bloom(s, x, y, 2.5, 8)
         bird(s, 20, 47, 1)
         bird(s, 45, 46, -1)
-        s.rect(26, 49, 38, 52, 11 if False else 3)
+        s.rect(26, 49, 38, 52, 3)
     elif kind == "mashhad":
         medallion(s, rx=16, ry=20, colors=(1, 8, 4, 7))
         for x, y in ((16, 17), (48, 17), (16, 47), (48, 47)):
