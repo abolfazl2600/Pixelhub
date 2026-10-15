@@ -973,3 +973,54 @@ Build/test:
 
     python3 tool/online_animated_masterworks_64_15_pack.py /tmp/content.zip
     python3 -m unittest discover -s tool/tests -p 'test_online_animated_masterworks_64_15_pack.py' -v
+
+
+## Twenty new original Iranian illustrations on exact 65×65 grids (October 2026)
+
+The reproducible source `tool/online_iran_more_20_pack.py` defines **20 unique
+65×65 color-by-number pixel-art levels**, each with a bilingual title and an
+immutable `online-iran-*-65` ID, `levelVersion: 1`, schema-v2 JSON, palette,
+grid checksum, and corresponding lossless PNG preview. None of the existing
+level IDs are replaced. These are new subjects not included in the earlier
+Iranian landmarks, architectural abstracts, Iranian mix, or 23-heritage packs.
+
+| Stable level ID | فارسی | English | Category |
+| --- | --- | --- | --- |
+| `online-iran-tabiat-bridge-65` | پل طبیعت تهران | Tabiat Bridge | patterns |
+| `online-iran-quran-gate-65` | دروازه قرآن شیراز | Quran Gate | patterns |
+| `online-iran-veresk-bridge-65` | پل ورسک | Veresk Bridge | patterns |
+| `online-iran-white-bridge-ahvaz-65` | پل سفید اهواز | Ahvaz White Bridge | patterns |
+| `online-iran-rudkhan-castle-65` | قلعه رودخان | Rudkhan Castle | patterns |
+| `online-iran-alamut-castle-65` | قلعه الموت | Alamut Castle | patterns |
+| `online-iran-babak-castle-65` | قلعه بابک | Babak Castle | patterns |
+| `online-iran-shushtar-watermills-65` | سازه‌های آبی شوشتر | Shushtar Hydraulic System | patterns |
+| `online-iran-shazdeh-garden-65` | باغ شاهزاده ماهان | Shazdeh Garden | nature |
+| `online-iran-agha-bozorg-65` | مسجد آقابزرگ کاشان | Agha Bozorg Mosque | patterns |
+| `online-iran-isfahan-jameh-65` | مسجد جامع اصفهان | Isfahan Jameh Mosque | patterns |
+| `online-iran-yazd-fire-temple-65` | آتشکده زرتشتیان یزد | Yazd Fire Temple | patterns |
+| `online-iran-saad-al-saltaneh-65` | کاروانسرای سعدالسلطنه | Sa'd al-Saltaneh | patterns |
+| `online-iran-ali-sadr-cave-65` | غار علیصدر همدان | Ali-Sadr Cave | nature |
+| `online-iran-badab-e-surt-65` | چشمه‌های باداب سورت | Badab-e Surt Springs | nature |
+| `online-iran-chabahar-martian-65` | کوه‌های مریخی چابهار | Chabahar Martian Mountains | nature |
+| `online-iran-boteh-jegheh-65` | بته‌جقه ایرانی | Boteh Jegheh Motif | patterns |
+| `online-iran-lalejin-pottery-65` | سفال لالجین | Lalejin Pottery | objects |
+| `online-iran-persian-tar-65` | ساز تار ایرانی | Persian Tar | objects |
+| `online-iran-persian-gulf-lenj-65` | لنج سنتی جنوب ایران | Persian Gulf Lenj | objects |
+
+**Packaging and availability:** On a successful `main` Web CI workflow
+completion, GitHub Pages creates the immutable
+[`pixelhub-content-iran-more-65-20-v1`](https://github.com/abolfazl2600/Pixelhub/releases/tag/pixelhub-content-iran-more-65-20-v1)
+Release if it does not yet exist, assembling its `content.zip` into the public
+online catalog. Only source drawing instructions are in git; the 20 full grid
+JSON files and 20 PNG previews remain Release assets rather than APK content.
+Existing downloads, progress and published art are preserved.
+
+Generate with
+`python3 tool/online_iran_more_20_pack.py /tmp/content.zip`.
+The current five allowed public online categories are preserved to remain
+compatible with deployed clients; the in-app category overlay resolves the
+`online-iran-` IDs into Persian architecture where applicable.
+
+The new content becomes available to players **only after both the Release
+publication and Pages deployment succeed**. Adding the source or merging the
+branch does not itself confirm a successful publication.
