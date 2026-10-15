@@ -39,6 +39,7 @@
   "paintingStyle": "Painting style",
   "pixelStyle": "Pixel",
   "canvasStyle": "Canvas",
+  "diamondStyle": "Diamond painting",
   "gestureHelp": "Drag in Paint mode to color. Switch to Move to pan. Pinch with two fingers to zoom.",
   "reset": "Start over",
   "resetTitle": "Reset this picture?",
