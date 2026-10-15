@@ -1275,3 +1275,43 @@ if absent and downloads all releases when rebuilding the online catalog.
 The ZIP, numbered JSON grids, and PNG previews remain external to Git and
 the Android package. Code merged on `main` is **not yet equivalent to online
 publication**: a successful Release creation and Pages deployment are needed.
+
+## Fifteen more world landmarks: exact 70×70 online artworks (October 2026)
+
+The new `tool/online_world_landmarks_15_70_pack.py` adds **15 completely
+new buildings and monuments** from Europe, Asia and Africa with original
+hand-composed **70×70 grids (4,900 numbered cells)**. None repeats the
+landmarks in the earlier 25 × 50×50 and 25 × 80×80 world-monument packs.
+
+| New immutable ID | فارسی | English | Country |
+| --- | --- | --- | --- |
+| `online-world-new-belem-tower-70` | برج بلم لیسبون | Belém Tower | Portugal |
+| `online-world-new-pena-palace-70` | کاخ پنا | Pena Palace | Portugal |
+| `online-world-new-prague-astronomical-clock-70` | ساعت نجومی پراگ | Prague Astronomical Clock | Czechia |
+| `online-world-new-charles-bridge-70` | پل چارلز پراگ | Charles Bridge | Czechia |
+| `online-world-new-hungarian-parliament-70` | پارلمان مجارستان | Hungarian Parliament | Hungary |
+| `online-world-new-edinburgh-castle-70` | قلعه ادینبرو | Edinburgh Castle | United Kingdom |
+| `online-world-new-milan-cathedral-70` | کلیسای جامع میلان | Milan Cathedral | Italy |
+| `online-world-new-blue-mosque-70` | مسجد آبی استانبول | Blue Mosque | Türkiye |
+| `online-world-new-galata-tower-70` | برج گالاتا | Galata Tower | Türkiye |
+| `online-world-new-borobudur-70` | معبد بوروبودور | Borobudur | Indonesia |
+| `online-world-new-prambanan-70` | معبد پرامبانان | Prambanan | Indonesia |
+| `online-world-new-shwedagon-pagoda-70` | پاگودای شوداگون | Shwedagon Pagoda | Myanmar |
+| `online-world-new-wat-arun-70` | معبد وات آرون | Wat Arun | Thailand |
+| `online-world-new-gateway-of-india-70` | دروازه هند بمبئی | Gateway of India | India |
+| `online-world-new-hassan-ii-mosque-70` | مسجد حسن دوم | Hassan II Mosque | Morocco |
+
+All levels have bilingual titles, schema-v2/levelVersion-1 metadata, distinct
+palette-index grids, checksum-bound JSON assets and matching 70×70 PNG
+previews. The public catalog category stays `patterns` to remain compatible
+with existing clients. The picture title distinguishes each landmark.
+
+To generate the online-only Release bundle, run
+`python3 tool/online_world_landmarks_15_70_pack.py /tmp/content.zip`.
+The success-gated `main` Web CI/Pages workflow generates immutable Release
+[`pixelhub-content-world-landmarks-70-15-v1`](https://github.com/abolfazl2600/Pixelhub/releases/tag/pixelhub-content-world-landmarks-70-15-v1)
+(one `catalog.json` and 15 each of PNG preview and level JSON), then
+assembles it into the online gallery. Older published IDs and saved progress
+are preserved, and these downloadable assets are not bundled into APKs.
+Source merge alone does **not** establish that the Release has been created
+or that the content is already live on GitHub Pages.
