@@ -3,13 +3,17 @@ import 'package:flutter/material.dart';
 /// Presentation-only styles. Never serialize this value into artwork JSON.
 enum ArtworkRenderStyle {
   pixel('pixel'),
-  canvas('canvas');
+  canvas('canvas'),
+  diamond('diamond');
 
   const ArtworkRenderStyle(this.storageId);
   final String storageId;
 
-  static ArtworkRenderStyle fromStorage(Object? value) =>
-      value == 'canvas' ? ArtworkRenderStyle.canvas : ArtworkRenderStyle.pixel;
+  static ArtworkRenderStyle fromStorage(Object? value) => switch (value) {
+    'canvas' => ArtworkRenderStyle.canvas,
+    'diamond' => ArtworkRenderStyle.diamond,
+    _ => ArtworkRenderStyle.pixel,
+  };
 }
 
 /// An artwork-space woven linen surface, intentionally different from the
