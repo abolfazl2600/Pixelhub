@@ -423,6 +423,20 @@ jobs:
               --notes "25 distinct bilingual online coloring levels, each exactly 50x50: Eiffel Tower, Taj Mahal, Colosseum, Giza Pyramids, Great Wall of China, Big Ben, Statue of Liberty, Sydney Opera House, Leaning Tower of Pisa, Sagrada Familia, Christ the Redeemer, Machu Picchu, Petra Treasury, Angkor Wat, Burj Khalifa, Golden Gate Bridge, Tower Bridge, Stonehenge, Chichen Itza, Easter Island Moai, Parthenon, Brandenburg Gate, Neuschwanstein Castle, St Basils Cathedral and Marina Bay Sands. Immutable schema-v2 JSON levels and PNG previews are hosted as Release-only content; existing gallery, user progress and APK assets remain unchanged." \
               --latest=false
           fi
+      - name: Publish twenty-five brand-new detailed 80x80 world monuments
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-world-landmarks-80-25-v1 >/dev/null 2>&1; then
+            python3 tool/online_world_landmarks_more_25_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-world-landmarks-80-25-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: 25 new original 80x80 world landmarks" \
+              --notes "25 distinct original bilingual 80x80 color-by-number landmark artworks not included in the original 50x50 set: Hagia Sophia, Notre-Dame de Paris, Arc de Triomphe, Louvre Pyramid, Mont Saint-Michel, Empire State Building, Space Needle, Gateway Arch, CN Tower, Forbidden City, Temple of Heaven, Potala Palace, Himeji Castle, Fushimi Inari, Gyeongbokgung Palace, Taipei 101, Petronas Twin Towers, Lotus Temple, Qutub Minar, Sheikh Zayed Grand Mosque, Dome of the Rock, Alhambra Palace, Florence Cathedral, St Peters Basilica and Abu Simbel. Immutable Release-only schema-v2 JSON levels and PNG previews; preserves all existing content IDs and user progress without increasing APK content." \
+              --latest=false
+          fi
       - name: Download release packs and assemble online catalog
         env:
           GH_TOKEN: ${{ github.token }}
