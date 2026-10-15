@@ -15,11 +15,13 @@ void paintDiamondGem(
   Color base, {
   required int column,
   required int row,
+  double zoomScale = 1,
 }) {
   if (rect.isEmpty) return;
   final w = rect.width;
   final h = rect.height;
   final side = math.min(w, h);
+  final detailSide = side * zoomScale;
 
   // Rich, dark mounting well with an offset rim makes each drill a separate
   // piece instead of simply drawing light streaks across a flat cell.
@@ -52,13 +54,13 @@ void paintDiamondGem(
       path,
       Paint()
         ..color = color
-        ..isAntiAlias = side >= 5,
+        ..isAntiAlias = detailSide >= 5,
     );
   }
 
   // At very small scales individual cuts cannot be resolved. The bead and
   // visible gap still read as rhinestones, at a fixed 1-bead-per-cell pitch.
-  if (side < 5) {
+  if (detailSide < 5) {
     canvas.drawOval(
       Rect.fromCenter(center: rect.center, width: w * .78, height: h * .78),
       Paint()..color = base,
@@ -98,14 +100,14 @@ void paintDiamondGem(
 
   // Deterministic micro-glint: slightly different cuts per bead, no random
   // flicker during scroll/zoom/animation, and no external texture files.
-  if (side >= 8) {
+  if (detailSide >= 8) {
     final seed = (column * 37 + row * 61) & 3;
     final sparkle = seed == 0 ? .36 : seed == 1 ? .43 : .39;
     facet([
       p(sparkle, .21), p(sparkle + .09, .19),
       p(sparkle + .04, .31),
     ], const Color(0xccffffff));
-    if (side >= 14) {
+    if (detailSide >= 14) {
       canvas.drawCircle(
         p(.29, .29),
         side * .025,
