@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import '../../l10n/strings.dart';
 import 'artwork_render_style.dart';
+import 'diamond_gem_painter.dart';
 import 'painting_controller.dart';
 
 class PaintingBoard extends StatefulWidget {
@@ -277,9 +278,11 @@ class _GridPainter extends CustomPainter {
     canvas.drawRect(
       Offset.zero & size,
       paint
-        ..color = renderStyle == ArtworkRenderStyle.canvas
-            ? const Color(0xfff8f1e5)
-            : Colors.white,
+        ..color = switch (renderStyle) {
+          ArtworkRenderStyle.canvas => const Color(0xfff8f1e5),
+          ArtworkRenderStyle.diamond => const Color(0xffe9edf4),
+          ArtworkRenderStyle.pixel => Colors.white,
+        },
     );
     for (var y = top; y < bottom; y++) {
       for (var x = left; x < right; x++) {
@@ -287,7 +290,25 @@ class _GridPainter extends CustomPainter {
         final color = level.cells[index];
         final done = session.isCompleted(index);
         final rect = Rect.fromLTWH(x * cw, y * ch, cw, ch);
-        if (done || color == session.selectedColor) {
+        if (renderStyle == ArtworkRenderStyle.diamond) {
+          if (done) {
+            paintDiamondGem(
+              canvas,
+              rect,
+              Color(level.palette[color]),
+              column: x,
+              row: y,
+            );
+          } else {
+            if (color == session.selectedColor) {
+              canvas.drawRect(
+                rect,
+                Paint()..color = const Color(0xffdcebdd),
+              );
+            }
+            paintDiamondSocket(canvas, rect);
+          }
+        } else if (done || color == session.selectedColor) {
           paint.color = done
               ? Color(level.palette[color])
               : const Color(0xffdcebdd);
@@ -341,9 +362,11 @@ class _GridPainter extends CustomPainter {
     canvas.drawPath(
       path,
       paint
-        ..color = renderStyle == ArtworkRenderStyle.canvas
-            ? const Color(0x66a5b0a5)
-            : const Color(0xffa5b0a5)
+        ..color = switch (renderStyle) {
+          ArtworkRenderStyle.canvas => const Color(0x66a5b0a5),
+          ArtworkRenderStyle.diamond => const Color(0x22546276),
+          ArtworkRenderStyle.pixel => const Color(0xffa5b0a5),
+        }
         ..style = PaintingStyle.stroke
         ..strokeWidth = 0.6 / scale,
     );
