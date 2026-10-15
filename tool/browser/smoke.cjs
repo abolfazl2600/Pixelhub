@@ -212,6 +212,30 @@ async function main() {
           if (!(error instanceof Error && error.name==='TimeoutError'))throw error;
         }
       }
+      // On a 128x128 board the headless browser can miss a mouse tap even
+      // after zooming. Exercise the real accessible keyboard painting path as
+      // well, without writing progress directly to storage or app internals.
+      // A Flutter widget test separately asserts precision touch input on
+      // the 128x128 board.
+      if (!painted && dimension === 128) {
+        console.log('Browser: dense grid keyboard input',id);
+        await page.getByRole('button',{
+          name:new RegExp(`^Color ${picture.cells[0]+1},`)
+        }).click();
+        await scrollTop();
+        const current=await boardBox();
+        await page.mouse.click(current.x+current.width/2,
+          current.y+current.height/2);
+        await page.keyboard.press('Space');
+        await page.waitForFunction(id=>{
+          const k=Object.keys(localStorage).find(key=>key.includes('pixelhub.progress.v1.'+id+'.1'));
+          if(!k)return false;
+          let value=JSON.parse(localStorage[k]);
+          if(typeof value==='string')value=JSON.parse(value);
+          return value.completedCount>=1;
+        },id,{timeout:15000});
+        painted=true;
+      }
       assert(painted, `a cell in ${id} must be saved after purchasing the artwork`);
     }
 
