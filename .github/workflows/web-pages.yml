@@ -437,6 +437,20 @@ jobs:
               --notes "25 distinct original bilingual 80x80 color-by-number landmark artworks not included in the original 50x50 set: Hagia Sophia, Notre-Dame de Paris, Arc de Triomphe, Louvre Pyramid, Mont Saint-Michel, Empire State Building, Space Needle, Gateway Arch, CN Tower, Forbidden City, Temple of Heaven, Potala Palace, Himeji Castle, Fushimi Inari, Gyeongbokgung Palace, Taipei 101, Petronas Twin Towers, Lotus Temple, Qutub Minar, Sheikh Zayed Grand Mosque, Dome of the Rock, Alhambra Palace, Florence Cathedral, St Peters Basilica and Abu Simbel. Immutable Release-only schema-v2 JSON levels and PNG previews; preserves all existing content IDs and user progress without increasing APK content." \
               --latest=false
           fi
+      - name: Publish fifteen new 70x70 world-famous landmark pictures
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-world-landmarks-70-15-v1 >/dev/null 2>&1; then
+            python3 tool/online_world_landmarks_15_70_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-world-landmarks-70-15-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: fifteen original 70x70 world landmarks" \
+              --notes "15 new bilingual, hand-authored 70x70 pixel-art country landmark coloring levels: Belem Tower, Pena Palace, Prague Astronomical Clock, Charles Bridge, Hungarian Parliament, Edinburgh Castle, Milan Cathedral, Blue Mosque, Galata Tower, Borobudur, Prambanan, Shwedagon Pagoda, Wat Arun, Gateway of India and Hassan II Mosque. No repeats from prior 50x50 and 80x80 landmark packs. All JSON levels and PNG previews are immutable Release-only assets outside the Android application; old IDs and user progress are unchanged." \
+              --latest=false
+          fi
       - name: Download release packs and assemble online catalog
         env:
           GH_TOKEN: ${{ github.token }}
