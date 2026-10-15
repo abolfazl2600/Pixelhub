@@ -381,6 +381,20 @@ jobs:
               --notes "Twenty-five distinct 65x65 bilingual Persian-rug-inspired online paintings, including Tabriz, Kashan, Isfahan, Nain, Qom, Heriz, Bijar, Senneh, Bakhtiari, Qashqai, Gabbeh, Turkmen, Baluch, Afshar, Kerman, Mashhad, Ardabil, Varamin, Sarouk, Hamedan, Shiraz, Yazd, Sistan, Mazandaran and Lori motifs. All generated JSON grids and lossless PNG previews are immutable release-only assets. Existing IDs, saved progress and APK contents are unchanged." \
               --latest=false
           fi
+      - name: Publish twenty new 10x10 country flag pictures
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-country-flags-10-20-v1 >/dev/null 2>&1; then
+            python3 tool/online_flags_20_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-country-flags-10-20-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: twenty 10x10 country flags" \
+              --notes "Twenty original compact bilingual 10x10 pixel flag color-by-number levels, including Iran, France, Germany, Italy, Russia, Ukraine, Netherlands, Poland, Japan, Turkey, United States, United Kingdom, Canada, Brazil, India, China, Sweden, Norway, Finland and Switzerland. Each flag has a checksum-bound JSON grid and PNG preview. Published as immutable Release-only online content, not bundled into the APK." \
+              --latest=false
+          fi
       - name: Download release packs and assemble online catalog
         env:
           GH_TOKEN: ${{ github.token }}
