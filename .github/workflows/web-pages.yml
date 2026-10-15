@@ -367,6 +367,20 @@ jobs:
               --notes "Twenty original bilingual 65x65 pixel-art levels: Tabiat, Quran Gate, Veresk, Ahvaz White Bridge, Rudkhan, Alamut, Babak Castle, Shushtar watermills, Shazdeh Garden, Agha Bozorg, Isfahan Jameh Mosque, Yazd Fire Temple, Sa'd al-Saltaneh, Ali-Sadr Cave, Badab-e Surt, Chabahar Martian Mountains, boteh jegheh, Lalejin pottery, Persian tar and traditional Gulf lenj. Immutable Release-only JSON levels and PNG previews; no APK or app update required." \
               --latest=false
           fi
+      - name: Publish twenty-five original 65x65 Persian rug coloring pictures
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-persian-rugs-65-25-v1 >/dev/null 2>&1; then
+            python3 tool/online_persian_rugs_25_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-persian-rugs-65-25-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: 25 Persian rug pixel-art patterns (65x65)" \
+              --notes "Twenty-five distinct 65x65 bilingual Persian-rug-inspired online paintings, including Tabriz, Kashan, Isfahan, Nain, Qom, Heriz, Bijar, Senneh, Bakhtiari, Qashqai, Gabbeh, Turkmen, Baluch, Afshar, Kerman, Mashhad, Ardabil, Varamin, Sarouk, Hamedan, Shiraz, Yazd, Sistan, Mazandaran and Lori motifs. All generated JSON grids and lossless PNG previews are immutable release-only assets. Existing IDs, saved progress and APK contents are unchanged." \
+              --latest=false
+          fi
       - name: Download release packs and assemble online catalog
         env:
           GH_TOKEN: ${{ github.token }}

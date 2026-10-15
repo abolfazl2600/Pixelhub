@@ -1024,3 +1024,59 @@ compatible with deployed clients; the in-app category overlay resolves the
 The new content becomes available to players **only after both the Release
 publication and Pages deployment succeed**. Adding the source or merging the
 branch does not itself confirm a successful publication.
+
+## Twenty-five Persian-rug-inspired 65×65 coloring patterns (October 2026)
+
+`tool/online_persian_rugs_25_pack.py` authors 25 **different, original**
+geometric and floral rug-inspired coloring artworks, rather than using
+copies of actual woven carpets. Each design is exactly **65×65 cells**
+with a separate hand-designed composition and color palette.
+All 25 have bilingual titles, distinct immutable online IDs,
+`levelVersion: 1`, schema-v2 level JSON, checksum and individual PNG preview.
+
+| ID | فارسی | English | Size |
+| --- | --- | --- | --- |
+| `online-persian-rug-tabriz-medallion-65` | فرش ترنج تبریز | Tabriz Medallion | 65×65 |
+| `online-persian-rug-kashan-flowers-65` | فرش گل‌وبوته کاشان | Kashan Floral | 65×65 |
+| `online-persian-rug-isfahan-arabesque-65` | فرش اسلیمی اصفهان | Isfahan Arabesque | 65×65 |
+| `online-persian-rug-nain-ivory-65` | فرش لچک ترنج نائین | Nain Ivory | 65×65 |
+| `online-persian-rug-qom-silk-65` | فرش ابریشمی قم | Qom Silk Bouquet | 65×65 |
+| `online-persian-rug-heriz-geometric-65` | فرش هندسی هریس | Heriz Geometric | 65×65 |
+| `online-persian-rug-bijar-herati-65` | فرش ماهی بیجار | Bijar Herati | 65×65 |
+| `online-persian-rug-senneh-boteh-65` | فرش بته‌جقه سنه | Senneh Boteh | 65×65 |
+| `online-persian-rug-bakhtiari-garden-65` | فرش خشتی بختیاری | Bakhtiari Garden | 65×65 |
+| `online-persian-rug-qashqai-diamonds-65` | قالی سه‌ترنج قشقایی | Qashqai Triple-Diamond | 65×65 |
+| `online-persian-rug-gabbeh-lion-65` | گبه شیر فارس | Fars Lion Gabbeh | 65×65 |
+| `online-persian-rug-turkmen-gul-65` | قالی گل ترکمن | Turkmen Gul | 65×65 |
+| `online-persian-rug-baluch-prayer-65` | قالی محرابی بلوچ | Baluch Prayer | 65×65 |
+| `online-persian-rug-afshar-diamonds-65` | قالی لوزی افشار | Afshar Diamond | 65×65 |
+| `online-persian-rug-kerman-tree-65` | فرش درخت زندگی کرمان | Kerman Tree of Life | 65×65 |
+| `online-persian-rug-mashhad-medallion-65` | فرش ترنج مشهد | Mashhad Medallion | 65×65 |
+| `online-persian-rug-ardabil-star-65` | فرش ستاره اردبیل | Ardabil Star | 65×65 |
+| `online-persian-rug-varamin-minakhani-65` | فرش میناخانی ورامین | Varamin Mina Khani | 65×65 |
+| `online-persian-rug-sarouk-roses-65` | فرش دسته‌گل ساروق | Sarouk Roses | 65×65 |
+| `online-persian-rug-hamedan-stripes-65` | قالی راه‌راه همدان | Hamedan Stripes | 65×65 |
+| `online-persian-rug-shiraz-cypress-65` | فرش سرو شیراز | Shiraz Cypress | 65×65 |
+| `online-persian-rug-yazd-four-gardens-65` | فرش چهارباغ یزد | Yazd Four Gardens | 65×65 |
+| `online-persian-rug-sistan-sun-65` | گلیم خورشیدی سیستان | Sistan Sun Kilim | 65×65 |
+| `online-persian-rug-mazandaran-kilim-65` | گلیم راه‌راه مازندران | Mazandaran Striped Kilim | 65×65 |
+| `online-persian-rug-lori-animals-65` | گلیم حیوانات لری | Lori Animal Motifs | 65×65 |
+
+All these artworks belong to the existing `patterns` catalog category
+to remain compatible with older clients. Their IDs intentionally start
+with `online-persian-rug-` instead of `online-iran-` so the gallery's
+historic Iranian-landmark category overlay does not mislabel rugs as
+architectural landmarks.
+
+On a **successful main-branch Web CI run**, the existing Pages workflow
+creates the immutable GitHub Release
+[`pixelhub-content-persian-rugs-65-25-v1`](https://github.com/abolfazl2600/Pixelhub/releases/tag/pixelhub-content-persian-rugs-65-25-v1)
+if absent, attaches the generated `content.zip`, and assembles the new
+online catalog. Generate manually with
+`python3 tool/online_persian_rugs_25_pack.py /tmp/content.zip`.
+Generated level grids and previews are Release-only assets, not committed
+to the repository or bundled in the Android app.
+
+All previously published paintings and user downloads/progress are unchanged.
+Source merge alone does **not** prove publication: the content becomes
+visible only after successful release creation and GitHub Pages deployment.
