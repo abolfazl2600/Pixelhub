@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/game_sounds.dart';
 import '../../l10n/strings.dart';
 import '../../platform_adapters/offline_support.dart';
 import '../gallery/library_controller.dart';
@@ -9,9 +12,11 @@ class SettingsScreen extends StatefulWidget {
   const SettingsScreen({
     required this.library,
     required this.onClear,
+    this.sounds,
     super.key,
   });
   final LibraryController library;
+  final GameSounds? sounds;
   final Future<void> Function() onClear;
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -103,6 +108,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: const Icon(Icons.privacy_tip_outlined),
                 label: Text(s.privacyPolicyTitle),
               ),
+              if (widget.sounds != null) ...[
+                const SizedBox(height: 12),
+                ListenableBuilder(
+                  listenable: widget.sounds!,
+                  builder: (context, _) => SwitchListTile.adaptive(
+                    contentPadding: EdgeInsets.zero,
+                    secondary: const Icon(Icons.volume_up_outlined),
+                    title: Text(
+                      context.isPersian ? 'افکت‌های صوتی' : 'Sound effects',
+                    ),
+                    subtitle: Text(
+                      context.isPersian
+                          ? 'سکه‌ها و تکمیل نقاشی'
+                          : 'Coins and completed paintings',
+                    ),
+                    value: widget.sounds!.enabled,
+                    onChanged: _busy
+                        ? null
+                        : (value) =>
+                              unawaited(widget.sounds!.setEnabled(value)),
+                  ),
+                ),
+              ],
               const SizedBox(height: 24),
               Text(s.importPrivacy, style: const TextStyle(height: 1.8)),
               const SizedBox(height: 12),

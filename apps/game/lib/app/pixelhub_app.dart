@@ -11,6 +11,7 @@ import 'package:persistence/persistence.dart';
 
 import '../features/home/home_screen.dart';
 import '../core/local_diagnostics.dart';
+import '../core/game_sounds.dart';
 import '../features/profile/profile_screen.dart';
 import '../features/gallery/artwork_screen.dart';
 import '../features/gallery/gallery_screen.dart';
@@ -59,6 +60,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
   late final ProgressRepository _progress;
   late final PreferencesRepository _preferences;
   late final LibraryController _library;
+  late final GameSounds _sounds;
   late final OnlineCatalogController _online;
   final ValueNotifier<Map<String, PixelAnimation>> _bundledAnimations =
       ValueNotifier({});
@@ -86,12 +88,17 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     _progress = widget.progressRepository ?? local!;
     _preferences = widget.preferences ?? local!;
     final preferences = _preferences;
+    _sounds = GameSounds(
+      preferences: preferences is SoundEffectsPreferences ? preferences : null,
+    );
+    unawaited(_sounds.initialize());
     _library = LibraryController(
       widget.artworkRepository ??
           (preferences is ArtworkRepository
               ? preferences as ArtworkRepository
               : MemoryPreferences()),
       _progress,
+      sounds: _sounds,
       recentArtworkRepository: preferences is RecentArtworkRepository
           ? preferences as RecentArtworkRepository
           : null,
@@ -328,7 +335,10 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
         final controller = PaintingController(
           level,
           _progress,
-          onCompleted: _diagnostics.recordCompletion,
+          onCompleted: () {
+            _diagnostics.recordCompletion();
+            unawaited(_sounds.play(SoundCue.paintingCompleted));
+          },
         );
         controller.addListener(() {
           if (controller.status == PaintingStatus.ready) {
@@ -377,6 +387,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     _sessions.clear();
     try {
       await _library.clear();
+      await _sounds.setEnabled(true);
       _online.clearDownloaded();
     } on Object {
       await _library.load();
@@ -449,7 +460,11 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
         );
       }
       if (page == 'settings') {
-        return SettingsScreen(library: _library, onClear: _clearLocalData);
+        return SettingsScreen(
+          library: _library,
+          sounds: _sounds,
+          onClear: _clearLocalData,
+        );
       }
       if (page == 'import' || (id?.startsWith('private-') ?? false)) {
         if (_library.status == LibraryStatus.loading) {
@@ -512,6 +527,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     _styleChanges.dispose();
     _bootstrap.dispose();
     _library.dispose();
+    _sounds.dispose();
     _online.dispose();
     _bundledAnimations.dispose();
     if (widget.diagnostics == null) _diagnostics.dispose();

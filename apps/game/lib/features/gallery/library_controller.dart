@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:game_domain/game_domain.dart';
 import 'package:level_schema/level_schema.dart';
 
+import '../../core/game_sounds.dart';
 import 'artwork_categories.dart';
 import 'artwork_economy.dart';
 
@@ -14,10 +15,12 @@ class LibraryController extends ChangeNotifier {
     this.repository,
     this.progressRepository, {
     this.recentArtworkRepository,
+    this.sounds,
   });
   final ArtworkRepository repository;
   final ProgressRepository progressRepository;
   final RecentArtworkRepository? recentArtworkRepository;
+  final GameSounds? sounds;
   ArtworkLibrary library = ArtworkLibrary();
   LibraryStatus status = LibraryStatus.loading;
   List<LevelDefinition> catalog = [];
@@ -243,6 +246,7 @@ class LibraryController extends ChangeNotifier {
     );
     await repository.writeLibrary(next);
     library = next;
+    if (sounds != null) unawaited(sounds!.play(SoundCue.coinPurchase));
   });
 
   /// Once per level ID, even after reset or app relaunch. A failed wallet
@@ -257,6 +261,7 @@ class LibraryController extends ChangeNotifier {
     );
     await repository.writeLibrary(next);
     library = next;
+    if (sounds != null) unawaited(sounds!.play(SoundCue.coinsEarned));
   });
 
   Future<void> _mutate(
