@@ -6,6 +6,7 @@ import 'package:level_schema/level_schema.dart';
 import '../../core/pixel_art_preview.dart';
 import '../../l10n/strings.dart';
 import 'artwork_render_style.dart';
+import 'diamond_gem_painter.dart';
 
 /// Shown only after a level is completed. Animation playback does not alter
 /// painting state and is disabled for pictures without a sidecar.
@@ -151,6 +152,22 @@ class _AnimationPainter extends CustomPainter {
     final paint = Paint()..isAntiAlias = false;
     final w = size.width / level.width;
     final h = size.height / level.height;
+    if (renderStyle == ArtworkRenderStyle.diamond) {
+      canvas.drawRect(Offset.zero & size, Paint()..color = const Color(0xffe9edf4));
+      for (var y = 0; y < level.height; y++) {
+        for (var x = 0; x < level.width; x++) {
+          final color = Color(level.palette[cells[y * level.width + x]]);
+          paintDiamondGem(
+            canvas,
+            Rect.fromLTWH(x * w, y * h, w, h),
+            color,
+            column: x,
+            row: y,
+          );
+        }
+      }
+      return;
+    }
     // Coalesce adjacent same-color pixels to reduce drawing operations.
     for (var y = 0; y < level.height; y++) {
       var x = 0;
