@@ -12,111 +12,152 @@ enum ArtworkRenderStyle {
       value == 'canvas' ? ArtworkRenderStyle.canvas : ArtworkRenderStyle.pixel;
 }
 
-/// Deterministic, multi-layer linen weave for the optional Canvas look.
+/// An artwork-space woven linen surface, intentionally different from the
+/// perfectly flat Pixel style. Broken strands and alternating crossings give
+/// the colored pigment the appearance of sitting on absorbent fabric.
 ///
-/// Every position is in *artwork coordinates*, including when the board pans
-/// and zooms. Alternating raised threads, recess shadows and tiny irregular
-/// fibers create a visible cloth surface on both light and dark pigments.
-/// This only changes rendering: numbered cells, palette and saved progress
-/// remain unchanged. A fixed thread pitch avoids expensive cell-wise textures
-/// for large (up to 128×128) paintings and long online animations.
+/// Drawing cost depends on visible surface area, NOT on the number of artwork
+/// cells (which may be 128x128). All marks have deterministic coordinates so
+/// zooming, panning and moving between still/animated views do not flicker.
+/// No image assets, randomness or saved artwork changes are required.
 void paintCanvasTexture(
   Canvas canvas,
   Rect bounds, {
   required double cellWidth,
   required double cellHeight,
-  double opacity = .24,
+  double opacity = .30,
 }) {
-  if (bounds.isEmpty) return;
-  // Thread density follows the display, not the level's pixel dimensions.
-  // Keep the textile identifiable even on 64/128-grid finished paintings.
-  const spacing = 6.0;
-  final strength = opacity.clamp(0.0, 0.4).toDouble();
+  if (bounds.isEmpty || opacity <= 0) return;
+  const pitch = 6.0;
+  final strength = opacity.clamp(0.0, .4).toDouble();
+  final shadowFibers = Path();
+  final raisedFibers = Path();
+  final fineFibers = Path();
+  final grain = Path();
+  final xStart = (bounds.left / pitch).floor() - 1;
+  final xEnd = (bounds.right / pitch).ceil();
+  final yStart = (bounds.top / pitch).floor() - 1;
+  final yEnd = (bounds.bottom / pitch).ceil();
 
-  final glaze = Paint()..color = Color.fromRGBO(239, 224, 198, strength * .30);
-  final threadShadow = Paint()
-    ..isAntiAlias = false
-    ..strokeWidth = .95
-    ..color = Color.fromRGBO(78, 57, 38, strength * 1.22);
-  final threadLight = Paint()
-    ..isAntiAlias = false
-    ..strokeWidth = .85
-    ..color = Color.fromRGBO(255, 251, 230, strength * 1.48);
-  final threadEdge = Paint()
-    ..isAntiAlias = false
-    ..strokeWidth = .42
-    ..color = Color.fromRGBO(112, 82, 55, strength * .58);
-  final raisedKnot = Paint()
-    ..isAntiAlias = false
-    ..color = Color.fromRGBO(255, 253, 239, strength * 1.30);
-  final recessedKnot = Paint()
-    ..isAntiAlias = false
-    ..color = Color.fromRGBO(88, 68, 46, strength * .90);
-
-  canvas.save();
-  canvas.clipRect(bounds);
-  canvas.drawRect(bounds, glaze);
-
-  // A close pair of shade and light strokes makes every yarn visibly raised.
-  // Opposing horizontal and vertical pairs interlock like woven cotton.
-  final xStart = (bounds.left / spacing).floor();
-  final xEnd = (bounds.right / spacing).ceil();
-  final yStart = (bounds.top / spacing).floor();
-  final yEnd = (bounds.bottom / spacing).ceil();
-
-  for (var xi = xStart; xi <= xEnd; xi++) {
-    final x = xi * spacing;
-    canvas.drawLine(
-      Offset(x + .45, bounds.top),
-      Offset(x + .45, bounds.bottom),
-      threadShadow,
-    );
-    canvas.drawLine(
-      Offset(x + 1.6, bounds.top),
-      Offset(x + 1.6, bounds.bottom),
-      threadLight,
-    );
-    canvas.drawLine(
-      Offset(x + 2.4, bounds.top),
-      Offset(x + 2.4, bounds.bottom),
-      threadEdge,
-    );
-  }
+  // Draw discontinuous strands instead of uninterrupted vertical/horizontal
+  // grid lines. Short woven segments alternate which thread goes over.
   for (var yi = yStart; yi <= yEnd; yi++) {
-    final y = yi * spacing;
-    canvas.drawLine(
-      Offset(bounds.left, y + .45),
-      Offset(bounds.right, y + .45),
-      threadShadow,
-    );
-    canvas.drawLine(
-      Offset(bounds.left, y + 1.6),
-      Offset(bounds.right, y + 1.6),
-      threadLight,
-    );
-    canvas.drawLine(
-      Offset(bounds.left, y + 2.4),
-      Offset(bounds.right, y + 2.4),
-      threadEdge,
-    );
-  }
-
-  // Intersections alternately catch light and recess into the fabric. Sparse,
-  // asymmetric dashes prevent the texture looking like a plain square grid.
-  for (var yi = yStart; yi <= yEnd; yi++) {
-    final y = yi * spacing;
+    final y = yi * pitch;
     for (var xi = xStart; xi <= xEnd; xi++) {
-      final x = xi * spacing;
-      if ((xi + yi).isEven) {
-        canvas.drawRect(Rect.fromLTWH(x + .2, y + 1.1, 2.5, .95), raisedKnot);
-      } else {
-        canvas.drawRect(
-          Rect.fromLTWH(x + 1.15, y + .2, .95, 2.5),
-          recessedKnot,
-        );
+      final x = xi * pitch;
+      final seed = (xi * 73 + yi * 137) & 15;
+      final shift = (seed - 7) * .065;
+      final over = (xi + yi).isEven;
+
+      shadowFibers
+        ..moveTo(x + .46 + shift, y + .3)
+        ..lineTo(x + .46 + shift, y + (over ? 4.8 : 5.55))
+        ..moveTo(x + .25, y + .46 - shift)
+        ..lineTo(x + (over ? 5.55 : 4.75), y + .46 - shift);
+      raisedFibers
+        ..moveTo(x + 1.48 + shift, y + (over ? .7 : 2.55))
+        ..lineTo(x + 1.48 + shift, y + (over ? 3.85 : 5.25))
+        ..moveTo(x + (over ? 2.35 : .75), y + 1.45 - shift)
+        ..lineTo(x + (over ? 5.2 : 3.8), y + 1.45 - shift);
+      fineFibers
+        ..moveTo(x + 2.35, y + 3.15 + shift)
+        ..lineTo(x + 4.5, y + 3.15 + shift);
+      // Small slubs resemble paint catching the high points of real linen.
+      if (seed.isEven) {
+        grain.addOval(Rect.fromLTWH(x + 2.65 + shift, y + 2.85, 1.1, .7));
       }
     }
   }
+
+  canvas.save();
+  canvas.clipRect(bounds);
+  canvas.drawRect(
+    bounds,
+    Paint()..color = Color.fromRGBO(242, 230, 208, strength * .32),
+  );
+  canvas.drawPath(
+    shadowFibers,
+    Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = .9
+      ..isAntiAlias = false
+      ..color = Color.fromRGBO(64, 47, 39, strength * 1.08),
+  );
+  canvas.drawPath(
+    raisedFibers,
+    Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = .95
+      ..isAntiAlias = false
+      ..color = Color.fromRGBO(255, 251, 231, strength * 1.22),
+  );
+  canvas.drawPath(
+    fineFibers,
+    Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = .55
+      ..isAntiAlias = false
+      ..color = Color.fromRGBO(110, 85, 66, strength * .44),
+  );
+  canvas.drawPath(
+    grain,
+    Paint()..color = Color.fromRGBO(255, 249, 229, strength * .63),
+  );
+  canvas.restore();
+}
+
+/// Translucent, slightly uneven pigment strokes on *completed* cells.
+/// The underlying palette color remains accurate and the strokes stay within
+/// that cell. Omit these details on dense grids where they would become
+/// expensive and visually noisy; the weave remains visible on those grids.
+void paintCanvasPigment(
+  Canvas canvas,
+  Rect rect, {
+  required int column,
+  required int row,
+}) {
+  final w = rect.width, h = rect.height;
+  if (w < 9 || h < 9) return;
+  final variation = ((column * 37 + row * 59) & 15) / 15.0;
+  final top = rect.top + h * (.15 + variation * .16);
+  final bottom = rect.top + h * (.58 + variation * .13);
+
+  canvas.save();
+  canvas.clipRect(rect);
+  canvas.drawRRect(
+    RRect.fromRectAndRadius(
+      Rect.fromLTWH(
+        rect.left + w * .07,
+        top,
+        w * (.54 + variation * .22),
+        h * .10,
+      ),
+      Radius.circular(h * .045),
+    ),
+    Paint()..color = const Color(0x22ffffff),
+  );
+  canvas.drawRRect(
+    RRect.fromRectAndRadius(
+      Rect.fromLTWH(
+        rect.left + w * (.12 + variation * .10),
+        bottom,
+        w * (.51 + variation * .21),
+        h * .075,
+      ),
+      Radius.circular(h * .037),
+    ),
+    Paint()..color = const Color(0x160c1313),
+  );
+  // Irregular dry-brush granulation on the high points of the weave.
+  canvas.drawOval(
+    Rect.fromLTWH(
+      rect.left + w * (.54 + variation * .12),
+      rect.top + h * .42,
+      w * .09,
+      h * .055,
+    ),
+    Paint()..color = const Color(0x27ffffff),
+  );
   canvas.restore();
 }
 

@@ -274,7 +274,13 @@ class _GridPainter extends CustomPainter {
     final bottom = (b.dy / ch).ceil().clamp(0, level.height);
     final paint = Paint()..isAntiAlias = false;
     final labels = <int, TextPainter>{};
-    canvas.drawRect(Offset.zero & size, paint..color = Colors.white);
+    canvas.drawRect(
+      Offset.zero & size,
+      paint
+        ..color = renderStyle == ArtworkRenderStyle.canvas
+            ? const Color(0xfff8f1e5)
+            : Colors.white,
+    );
     for (var y = top; y < bottom; y++) {
       for (var x = left; x < right; x++) {
         final index = y * level.width + x;
@@ -286,6 +292,9 @@ class _GridPainter extends CustomPainter {
               ? Color(level.palette[color])
               : const Color(0xffdcebdd);
           canvas.drawRect(rect, paint);
+          if (done && renderStyle == ArtworkRenderStyle.canvas) {
+            paintCanvasPigment(canvas, rect, column: x, row: y);
+          }
         }
         if (!done && cw * scale >= 14) {
           final label = labels.putIfAbsent(color, () {
@@ -332,7 +341,9 @@ class _GridPainter extends CustomPainter {
     canvas.drawPath(
       path,
       paint
-        ..color = const Color(0xffa5b0a5)
+        ..color = renderStyle == ArtworkRenderStyle.canvas
+            ? const Color(0x66a5b0a5)
+            : const Color(0xffa5b0a5)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 0.6 / scale,
     );
