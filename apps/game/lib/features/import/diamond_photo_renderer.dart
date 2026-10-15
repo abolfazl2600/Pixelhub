@@ -38,6 +38,7 @@ img.Image renderDiamondImage(LevelDefinition level) {
       final b = base & 255;
       final glint = (column * 37 + row * 61) & 3;
       final sparkle = glint == 0 ? .36 : glint == 1 ? .43 : .39;
+      final glintFacet = [sparkle, .21, sparkle + .09, .19, sparkle + .04, .31];
 
       for (var iy = 0; iy < ch; iy++) {
         final v = (iy + .5) / ch;
@@ -82,10 +83,7 @@ img.Image renderDiamondImage(LevelDefinition level) {
             } else if (_insidePolygon(u, v, upperBevel)) {
               mix = .52;
             }
-            if (cw >= 8 &&
-                _insidePolygon(u, v, [
-                  sparkle, .21, sparkle + .09, .19, sparkle + .04, .31,
-                ])) {
+            if (cw >= 8 && _insidePolygon(u, v, glintFacet)) {
               mix = .82; // White glint with 80%-opacity coverage.
             }
           }
