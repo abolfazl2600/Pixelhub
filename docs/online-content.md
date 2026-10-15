@@ -1114,3 +1114,60 @@ Build the pack manually with
 Older published artworks, downloaded progress and existing IDs are preserved.
 Merely committing this recipe does not establish live availability: the
 Release creation and Pages deployment must complete successfully.
+
+
+## Twenty-five additional country flags on exact 35×35 grids (October 2026)
+
+The reproducible source `tool/online_flags_35_25_pack.py` defines **25 new**
+national flag-inspired pixel-art paintings, all exactly **35×35 cells**,
+with a 35×23 flag field centered vertically on a neutral 35×35 canvas.
+These add to the earlier 20 exact-10×10 country flag pictures **without any
+country overlap**.
+
+| Country | Persian title | ID |
+| --- | --- | --- |
+| Spain | پرچم اسپانیا | `online-flag-spain-35` |
+| Portugal | پرچم پرتغال | `online-flag-portugal-35` |
+| Belgium | پرچم بلژیک | `online-flag-belgium-35` |
+| Austria | پرچم اتریش | `online-flag-austria-35` |
+| Denmark | پرچم دانمارک | `online-flag-denmark-35` |
+| Greece | پرچم یونان | `online-flag-greece-35` |
+| Ireland | پرچم ایرلند | `online-flag-ireland-35` |
+| Czechia | پرچم چک | `online-flag-czechia-35` |
+| Slovakia | پرچم اسلواکی | `online-flag-slovakia-35` |
+| Hungary | پرچم مجارستان | `online-flag-hungary-35` |
+| Romania | پرچم رومانی | `online-flag-romania-35` |
+| Bulgaria | پرچم بلغارستان | `online-flag-bulgaria-35` |
+| Croatia | پرچم کرواسی | `online-flag-croatia-35` |
+| Serbia | پرچم صربستان | `online-flag-serbia-35` |
+| South Korea | پرچم کره جنوبی | `online-flag-south-korea-35` |
+| Australia | پرچم استرالیا | `online-flag-australia-35` |
+| New Zealand | پرچم نیوزیلند | `online-flag-new-zealand-35` |
+| Mexico | پرچم مکزیک | `online-flag-mexico-35` |
+| Argentina | پرچم آرژانتین | `online-flag-argentina-35` |
+| Chile | پرچم شیلی | `online-flag-chile-35` |
+| Colombia | پرچم کلمبیا | `online-flag-colombia-35` |
+| Peru | پرچم پرو | `online-flag-peru-35` |
+| South Africa | پرچم آفریقای جنوبی | `online-flag-south-africa-35` |
+| Egypt | پرچم مصر | `online-flag-egypt-35` |
+| Saudi Arabia | پرچم عربستان سعودی | `online-flag-saudi-arabia-35` |
+
+Each flag uses a unique immutable `online-flag-*-35` ID, bilingual titles,
+schema-v2 numbered JSON, SHA-256 checksum, version 1, and a PNG preview.
+The manifest category is the supported legacy `patterns`, enabling the
+existing online gallery to display the flags without a client update. Small
+coats of arms, stars and calligraphy are simplified; the Saudi design uses an
+abstract non-textual motif instead of depicting Arabic religious lettering.
+
+The GitHub Pages workflow creates the immutable
+[`pixelhub-content-country-flags-35-25-v1`](https://github.com/abolfazl2600/Pixelhub/releases/tag/pixelhub-content-country-flags-35-25-v1)
+Release after a **successful `main` CI run**, attaches its generated
+`content.zip`, and assembles it into the downloadable online gallery catalog.
+Generate manually with
+`python3 tool/online_flags_35_25_pack.py /tmp/content.zip`.
+Only drawing instructions and tests are committed; the grid JSON and preview
+PNG assets remain Release-only and are not bundled into APKs. Previously
+published level IDs and existing user progress remain untouched.
+
+Code merge alone does not establish publication: the Release and GitHub Pages
+deployment must both complete successfully before users see these flags.
