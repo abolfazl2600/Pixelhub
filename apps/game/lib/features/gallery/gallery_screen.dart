@@ -216,6 +216,22 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   '${context.digits(picture.height)}',
                   textAlign: TextAlign.center,
                 ),
+                const SizedBox(height: 6),
+                Text(
+                  context.strings.artworkCoins(
+                    context.digits(
+                      artworkReward(
+                        difficultyForOnlineGrid(
+                          width: picture.width,
+                          height: picture.height,
+                          colorCount: picture.colorCount,
+                        ),
+                      ),
+                    ),
+                  ),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
                 if (picture.animation != null) ...[
                   const SizedBox(height: 6),
                   Text(
@@ -343,6 +359,15 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 )
               else if (library.library.unlocked.contains(level.id))
                 Text(s.artworkOwned, style: const TextStyle(fontSize: 11)),
+              Text(
+                s.artworkCoins(context.digits(rewardForLevel(level))),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
               const SizedBox(height: 2),
               if (count > 0) ...[
                 LinearProgressIndicator(
@@ -473,6 +498,23 @@ class _GalleryScreenState extends State<GalleryScreen> {
                     ),
                     style: const TextStyle(fontSize: 10),
                   ),
+                  Text(
+                    s.artworkCoins(
+                      context.digits(
+                        artworkReward(
+                          difficultyForOnlineGrid(
+                            width: picture.width,
+                            height: picture.height,
+                            colorCount: picture.colorCount,
+                          ),
+                        ),
+                      ),
+                    ),
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 2),
@@ -525,7 +567,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
       final visible = available.take(_onlineVisibleCount).toList();
       const grid = SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 240,
-        mainAxisExtent: 292,
+        mainAxisExtent: 318,
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
       );
