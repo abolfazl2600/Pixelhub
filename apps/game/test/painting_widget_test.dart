@@ -235,6 +235,35 @@ void main() {
     expect(controller.saveStatus, SaveStatus.saved);
   });
 
+  testWidgets('128x128 board accepts precise touch and persists the cell', (
+    tester,
+  ) async {
+    const dimension = 128;
+    final level = LevelDefinition(
+      id: 'sunflower',
+      title: 'نمونه بزرگ',
+      titleEn: 'Large sample',
+      schemaVersion: 2,
+      contentVersion: 1,
+      width: dimension,
+      height: dimension,
+      palette: [0xff316349],
+      cells: List.filled(dimension * dimension, 0),
+    );
+    final storage = MemoryPreferences();
+    final controller = await pumpPainting(
+      tester,
+      level: level,
+      storage: storage,
+    );
+    final board = tester.getRect(find.byKey(const ValueKey('painting-board')));
+    await tester.tapAt(board.center);
+    await tester.pumpAndSettle();
+    expect(controller.session!.isCompleted(64 * dimension + 64), isTrue);
+    expect(controller.session!.completedCount, 1);
+    expect((await storage.read(level))?.completedCount, 1);
+  });
+
   testWidgets('pinch cannot paint and Move mode cannot paint', (tester) async {
     final controller = await pumpPainting(tester);
     final board = tester.getRect(find.byKey(const ValueKey('painting-board')));
