@@ -553,10 +553,13 @@ final class MemoryPreferences
   }
 
   @override
-  Future<String?> readArtworkStyle() async =>
-      artworkStyle == 'canvas' || artworkStyle == 'pixel' || artworkStyle == 'diamond'
-          ? artworkStyle
-          : null;
+  Future<String?> readArtworkStyle() async {
+    final value = artworkStyle;
+    if (value == 'canvas' || value == 'pixel' || value == 'diamond') {
+      return value;
+    }
+    return null;
+  }
 
   @override
   Future<void> writeArtworkStyle(String value) async {
