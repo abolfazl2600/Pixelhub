@@ -353,6 +353,20 @@ jobs:
               --notes "15 distinct original pixel-art homages to public-domain classic paintings. Each 64x64 picture includes a checksum-bound eight-frame online animation companion and bilingual metadata. Assets are immutable Release files and are not bundled in the APK." \
               --latest=false
           fi
+      - name: Publish twenty new 65x65 Iranian landmarks and cultural pictures
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-iran-more-65-20-v1 >/dev/null 2>&1; then
+            python3 tool/online_iran_more_20_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-iran-more-65-20-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: 20 new 65x65 Iranian coloring pictures" \
+              --notes "Twenty original bilingual 65x65 pixel-art levels: Tabiat, Quran Gate, Veresk, Ahvaz White Bridge, Rudkhan, Alamut, Babak Castle, Shushtar watermills, Shazdeh Garden, Agha Bozorg, Isfahan Jameh Mosque, Yazd Fire Temple, Sa'd al-Saltaneh, Ali-Sadr Cave, Badab-e Surt, Chabahar Martian Mountains, boteh jegheh, Lalejin pottery, Persian tar and traditional Gulf lenj. Immutable Release-only JSON levels and PNG previews; no APK or app update required." \
+              --latest=false
+          fi
       - name: Download release packs and assemble online catalog
         env:
           GH_TOKEN: ${{ github.token }}
