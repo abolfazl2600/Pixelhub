@@ -5,6 +5,12 @@ import 'package:game_domain/game_domain.dart';
 import 'package:level_schema/level_schema.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Optional offline preference for bundled game event sounds.
+abstract interface class SoundEffectsPreferences {
+  Future<bool?> readSoundEffectsEnabled();
+  Future<void> writeSoundEffectsEnabled(bool enabled);
+}
+
 final class AssetLevelRepository
     implements LevelRepository, CatalogMetadataRepository {
   AssetLevelRepository({AssetBundle? bundle}) : _bundle = bundle ?? rootBundle;
@@ -83,7 +89,8 @@ final class LocalPreferences
         ProgressSyncOutboxRepository,
         OnlineLevelStorage,
         OnlineAnimationStorage,
-        ArtworkStylePreferences {
+        ArtworkStylePreferences,
+        SoundEffectsPreferences {
   LocalPreferences({SharedPreferencesAsync? preferences})
     : _preferences = preferences ?? SharedPreferencesAsync();
   final SharedPreferencesAsync _preferences;
@@ -343,6 +350,16 @@ final class LocalPreferences
       _enqueue(() => _preferences.setString('pixelhub.language', language));
 
   @override
+  Future<bool?> readSoundEffectsEnabled() async {
+    await _writes;
+    return _preferences.getBool('pixelhub.soundEffects.v1');
+  }
+
+  @override
+  Future<void> writeSoundEffectsEnabled(bool enabled) =>
+      _enqueue(() => _preferences.setBool('pixelhub.soundEffects.v1', enabled));
+
+  @override
   Future<String?> readArtworkStyle() async {
     await _writes;
     final value = await _preferences.getString('pixelhub.artworkStyle.v1');
@@ -435,10 +452,12 @@ final class MemoryPreferences
         ProgressSyncOutboxRepository,
         OnlineLevelStorage,
         OnlineAnimationStorage,
-        ArtworkStylePreferences {
+        ArtworkStylePreferences,
+        SoundEffectsPreferences {
   final Map<String, ProgressSnapshot> _records = {};
   String? language;
   String? artworkStyle;
+  bool? soundEffectsEnabled;
   String? recentArtworkId;
   ArtworkLibrary _library = ArtworkLibrary();
   final Map<String, ProgressSyncOutbox> _outboxes = {};
@@ -553,6 +572,14 @@ final class MemoryPreferences
   }
 
   @override
+  Future<bool?> readSoundEffectsEnabled() async => soundEffectsEnabled;
+
+  @override
+  Future<void> writeSoundEffectsEnabled(bool enabled) async {
+    soundEffectsEnabled = enabled;
+  }
+
+  @override
   Future<String?> readArtworkStyle() async {
     final value = artworkStyle;
     if (value == 'canvas' || value == 'pixel' || value == 'diamond') {
@@ -607,6 +634,7 @@ final class MemoryPreferences
     _library = ArtworkLibrary();
     language = null;
     artworkStyle = null;
+    soundEffectsEnabled = null;
     recentArtworkId = null;
   }
 }
