@@ -346,7 +346,9 @@ final class LocalPreferences
   Future<String?> readArtworkStyle() async {
     await _writes;
     final value = await _preferences.getString('pixelhub.artworkStyle.v1');
-    return value == 'canvas' || value == 'pixel' || value == 'diamond' ? value : null;
+    return value == 'canvas' || value == 'pixel' || value == 'diamond'
+        ? value
+        : null;
   }
 
   @override
