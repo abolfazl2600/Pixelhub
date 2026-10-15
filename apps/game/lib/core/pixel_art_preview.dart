@@ -42,15 +42,16 @@ class _FixturePainter extends CustomPainter {
     for (var y = 0; y < level.height; y++) {
       for (var x = 0; x < level.width; x++) {
         paint.color = Color(level.palette[level.cells[y * level.width + x]]);
-        canvas.drawRect(
-          Rect.fromLTRB(
-            x * size.width / level.width,
-            y * size.height / level.height,
-            (x + 1) * size.width / level.width,
-            (y + 1) * size.height / level.height,
-          ),
-          paint,
+        final rect = Rect.fromLTRB(
+          x * size.width / level.width,
+          y * size.height / level.height,
+          (x + 1) * size.width / level.width,
+          (y + 1) * size.height / level.height,
         );
+        canvas.drawRect(rect, paint);
+        if (renderStyle == ArtworkRenderStyle.canvas) {
+          paintCanvasPigment(canvas, rect, column: x, row: y);
+        }
       }
     }
     artworkStylePainters[renderStyle]?.call(
