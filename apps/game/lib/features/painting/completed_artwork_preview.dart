@@ -153,7 +153,10 @@ class _AnimationPainter extends CustomPainter {
     final w = size.width / level.width;
     final h = size.height / level.height;
     if (renderStyle == ArtworkRenderStyle.diamond) {
-      canvas.drawRect(Offset.zero & size, Paint()..color = const Color(0xffe9edf4));
+      canvas.drawRect(
+        Offset.zero & size,
+        Paint()..color = const Color(0xffe9edf4),
+      );
       for (var y = 0; y < level.height; y++) {
         for (var x = 0; x < level.width; x++) {
           final color = Color(level.palette[cells[y * level.width + x]]);
