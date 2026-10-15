@@ -1080,3 +1080,37 @@ to the repository or bundled in the Android app.
 All previously published paintings and user downloads/progress are unchanged.
 Source merge alone does **not** prove publication: the content becomes
 visible only after successful release creation and GitHub Pages deployment.
+
+
+## Twenty original country flag icons on exact 10×10 grids (October 2026)
+
+`tool/online_flags_20_pack.py` contains original hand-authored compact pixel
+rendering recipes for **20 countries**:
+Iran, France, Germany, Italy, Russia, Ukraine, Netherlands, Poland, Japan,
+Turkey, United States, United Kingdom, Canada, Brazil, India, China, Sweden,
+Norway, Finland, and Switzerland. Iran is included as
+`online-flag-iran-10` / «پرچم ایران».
+
+All levels use **exactly 10×10 color-by-number cells** with bilingual titles,
+new immutable `online-flag-<country>-10` IDs, `levelVersion: 1`,
+schema-v2 level JSON, checksum and PNG preview. All use the existing
+`patterns` public catalog category to preserve backwards compatibility with
+older Android clients and will appear in the online pictures section.
+The small flags are generally drawn in a 10×6 region centered on the 10×10
+canvas; Switzerland uses a square 6×6 motif. Fine heraldic details,
+inscriptions and star patterns have to be simplified at this pixel resolution,
+so these are recognizable pixel-art interpretations rather than official
+vector-accurate national flag artwork.
+
+The successful `main` Web CI workflow triggers the Pages job, which creates
+[`pixelhub-content-country-flags-10-20-v1`](https://github.com/abolfazl2600/Pixelhub/releases/tag/pixelhub-content-country-flags-10-20-v1)
+as a new immutable Release with `content.zip`, unless it already exists,
+and includes all 20 pictures in the assembled public online catalog.
+The level JSON files and PNG previews are generated only in the workflow
+runner and stored as Release assets—not committed to Git or bundled in APKs.
+
+Build the pack manually with
+`python3 tool/online_flags_20_pack.py /tmp/content.zip`.
+Older published artworks, downloaded progress and existing IDs are preserved.
+Merely committing this recipe does not establish live availability: the
+Release creation and Pages deployment must complete successfully.
