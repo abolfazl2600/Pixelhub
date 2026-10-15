@@ -3,6 +3,7 @@ import 'package:level_schema/level_schema.dart';
 
 import '../l10n/strings.dart';
 import '../features/painting/artwork_render_style.dart';
+import '../features/painting/diamond_gem_painter.dart';
 
 /// Read-only fixture rendering. No input, painting engine or progress in V1.
 class PixelArtPreview extends StatelessWidget {
@@ -39,6 +40,9 @@ class _FixturePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..isAntiAlias = false;
+    if (renderStyle == ArtworkRenderStyle.diamond) {
+      canvas.drawRect(Offset.zero & size, Paint()..color = const Color(0xffe9edf4));
+    }
     for (var y = 0; y < level.height; y++) {
       for (var x = 0; x < level.width; x++) {
         paint.color = Color(level.palette[level.cells[y * level.width + x]]);
@@ -48,7 +52,11 @@ class _FixturePainter extends CustomPainter {
           (x + 1) * size.width / level.width,
           (y + 1) * size.height / level.height,
         );
-        canvas.drawRect(rect, paint);
+        if (renderStyle == ArtworkRenderStyle.diamond) {
+          paintDiamondGem(canvas, rect, paint.color, column: x, row: y);
+        } else {
+          canvas.drawRect(rect, paint);
+        }
         if (renderStyle == ArtworkRenderStyle.canvas) {
           paintCanvasPigment(canvas, rect, column: x, row: y);
         }
