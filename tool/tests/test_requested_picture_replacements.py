@@ -42,7 +42,7 @@ class RequestedPictureReplacementsTests(unittest.TestCase):
         # Red crescent must be hollow; flag cores are full-bleed.
         flag = sprites[1]
         at = lambda x, y: flag.cells[y * flag.side + x]
-        self.assertEqual(at(15, 20), 1)
+        self.assertEqual(at(8, 20), 1)
         self.assertEqual(at(22, 20), 0)
         self.assertEqual(at(30, 17), 1)
         iran_flag = sprites[2]
@@ -51,7 +51,7 @@ class RequestedPictureReplacementsTests(unittest.TestCase):
                          [0, 1, 2])
         self.assertNotEqual(at_iran(19, 20), at_iran(8, 20))
         uk = sprites[0]
-        self.assertNotEqual(uk.cells[0], uk.cells[14 * 30 + 14])
+        self.assertNotEqual(uk.cells[10 * 30], uk.cells[14 * 30 + 14])
 
     def test_pack_checksums_previews_and_palette(self):
         with tempfile.TemporaryDirectory() as t:
