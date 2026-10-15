@@ -41,7 +41,10 @@ class _FixturePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..isAntiAlias = false;
     if (renderStyle == ArtworkRenderStyle.diamond) {
-      canvas.drawRect(Offset.zero & size, Paint()..color = const Color(0xffe9edf4));
+      canvas.drawRect(
+        Offset.zero & size,
+        Paint()..color = const Color(0xffe9edf4),
+      );
     }
     for (var y = 0; y < level.height; y++) {
       for (var x = 0; x < level.width; x++) {
