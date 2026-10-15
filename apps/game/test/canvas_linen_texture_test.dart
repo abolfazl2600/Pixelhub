@@ -11,7 +11,7 @@ void main() {
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
     canvas.drawRect(
-      const Rect.fromLTWH(0, 0, width.toDouble(), height.toDouble()),
+      const Rect.fromLTWH(0, 0, 48, 24),
       Paint()..color = const Color(0xff665544),
     );
     paintCanvasPigment(
