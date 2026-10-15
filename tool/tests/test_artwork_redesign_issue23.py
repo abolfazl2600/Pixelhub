@@ -9,6 +9,7 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 from online_release import assemble, checksum
 from online_masterworks_pack import create_pack as original_masterworks_pack
+from online_requested_remakes_pack import create_pack as requested_remakes_pack
 from online_starry_night_replacement_pack import (
     ID, create_pack as detailed_pack, draw,
 )
@@ -81,6 +82,11 @@ class ArtworkRedesignTests(unittest.TestCase):
             new = root / "packs/pixelhub-content-starry-night-detailed-1-v1/content.zip"
             original_masterworks_pack(old)
             detailed_pack(new)
+            # The new catalog also retires the original Mona Lisa; include its
+            # immutable replacement when assembling this historical fixture.
+            requested_remakes_pack(
+                root / "packs/pixelhub-content-requested-remakes-4-v1/content.zip"
+            )
             with zipfile.ZipFile(new) as archive:
                 manifest = json.loads(archive.read("catalog.json"))
                 item = manifest["pictures"][0]
