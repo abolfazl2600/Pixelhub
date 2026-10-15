@@ -483,6 +483,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       }
       return PaintingPreviewScreen(
         controller: _controller(matches.first),
+        library: _library,
         animation: _animationFor(matches.first),
         diagnostics: _diagnostics,
         renderStyle: _renderStyle,
