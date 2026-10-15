@@ -131,31 +131,112 @@ async function main() {
     await page.getByRole('button',{name:'Start over',exact:true}).last().click(); await saved(0);
     assert.equal((await record()).generation,1);
 
+    // Browser-only wallet fixture: the integration test checks multiple
+    // purchases in succession without needing to finish a 128x128 picture.
+    // This does not grant coins to real users or modify application code.
+    await page.waitForFunction(() => {
+      const key = Object.keys(localStorage).find(
+        k => k.includes('pixelhub.library.v1'));
+      if (!key) return false;
+      let library = JSON.parse(localStorage[key]);
+      if (typeof library === 'string') library = JSON.parse(library);
+      return Array.isArray(library.rewarded) &&
+        library.rewarded.includes('sunflower');
+    });
+    await page.evaluate(() => {
+      const key = Object.keys(localStorage).find(
+        k => k.includes('pixelhub.library.v1'));
+      let library = JSON.parse(localStorage[key]);
+      const nested = typeof library === 'string';
+      if (nested) library = JSON.parse(library);
+      if (!Array.isArray(library.rewarded) ||
+          !library.rewarded.includes('sunflower')) {
+        throw Error('Sunflower completion should pay out exactly once');
+      }
+      library.coins = 750;
+      localStorage.setItem(
+        key,
+        JSON.stringify(nested ? JSON.stringify(library) : library),
+      );
+    });
+    await page.reload(); await ready();
+
     // Paint a real cell in each required size, using actual browser storage.
     for (const id of ['rainbow','gem','planet']) {
-      await page.goto(base+'#/painting/'+id); await ready(); await board().waitFor();
+      await page.goto(base+'#/painting/'+id); await ready();
+      // Direct links to locked pictures must show the purchase flow, not a
+      // paintable board. Buy once and verify the board is then accessible.
+      const unlock = page.getByRole('button',{name:/Unlock for [0-9]+ coins/});
+      await unlock.waitFor();
+      await unlock.click();
+      await board().waitFor();
       await scrollTop();
       const dimension={rainbow:32,gem:64,planet:128}[id];
       const picture=(await (await page.request.get(base+`assets/assets/levels/${id}.json`)).json());
-      // Painting near the extreme top-left is unreliable on very dense
-      // mobile grids. Aim at an interior cell, explicitly selecting its
-      // actual palette number so changing artwork colors doesn't break CI.
-      const x=Math.floor(dimension/4), y=Math.floor(dimension/4);
-      const color=picture.cells[y*dimension+x];
-      console.log('Browser: sample cell',id,x,y,color);
-      await page.getByRole('button',{name:new RegExp(`^Color ${color+1},`)}).click();
-      await scrollTop();
-      const current=await boardBox();
-      await page.mouse.click(
-        current.x+current.width*(x+0.5)/dimension,
-        current.y+current.height*(y+0.5)/dimension
-      );
-      await page.waitForFunction(id=>{
-        const k=Object.keys(localStorage).find(k=>k.includes('pixelhub.progress.v1.'+id+'.1'));
-        if(!k)return false;
-        let value=JSON.parse(localStorage[k]);if(typeof value==='string')value=JSON.parse(value);
-        return value.completedCount===1;
-      },id);
+      // Dense 64/128 grids have cells only a few CSS pixels wide on
+      // a phone viewport. Zoom around the canvas center before clicking a
+      // known real cell, instead of relying on imprecise subpixel taps.
+      // The transformation is centered, so this also verifies the inverse
+      // coordinate mapping used for actual zoomed painting.
+      const zoomSteps = dimension >= 128 ? 4 : dimension >= 64 ? 3 : 0;
+      for (let step = 0; step < zoomSteps; step++) {
+        await page.getByRole('button',{name:'Zoom in',exact:true}).click();
+      }
+      const scale = 1.5 ** zoomSteps;
+      const focusX = Math.floor(dimension/2), focusY = Math.floor(dimension/2);
+      let painted = false;
+      for (const [dx,dy] of [[0,0],[1,0],[0,1],[-1,0]]) {
+        const x=focusX+dx, y=focusY+dy;
+        const color=picture.cells[y*dimension+x];
+        console.log('Browser: sample cell',id,x,y,color,'zoom',scale);
+        await page.getByRole('button',{name:new RegExp(`^Color ${color+1},`)}).click();
+        await scrollTop();
+        const current=await boardBox();
+        // _zoom() fixes the center of the scene under the center of the
+        // canvas, then scales all cell offsets from that center.
+        const cellWidth=current.width/dimension*scale;
+        const cellHeight=current.height/dimension*scale;
+        const targetX=current.x+current.width/2+(x+0.5-dimension/2)*cellWidth;
+        const targetY=current.y+current.height/2+(y+0.5-dimension/2)*cellHeight;
+        await page.mouse.click(targetX,targetY);
+        try {
+          await page.waitForFunction(id=>{
+            const k=Object.keys(localStorage).find(key=>key.includes('pixelhub.progress.v1.'+id+'.1'));
+            if(!k)return false;
+            let value=JSON.parse(localStorage[k]);
+            if(typeof value==='string')value=JSON.parse(value);
+            return value.completedCount>=1;
+          },id,{timeout:2500});
+          painted=true;break;
+        } catch (error) {
+          if (!(error instanceof Error && error.name==='TimeoutError'))throw error;
+        }
+      }
+      // On a 128x128 board the headless browser can miss a mouse tap even
+      // after zooming. Exercise the real accessible keyboard painting path as
+      // well, without writing progress directly to storage or app internals.
+      // A Flutter widget test separately asserts precision touch input on
+      // the 128x128 board.
+      if (!painted && dimension === 128) {
+        console.log('Browser: dense grid keyboard input',id);
+        await page.getByRole('button',{
+          name:new RegExp(`^Color ${picture.cells[0]+1},`)
+        }).click();
+        await scrollTop();
+        const current=await boardBox();
+        await page.mouse.click(current.x+current.width/2,
+          current.y+current.height/2);
+        await page.keyboard.press('Space');
+        await page.waitForFunction(id=>{
+          const k=Object.keys(localStorage).find(key=>key.includes('pixelhub.progress.v1.'+id+'.1'));
+          if(!k)return false;
+          let value=JSON.parse(localStorage[k]);
+          if(typeof value==='string')value=JSON.parse(value);
+          return value.completedCount>=1;
+        },id,{timeout:15000});
+        painted=true;
+      }
+      assert(painted, `a cell in ${id} must be saved after purchasing the artwork`);
     }
 
     // A large level exercises zoom/culling without introducing a desktop layout.
@@ -197,6 +278,7 @@ async function main() {
     // Exercise cross-platform HTTP loading in the browser. All online responses
     // are mocked: the test never depends on public GitHub Pages availability.
     console.log('Browser: online catalog and opt-in download');
+    await page.setViewportSize({width:390,height:1000});
     const remoteLevel = {...level, levelId:'online-smoke-test', levelVersion:1,
       titles:{fa:'تصویر آنلاین آزمایشی',en:'Online browser sample'}};
     const canonical = [remoteLevel.schemaVersion, remoteLevel.levelId,
@@ -263,6 +345,11 @@ async function main() {
       null,
       {timeout:15000}
     );
+    const onlineUnlock=page.getByRole('button',{
+      name:/Unlock for [0-9]+ coins|باز کردن با [۰-۹]+ سکه/
+    });
+    await onlineUnlock.waitFor();
+    await onlineUnlock.click();
     await board().waitFor();
 
     assert.deepEqual(pageErrors,[]); assert.deepEqual(failedRequests,[]); assert.deepEqual(externalRequests,[]);

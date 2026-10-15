@@ -333,6 +333,14 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
         controller.addListener(() {
           if (controller.status == PaintingStatus.ready) {
             _library.updateProgress(controller.session!.snapshot);
+            // Grant only after the final painting snapshot was persisted.
+            // Wallet ledger is durable and idempotent across resets/restarts.
+            if (controller.session!.isComplete &&
+                controller.saveStatus == SaveStatus.saved) {
+              unawaited(
+                _library.rewardCompletion(level).catchError((Object _) {}),
+              );
+            }
           }
         });
         unawaited(controller.load());
@@ -464,7 +472,8 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       if (matches.isEmpty) {
         return _notFound(context);
       }
-      if (page == 'artwork') {
+      if (page == 'artwork' ||
+          (page == 'painting' && !_library.canPaint(matches.first))) {
         return ArtworkScreen(
           level: matches.first,
           library: _library,

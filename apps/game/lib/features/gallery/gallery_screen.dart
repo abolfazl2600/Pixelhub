@@ -7,6 +7,7 @@ import '../../core/pixel_art_preview.dart';
 import '../../l10n/strings.dart';
 import 'artwork_categories.dart';
 import 'artwork_difficulty.dart';
+import 'artwork_economy.dart';
 import 'gallery_filters.dart';
 import 'library_controller.dart';
 import 'online_catalog_controller.dart';
@@ -334,6 +335,14 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   ),
                 ],
               ),
+              if (!library.canPaint(level))
+                Text(
+                  s.artworkCost(context.digits(priceForLevel(level))),
+                  maxLines: 1,
+                  style: const TextStyle(fontSize: 11),
+                )
+              else if (library.library.unlocked.contains(level.id))
+                Text(s.artworkOwned, style: const TextStyle(fontSize: 11)),
               const SizedBox(height: 2),
               if (count > 0) ...[
                 LinearProgressIndicator(
@@ -436,7 +445,10 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 ],
               ),
               const SizedBox(height: 4),
-              Row(
+              Wrap(
+                spacing: 6,
+                runSpacing: 4,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   _difficultyBadge(
                     context,
@@ -446,7 +458,21 @@ class _GalleryScreenState extends State<GalleryScreen> {
                       colorCount: picture.colorCount,
                     ),
                   ),
-                  const Spacer(),
+                  Text(
+                    s.artworkCost(
+                      context.digits(
+                        artworkPrice(
+                          picture.id,
+                          difficultyForOnlineGrid(
+                            width: picture.width,
+                            height: picture.height,
+                            colorCount: picture.colorCount,
+                          ),
+                        ),
+                      ),
+                    ),
+                    style: const TextStyle(fontSize: 10),
+                  ),
                 ],
               ),
               const SizedBox(height: 2),
@@ -499,7 +525,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
       final visible = available.take(_onlineVisibleCount).toList();
       const grid = SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 240,
-        mainAxisExtent: 270,
+        mainAxisExtent: 292,
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
       );
@@ -543,6 +569,23 @@ class _GalleryScreenState extends State<GalleryScreen> {
                           border: const OutlineInputBorder(),
                         ),
                         onChanged: _updateSearch,
+                      ),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 6,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          const Icon(Icons.monetization_on_outlined, size: 20),
+                          Text(
+                            '${s.walletCoins}: ${context.digits(library.coins)}',
+                            style: const TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                          Text(
+                            '${s.walletPoints}: ${context.digits(library.totalPoints)}',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 12),
                       Wrap(

@@ -5,6 +5,7 @@ import 'package:level_schema/level_schema.dart';
 import '../../core/pixel_art_preview.dart';
 import '../../l10n/strings.dart';
 import 'export_button.dart';
+import 'artwork_economy.dart';
 import 'gallery_screen.dart';
 import 'library_controller.dart';
 import '../painting/completed_artwork_preview.dart';
@@ -59,6 +60,29 @@ class ArtworkScreen extends StatelessWidget {
           SnackBar(content: Text(context.strings.librarySaveError)),
         );
       }
+    }
+  }
+
+  Future<void> _unlock(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await library.unlock(level);
+      if (!context.mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text(context.strings.artworkUnlocked)),
+      );
+      context.go('/painting/${level.id}');
+    } on Object {
+      if (!context.mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            library.coins < priceForLevel(level)
+                ? context.strings.insufficientCoins
+                : context.strings.coinSaveFailed,
+          ),
+        ),
+      );
     }
   }
 
@@ -128,11 +152,38 @@ class ArtworkScreen extends StatelessWidget {
                   ),
                 ),
               ],
-              const SizedBox(height: 16),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  const Icon(Icons.monetization_on_outlined, size: 20),
+                  const SizedBox(width: 6),
+                  Text(
+                    '${s.walletCoins}: ${context.digits(library.coins)}',
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Text(s.artworkReward(context.digits(rewardForLevel(level)))),
+              const SizedBox(height: 8),
+              if (!library.canPaint(level))
+                Text(s.artworkCost(context.digits(priceForLevel(level)))),
+              const SizedBox(height: 12),
               FilledButton.icon(
-                onPressed: () => context.push('/painting/${level.id}'),
-                icon: const Icon(Icons.brush),
-                label: Text(s.startPainting),
+                key: ValueKey('artwork-access-${level.id}'),
+                onPressed: library.busy || library.status != LibraryStatus.ready
+                    ? null
+                    : library.canPaint(level)
+                    ? () => context.go('/painting/${level.id}')
+                    : () => _unlock(context),
+                icon: Icon(
+                  library.canPaint(level) ? Icons.brush : Icons.lock_open,
+                ),
+                label: Text(
+                  library.canPaint(level)
+                      ? s.startPainting
+                      : s.unlockArtwork(context.digits(priceForLevel(level))),
+                ),
               ),
               const SizedBox(height: 8),
               OutlinedButton.icon(

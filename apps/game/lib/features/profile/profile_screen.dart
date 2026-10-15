@@ -7,7 +7,7 @@ import '../../core/local_diagnostics.dart';
 import '../../l10n/strings.dart';
 import '../gallery/library_controller.dart';
 
-/// Local guest profile. Wallet and remote analytics deliberately disabled.
+/// Local guest profile with an offline earned-coins wallet.
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({
     required this.library,
@@ -100,29 +100,20 @@ class ProfileScreen extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 8),
+                _MetricTile(
+                  icon: Icons.monetization_on_outlined,
+                  title: s.walletCoins,
+                  value: context.digits(library.coins),
+                ),
+                _MetricTile(
+                  icon: Icons.stars_outlined,
+                  title: s.walletPoints,
+                  value: context.digits(library.totalPoints),
+                ),
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(s.inventoryComingSoon),
-                        const SizedBox(height: 10),
-                        OutlinedButton.icon(
-                          onPressed: null,
-                          icon: const Icon(Icons.wallet_outlined),
-                          label: Text(s.coinComingSoon),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          s.freeToolsNote,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: PixelTokens.muted,
-                          ),
-                        ),
-                      ],
-                    ),
+                    child: Text(s.walletExplanation),
                   ),
                 ),
                 const SizedBox(height: 18),
