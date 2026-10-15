@@ -147,11 +147,14 @@ def step_pyramid(s, x, top, bottom, half=28, color=3):
 
 def scenery(s, kind):
     s.rect(0, 0, 79, 79, 0)
-    water = {"louvre", "mont", "gateway", "cn", "petronas",
-             "lotus", "sheikh", "dome", "hagia"}
-    night = {"taipei", "empire", "space"}
-    hills = {"potala", "himeji", "mont", "alhambra"}
-    desert = {"abu", "qutub", "alhambra"}
+    water = {
+        "louvre-pyramid", "mont-saint-michel", "gateway-arch", "cn-tower",
+        "petronas-twin-towers", "lotus-temple", "sheikh-zayed-mosque",
+        "dome-of-the-rock", "hagia-sophia",
+    }
+    night = {"taipei-101", "empire-state-building", "space-needle"}
+    hills = {"potala-palace", "himeji-castle", "mont-saint-michel", "alhambra"}
+    desert = {"abu-simbel", "qutub-minar", "alhambra"}
     if kind in night:
         s.rect(0, 0, 79, 79, 20)
         for x,y in ((7,8),(19,16),(29,6),(52,13),(64,5),(74,23),
@@ -315,7 +318,7 @@ def paint(kind):
         s.line(7,69,73,69,12)
         for x in (10,70):
             s.rect(x-2,62,x+2,70,17)
-    elif kind == "cn":
+    elif kind == "cn-tower":
         s.rect(20,69,59,72,12)
         s.polygon([(38,9),(42,9),(47,66),(33,66)],1)
         s.polygon([(39,11),(41,11),(45,66),(35,66)],17)
@@ -355,7 +358,7 @@ def paint(kind):
                 s.rect(x,top+7,x+2,min(top+14,67),15)
         for y in (68,71,74):
             s.line(6-(y-68),y,74+(y-68),y,2)
-    elif kind == "potala":
+    elif kind == "potala-palace":
         s.polygon([(0,71),(15,53),(34,47),(55,53),
                    (79,66),(79,78),(0,78)],4)
         border_rect(s,5,48,75,67,2)
@@ -371,7 +374,7 @@ def paint(kind):
                     s.rect(x,y,x+2,y+4,1)
         for y in (62,66,71):
             s.line(0,y,79,y,3)
-    elif kind == "himeji":
+    elif kind == "himeji-castle":
         border_rect(s,12,52,68,68,2)
         for left,right,top in ((15,65,46),(23,57,34),(28,53,24)):
             border_rect(s,left,top+5,right,top+13,2)
@@ -422,7 +425,7 @@ def paint(kind):
         for x in (11,69):
             s.rect(x-4,58,x+3,67,1)
             s.rect(x-3,59,x+2,65,4)
-    elif kind == "taipei":
+    elif kind == "taipei-101":
         s.rect(21,68,59,72,12)
         for i in range(8):
             y=61-i*6
@@ -441,7 +444,7 @@ def paint(kind):
             border_rect(s,x-6,49,x+6,70,12)
             for y in (54,60,66):
                 s.dot(x,y,18)
-    elif kind == "petronas":
+    elif kind == "petronas-twin-towers":
         for cx in (23,57):
             border_rect(s,cx-10,24,cx+10,68,17)
             for stage in range(7):
@@ -460,7 +463,7 @@ def paint(kind):
         s.line(23,43,33,43,12)
         s.line(47,43,57,43,12)
         s.rect(6,70,74,72,12)
-    elif kind == "lotus":
+    elif kind == "lotus-temple":
         s.rect(4,68,75,71,3)
         for x,r in ((20,18),(30,23),(40,29),(50,23),(60,18)):
             s.polygon([(x-14,65),(x-8,54),(x,68-r),
@@ -475,7 +478,7 @@ def paint(kind):
                        (x+4,56),(x+7,65)],13)
         s.rect(25,66,55,70,2)
         s.ellipse(40,72,27,2,9)
-    elif kind == "qutub":
+    elif kind == "qutub-minar":
         # Historic tapering brick minaret with alternating fluted balconies.
         border_rect(s,29,13,50,69,10)
         s.polygon([(32,13),(47,13),(51,69),(27,69)],1)
@@ -493,7 +496,7 @@ def paint(kind):
             arch(s,x,56,69,5,3,1)
         for x in range(0,80,12):
             s.line(x,73,x+6,73,4)
-    elif kind == "sheikh":
+    elif kind == "sheikh-zayed-mosque":
         border_rect(s,6,49,73,67,2)
         border_rect(s,16,40,64,65,13)
         dome(s,40,37,20,2)
@@ -509,7 +512,7 @@ def paint(kind):
             for y in (29,39):
                 s.dot(x,y,22)
         s.rect(3,69,76,72,2)
-    elif kind == "dome":
+    elif kind == "dome-of-the-rock":
         border_rect(s,12,45,68,65,2)
         border_rect(s,16,36,64,55,8)
         dome(s,40,35,25,22)
@@ -537,7 +540,7 @@ def paint(kind):
             arch(s,x,48,67,8,3,1)
         masonry(s,8,52,70,65,gap=9)
         s.rect(0,69,79,71,4)
-    elif kind == "florence":
+    elif kind == "florence-cathedral":
         border_rect(s,9,40,70,68,3)
         border_rect(s,14,31,59,65,2)
         dome(s,37,28,23,10)
@@ -552,7 +555,7 @@ def paint(kind):
             arch(s,x,47,67,5,stone=2,inside=8)
         s.line(10,61,61,61,10)
         s.rect(7,68,76,71,17)
-    elif kind == "stpeters":
+    elif kind == "st-peters-basilica":
         border_rect(s,5,49,75,69,2)
         border_rect(s,19,34,61,62,3)
         dome(s,40,33,21,17)
@@ -566,7 +569,7 @@ def paint(kind):
         arch(s,40,48,70,8,3,1)
         s.rect(0,70,79,72,3)
         s.line(11,74,69,74,17)
-    elif kind == "abu":
+    elif kind == "abu-simbel":
         s.rect(0,16,79,70,4)
         s.polygon([(0,20),(18,13),(34,20),(58,12),
                    (79,18),(79,71),(0,71)],14)

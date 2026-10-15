@@ -346,7 +346,7 @@ def paint(slug):
             s.rect(x-r,y,x+r,y+4,1)
             for dx in (-2,1):
                 s.dot(x+dx,y+2,8)
-        minaret(s,35,12,35,stone=17,width=6)
+        minaret(s,35,12,35,wall=17,width=6)
         s.rect(2,63,67,66,4)
 
     elif slug == "prambanan":
@@ -380,7 +380,7 @@ def paint(slug):
         s.line(35,7,35,2,18)
         s.ellipse(35,2,3,2,18)
         for x in (9,60):
-            minaret(s,x,32,63,stone=22,width=6)
+            minaret(s,x,32,63,wall=22,width=6)
             s.ellipse(x,29,6,6,22)
         for y in (25,35,45,55):
             s.line(12,y,58,y,18,radius=.3)
@@ -434,7 +434,7 @@ def paint(slug):
         block(s,12,38,53,60,3)
         for x in (12,58):
             onion_dome(s,x,37,7,5)
-        minaret(s,43,9,62,stone=5,width=12)
+        minaret(s,43,9,62,wall=5,width=12)
         s.rect(36,11,50,15,1)
         s.rect(37,12,49,14,21)
         for y in (20,29,38,48):

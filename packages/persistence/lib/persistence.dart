@@ -346,7 +346,9 @@ final class LocalPreferences
   Future<String?> readArtworkStyle() async {
     await _writes;
     final value = await _preferences.getString('pixelhub.artworkStyle.v1');
-    return value == 'canvas' || value == 'pixel' || value == 'diamond' ? value : null;
+    return value == 'canvas' || value == 'pixel' || value == 'diamond'
+        ? value
+        : null;
   }
 
   @override
@@ -551,8 +553,13 @@ final class MemoryPreferences
   }
 
   @override
-  Future<String?> readArtworkStyle() async =>
-      artworkStyle == 'canvas' || artworkStyle == 'pixel' ? artworkStyle : null;
+  Future<String?> readArtworkStyle() async {
+    final value = artworkStyle;
+    if (value == 'canvas' || value == 'pixel' || value == 'diamond') {
+      return value;
+    }
+    return null;
+  }
 
   @override
   Future<void> writeArtworkStyle(String value) async {

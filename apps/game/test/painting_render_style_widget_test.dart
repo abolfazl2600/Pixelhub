@@ -123,16 +123,18 @@ void main() {
       await openApp();
       await tester.ensureVisible(find.byKey(const ValueKey('style-diamond')));
       expect(
-        tester.widget<PaintingPreviewScreen>(
-          find.byType(PaintingPreviewScreen),
-        ).renderStyle,
+        tester
+            .widget<PaintingPreviewScreen>(find.byType(PaintingPreviewScreen))
+            .renderStyle,
         ArtworkRenderStyle.diamond,
       );
       expect(storage.artworkStyle, 'diamond');
       expect(
-        tester.widget<PaintingPreviewScreen>(
-          find.byType(PaintingPreviewScreen),
-        ).controller.session!.completedCount,
+        tester
+            .widget<PaintingPreviewScreen>(find.byType(PaintingPreviewScreen))
+            .controller
+            .session!
+            .completedCount,
         completedBeforeSwitch,
       );
     },

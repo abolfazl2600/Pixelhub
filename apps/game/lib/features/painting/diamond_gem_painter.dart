@@ -46,8 +46,7 @@ void paintDiamondGem(
   final left = Color.lerp(base, Colors.white, .17)!;
   final right = Color.lerp(base, Colors.black, .14)!;
 
-  Offset p(double x, double y) =>
-      Offset(rect.left + x * w, rect.top + y * h);
+  Offset p(double x, double y) => Offset(rect.left + x * w, rect.top + y * h);
   void facet(List<Offset> points, Color color) {
     final path = Path()..addPolygon(points, true);
     canvas.drawPath(
@@ -66,9 +65,7 @@ void paintDiamondGem(
       Paint()..color = base,
     );
     canvas.drawOval(
-      Rect.fromCenter(
-        center: p(.38, .33), width: w * .27, height: h * .24,
-      ),
+      Rect.fromCenter(center: p(.38, .33), width: w * .27, height: h * .24),
       Paint()..color = light,
     );
     return;
@@ -77,34 +74,70 @@ void paintDiamondGem(
   // Eight-sided cut crystal. This silhouette avoids the square tile look and
   // produces a tiny but stable physical gap between neighboring diamonds.
   facet([
-    p(.24, .06), p(.76, .06), p(.94, .24), p(.94, .76),
-    p(.76, .94), p(.24, .94), p(.06, .76), p(.06, .24),
+    p(.24, .06),
+    p(.76, .06),
+    p(.94, .24),
+    p(.94, .76),
+    p(.76, .94),
+    p(.24, .94),
+    p(.06, .76),
+    p(.06, .24),
   ], dark);
   facet([
-    p(.25, .10), p(.75, .10), p(.90, .25), p(.90, .74),
-    p(.75, .90), p(.25, .90), p(.10, .74), p(.10, .25),
+    p(.25, .10),
+    p(.75, .10),
+    p(.90, .25),
+    p(.90, .74),
+    p(.75, .90),
+    p(.25, .90),
+    p(.10, .74),
+    p(.10, .25),
   ], base);
 
   // Four outer bevel directions use physically consistent top-left lighting.
-  facet([p(.25,.10),p(.75,.10),p(.69,.32),p(.31,.32)], light);
-  facet([p(.75,.10),p(.90,.25),p(.90,.74),p(.69,.68),p(.69,.32)], right);
-  facet([p(.90,.74),p(.75,.90),p(.25,.90),p(.31,.68),p(.69,.68)], lower);
-  facet([p(.25,.90),p(.10,.74),p(.10,.25),p(.25,.10),p(.31,.32),p(.31,.68)], left);
+  facet([p(.25, .10), p(.75, .10), p(.69, .32), p(.31, .32)], light);
+  facet([
+    p(.75, .10),
+    p(.90, .25),
+    p(.90, .74),
+    p(.69, .68),
+    p(.69, .32),
+  ], right);
+  facet([
+    p(.90, .74),
+    p(.75, .90),
+    p(.25, .90),
+    p(.31, .68),
+    p(.69, .68),
+  ], lower);
+  facet([
+    p(.25, .90),
+    p(.10, .74),
+    p(.10, .25),
+    p(.25, .10),
+    p(.31, .32),
+    p(.31, .68),
+  ], left);
 
   // Table (top polished facet) and its precise diamond-cut internal edges.
-  facet([p(.31,.32),p(.69,.32),p(.69,.68),p(.31,.68)], upper);
-  facet([p(.31,.32),p(.49,.25),p(.69,.32),p(.49,.49)], shine);
-  facet([p(.69,.32),p(.75,.50),p(.69,.68),p(.49,.49)], base);
-  facet([p(.69,.68),p(.49,.75),p(.31,.68),p(.49,.49)], right);
-  facet([p(.31,.68),p(.25,.50),p(.31,.32),p(.49,.49)], light);
+  facet([p(.31, .32), p(.69, .32), p(.69, .68), p(.31, .68)], upper);
+  facet([p(.31, .32), p(.49, .25), p(.69, .32), p(.49, .49)], shine);
+  facet([p(.69, .32), p(.75, .50), p(.69, .68), p(.49, .49)], base);
+  facet([p(.69, .68), p(.49, .75), p(.31, .68), p(.49, .49)], right);
+  facet([p(.31, .68), p(.25, .50), p(.31, .32), p(.49, .49)], light);
 
   // Deterministic micro-glint: slightly different cuts per bead, no random
   // flicker during scroll/zoom/animation, and no external texture files.
   if (detailSide >= 8) {
     final seed = (column * 37 + row * 61) & 3;
-    final sparkle = seed == 0 ? .36 : seed == 1 ? .43 : .39;
+    final sparkle = seed == 0
+        ? .36
+        : seed == 1
+        ? .43
+        : .39;
     facet([
-      p(sparkle, .21), p(sparkle + .09, .19),
+      p(sparkle, .21),
+      p(sparkle + .09, .19),
       p(sparkle + .04, .31),
     ], const Color(0xccffffff));
     if (detailSide >= 14) {

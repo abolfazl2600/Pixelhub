@@ -101,8 +101,10 @@ void main() {
       expect(mount.r.toInt(), isNot(center.r.toInt()));
       expect(mount.g.toInt(), isNot(center.g.toInt()));
       // The same palette keeps distinctly colored gem centers.
-      expect(gemImage.getPixel(640, 128).g.toInt(),
-          isNot(gemImage.getPixel(128, 128).g.toInt()));
+      expect(
+        gemImage.getPixel(640, 128).g.toInt(),
+        isNot(gemImage.getPixel(128, 128).g.toInt()),
+      );
       expect(
         renderLevelPng({...level, 'renderStyle': 'diamond'}),
         orderedEquals(diamond),

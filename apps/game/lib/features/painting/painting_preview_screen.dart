@@ -284,7 +284,8 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                       key: const ValueKey('style-diamond'),
                       avatar: const Icon(Icons.diamond_outlined, size: 18),
                       label: Text(s.diamondStyle),
-                      selected: widget.renderStyle == ArtworkRenderStyle.diamond,
+                      selected:
+                          widget.renderStyle == ArtworkRenderStyle.diamond,
                       onSelected: (_) => widget.onRenderStyleChanged?.call(
                         ArtworkRenderStyle.diamond,
                       ),

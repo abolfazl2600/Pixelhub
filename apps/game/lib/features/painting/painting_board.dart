@@ -302,10 +302,7 @@ class _GridPainter extends CustomPainter {
             );
           } else {
             if (color == session.selectedColor) {
-              canvas.drawRect(
-                rect,
-                Paint()..color = const Color(0xffdcebdd),
-              );
+              canvas.drawRect(rect, Paint()..color = const Color(0xffdcebdd));
             }
             paintDiamondSocket(canvas, rect);
           }
