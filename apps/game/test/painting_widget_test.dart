@@ -7,6 +7,7 @@ import 'package:painting_engine/painting_engine.dart';
 import 'package:level_schema/level_schema.dart';
 import 'package:persistence/persistence.dart';
 import 'package:pixelhub/app/pixelhub_app.dart';
+import 'package:pixelhub/features/gallery/artwork_economy.dart';
 import 'package:pixelhub/features/profile/profile_screen.dart';
 import 'package:pixelhub/features/painting/painting_controller.dart';
 import 'package:pixelhub/features/painting/painting_preview_screen.dart';
@@ -205,7 +206,10 @@ void main() {
   testWidgets('completion follows correct painting of every color', (
     tester,
   ) async {
-    final controller = await pumpPainting(tester);
+    final storage = MemoryPreferences();
+    final controller = await pumpPainting(tester, storage: storage);
+    final reward = rewardForLevel(controller.level);
+    expect(find.text('پاداش: +۴۰ سکه'), findsOneWidget);
     final board = tester.getRect(find.byKey(const ValueKey('painting-board')));
     for (final cell in [(0, 0), (1, 1)]) {
       await tester.tapAt(
@@ -233,6 +237,12 @@ void main() {
     expect(find.text('آفرین، تصویرت کامل شد!'), findsOneWidget);
     expect(controller.session!.completedCount, 4);
     expect(controller.saveStatus, SaveStatus.saved);
+    expect(find.text('دریافت کردی: +۴۰ سکه!'), findsOneWidget);
+    expect(find.text('پاداش در کیف پول ثبت شد.'), findsOneWidget);
+    final wallet = await storage.readLibrary();
+    expect(wallet.coins, 120 + reward);
+    expect(wallet.totalPoints, reward);
+    expect(wallet.rewarded, contains(controller.level.id));
   });
 
   testWidgets('128x128 board accepts precise touch and persists the cell', (
