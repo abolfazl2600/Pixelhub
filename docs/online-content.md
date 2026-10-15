@@ -1222,3 +1222,56 @@ Release with `content.zip` and integrates its catalog in the online gallery.
 The generated assets remain in GitHub Release storage, not inside Git history
 or the Android APK. Merging code does **not** establish a completed release
 or Pages deployment; these must succeed independently.
+
+## Twenty-five additional world-famous buildings and monuments (80×80)
+
+The online gallery adds **25 entirely new landmark paintings**, each
+hand-composed directly on an exact **80×80 integer-pixel grid** (6,400 cells).
+These scenes are separate from the first pack's 25 world landmarks on 50×50
+grids: new subjects, fresh IDs and richer tower, window, dome, arch, masonry
+and landscaping detail—not enlargements or replacements of old levels.
+
+| New ID | فارسی | English | Location |
+| --- | --- | --- | --- |
+| `online-world-more-hagia-sophia-80` | ایاصوفیه استانبول | Hagia Sophia | Türkiye |
+| `online-world-more-notre-dame-paris-80` | کلیسای نوتردام پاریس | Notre-Dame de Paris | France |
+| `online-world-more-arc-de-triomphe-80` | طاق پیروزی پاریس | Arc de Triomphe | France |
+| `online-world-more-louvre-pyramid-80` | هرم موزه لوور | Louvre Pyramid | France |
+| `online-world-more-mont-saint-michel-80` | مون سن میشل | Mont Saint-Michel | France |
+| `online-world-more-empire-state-building-80` | ساختمان امپایر استیت | Empire State Building | United States |
+| `online-world-more-space-needle-80` | برج اسپیس نیدل | Space Needle | United States |
+| `online-world-more-gateway-arch-80` | طاق دروازه سنت لوئیس | Gateway Arch | United States |
+| `online-world-more-cn-tower-80` | برج سی‌ان تورنتو | CN Tower | Canada |
+| `online-world-more-forbidden-city-80` | شهر ممنوعه پکن | Forbidden City | China |
+| `online-world-more-temple-of-heaven-80` | معبد آسمان پکن | Temple of Heaven | China |
+| `online-world-more-potala-palace-80` | کاخ پوتالا | Potala Palace | China |
+| `online-world-more-himeji-castle-80` | قلعه هیمه‌جی | Himeji Castle | Japan |
+| `online-world-more-fushimi-inari-80` | دروازه‌های فوشیمی ایناری | Fushimi Inari | Japan |
+| `online-world-more-gyeongbokgung-80` | کاخ گیونگ‌بوک‌گونگ | Gyeongbokgung Palace | South Korea |
+| `online-world-more-taipei-101-80` | برج تایپه ۱۰۱ | Taipei 101 | Taiwan |
+| `online-world-more-petronas-twin-towers-80` | برج‌های دوقلوی پتروناس | Petronas Twin Towers | Malaysia |
+| `online-world-more-lotus-temple-80` | معبد نیلوفر آبی | Lotus Temple | India |
+| `online-world-more-qutub-minar-80` | قطب منار دهلی | Qutub Minar | India |
+| `online-world-more-sheikh-zayed-mosque-80` | مسجد شیخ زاید | Sheikh Zayed Grand Mosque | United Arab Emirates |
+| `online-world-more-dome-of-the-rock-80` | قبةالصخره | Dome of the Rock | Jerusalem |
+| `online-world-more-alhambra-80` | کاخ الحمرا | Alhambra | Spain |
+| `online-world-more-florence-cathedral-80` | کلیسای جامع فلورانس | Florence Cathedral | Italy |
+| `online-world-more-st-peters-basilica-80` | کلیسای سن پیترو | St. Peter's Basilica | Vatican City |
+| `online-world-more-abu-simbel-80` | معبد ابوسمبل | Abu Simbel | Egypt |
+
+The reproducible source is `tool/online_world_landmarks_more_25_pack.py`.
+Each level has schema version 2, levelVersion 1, a Persian and an English
+title, checksum-bound numbered cells, its own lossless PNG preview and a
+fresh immutable `online-world-more-*-80` identifier. The online catalog
+uses the existing legacy-compatible `patterns` category. Other published
+levels, existing user progress, and APK size/content are unaffected.
+
+Run `python3 tool/online_world_landmarks_more_25_pack.py /tmp/content.zip`
+to generate the complete release ZIP (one catalog and 25 pairs of JSON and
+PNG files). The successful main-branch Web CI triggers the Pages workflow,
+which creates the immutable Release
+[`pixelhub-content-world-landmarks-80-25-v1`](https://github.com/abolfazl2600/Pixelhub/releases/tag/pixelhub-content-world-landmarks-80-25-v1)
+if absent and downloads all releases when rebuilding the online catalog.
+The ZIP, numbered JSON grids, and PNG previews remain external to Git and
+the Android package. Code merged on `main` is **not yet equivalent to online
+publication**: a successful Release creation and Pages deployment are needed.
