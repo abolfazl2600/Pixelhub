@@ -173,25 +173,32 @@ async function main() {
       await scrollTop();
       const dimension={rainbow:32,gem:64,planet:128}[id];
       const picture=(await (await page.request.get(base+`assets/assets/levels/${id}.json`)).json());
-      // Painting near the extreme top-left is unreliable on very dense
-      // mobile grids. Aim at an interior cell, explicitly selecting its
-      // actual palette number so changing artwork colors doesn't break CI.
-      const focusX=Math.floor(dimension/4), focusY=Math.floor(dimension/4);
+      // Dense 64/128 grids have cells only a few CSS pixels wide on
+      // a phone viewport. Zoom around the canvas center before clicking a
+      // known real cell, instead of relying on imprecise subpixel taps.
+      // The transformation is centered, so this also verifies the inverse
+      // coordinate mapping used for actual zoomed painting.
+      const zoomSteps = dimension >= 128 ? 4 : dimension >= 64 ? 3 : 0;
+      for (let step = 0; step < zoomSteps; step++) {
+        await page.getByRole('button',{name:'Zoom in',exact:true}).click();
+      }
+      const scale = 1.5 ** zoomSteps;
+      const focusX = Math.floor(dimension/2), focusY = Math.floor(dimension/2);
       let painted = false;
-      // The center of a dense 64/128 grid pixel can be only 2-6 device
-      // pixels wide. Try several interior coordinates rather than depending
-      // on one subpixel hit after scrolling and Flutter semantics rebuilds.
-      for (const [dx,dy] of [[0,0],[1,0],[0,1],[-1,0],[2,1],[0,2]]) {
+      for (const [dx,dy] of [[0,0],[1,0],[0,1],[-1,0]]) {
         const x=focusX+dx, y=focusY+dy;
         const color=picture.cells[y*dimension+x];
-        console.log('Browser: sample cell',id,x,y,color);
+        console.log('Browser: sample cell',id,x,y,color,'zoom',scale);
         await page.getByRole('button',{name:new RegExp(`^Color ${color+1},`)}).click();
         await scrollTop();
         const current=await boardBox();
-        await page.mouse.click(
-          current.x+current.width*(x+0.5)/dimension,
-          current.y+current.height*(y+0.5)/dimension
-        );
+        // _zoom() fixes the center of the scene under the center of the
+        // canvas, then scales all cell offsets from that center.
+        const cellWidth=current.width/dimension*scale;
+        const cellHeight=current.height/dimension*scale;
+        const targetX=current.x+current.width/2+(x+0.5-dimension/2)*cellWidth;
+        const targetY=current.y+current.height/2+(y+0.5-dimension/2)*cellHeight;
+        await page.mouse.click(targetX,targetY);
         try {
           await page.waitForFunction(id=>{
             const k=Object.keys(localStorage).find(key=>key.includes('pixelhub.progress.v1.'+id+'.1'));
