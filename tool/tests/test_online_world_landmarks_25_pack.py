@@ -39,10 +39,7 @@ class WorldLandmarks50Tests(unittest.TestCase):
 
     def test_no_duplicate_iranian_landmark_identifiers(self):
         from online_iran_more_20_pack import PICTURES as IRAN_MORE
-        from online_iran_landmarks_pack import PICTURES as IRAN_LANDMARKS
         other = {item[0] for item in IRAN_MORE}
-        # Existing pack may have a different tuple format; canonicalized from
-        # generated level identities where available.
         self.assertFalse(other & {item[0] for item in PICTURES})
         self.assertEqual(len(PICTURES), 25)
 
