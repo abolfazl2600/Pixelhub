@@ -11,6 +11,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 
 from online_flags_20_pack import create_pack as historical_flags
 from online_masterworks_pack import create_pack as historical_masterworks
+from online_starry_night_replacement_pack import create_pack as detailed_starry
 from online_release import RETIRED_ONLINE_IDS, assemble, checksum
 from online_requested_remakes_pack import (
     REPLACEMENTS, create_pack, iran, mona_lisa, turkey, united_kingdom,
@@ -87,6 +88,7 @@ class RequestedPictureReplacementsTests(unittest.TestCase):
             for tag, generator in [
                 ("pixelhub-content-country-flags-10-20-v1", historical_flags),
                 ("pixelhub-content-masterworks-6-v1", historical_masterworks),
+                ("pixelhub-content-starry-night-detailed-1-v1", detailed_starry),
                 ("pixelhub-content-requested-remakes-4-v1", create_pack),
             ]:
                 path = packs / tag / "content.zip"
