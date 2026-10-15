@@ -20,15 +20,28 @@ img.Image renderDiamondImage(LevelDefinition level) {
 
   // Normalized polygons mirror diamond_gem_painter.dart. Lists are allocated
   // once, rather than once per output pixel.
-  const upperBevel = [.25,.10, .75,.10, .69,.32, .31,.32];
-  const rightBevel = [.75,.10, .90,.25, .90,.74, .69,.68, .69,.32];
-  const bottomBevel = [.90,.74, .75,.90, .25,.90, .31,.68, .69,.68];
-  const leftBevel = [.25,.90, .10,.74, .10,.25, .25,.10, .31,.32, .31,.68];
-  const table = [.31,.32, .69,.32, .69,.68, .31,.68];
-  const cutTop = [.31,.32, .49,.25, .69,.32, .49,.49];
-  const cutRight = [.69,.32, .75,.50, .69,.68, .49,.49];
-  const cutBottom = [.69,.68, .49,.75, .31,.68, .49,.49];
-  const cutLeft = [.31,.68, .25,.50, .31,.32, .49,.49];
+  const upperBevel = [.25, .10, .75, .10, .69, .32, .31, .32];
+  const rightBevel = [.75, .10, .90, .25, .90, .74, .69, .68, .69, .32];
+  const bottomBevel = [.90, .74, .75, .90, .25, .90, .31, .68, .69, .68];
+  const leftBevel = [
+    .25,
+    .90,
+    .10,
+    .74,
+    .10,
+    .25,
+    .25,
+    .10,
+    .31,
+    .32,
+    .31,
+    .68,
+  ];
+  const table = [.31, .32, .69, .32, .69, .68, .31, .68];
+  const cutTop = [.31, .32, .49, .25, .69, .32, .49, .49];
+  const cutRight = [.69, .32, .75, .50, .69, .68, .49, .49];
+  const cutBottom = [.69, .68, .49, .75, .31, .68, .49, .49];
+  const cutLeft = [.31, .68, .25, .50, .31, .32, .49, .49];
 
   for (var row = 0; row < level.height; row++) {
     for (var column = 0; column < level.width; column++) {
@@ -37,7 +50,11 @@ img.Image renderDiamondImage(LevelDefinition level) {
       final g = (base >> 8) & 255;
       final b = base & 255;
       final glint = (column * 37 + row * 61) & 3;
-      final sparkle = glint == 0 ? .36 : glint == 1 ? .43 : .39;
+      final sparkle = glint == 0
+          ? .36
+          : glint == 1
+          ? .43
+          : .39;
       final glintFacet = [sparkle, .21, sparkle + .09, .19, sparkle + .04, .31];
 
       for (var iy = 0; iy < ch; iy++) {
@@ -52,11 +69,9 @@ img.Image renderDiamondImage(LevelDefinition level) {
 
           if (minU < .01 || minV < .01) {
             fixed = 0xe9edf4;
-          } else if (minU < .06 || minV < .06 ||
-              minU + minV < .30) {
+          } else if (minU < .06 || minV < .06 || minU + minV < .30) {
             fixed = 0x161e2a; // Recessed mounting well.
-          } else if (minU < .10 || minV < .10 ||
-              minU + minV < .35) {
+          } else if (minU < .10 || minV < .10 || minU + minV < .35) {
             mix = .44;
             target = 0;
           } else {
@@ -88,12 +103,15 @@ img.Image renderDiamondImage(LevelDefinition level) {
             }
           }
 
-          final rr = fixed >= 0 ? (fixed >> 16) & 255 :
-              (r * (1 - mix) + target * mix).round().clamp(0, 255);
-          final gg = fixed >= 0 ? (fixed >> 8) & 255 :
-              (g * (1 - mix) + target * mix).round().clamp(0, 255);
-          final bb = fixed >= 0 ? fixed & 255 :
-              (b * (1 - mix) + target * mix).round().clamp(0, 255);
+          final rr = fixed >= 0
+              ? (fixed >> 16) & 255
+              : (r * (1 - mix) + target * mix).round().clamp(0, 255);
+          final gg = fixed >= 0
+              ? (fixed >> 8) & 255
+              : (g * (1 - mix) + target * mix).round().clamp(0, 255);
+          final bb = fixed >= 0
+              ? fixed & 255
+              : (b * (1 - mix) + target * mix).round().clamp(0, 255);
           output.setPixelRgb(column * cw + ix, row * ch + iy, rr, gg, bb);
         }
       }
@@ -104,13 +122,10 @@ img.Image renderDiamondImage(LevelDefinition level) {
 
 bool _insidePolygon(double x, double y, List<double> vertices) {
   var inside = false;
-  for (var i = 0, j = vertices.length - 2;
-      i < vertices.length;
-      j = i, i += 2) {
+  for (var i = 0, j = vertices.length - 2; i < vertices.length; j = i, i += 2) {
     final xi = vertices[i], yi = vertices[i + 1];
     final xj = vertices[j], yj = vertices[j + 1];
-    if ((yi > y) != (yj > y) &&
-        x < (xj - xi) * (y - yi) / (yj - yi) + xi) {
+    if ((yi > y) != (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) {
       inside = !inside;
     }
   }
