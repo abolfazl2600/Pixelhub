@@ -24,6 +24,8 @@ class WorldLandmarks80PackTests(unittest.TestCase):
         earlier = {item[0] for item in FIRST_LANDMARKS}
         identifiers = {"online-world-more-" + name + "-80" for name in slugs}
         self.assertFalse(earlier.intersection(identifiers))
+        self.assertFalse({item[2].casefold() for item in FIRST_LANDMARKS}
+                         & {item[2].casefold() for item in PICTURES})
         self.assertTrue(all(not name.endswith("-50") for name in slugs))
         self.assertEqual(SIDE, 80)
 
