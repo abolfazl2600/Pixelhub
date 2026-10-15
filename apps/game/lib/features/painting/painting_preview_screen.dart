@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/local_diagnostics.dart';
 import '../../l10n/strings.dart';
+import '../gallery/artwork_economy.dart';
+import '../gallery/library_controller.dart';
 import '../gallery/export_button.dart';
 import 'painting_board.dart';
 import 'artwork_render_style.dart';
@@ -14,6 +16,7 @@ import 'package:level_schema/level_schema.dart';
 class PaintingPreviewScreen extends StatefulWidget {
   const PaintingPreviewScreen({
     required this.controller,
+    required this.library,
     required this.diagnostics,
     this.animation,
     this.onOpened,
@@ -23,6 +26,7 @@ class PaintingPreviewScreen extends StatefulWidget {
   });
   static const route = '/painting';
   final PaintingController controller;
+  final LibraryController library;
   final LocalDiagnostics diagnostics;
   final PixelAnimation? animation;
   final VoidCallback? onOpened;
@@ -128,7 +132,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
-    listenable: widget.controller,
+    listenable: Listenable.merge([widget.controller, widget.library]),
     builder: (context, _) {
       final s = context.strings;
       final controller = widget.controller;
@@ -184,6 +188,18 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
           renderStyle: widget.renderStyle,
           appBar: appBar,
           saveState: _saveState(),
+          rewardCoins: rewardForLevel(controller.level),
+          rewardReceived: widget.library.library.rewarded.contains(
+            controller.level.id,
+          ),
+          rewardSaveError: widget.library.storageError,
+          onRetryReward: () async {
+            try {
+              await widget.library.rewardCompletion(controller.level);
+            } on Object {
+              // Display the persistent wallet error and allow another retry.
+            }
+          },
           onView: () => setState(() => _viewResult = true),
           onNext: () => context.go('/'),
         );
@@ -211,6 +227,19 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                 ),
                 const SizedBox(height: 8),
                 _saveState(),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Icon(Icons.monetization_on_outlined, size: 18),
+                    const SizedBox(width: 6),
+                    Text(
+                      s.artworkCoins(
+                        context.digits(rewardForLevel(controller.level)),
+                      ),
+                      style: const TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 12),
                 Wrap(
                   spacing: 8,
@@ -424,6 +453,10 @@ class CompletionScreen extends StatelessWidget {
     this.renderStyle = ArtworkRenderStyle.pixel,
     required this.appBar,
     required this.saveState,
+    required this.rewardCoins,
+    required this.rewardReceived,
+    required this.rewardSaveError,
+    required this.onRetryReward,
     required this.onView,
     required this.onNext,
     super.key,
@@ -433,6 +466,10 @@ class CompletionScreen extends StatelessWidget {
   final ArtworkRenderStyle renderStyle;
   final PreferredSizeWidget appBar;
   final Widget saveState;
+  final int rewardCoins;
+  final bool rewardReceived;
+  final bool rewardSaveError;
+  final VoidCallback onRetryReward;
   final VoidCallback onView;
   final VoidCallback onNext;
   @override
@@ -458,6 +495,63 @@ class CompletionScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(context.strings.completedMessage, textAlign: TextAlign.center),
+            const SizedBox(height: 16),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 18,
+              ),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.monetization_on_rounded,
+                        size: 28,
+                        color: PixelTokens.green,
+                      ),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          rewardReceived
+                              ? context.strings.completionCoinsEarned(
+                                  context.digits(rewardCoins),
+                                )
+                              : context.strings.artworkCoins(
+                                  context.digits(rewardCoins),
+                                ),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 19,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    rewardReceived
+                        ? context.strings.completionCoinsReceived
+                        : rewardSaveError
+                        ? context.strings.coinSaveFailed
+                        : context.strings.completionCoinsPending,
+                    textAlign: TextAlign.center,
+                  ),
+                  if (!rewardReceived && rewardSaveError)
+                    TextButton(
+                      onPressed: onRetryReward,
+                      child: Text(context.strings.retry),
+                    ),
+                ],
+              ),
+            ),
             const SizedBox(height: 24),
             ClipRRect(
               borderRadius: BorderRadius.circular(24),
