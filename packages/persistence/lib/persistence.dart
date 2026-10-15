@@ -346,12 +346,12 @@ final class LocalPreferences
   Future<String?> readArtworkStyle() async {
     await _writes;
     final value = await _preferences.getString('pixelhub.artworkStyle.v1');
-    return value == 'canvas' || value == 'pixel' ? value : null;
+    return value == 'canvas' || value == 'pixel' || value == 'diamond' ? value : null;
   }
 
   @override
   Future<void> writeArtworkStyle(String style) {
-    if (style != 'pixel' && style != 'canvas') {
+    if (style != 'pixel' && style != 'canvas' && style != 'diamond') {
       return Future<void>.error(
         const FormatException('Invalid artwork style.'),
       );
@@ -556,7 +556,7 @@ final class MemoryPreferences
 
   @override
   Future<void> writeArtworkStyle(String value) async {
-    if (value != 'pixel' && value != 'canvas') {
+    if (value != 'pixel' && value != 'canvas' && value != 'diamond') {
       throw const FormatException('Invalid artwork style.');
     }
     artworkStyle = value;

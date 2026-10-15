@@ -4,6 +4,8 @@ import 'dart:typed_data';
 import 'package:image/image.dart' as img;
 import 'package:level_schema/level_schema.dart';
 
+import 'diamond_photo_renderer.dart';
+
 const maxPhotoBytes = 12 * 1024 * 1024;
 
 final class NormalizedPhoto {
@@ -211,9 +213,14 @@ final class _Bucket {
 }
 
 Uint8List renderLevelPng(Map<String, Object> source) {
-  final style = source['renderStyle'] == 'canvas' ? 'canvas' : 'pixel';
+  final style = switch (source['renderStyle']) {
+    'canvas' => 'canvas',
+    'diamond' => 'diamond',
+    _ => 'pixel',
+  };
   final levelJson = Map<String, Object>.from(source)..remove('renderStyle');
   final level = LevelDefinition.fromJson(levelJson);
+  if (style == 'diamond') return img.encodePng(renderDiamondImage(level));
   final image = img.Image(
     width: level.width,
     height: level.height,

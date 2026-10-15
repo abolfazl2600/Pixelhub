@@ -35,6 +35,14 @@ void main() {
         ArtworkRenderStyle.canvas,
       );
 
+      await storage.writeArtworkStyle('diamond');
+      expect(await storage.readArtworkStyle(), 'diamond');
+      expect(
+        ArtworkRenderStyle.fromStorage(await storage.readArtworkStyle()),
+        ArtworkRenderStyle.diamond,
+      );
+      expect(ArtworkRenderStyle.diamond.storageId, 'diamond');
+
       storage.artworkStyle = 'unknown-corrupt-value';
       expect(await storage.readArtworkStyle(), isNull);
       expect(
@@ -77,6 +85,28 @@ void main() {
       // Plain pixel output is still flat: its same-cell pixels are identical.
       expect(pixelImage.getPixel(120, 120).r, pixelImage.getPixel(121, 121).r);
       expect(pixelImage.getPixel(768, 120).r, pixelImage.getPixel(769, 121).r);
+
+      // Diamond mode exports individual facets, gaps, and light direction,
+      // while leaving the classic Pixel and Canvas encoders intact.
+      final diamond = renderLevelPng({...level, 'renderStyle': 'diamond'});
+      expect(diamond, isNotEmpty);
+      expect(diamond, isNot(equals(pixel)));
+      expect(diamond, isNot(equals(canvas)));
+      final gemImage = img.decodePng(diamond)!;
+      expect(gemImage.width, 1024);
+      expect(gemImage.height, 1024);
+      // Pixel (0,0) samples the mounting border, the center samples a gem.
+      final mount = gemImage.getPixel(0, 0);
+      final center = gemImage.getPixel(128, 128);
+      expect(mount.r.toInt(), isNot(center.r.toInt()));
+      expect(mount.g.toInt(), isNot(center.g.toInt()));
+      // The same palette keeps distinctly colored gem centers.
+      expect(gemImage.getPixel(640, 128).g.toInt(),
+          isNot(gemImage.getPixel(128, 128).g.toInt()));
+      expect(
+        renderLevelPng({...level, 'renderStyle': 'diamond'}),
+        orderedEquals(diamond),
+      );
 
       // The procedural weave is stable across exports, with no extra asset.
       expect(
