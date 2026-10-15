@@ -77,6 +77,12 @@ def png(level):
 # Replacement ships under a fresh ID because downloaded levels are checksum-bound.
 RETIRED_ONLINE_IDS = {
     "online-starry-night": "online-classic-starry-night-detailed",
+    # New content replaces the visible catalog cards; old Release files remain
+    # immutable and readable for any downloads already in progress.
+    "online-flag-united-kingdom-10": "online-flag-united-kingdom-30",
+    "online-flag-turkey-10": "online-flag-turkey-40",
+    "online-flag-iran-10": "online-flag-iran-40",
+    "online-mona-lisa": "online-mona-lisa-detailed-90",
 }
 
 LEGACY_AZADI_ID = "online-iran-azadi-tower"
