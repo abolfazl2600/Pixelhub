@@ -298,6 +298,7 @@ class _GridPainter extends CustomPainter {
               Color(level.palette[color]),
               column: x,
               row: y,
+              zoomScale: scale,
             );
           } else {
             if (color == session.selectedColor) {
