@@ -16,14 +16,14 @@ class _WebSoundEffectPlayer implements SoundEffectPlayer {
   Future<void> preload() async {
     for (final cue in SoundCue.values) {
       final data = await rootBundle.load(
-        'assets/sounds/' + cue.assetName + '.wav',
+        'assets/sounds/${cue.assetName}.wav',
       );
       final bytes = data.buffer.asUint8List(
         data.offsetInBytes,
         data.lengthInBytes,
       );
       _sounds[cue] = web.HTMLAudioElement()
-        ..src = 'data:audio/wav;base64,' + base64Encode(bytes)
+        ..src = 'data:audio/wav;base64,${base64Encode(bytes)}'
         ..preload = 'auto'
         ..volume = 0.45;
     }

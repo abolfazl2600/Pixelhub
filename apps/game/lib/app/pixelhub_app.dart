@@ -89,7 +89,9 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     _preferences = widget.preferences ?? local!;
     final preferences = _preferences;
     _sounds = GameSounds(
-      preferences: preferences is SoundEffectsPreferences ? preferences : null,
+      preferences: preferences is SoundEffectsPreferences
+          ? preferences as SoundEffectsPreferences
+          : null,
     );
     unawaited(_sounds.initialize());
     _library = LibraryController(

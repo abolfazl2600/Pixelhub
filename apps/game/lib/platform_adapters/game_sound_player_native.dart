@@ -13,7 +13,7 @@ class _NativeSoundEffectPlayer implements SoundEffectPlayer {
   Future<void> preload() async {
     for (final cue in SoundCue.values) {
       final data = await rootBundle.load(
-        'assets/sounds/' + cue.assetName + '.wav',
+        'assets/sounds/${cue.assetName}.wav',
       );
       await _channel.invokeMethod<void>('load', {
         'name': cue.assetName,
