@@ -15,9 +15,7 @@ class _WebSoundEffectPlayer implements SoundEffectPlayer {
   @override
   Future<void> preload() async {
     for (final cue in SoundCue.values) {
-      final data = await rootBundle.load(
-        'assets/sounds/${cue.assetName}.wav',
-      );
+      final data = await rootBundle.load('assets/sounds/${cue.assetName}.wav');
       final bytes = data.buffer.asUint8List(
         data.offsetInBytes,
         data.lengthInBytes,
