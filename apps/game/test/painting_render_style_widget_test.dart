@@ -106,6 +106,35 @@ void main() {
           .widget<PaintingPreviewScreen>(find.byType(PaintingPreviewScreen))
           .controller;
       expect(reopened.session!.completedCount, completedBeforeSwitch);
+
+      // Diamond is a presentation-only toggle, including saved sessions.
+      await tester.ensureVisible(find.byKey(const ValueKey('style-diamond')));
+      await tester.tap(find.byKey(const ValueKey('style-diamond')));
+      await tester.pumpAndSettle();
+      expect(storage.artworkStyle, 'diamond');
+      expect(reopened.session!.completedCount, completedBeforeSwitch);
+      expect(
+        tester.widget<PaintingBoard>(find.byType(PaintingBoard)).renderStyle,
+        ArtworkRenderStyle.diamond,
+      );
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+      await openApp();
+      await tester.ensureVisible(find.byKey(const ValueKey('style-diamond')));
+      expect(
+        tester.widget<PaintingPreviewScreen>(
+          find.byType(PaintingPreviewScreen),
+        ).renderStyle,
+        ArtworkRenderStyle.diamond,
+      );
+      expect(storage.artworkStyle, 'diamond');
+      expect(
+        tester.widget<PaintingPreviewScreen>(
+          find.byType(PaintingPreviewScreen),
+        ).controller.session!.completedCount,
+        completedBeforeSwitch,
+      );
     },
   );
 }
