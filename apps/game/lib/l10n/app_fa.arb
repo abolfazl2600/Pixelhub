@@ -34,6 +34,8 @@
   "retry": "تلاش دوباره",
   "notFound": "این صفحه پیدا نشد.",
   "colors": "رنگ‌ها",
+  "focusMode": "تمرکز",
+  "exitFocusMode": "خروج از تمرکز",
   "paintMode": "رنگ‌آمیزی",
   "panMode": "حرکت / زوم",
   "paintingStyle": "سبک نمایش",
