@@ -40,7 +40,10 @@ void main() {
     final gap = wovenThreadLighting(1, 1, pitch);
     expect(top.lift, greaterThan(gap.lift));
     expect(shadeWovenChannel(70, top), greaterThan(shadeWovenChannel(70, gap)));
-    expect(shadeWovenChannel(230, top), greaterThan(shadeWovenChannel(230, gap)));
+    expect(
+      shadeWovenChannel(230, top),
+      greaterThan(shadeWovenChannel(230, gap)),
+    );
     // At alternate tile intersections the direction of the raised strand
     // flips: a point near the warp remains bright only on even crossings.
     final evenWarp = wovenThreadLighting(6, 3, pitch);
@@ -51,16 +54,21 @@ void main() {
     expect(shadeWovenChannel(255, top), lessThanOrEqualTo(255));
   });
 
-  test('raised yarn is visible on pale and dark pigment, with no overflow', () async {
-    final pixels = await renderFabric();
-    int red(int x, int y) => pixels.getUint8((y * 126 + x) * 4);
-    // Pitch is 8.4 for 20px cells. Compare a yarn core and the cloth gap.
-    expect(red(4, 4), greaterThan(red(0, 0) + 10));
-    expect(red(71, 4), greaterThan(red(67, 0) + 10));
-    // Drawing is confined to its rectangle. The bottom rows are untouched.
-    expect(red(22, 124), 0xeb);
-    expect(red(100, 124), 0x34);
-    final again = await renderFabric();
-    expect(again.buffer.asUint8List(), orderedEquals(pixels.buffer.asUint8List()));
+  test(
+    'raised yarn is visible on pale and dark pigment, with no overflow',
+    () async {
+      final pixels = await renderFabric();
+      int red(int x, int y) => pixels.getUint8((y * 126 + x) * 4);
+      // Pitch is 8.4 for 20px cells. Compare a yarn core and the cloth gap.
+      expect(red(4, 4), greaterThan(red(0, 0) + 10));
+      expect(red(71, 4), greaterThan(red(67, 0) + 10));
+      // Drawing is confined to its rectangle. The bottom rows are untouched.
+      expect(red(22, 124), 0xeb);
+      expect(red(100, 124), 0x34);
+      final again = await renderFabric();
+      expect(
+        again.buffer.asUint8List(),
+        orderedEquals(pixels.buffer.asUint8List()),
+      );
   });
 }

@@ -185,7 +185,6 @@ class _AnimationPainter extends CustomPainter {
           Rect.fromLTRB(left * w, y * h, x * w, (y + 1) * h),
           paint,
         );
-
       }
     }
     artworkStylePainters[renderStyle]?.call(
