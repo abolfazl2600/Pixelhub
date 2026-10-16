@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:game_domain/game_domain.dart';
 import 'package:level_schema/level_schema.dart';
 import 'package:persistence/persistence.dart';
+import 'package:painting_engine/painting_engine.dart';
 import 'package:pixelhub/features/gallery/artwork_difficulty.dart';
 import 'package:pixelhub/features/gallery/artwork_economy.dart';
 import 'package:pixelhub/features/gallery/library_controller.dart';
@@ -103,6 +104,33 @@ void main() {
       expect((await storage.readLibrary()).unlocked, isEmpty);
     },
   );
+
+  test('precision tool charges serialize and persist without points loss', () async {
+    final storage = MemoryPreferences();
+    final wallet = LibraryController(storage, storage);
+    addTearDown(wallet.dispose);
+    await wallet.load();
+    expect(precisionToolPrice(PrecisionPaintTool.magicWand), 12);
+    expect(precisionToolPrice(PrecisionPaintTool.colorSplash), 6);
+    expect(wallet.coins, 120);
+
+    await Future.wait([
+      wallet.spendToolCoins(precisionToolPrice(PrecisionPaintTool.magicWand)),
+      wallet.spendToolCoins(precisionToolPrice(PrecisionPaintTool.colorSplash)),
+    ]);
+    expect(wallet.coins, 102);
+    expect(wallet.totalPoints, 0);
+    await expectLater(wallet.spendToolCoins(103), throwsStateError);
+    await expectLater(wallet.spendToolCoins(0), throwsArgumentError);
+    expect(wallet.coins, 102);
+    expect((await storage.readLibrary()).coins, 102);
+
+    final reopened = LibraryController(storage, storage);
+    addTearDown(reopened.dispose);
+    await reopened.load();
+    expect(reopened.coins, 102);
+    expect(reopened.totalPoints, 0);
+  });
 
   test(
     'existing library migrates safely and in-progress old art stays playable',
