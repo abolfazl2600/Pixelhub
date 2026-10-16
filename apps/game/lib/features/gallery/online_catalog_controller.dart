@@ -10,8 +10,7 @@ import 'package:level_schema/level_schema.dart';
 import 'artwork_categories.dart';
 
 /// Only these known, immutable replacements may remove an existing download.
-/// Unknown remotely supplied retirement IDs are rejected to prevent deletion
-/// of arbitrary user artwork. Keep in sync with tool/online_release.py.
+/// Keep in sync with tool/online_release.py.
 const _retiredOnlineReplacements = <String, String>{
   'online-starry-night': 'online-classic-starry-night-detailed',
   'online-flag-united-kingdom-10': 'online-flag-united-kingdom-30',
@@ -390,9 +389,8 @@ class OnlineCatalogController extends ChangeNotifier {
         }
         result.add(entry);
       }
-      // Legacy clients only recognize Starry Night in retiredIds. Newer
-      // retirements are published separately so older binaries can still
-      // download other pictures without understanding the new field.
+      // The legacy retiredIds field cannot contain new IDs: older clients
+      // accept Starry Night only, rejecting the whole online catalog otherwise.
       final legacyRetirement = json['retiredIds'];
       final laterRetirement = json['retiredIdsV2'];
       if ((legacyRetirement != null && legacyRetirement is! List) ||
@@ -403,119 +401,12 @@ class OnlineCatalogController extends ChangeNotifier {
       final legacyIds = legacyRetirement as List? ?? const [];
       final laterIds = laterRetirement as List? ?? const [];
       for (final id in [...legacyIds, ...laterIds]) {
-        if (id is! String ||
-            !RegExp(r'^online-[a-z0-9-]{1,64}
-      if (_disposed) return;
-      for (final id in retired) {
-        if (_disposed) return;
-        if (_downloaded.containsKey(id)) {
-          try {
-            await removeDownloaded(id);
-          } on Object {
-            // Retry on the next valid catalog fetch.
-          }
-        }
-      }
-      if (_disposed) return;
-      pictures = List.unmodifiable(result);
-      status = OnlineCatalogStatus.ready;
-      unawaited(_backfillAnimations(result));
-      // Upgrade legacy downloads only when an authoritative catalog is
-      // available. Failure to write metadata must not hide online pictures.
-      for (final picture in result) {
-        if (_disposed) return;
-        if (_downloaded.containsKey(picture.id) &&
-            _downloadedCategories[picture.id] != picture.category) {
-          try {
-            await storage.saveDownloadedCategory(picture.id, picture.category);
-            _downloadedCategories[picture.id] = picture.category;
-          } on Object {
-            // Retry a missing category the next time the gallery refreshes.
-          }
-        }
-      }
-    } on Object {
-      if (_disposed) return;
-      status = OnlineCatalogStatus.error;
-    }
-    _notify();
-  }
-
-  Future<void> download(OnlinePicture picture) async {
-    if (downloadingId != null || _downloaded.containsKey(picture.id)) return;
-    downloadingId = picture.id;
-    failedDownloadId = null;
-    _notify();
-    try {
-      final source = await _loadRemote(
-        'levels/${picture.stem}.json',
-        timeout: const Duration(seconds: 25),
-        maxBytes: 262144,
-      );
-      if (utf8.encode(source).length != picture.bytes) {
-        throw const FormatException('Download length mismatch.');
-      }
-      final decoded = jsonDecode(source);
-      if (decoded is! Map<String, dynamic>) {
-        throw const FormatException('Invalid downloaded level.');
-      }
-      final level = LevelDefinition.fromJson(decoded);
-      if (level.id != picture.id ||
-          level.contentVersion != picture.version ||
-          level.checksum != picture.checksum ||
-          level.width != picture.width ||
-          level.height != picture.height) {
-        throw const FormatException('Downloaded level does not match catalog.');
-      }
-      // Persist the verified still image before attempting any optional
-      // animation. Never make painting depend on a separate network request.
-      await storage.saveDownloadedLevel(level, category: picture.category);
-      if (_disposed) return;
-      _downloaded[level.id] = level;
-      _downloadedCategories[level.id] = picture.category;
-      _notify();
-      // Fetch optional frames in the background so the gallery can navigate
-      // to the saved picture immediately, even on slow or broken connections.
-      unawaited(_downloadOptionalAnimation(picture, level));
-    } on Object catch (error) {
-      debugPrint('Online picture download failed: $error');
-      if (!_disposed) failedDownloadId = picture.id;
-    } finally {
-      downloadingId = null;
-      _notify();
-    }
-  }
-
-  Future<void> removeDownloaded(String id) async {
-    if (!_downloaded.containsKey(id)) return;
-    await storage.removeDownloadedLevel(id);
-    _downloaded.remove(id);
-    _downloadedCategories.remove(id);
-    _animations.remove(id);
-    _notify();
-  }
-
-  void clearDownloaded() {
-    _downloaded.clear();
-    _downloadedCategories.clear();
-    _animations.clear();
-    pictures = [];
-    status = OnlineCatalogStatus.idle;
-    _notify();
-  }
-
-  @override
-  void dispose() {
-    _disposed = true;
-    if (_ownsClient) _client.close();
-    super.dispose();
-  }
-}
-).hasMatch(id) ||
-            !_retiredOnlineReplacements.containsKey(id) ||
-            !ids.contains(_retiredOnlineReplacements[id]) ||
+        final replacement =
+            id is String ? _retiredOnlineReplacements[id] : null;
+        if (replacement == null ||
+            !ids.contains(replacement) ||
             ids.contains(id) ||
-            !retired.add(id)) {
+            !retired.add(id as String)) {
           throw const FormatException('Invalid retired online picture ID.');
         }
       }
