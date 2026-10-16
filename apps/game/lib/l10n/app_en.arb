@@ -34,6 +34,8 @@
   "retry": "Try again",
   "notFound": "This page could not be found.",
   "colors": "Colors",
+  "focusMode": "Focus",
+  "exitFocusMode": "Exit focus",
   "paintMode": "Paint",
   "panMode": "Move / zoom",
   "paintingStyle": "Painting style",

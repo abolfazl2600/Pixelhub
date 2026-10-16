@@ -14,6 +14,8 @@ class PaintingBoard extends StatefulWidget {
     required this.controller,
     required this.moveMode,
     this.onInteractionChanged,
+    this.showZoomControls = true,
+    this.maxBoardSize,
     this.renderStyle = ArtworkRenderStyle.pixel,
     super.key,
   });
@@ -22,6 +24,13 @@ class PaintingBoard extends StatefulWidget {
 
   /// The parent scroll view must not scroll during a canvas interaction.
   final ValueChanged<bool>? onInteractionChanged;
+
+  /// Hide the secondary zoom buttons when the surrounding screen is focused.
+  /// Pinch zoom and touch painting remain enabled.
+  final bool showZoomControls;
+
+  /// Optional limit for tight focus-mode viewports and landscape screens.
+  final double? maxBoardSize;
   final ArtworkRenderStyle renderStyle;
   @override
   State<PaintingBoard> createState() => _PaintingBoardState();
@@ -169,6 +178,7 @@ class _PaintingBoardState extends State<PaintingBoard> {
 
   @override
   Widget build(BuildContext context) => Column(
+    mainAxisSize: MainAxisSize.min,
     children: [
       LayoutBuilder(
         builder: (context, constraints) {
@@ -176,7 +186,10 @@ class _PaintingBoardState extends State<PaintingBoard> {
           // The surrounding screen still uses the entire viewport.
           _size = math.min(
             constraints.maxWidth,
-            math.max(280.0, MediaQuery.sizeOf(context).height * 0.76),
+            math.min(
+              widget.maxBoardSize ?? double.infinity,
+              math.max(280.0, MediaQuery.sizeOf(context).height * 0.76),
+            ),
           );
           return Semantics(
             label: context.strings.canvasLabel,
@@ -221,26 +234,27 @@ class _PaintingBoardState extends State<PaintingBoard> {
           );
         },
       ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          IconButton(
-            tooltip: context.strings.zoomOut,
-            onPressed: () => _zoom(1 / 1.5),
-            icon: const Icon(Icons.remove_rounded),
-          ),
-          IconButton(
-            tooltip: context.strings.fitCanvas,
-            onPressed: () => _transform.value = Matrix4.identity(),
-            icon: const Icon(Icons.fit_screen_rounded),
-          ),
-          IconButton(
-            tooltip: context.strings.zoomIn,
-            onPressed: () => _zoom(1.5),
-            icon: const Icon(Icons.add_rounded),
-          ),
-        ],
-      ),
+      if (widget.showZoomControls)
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+              tooltip: context.strings.zoomOut,
+              onPressed: () => _zoom(1 / 1.5),
+              icon: const Icon(Icons.remove_rounded),
+            ),
+            IconButton(
+              tooltip: context.strings.fitCanvas,
+              onPressed: () => _transform.value = Matrix4.identity(),
+              icon: const Icon(Icons.fit_screen_rounded),
+            ),
+            IconButton(
+              tooltip: context.strings.zoomIn,
+              onPressed: () => _zoom(1.5),
+              icon: const Icon(Icons.add_rounded),
+            ),
+          ],
+        ),
     ],
   );
 

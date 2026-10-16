@@ -159,6 +159,92 @@ void main() {
     },
   );
 
+  testWidgets(
+    'focus mode hides secondary controls, keeps coloring and restores them',
+    (tester) async {
+      final controller = await pumpPainting(tester);
+      expect(find.byKey(const ValueKey('focus-mode-toggle')), findsOneWidget);
+      expect(find.byKey(const ValueKey('hint-tool')), findsOneWidget);
+      expect(find.byKey(const ValueKey('style-diamond')), findsOneWidget);
+      await tester.tap(find.byTooltip('تمرکز'));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const ValueKey('painting-board')), findsOneWidget);
+      expect(find.byKey(const ValueKey('focus-progress')), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('color-palette-scroll')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const ValueKey('hint-tool')), findsNothing);
+      expect(find.byKey(const ValueKey('bomb-tool')), findsNothing);
+      expect(find.byKey(const ValueKey('style-diamond')), findsNothing);
+      expect(find.byTooltip('شروع دوباره'), findsNothing);
+      expect(find.byTooltip('بزرگ‌نمایی'), findsNothing);
+      expect(find.byKey(const ValueKey('painting-scroll')), findsNothing);
+
+      final board = tester.getRect(
+        find.byKey(const ValueKey('painting-board')),
+      );
+      await tester.tapAt(
+        board.topLeft + Offset(board.width * .25, board.height * .25),
+      );
+      await tester.pumpAndSettle();
+      expect(controller.session!.completedCount, 1);
+      expect(find.text('۲۵٪'), findsOneWidget);
+
+      await tester.tap(find.byTooltip('خروج از تمرکز'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('hint-tool')), findsOneWidget);
+      expect(find.byKey(const ValueKey('style-diamond')), findsOneWidget);
+      expect(find.byKey(const ValueKey('painting-scroll')), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('color-palette-scroll')),
+        findsOneWidget,
+      );
+      expect(controller.session!.completedCount, 1);
+    },
+  );
+
+  testWidgets(
+    'focus mode maximizes small landscape canvas and allows pinch zoom',
+    (tester) async {
+      await pumpPainting(tester);
+      tester.view.physicalSize = const Size(800, 360);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('تمرکز'));
+      await tester.pumpAndSettle();
+      final canvas = find.byKey(const ValueKey('painting-board'));
+      final rect = tester.getRect(canvas);
+      expect(rect.width, lessThanOrEqualTo(360));
+      expect(rect.bottom, lessThanOrEqualTo(360));
+      expect(rect.top, greaterThanOrEqualTo(0));
+
+      final first = await tester.startGesture(
+        rect.center - const Offset(20, 0),
+        pointer: 1,
+      );
+      final second = await tester.startGesture(
+        rect.center + const Offset(20, 0),
+        pointer: 2,
+      );
+      await first.moveBy(const Offset(-20, 0));
+      await second.moveBy(const Offset(20, 0));
+      await tester.pump();
+      await first.up();
+      await second.up();
+      await tester.pumpAndSettle();
+      expect(
+        tester
+            .widget<InteractiveViewer>(find.byType(InteractiveViewer))
+            .transformationController!
+            .value
+            .getMaxScaleOnAxis(),
+        greaterThan(1),
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('valid taps paint; wrong color does not paint; Undo is hidden', (
     tester,
   ) async {

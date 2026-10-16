@@ -64,6 +64,7 @@ class PaintingPreviewScreen extends StatefulWidget {
 
 class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
   bool _moveMode = false;
+  bool _focusMode = false;
   bool _viewResult = false;
   bool _pointerOnCanvas = false;
 
@@ -97,12 +98,22 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
       _recordOpen();
       _viewResult = false;
       _moveMode = false;
+      _focusMode = false;
       _pointerOnCanvas = false;
     }
   }
 
   void _canvasInteractionChanged(bool active) {
     _pointerOnCanvas = active;
+  }
+
+  void _setFocusMode(bool focused) {
+    widget.controller.endStroke();
+    setState(() {
+      _focusMode = focused;
+      _pointerOnCanvas = false;
+      if (focused) _moveMode = false;
+    });
   }
 
   void _hint() {
@@ -286,6 +297,19 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
           title,
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
         ),
+        actions: [
+          if (controller.status == PaintingStatus.ready)
+            IconButton(
+              key: const ValueKey('focus-mode-toggle'),
+              tooltip: _focusMode ? s.exitFocusMode : s.focusMode,
+              icon: Icon(
+                _focusMode
+                    ? Icons.fullscreen_exit_rounded
+                    : Icons.fullscreen_rounded,
+              ),
+              onPressed: () => _setFocusMode(!_focusMode),
+            ),
+        ],
       );
       if (controller.status == PaintingStatus.loading) {
         return Scaffold(
@@ -340,6 +364,77 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
           },
           onView: () => setState(() => _viewResult = true),
           onNext: () => context.go('/'),
+        );
+      }
+      if (_focusMode) {
+        return Scaffold(
+          appBar: AppBar(
+            toolbarHeight: 48,
+            leading: IconButton(
+              tooltip: s.backHome,
+              icon: const Icon(Icons.arrow_back_rounded),
+              onPressed: _back,
+            ),
+            title: Text(
+              s.progressPercent(
+                context.digits((session.fraction * 100).floor()),
+              ),
+              key: const ValueKey('focus-progress'),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+            ),
+            actions: [
+              IconButton(
+                key: const ValueKey('focus-mode-toggle'),
+                tooltip: s.exitFocusMode,
+                icon: const Icon(Icons.fullscreen_exit_rounded),
+                onPressed: () => _setFocusMode(false),
+              ),
+            ],
+          ),
+          bottomNavigationBar: SafeArea(
+            top: false,
+            child: _paletteStrip(context, controller),
+          ),
+          body: SafeArea(
+            top: false,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: LinearProgressIndicator(
+                    value: session.fraction,
+                    minHeight: 6,
+                    semanticsLabel: s.progressPercent(
+                      context.digits((session.fraction * 100).floor()),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final availableSize =
+                          constraints.maxWidth < constraints.maxHeight
+                          ? constraints.maxWidth
+                          : constraints.maxHeight;
+                      return Center(
+                        child: PaintingBoard(
+                          key: ValueKey(controller.level.id),
+                          controller: controller,
+                          moveMode: false,
+                          showZoomControls: false,
+                          maxBoardSize: availableSize > 16
+                              ? availableSize - 16
+                              : availableSize,
+                          onInteractionChanged: _canvasInteractionChanged,
+                          renderStyle: widget.renderStyle,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
         );
       }
       return Scaffold(
