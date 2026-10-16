@@ -495,6 +495,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
           level: matches.first,
           library: _library,
           animation: _animationFor(matches.first),
+          renderStyle: _renderStyle,
           onDelete: _deleteArtwork,
         );
       }

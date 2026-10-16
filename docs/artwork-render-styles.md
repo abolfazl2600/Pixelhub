@@ -31,3 +31,20 @@ PixelHub's render style is presentation state, never painting content.
 This is a woven-thread visual effect, not physically simulated cloth.
 Quality/performance should be verified on representative low-end Android
 devices; unit and CI tests cover geometry, PNG integrity and style persistence.
+
+## Consistent preview and PNG export
+
+- The current persisted style is provided to the artwork details route,
+  including its still/animated preview and its PNG export control. The
+  completed-painting screen also exports with the active style.
+- The PNG pipeline resides in `apps/game/lib/features/painting/artwork_png_export.dart`.
+  `artworkPngRenderers` maps style storage IDs to pure-Dart raster functions.
+  There is no hard-coded style switch in the export entry point.
+- To add a style: add its `ArtworkRenderStyle` entry and persistence handling,
+  implement the Flutter preview/painting rendering, and register a matching
+  pure-Dart `ArtworkPngRenderer`. Both implementations should share pure
+  geometry/color math, as the yarn and diamond renderers do today.
+- The style-coverage test fails when a new enum entry has no PNG renderer.
+  Unknown export IDs throw a `FormatException` rather than silently
+  generating a Pixel-style PNG. Missing style metadata defaults to Pixel for
+  older callers. PNG export remains offline with no additional assets.
