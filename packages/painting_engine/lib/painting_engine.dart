@@ -1,5 +1,8 @@
 import 'dart:typed_data';
 
+/// Paid, targeted tools. Ordinary painting remains free.
+enum PrecisionPaintTool { magicWand, colorSplash }
+
 import 'package:game_domain/game_domain.dart';
 import 'package:level_schema/level_schema.dart';
 
@@ -112,6 +115,81 @@ final class PaintingSession {
         y += sy;
       }
     }
+    return changed;
+  }
+
+  /// Returns the exact unfinished cells the selected tool would fill.
+  ///
+  /// The tapped cell must have the selected palette color. Already completed
+  /// cells of that color can connect a region, but are never charged/painted
+  /// again. The result is read-only to callers; computing it changes nothing.
+  List<int> previewTool(
+    PrecisionPaintTool tool,
+    int x,
+    int y,
+  ) {
+    if (x < 0 || y < 0 || x >= level.width || y >= level.height) {
+      return const [];
+    }
+    final origin = y * level.width + x;
+    if (level.cells[origin] != _selectedColor) return const [];
+
+    if (tool == PrecisionPaintTool.colorSplash) {
+      final targets = <int>[];
+      for (var row = (y - 1).clamp(0, level.height - 1);
+          row <= (y + 1).clamp(0, level.height - 1);
+          row++) {
+        for (var col = (x - 1).clamp(0, level.width - 1);
+            col <= (x + 1).clamp(0, level.width - 1);
+            col++) {
+          final index = row * level.width + col;
+          if (level.cells[index] == _selectedColor && !isCompleted(index)) {
+            targets.add(index);
+          }
+        }
+      }
+      return targets;
+    }
+
+    // Iterative 4-connected flood fill; bounded by the entire level, and
+    // independent of the number of pixels on screen or the current zoom.
+    final visited = Uint8List(level.cells.length);
+    final queue = <int>[origin];
+    final targets = <int>[];
+    visited[origin] = 1;
+    for (var head = 0; head < queue.length; head++) {
+      final index = queue[head];
+      if (!isCompleted(index)) targets.add(index);
+      final col = index % level.width;
+      final row = index ~/ level.width;
+
+      void consider(int other) {
+        if (visited[other] != 0 || level.cells[other] != _selectedColor) {
+          return;
+        }
+        visited[other] = 1;
+        queue.add(other);
+      }
+
+      if (col > 0) consider(index - 1);
+      if (col + 1 < level.width) consider(index + 1);
+      if (row > 0) consider(index - level.width);
+      if (row + 1 < level.height) consider(index + level.width);
+    }
+    return targets;
+  }
+
+  /// Commit a previously previewed selection after the wallet is saved.
+  ///
+  /// The normal paintCell guards still reject completed or wrong-color cells.
+  int paintToolTargets(List<int> targets) {
+    endStroke();
+    beginStroke();
+    var changed = 0;
+    for (final index in targets) {
+      if (paintCell(index)) changed++;
+    }
+    endStroke();
     return changed;
   }
 
