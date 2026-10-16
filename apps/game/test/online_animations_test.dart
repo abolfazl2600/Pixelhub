@@ -447,8 +447,10 @@ void main() {
         ],
       });
       final client = MockClient(
-        (request) async => http.Response(
-          request.url.path.endsWith('catalog.json') ? catalog : levelBody,
+        (request) async => http.Response.bytes(
+          utf8.encode(
+            request.url.path.endsWith('catalog.json') ? catalog : levelBody,
+          ),
           200,
         ),
       );
@@ -507,16 +509,16 @@ void main() {
     final failedOnce = Completer<void>();
     final client = MockClient((request) async {
       if (request.url.path.endsWith('/catalog.json')) {
-        return http.Response(catalog, 200);
+        return http.Response.bytes(utf8.encode(catalog), 200);
       }
       if (request.url.path.contains('/levels/')) {
-        return http.Response(levelBody, 200);
+        return http.Response.bytes(utf8.encode(levelBody), 200);
       }
       if (!hasAnimation) {
         if (!failedOnce.isCompleted) failedOnce.complete();
         return http.Response('Missing', 404);
       }
-      return http.Response(framesBody, 200);
+      return http.Response.bytes(utf8.encode(framesBody), 200);
     });
     addTearDown(client.close);
     final store = MemoryPreferences();
