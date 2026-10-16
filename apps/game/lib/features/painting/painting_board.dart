@@ -13,11 +13,14 @@ class PaintingBoard extends StatefulWidget {
   const PaintingBoard({
     required this.controller,
     required this.moveMode,
+    this.onInteractionChanged,
     this.renderStyle = ArtworkRenderStyle.pixel,
     super.key,
   });
   final PaintingController controller;
   final bool moveMode;
+  /// The parent scroll view must not scroll during a canvas interaction.
+  final ValueChanged<bool>? onInteractionChanged;
   final ArtworkRenderStyle renderStyle;
   @override
   State<PaintingBoard> createState() => _PaintingBoardState();
@@ -54,6 +57,7 @@ class _PaintingBoardState extends State<PaintingBoard> {
 
   void _down(PointerDownEvent event) {
     _pointers.add(event.pointer);
+    if (_pointers.length == 1) widget.onInteractionChanged?.call(true);
     if (_pointers.length > 1) {
       _multiTouch = true;
       widget.controller.cancelStroke();
@@ -106,6 +110,7 @@ class _PaintingBoardState extends State<PaintingBoard> {
     }
     _pointers.remove(event.pointer);
     if (_pointers.isEmpty) {
+      widget.onInteractionChanged?.call(false);
       widget.controller.endStroke();
       _last = null;
       _start = null;
@@ -115,6 +120,7 @@ class _PaintingBoardState extends State<PaintingBoard> {
 
   void _cancel(PointerCancelEvent event) {
     _pointers.remove(event.pointer);
+    if (_pointers.isEmpty) widget.onInteractionChanged?.call(false);
     widget.controller.cancelStroke();
     _last = null;
     _start = null;
@@ -239,6 +245,7 @@ class _PaintingBoardState extends State<PaintingBoard> {
 
   @override
   void dispose() {
+    if (_pointers.isNotEmpty) widget.onInteractionChanged?.call(false);
     widget.controller.session?.endStroke();
     _transform.dispose();
     _focus.dispose();
