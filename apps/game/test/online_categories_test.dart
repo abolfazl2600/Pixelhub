@@ -278,7 +278,6 @@ void main() {
     },
   );
 
-
   test(
     'all five retired artworks coexist with the new public catalog',
     () async {
