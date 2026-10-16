@@ -221,7 +221,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               CircleAvatar(
-                                radius: 16,
+                                radius: 14,
                                 backgroundColor: color,
                                 child: Text(
                                   context.digits(i + 1),
@@ -237,7 +237,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 4),
+                              const SizedBox(height: 2),
                               Text(
                                 context.digits(session.remaining[i]),
                                 style: const TextStyle(fontSize: 11),

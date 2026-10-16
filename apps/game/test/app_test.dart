@@ -101,10 +101,10 @@ void main() {
       );
       await tester.tap(find.byKey(const ValueKey('open-preview')));
       await tester.pumpAndSettle();
-      await tester.scrollUntilVisible(
-        find.byKey(const ValueKey('color-5')),
-        200,
-      );
+      // Palette stays pinned regardless of the page's vertical scroll.
+      final palette = find.byKey(const ValueKey('color-palette-scroll'));
+      expect(palette, findsOneWidget);
+      expect(tester.getRect(palette).bottom, lessThanOrEqualTo(viewport.height));
       expect(tester.takeException(), isNull);
       expect(tester.getSize(frame).width, width);
     });
@@ -196,7 +196,9 @@ void main() {
     );
     await tester.tap(find.byKey(const ValueKey('open-preview')));
     await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(find.byKey(const ValueKey('color-5')), 200);
+    final palette = find.byKey(const ValueKey('color-palette-scroll'));
+    expect(palette, findsOneWidget);
+    expect(tester.getRect(palette).bottom, lessThanOrEqualTo(640));
     expect(tester.takeException(), isNull);
   });
 }
