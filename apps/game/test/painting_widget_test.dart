@@ -307,6 +307,75 @@ void main() {
     expect(controller.session!.completedCount, 0);
   });
 
+  testWidgets(
+    'vertical touch strokes paint without scrolling and the palette stays pinned',
+    (tester) async {
+      final level = LevelDefinition(
+        id: 'sunflower',
+        title: 'نمونه عمودی',
+        titleEn: 'Vertical stroke',
+        schemaVersion: 2,
+        contentVersion: 1,
+        width: 16,
+        height: 16,
+        palette: [0xff316349],
+        cells: List.filled(256, 0),
+      );
+      final controller = await pumpPainting(tester, level: level);
+      tester.view.physicalSize = const Size(390, 760);
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.byKey(const ValueKey('painting-board')));
+      await tester.pumpAndSettle();
+
+      final scrollable = tester.state<ScrollableState>(
+        find.descendant(
+          of: find.byKey(const ValueKey('painting-scroll')),
+          matching: find.byType(Scrollable),
+        ),
+      );
+      final before = scrollable.position.pixels;
+      final board = tester.getRect(
+        find.byKey(const ValueKey('painting-board')),
+      );
+      final finger = await tester.startGesture(
+        board.topLeft + Offset(board.width / 2, board.height * .3),
+      );
+      await finger.moveTo(
+        board.topLeft + Offset(board.width / 2, board.height * .7),
+      );
+      await tester.pump();
+      expect(scrollable.position.pixels, before);
+      await finger.up();
+      await tester.pumpAndSettle();
+      expect(controller.session!.completedCount, greaterThan(1));
+      expect(scrollable.position.pixels, before);
+
+      // The color strip is outside the vertical scroller.
+      expect(
+        find.byKey(const ValueKey('color-palette-scroll')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const ValueKey('color-0')), findsOneWidget);
+      expect(
+        tester.getRect(find.byKey(const ValueKey('color-0'))).bottom,
+        lessThanOrEqualTo(760),
+      );
+
+      // Releasing the finger must not leave scrolling permanently disabled.
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('progress-summary')),
+      );
+      await tester.pumpAndSettle();
+      final outsideBefore = scrollable.position.pixels;
+      await tester.drag(
+        find.byKey(const ValueKey('progress-summary')),
+        const Offset(0, -180),
+      );
+      await tester.pumpAndSettle();
+      expect(scrollable.position.pixels, greaterThan(outsideBefore));
+    },
+  );
+
   testWidgets('fast stroke and inverse zoom mapping paint the intended cells', (
     tester,
   ) async {

@@ -13,6 +13,32 @@ import 'painting_controller.dart';
 import 'completed_artwork_preview.dart';
 import 'package:level_schema/level_schema.dart';
 
+/// Keep vertical painting strokes from scrolling the surrounding controls.
+/// Read pointer state synchronously so pinch/drag recognizers are not rebuilt.
+class _CanvasInteractionScrollPhysics extends ScrollPhysics {
+  const _CanvasInteractionScrollPhysics({
+    required this.isCanvasActive,
+    super.parent,
+  });
+
+  final bool Function() isCanvasActive;
+
+  @override
+  _CanvasInteractionScrollPhysics applyTo(ScrollPhysics? ancestor) {
+    return _CanvasInteractionScrollPhysics(
+      isCanvasActive: isCanvasActive,
+      parent: buildParent(ancestor),
+    );
+  }
+
+  @override
+  double applyPhysicsToUserOffset(ScrollMetrics position, double offset) {
+    return isCanvasActive()
+        ? 0
+        : super.applyPhysicsToUserOffset(position, offset);
+  }
+}
+
 class PaintingPreviewScreen extends StatefulWidget {
   const PaintingPreviewScreen({
     required this.controller,
@@ -39,6 +65,7 @@ class PaintingPreviewScreen extends StatefulWidget {
 class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
   bool _moveMode = false;
   bool _viewResult = false;
+  bool _pointerOnCanvas = false;
 
   @override
   void initState() {
@@ -70,7 +97,12 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
       _recordOpen();
       _viewResult = false;
       _moveMode = false;
+      _pointerOnCanvas = false;
     }
+  }
+
+  void _canvasInteractionChanged(bool active) {
+    _pointerOnCanvas = active;
   }
 
   void _hint() {
@@ -126,6 +158,112 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
         controller.saveStatus == SaveStatus.saving ? s.saving : s.saved,
         key: const ValueKey('save-status'),
         style: const TextStyle(color: PixelTokens.muted, fontSize: 12),
+      ),
+    );
+  }
+
+  /// Horizontally scrolling palette remains visible while the canvas/tools
+  /// occupy the vertical scroll area. Color selection never moves the canvas.
+  Widget _paletteStrip(BuildContext context, PaintingController controller) {
+    final session = controller.session!;
+    final s = context.strings;
+    return Container(
+      height: 108,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        border: const Border(top: BorderSide(color: PixelTokens.backdrop)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsetsDirectional.only(start: 16, top: 6),
+            child: Text(
+              s.colors,
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              key: const ValueKey('color-palette-scroll'),
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              child: Row(
+                children: [
+                  for (var i = 0; i < controller.level.palette.length; i++)
+                    Padding(
+                      padding: const EdgeInsetsDirectional.only(end: 8),
+                      child: Builder(
+                        builder: (context) {
+                          final color = Color(controller.level.palette[i]);
+                          return Semantics(
+                            label: s.colorLabel(
+                              context.digits(i + 1),
+                              context.digits(session.remaining[i]),
+                            ),
+                            button: true,
+                            selected: session.selectedColor == i,
+                            child: ExcludeSemantics(
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  key: ValueKey('color-$i'),
+                                  borderRadius: BorderRadius.circular(16),
+                                  onTap: () => controller.selectColor(i),
+                                  child: Container(
+                                    width: 56,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(
+                                        color: session.selectedColor == i
+                                            ? PixelTokens.green
+                                            : PixelTokens.backdrop,
+                                        width: session.selectedColor == i
+                                            ? 2
+                                            : 1,
+                                      ),
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 14,
+                                          backgroundColor: color,
+                                          child: Text(
+                                            context.digits(i + 1),
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w700,
+                                              color:
+                                                  ThemeData.estimateBrightnessForColor(
+                                                        color,
+                                                      ) ==
+                                                      Brightness.dark
+                                                  ? Colors.white
+                                                  : PixelTokens.ink,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          context.digits(session.remaining[i]),
+                                          style: const TextStyle(fontSize: 11),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -206,10 +344,17 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
       }
       return Scaffold(
         appBar: appBar,
+        bottomNavigationBar: SafeArea(
+          top: false,
+          child: _paletteStrip(context, controller),
+        ),
         body: SafeArea(
           top: false,
           child: SingleChildScrollView(
             key: const ValueKey('painting-scroll'),
+            physics: _CanvasInteractionScrollPhysics(
+              isCanvasActive: () => _pointerOnCanvas,
+            ),
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -351,92 +496,8 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                   key: ValueKey(controller.level.id),
                   controller: controller,
                   moveMode: _moveMode,
+                  onInteractionChanged: _canvasInteractionChanged,
                   renderStyle: widget.renderStyle,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  s.colors,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    for (var i = 0; i < controller.level.palette.length; i++)
-                      Semantics(
-                        label: s.colorLabel(
-                          context.digits(i + 1),
-                          context.digits(session.remaining[i]),
-                        ),
-                        button: true,
-                        onTap: () => controller.selectColor(i),
-                        selected: session.selectedColor == i,
-                        child: ExcludeSemantics(
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              key: ValueKey('color-$i'),
-                              borderRadius: BorderRadius.circular(16),
-                              onTap: () => controller.selectColor(i),
-                              child: Container(
-                                width: 56,
-                                constraints: const BoxConstraints(
-                                  minHeight: 72,
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 8,
-                                ),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: session.selectedColor == i
-                                        ? PixelTokens.green
-                                        : PixelTokens.backdrop,
-                                    width: session.selectedColor == i ? 2 : 1,
-                                  ),
-                                ),
-                                child: Column(
-                                  children: [
-                                    CircleAvatar(
-                                      radius: 16,
-                                      backgroundColor: Color(
-                                        controller.level.palette[i],
-                                      ),
-                                      child: Text(
-                                        context.digits(i + 1),
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w700,
-                                          color:
-                                              ThemeData.estimateBrightnessForColor(
-                                                    Color(
-                                                      controller
-                                                          .level
-                                                          .palette[i],
-                                                    ),
-                                                  ) ==
-                                                  Brightness.dark
-                                              ? Colors.white
-                                              : PixelTokens.ink,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      context.digits(session.remaining[i]),
-                                      style: const TextStyle(fontSize: 11),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
                 ),
                 const SizedBox(height: 16),
                 Text(
