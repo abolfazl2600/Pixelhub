@@ -21,10 +21,12 @@ YarnLighting wovenThreadLighting(double x, double y, double pitch) {
   final verticalOnTop = (column + row).isEven;
 
   // A little bow toward the crossover gives strands a rounded silhouette.
-  final verticalBow = (verticalOnTop ? -.055 : .055) *
-      (1 - math.pow(2 * v - 1, 2));
-  final horizontalBow = (verticalOnTop ? .055 : -.055) *
-      (1 - math.pow(2 * u - 1, 2));
+  final verticalMid = 2 * v - 1;
+  final horizontalMid = 2 * u - 1;
+  final verticalBow =
+      (verticalOnTop ? -.055 : .055) * (1 - verticalMid * verticalMid);
+  final horizontalBow =
+      (verticalOnTop ? .055 : -.055) * (1 - horizontalMid * horizontalMid);
   final warp = (u - .5 - verticalBow).abs();
   final weft = (v - .5 - horizontalBow).abs();
   final nearWarp = warp < .28;
@@ -57,4 +59,4 @@ YarnLighting wovenThreadLighting(double x, double y, double pitch) {
 }
 
 int shadeWovenChannel(int channel, YarnLighting lighting) =>
-    (channel * lighting.multiply + lighting.lift).round().clamp(0, 255);
+    (channel * lighting.multiply + lighting.lift).round().clamp(0, 255).toInt();

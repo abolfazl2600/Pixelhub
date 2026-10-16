@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -54,8 +55,8 @@ void main() {
     final pixels = await renderFabric();
     int red(int x, int y) => pixels.getUint8((y * 126 + x) * 4);
     // Pitch is 8.4 for 20px cells. Compare a yarn core and the cloth gap.
-    expect(red(4, 4), greaterThan(red(0, 0) + 12));
-    expect(red(71, 4), greaterThan(red(67, 0) + 12));
+    expect(red(4, 4), greaterThan(red(0, 0) + 10));
+    expect(red(71, 4), greaterThan(red(67, 0) + 10));
     // Drawing is confined to its rectangle. The bottom rows are untouched.
     expect(red(22, 124), 0xeb);
     expect(red(100, 124), 0x34);

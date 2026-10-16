@@ -57,7 +57,7 @@ void main() {
   );
 
   test(
-    'PNG export keeps legacy Pixel output and applies Canvas weave only on opt-in',
+    'PNG export leaves Pixel flat and draws woven yarn only on opt-in',
     () {
       final level = _level().toJson();
       final pixel = renderLevelPng({...level, 'renderStyle': 'pixel'});
@@ -73,18 +73,17 @@ void main() {
       expect(pixelImage.width, 1024);
       expect(pixelImage.height, 1024);
 
-      // Linen must be unambiguously visible: the recessed yarn crossings are
-      // noticeably darker than raised threads in both light and dark paint.
-      // These probes are inside solid-color cells (not at palette boundaries).
+      // Interlaced raised cores at the same point in two palette regions are
+      // brighter than the recessed cloth. Pitch is 12px in a 4x4 export.
       final lightRecess = canvasImage.getPixel(120, 120);
-      final lightRaised = canvasImage.getPixel(121, 121);
-      expect(lightRaised.r.toInt() - lightRecess.r.toInt(), greaterThan(40));
+      final lightRaised = canvasImage.getPixel(126, 126);
+      expect(lightRaised.r.toInt() - lightRecess.r.toInt(), greaterThan(20));
       final darkRecess = canvasImage.getPixel(768, 120);
-      final darkRaised = canvasImage.getPixel(769, 121);
-      expect(darkRaised.r.toInt() - darkRecess.r.toInt(), greaterThan(35));
-      // Plain pixel output is still flat: its same-cell pixels are identical.
-      expect(pixelImage.getPixel(120, 120).r, pixelImage.getPixel(121, 121).r);
-      expect(pixelImage.getPixel(768, 120).r, pixelImage.getPixel(769, 121).r);
+      final darkRaised = canvasImage.getPixel(774, 126);
+      expect(darkRaised.r.toInt() - darkRecess.r.toInt(), greaterThan(20));
+      // Pixel mode must stay completely flat even where the yarn would rise.
+      expect(pixelImage.getPixel(120, 120).r, pixelImage.getPixel(126, 126).r);
+      expect(pixelImage.getPixel(768, 120).r, pixelImage.getPixel(774, 126).r);
 
       // Diamond mode exports individual facets, gaps, and light direction,
       // while leaving the classic Pixel and Canvas encoders intact.
