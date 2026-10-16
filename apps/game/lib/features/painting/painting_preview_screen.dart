@@ -13,6 +13,32 @@ import 'painting_controller.dart';
 import 'completed_artwork_preview.dart';
 import 'package:level_schema/level_schema.dart';
 
+/// Keep vertical painting strokes from scrolling the surrounding controls.
+/// Read pointer state synchronously so pinch/drag recognizers are not rebuilt.
+class _CanvasInteractionScrollPhysics extends ScrollPhysics {
+  const _CanvasInteractionScrollPhysics({
+    required this.isCanvasActive,
+    super.parent,
+  });
+
+  final bool Function() isCanvasActive;
+
+  @override
+  _CanvasInteractionScrollPhysics applyTo(ScrollPhysics? ancestor) {
+    return _CanvasInteractionScrollPhysics(
+      isCanvasActive: isCanvasActive,
+      parent: buildParent(ancestor),
+    );
+  }
+
+  @override
+  double applyPhysicsToUserOffset(ScrollMetrics position, double offset) {
+    return isCanvasActive()
+        ? 0
+        : super.applyPhysicsToUserOffset(position, offset);
+  }
+}
+
 class PaintingPreviewScreen extends StatefulWidget {
   const PaintingPreviewScreen({
     required this.controller,
@@ -39,6 +65,7 @@ class PaintingPreviewScreen extends StatefulWidget {
 class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
   bool _moveMode = false;
   bool _viewResult = false;
+  bool _pointerOnCanvas = false;
 
   @override
   void initState() {
@@ -70,7 +97,12 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
       _recordOpen();
       _viewResult = false;
       _moveMode = false;
+      _pointerOnCanvas = false;
     }
+  }
+
+  void _canvasInteractionChanged(bool active) {
+    _pointerOnCanvas = active;
   }
 
   void _hint() {
@@ -210,6 +242,9 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
           top: false,
           child: SingleChildScrollView(
             key: const ValueKey('painting-scroll'),
+            physics: _CanvasInteractionScrollPhysics(
+              isCanvasActive: () => _pointerOnCanvas,
+            ),
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -351,6 +386,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                   key: ValueKey(controller.level.id),
                   controller: controller,
                   moveMode: _moveMode,
+                  onInteractionChanged: _canvasInteractionChanged,
                   renderStyle: widget.renderStyle,
                 ),
                 const SizedBox(height: 8),
