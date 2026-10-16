@@ -70,5 +70,6 @@ void main() {
         again.buffer.asUint8List(),
         orderedEquals(pixels.buffer.asUint8List()),
       );
-  });
+    },
+  );
 }
