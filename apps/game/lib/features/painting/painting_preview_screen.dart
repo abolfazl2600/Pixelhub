@@ -137,7 +137,8 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
   Future<void> _usePrecisionTool((int, int) cell) async {
     final tool = _activeTool;
     if (tool == null || _toolBusy || widget.library.busy) return;
-    final targets = widget.controller.previewTool(tool, cell.$1, cell.$2);
+    final controller = widget.controller;
+    final targets = controller.previewTool(tool, cell.$1, cell.$2);
     if (targets.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(context.strings.precisionToolNoTargets)),
@@ -156,7 +157,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
       await widget.library.spendToolCoins(cost);
       // Sessions are cached by the parent, so apply the paid action even if
       // navigation disposed this screen during the wallet write.
-      final filled = widget.controller.applyToolTargets(targets);
+      final filled = controller.applyToolTargets(targets);
       if (!mounted) return;
       setState(() => _activeTool = null);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -186,6 +187,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
   }
 
   void _hint() {
+    if (_toolBusy) return;
     if (widget.controller.showHint() != null) widget.diagnostics.recordHint();
   }
 
