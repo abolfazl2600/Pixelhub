@@ -62,7 +62,9 @@ void main() {
         style,
       );
       expect(
-        tester.widget<PixelArtPreview>(find.byType(PixelArtPreview)).renderStyle,
+        tester
+            .widget<PixelArtPreview>(find.byType(PixelArtPreview))
+            .renderStyle,
         style,
       );
       expect(
