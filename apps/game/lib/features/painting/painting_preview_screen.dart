@@ -218,11 +218,14 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                                         color: session.selectedColor == i
                                             ? PixelTokens.green
                                             : PixelTokens.backdrop,
-                                        width: session.selectedColor == i ? 2 : 1,
+                                        width: session.selectedColor == i
+                                            ? 2
+                                            : 1,
                                       ),
                                     ),
                                     child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         CircleAvatar(
                                           radius: 14,
