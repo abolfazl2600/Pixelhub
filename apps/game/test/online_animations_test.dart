@@ -424,40 +424,45 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  test('invalid optional animation metadata leaves catalog downloadable', () async {
-    final level = onlineFixture('online-invalid-sidecar-metadata');
-    final levelBody = jsonEncode(level.toJson());
-    final catalog = jsonEncode({
-      'schemaVersion': 1,
-      'pictures': [
-        {
-          'id': level.id,
-          'version': level.contentVersion,
-          'title': level.title,
-          'titleEn': level.titleEn,
-          'category': 'nature',
-          'width': level.width,
-          'height': level.height,
-          'bytes': utf8.encode(levelBody).length,
-          'checksum': level.checksum,
-          'animation': {'frameCount': -1},
-        },
-      ],
-    });
-    final client = MockClient((request) async => http.Response(
-      request.url.path.endsWith('catalog.json') ? catalog : levelBody,
-      200,
-    ));
-    addTearDown(client.close);
-    final store = MemoryPreferences();
-    final online = OnlineCatalogController(store, client: client);
-    addTearDown(online.dispose);
-    await online.checkForUpdates();
-    expect(online.status, OnlineCatalogStatus.ready);
-    expect(online.available.single.animation, isNull);
-    await online.download(online.available.single);
-    expect(online.downloaded.single.id, level.id);
-  });
+  test(
+    'invalid optional animation metadata leaves catalog downloadable',
+    () async {
+      final level = onlineFixture('online-invalid-sidecar-metadata');
+      final levelBody = jsonEncode(level.toJson());
+      final catalog = jsonEncode({
+        'schemaVersion': 1,
+        'pictures': [
+          {
+            'id': level.id,
+            'version': level.contentVersion,
+            'title': level.title,
+            'titleEn': level.titleEn,
+            'category': 'nature',
+            'width': level.width,
+            'height': level.height,
+            'bytes': utf8.encode(levelBody).length,
+            'checksum': level.checksum,
+            'animation': {'frameCount': -1},
+          },
+        ],
+      });
+      final client = MockClient(
+        (request) async => http.Response(
+          request.url.path.endsWith('catalog.json') ? catalog : levelBody,
+          200,
+        ),
+      );
+      addTearDown(client.close);
+      final store = MemoryPreferences();
+      final online = OnlineCatalogController(store, client: client);
+      addTearDown(online.dispose);
+      await online.checkForUpdates();
+      expect(online.status, OnlineCatalogStatus.ready);
+      expect(online.available.single.animation, isNull);
+      await online.download(online.available.single);
+      expect(online.downloaded.single.id, level.id);
+    },
+  );
 
   test('a missing animation retries on the next catalog refresh', () async {
     final level = onlineFixture('online-sidecar-retry');
@@ -470,7 +475,11 @@ void main() {
       'frameDurationMs': 120,
       'frames': [
         {'changes': <Object>[]},
-        {'changes': [[0, 1]]},
+        {
+          'changes': [
+            [0, 1],
+          ],
+        },
       ],
     });
     final catalog = jsonEncode({
