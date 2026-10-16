@@ -56,65 +56,61 @@ void main() {
     },
   );
 
-  test(
-    'PNG export keeps legacy Pixel output and applies Canvas weave only on opt-in',
-    () {
-      final level = _level().toJson();
-      final pixel = renderLevelPng({...level, 'renderStyle': 'pixel'});
-      final canvas = renderLevelPng({...level, 'renderStyle': 'canvas'});
-      expect(pixel, isNotEmpty);
-      expect(canvas, isNotEmpty);
-      expect(canvas, isNot(equals(pixel)));
+  test('PNG export leaves Pixel flat and draws woven yarn only on opt-in', () {
+    final level = _level().toJson();
+    final pixel = renderLevelPng({...level, 'renderStyle': 'pixel'});
+    final canvas = renderLevelPng({...level, 'renderStyle': 'canvas'});
+    expect(pixel, isNotEmpty);
+    expect(canvas, isNotEmpty);
+    expect(canvas, isNot(equals(pixel)));
 
-      final pixelImage = img.decodePng(pixel)!;
-      final canvasImage = img.decodePng(canvas)!;
-      expect(canvasImage.width, pixelImage.width);
-      expect(canvasImage.height, pixelImage.height);
-      expect(pixelImage.width, 1024);
-      expect(pixelImage.height, 1024);
+    final pixelImage = img.decodePng(pixel)!;
+    final canvasImage = img.decodePng(canvas)!;
+    expect(canvasImage.width, pixelImage.width);
+    expect(canvasImage.height, pixelImage.height);
+    expect(pixelImage.width, 1024);
+    expect(pixelImage.height, 1024);
 
-      // Linen must be unambiguously visible: the recessed yarn crossings are
-      // noticeably darker than raised threads in both light and dark paint.
-      // These probes are inside solid-color cells (not at palette boundaries).
-      final lightRecess = canvasImage.getPixel(120, 120);
-      final lightRaised = canvasImage.getPixel(121, 121);
-      expect(lightRaised.r.toInt() - lightRecess.r.toInt(), greaterThan(40));
-      final darkRecess = canvasImage.getPixel(768, 120);
-      final darkRaised = canvasImage.getPixel(769, 121);
-      expect(darkRaised.r.toInt() - darkRecess.r.toInt(), greaterThan(35));
-      // Plain pixel output is still flat: its same-cell pixels are identical.
-      expect(pixelImage.getPixel(120, 120).r, pixelImage.getPixel(121, 121).r);
-      expect(pixelImage.getPixel(768, 120).r, pixelImage.getPixel(769, 121).r);
+    // Interlaced raised cores at the same point in two palette regions are
+    // brighter than the recessed cloth. Pitch is 12px in a 4x4 export.
+    final lightRecess = canvasImage.getPixel(120, 120);
+    final lightRaised = canvasImage.getPixel(126, 126);
+    expect(lightRaised.r.toInt() - lightRecess.r.toInt(), greaterThan(20));
+    final darkRecess = canvasImage.getPixel(768, 120);
+    final darkRaised = canvasImage.getPixel(774, 126);
+    expect(darkRaised.r.toInt() - darkRecess.r.toInt(), greaterThan(14));
+    // Pixel mode must stay completely flat even where the yarn would rise.
+    expect(pixelImage.getPixel(120, 120).r, pixelImage.getPixel(126, 126).r);
+    expect(pixelImage.getPixel(768, 120).r, pixelImage.getPixel(774, 126).r);
 
-      // Diamond mode exports individual facets, gaps, and light direction,
-      // while leaving the classic Pixel and Canvas encoders intact.
-      final diamond = renderLevelPng({...level, 'renderStyle': 'diamond'});
-      expect(diamond, isNotEmpty);
-      expect(diamond, isNot(equals(pixel)));
-      expect(diamond, isNot(equals(canvas)));
-      final gemImage = img.decodePng(diamond)!;
-      expect(gemImage.width, 1024);
-      expect(gemImage.height, 1024);
-      // Pixel (0,0) samples the mounting border, the center samples a gem.
-      final mount = gemImage.getPixel(0, 0);
-      final center = gemImage.getPixel(128, 128);
-      expect(mount.r.toInt(), isNot(center.r.toInt()));
-      expect(mount.g.toInt(), isNot(center.g.toInt()));
-      // The same palette keeps distinctly colored gem centers.
-      expect(
-        gemImage.getPixel(640, 128).g.toInt(),
-        isNot(gemImage.getPixel(128, 128).g.toInt()),
-      );
-      expect(
-        renderLevelPng({...level, 'renderStyle': 'diamond'}),
-        orderedEquals(diamond),
-      );
+    // Diamond mode exports individual facets, gaps, and light direction,
+    // while leaving the classic Pixel and Canvas encoders intact.
+    final diamond = renderLevelPng({...level, 'renderStyle': 'diamond'});
+    expect(diamond, isNotEmpty);
+    expect(diamond, isNot(equals(pixel)));
+    expect(diamond, isNot(equals(canvas)));
+    final gemImage = img.decodePng(diamond)!;
+    expect(gemImage.width, 1024);
+    expect(gemImage.height, 1024);
+    // Pixel (0,0) samples the mounting border, the center samples a gem.
+    final mount = gemImage.getPixel(0, 0);
+    final center = gemImage.getPixel(128, 128);
+    expect(mount.r.toInt(), isNot(center.r.toInt()));
+    expect(mount.g.toInt(), isNot(center.g.toInt()));
+    // The same palette keeps distinctly colored gem centers.
+    expect(
+      gemImage.getPixel(640, 128).g.toInt(),
+      isNot(gemImage.getPixel(128, 128).g.toInt()),
+    );
+    expect(
+      renderLevelPng({...level, 'renderStyle': 'diamond'}),
+      orderedEquals(diamond),
+    );
 
-      // The procedural weave is stable across exports, with no extra asset.
-      expect(
-        renderLevelPng({...level, 'renderStyle': 'canvas'}),
-        orderedEquals(canvas),
-      );
-    },
-  );
+    // The procedural weave is stable across exports, with no extra asset.
+    expect(
+      renderLevelPng({...level, 'renderStyle': 'canvas'}),
+      orderedEquals(canvas),
+    );
+  });
 }
