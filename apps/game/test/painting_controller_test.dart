@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:game_domain/game_domain.dart';
 import 'package:level_schema/level_schema.dart';
 import 'package:persistence/persistence.dart';
+import 'package:painting_engine/painting_engine.dart';
 import 'package:pixelhub/features/painting/painting_controller.dart';
 
 import 'bootstrap_test.dart' show fixture;
@@ -101,6 +102,71 @@ void main() {
     expect(reopened.session!.isComplete, isTrue);
     expect(reopened.session!.completedCount, 4);
   });
+  test('wand and splash target only matching unfinished cells', () async {
+    final level = LevelDefinition(
+      id: 'precision-tool-fixture',
+      title: 'بافت',
+      titleEn: 'Pattern',
+      schemaVersion: 2,
+      contentVersion: 1,
+      width: 5,
+      height: 4,
+      palette: [0xff112233, 0xffeecc99],
+      cells: [
+        0, 0, 1, 0, 0,
+        0, 1, 1, 0, 0,
+        0, 0, 1, 0, 1,
+        1, 0, 1, 0, 0,
+      ],
+    );
+    final storage = MemoryPreferences();
+    final controller = PaintingController(level, storage);
+    addTearDown(controller.dispose);
+    await controller.load();
+    final session = controller.session!;
+    final initialRevision = session.revision;
+    expect(
+      controller.previewTool(PrecisionPaintTool.magicWand, 0, 0),
+      hasLength(6),
+    );
+    expect(controller.previewTool(PrecisionPaintTool.magicWand, 2, 0), isEmpty);
+    expect(controller.previewTool(PrecisionPaintTool.magicWand, -1, 0), isEmpty);
+    expect(session.revision, initialRevision);
+    expect(session.completedCount, 0);
+
+    controller.beginStroke();
+    expect(controller.paintLine(0, 0, 0, 0), isTrue);
+    controller.endStroke();
+    expect(
+      controller.previewTool(PrecisionPaintTool.colorSplash, 0, 0),
+      unorderedEquals([1, 5]),
+    );
+    final splash = controller.previewTool(
+      PrecisionPaintTool.colorSplash,
+      0,
+      0,
+    );
+    expect(controller.applyToolTargets(splash), 2);
+    expect(session.completedCount, 3);
+    final wand = controller.previewTool(
+      PrecisionPaintTool.magicWand,
+      0,
+      0,
+    );
+    expect(wand, unorderedEquals([10, 11, 16]));
+    expect(controller.applyToolTargets(wand), 3);
+    expect(controller.previewTool(PrecisionPaintTool.magicWand, 0, 0), isEmpty);
+    expect(session.completedCount, 6);
+    expect(session.selectedColor, 0);
+    await controller.flush();
+
+    final reopened = PaintingController(level, storage);
+    addTearDown(reopened.dispose);
+    await reopened.load();
+    expect(reopened.session!.completedCount, 6);
+    expect(reopened.session!.snapshot.generation, 0);
+  });
+
   test(
     'hint does not change progress; bomb paints and reset clears hint',
     () async {
