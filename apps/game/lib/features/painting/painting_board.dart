@@ -275,11 +275,12 @@ class _GridPainter extends CustomPainter {
     final bottom = (b.dy / ch).ceil().clamp(0, level.height);
     final paint = Paint()..isAntiAlias = false;
     final labels = <int, TextPainter>{};
+    final wovenCells = Path();
     canvas.drawRect(
       Offset.zero & size,
       paint
         ..color = switch (renderStyle) {
-          ArtworkRenderStyle.canvas => const Color(0xfff8f1e5),
+          ArtworkRenderStyle.canvas => const Color(0xfff6f5f1),
           ArtworkRenderStyle.diamond => const Color(0xffe9edf4),
           ArtworkRenderStyle.pixel => Colors.white,
         },
@@ -290,6 +291,9 @@ class _GridPainter extends CustomPainter {
         final color = level.cells[index];
         final done = session.isCompleted(index);
         final rect = Rect.fromLTWH(x * cw, y * ch, cw, ch);
+        if (done && renderStyle == ArtworkRenderStyle.canvas) {
+          wovenCells.addRect(rect);
+        }
         if (renderStyle == ArtworkRenderStyle.diamond) {
           if (done) {
             paintDiamondGem(
@@ -311,9 +315,6 @@ class _GridPainter extends CustomPainter {
               ? Color(level.palette[color])
               : const Color(0xffdcebdd);
           canvas.drawRect(rect, paint);
-          if (done && renderStyle == ArtworkRenderStyle.canvas) {
-            paintCanvasPigment(canvas, rect, column: x, row: y);
-          }
         }
         if (!done && cw * scale >= 14) {
           final label = labels.putIfAbsent(color, () {
@@ -342,12 +343,18 @@ class _GridPainter extends CustomPainter {
         }
       }
     }
-    artworkStylePainters[renderStyle]?.call(
-      canvas,
-      Rect.fromLTRB(left * cw, top * ch, right * cw, bottom * ch),
-      cellWidth: cw,
-      cellHeight: ch,
-    );
+    if (renderStyle == ArtworkRenderStyle.canvas) {
+      // Unpainted numbered cells remain readable and untextured.
+      canvas.save();
+      canvas.clipPath(wovenCells);
+      paintCanvasTexture(
+        canvas,
+        Rect.fromLTRB(left * cw, top * ch, right * cw, bottom * ch),
+        cellWidth: cw,
+        cellHeight: ch,
+      );
+      canvas.restore();
+    }
     final path = Path();
     for (var x = left; x <= right; x++) {
       path.moveTo(x * cw, top * ch);
@@ -361,7 +368,7 @@ class _GridPainter extends CustomPainter {
       path,
       paint
         ..color = switch (renderStyle) {
-          ArtworkRenderStyle.canvas => const Color(0x66a5b0a5),
+          ArtworkRenderStyle.canvas => const Color(0x664f5965),
           ArtworkRenderStyle.diamond => const Color(0x22546276),
           ArtworkRenderStyle.pixel => const Color(0xffa5b0a5),
         }

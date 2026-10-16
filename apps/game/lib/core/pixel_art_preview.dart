@@ -60,9 +60,6 @@ class _FixturePainter extends CustomPainter {
         } else {
           canvas.drawRect(rect, paint);
         }
-        if (renderStyle == ArtworkRenderStyle.canvas) {
-          paintCanvasPigment(canvas, rect, column: x, row: y);
-        }
       }
     }
     artworkStylePainters[renderStyle]?.call(

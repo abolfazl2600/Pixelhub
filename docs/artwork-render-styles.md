@@ -1,26 +1,33 @@
 # Artwork rendering styles
 
-PixelHub's render style is presentation state, not artwork content.
+PixelHub's render style is presentation state, never painting content.
 
-- `pixel` is the stable default and retains the legacy cell-color rendering.
-- `canvas` overlays a subtle deterministic procedural weave. It uses no image asset,
-  network request, per-level file, palette entry, or artwork-schema field.
-- The typed `ArtworkRenderStyle` enum and `artworkStylePainters` registry are the
-  extension point for future looks such as paper or cross-stitch.
-- The selected style is stored under `pixelhub.artworkStyle.v1` by the optional
-  `ArtworkStylePreferences` contract. Unknown or malformed values resolve to
-  `pixel`. It is independent of progress bitsets, favorites, artwork IDs,
-  checksums, and downloaded level metadata.
-- The same selection is applied to the live board, still/animated completion
-  preview, and PNG export. The export's Pixel path remains the default legacy
-  renderer; Canvas uses a deterministic low-opacity weave after nearest-neighbor
-  scaling so cell edges remain crisp.
-- The texture is drawn only within the visible board bounds and uses bounded
-  procedural line drawing. It does not decode assets during gestures or zoom.
+- `pixel` stays the original, flat and lossless pixel painting.
+- `canvas` is **now woven threads / بافتنی**. Its stored identifier remains
+  `canvas` for compatibility with existing user preferences. It renders actual
+  over-under crossings of two rounded yarn strands, with recessed gaps, cast
+  shadows and raised highlights. The previous linen grain and pigment streaks
+  are removed.
+- `diamond` preserves the separate gem-facet rendering.
 
-The UI selector is compact and localized inline for Persian RTL and English LTR.
-Changing style only rebuilds presentation; it never touches the painting session.
-No claim of device frame-time or APK-size improvement is made without a measured
-release build on representative Android hardware. The regression suite covers
-preference validation, Pixel fallback, style switching, unchanged progress,
-offline persistence, and style-aware PNG dimensions/content.
+## Woven fabric rendering
+
+- Continuous horizontal and vertical yarns alternate over/under each other on
+  a deterministic artwork-space grid. Yarn pitch is derived from the actual
+  cell size, not downloaded content. No art JSON, palette, checksum or saved
+  pixel changes are necessary.
+- On the interactive board, the yarn surface is **clipped to completed cells**;
+  numbered unfinished cells stay clear, so it remains easy to paint.
+- Completed stills and animated frames use the same Flutter painter, while PNG
+  export uses the shared pure-Dart intersection geometry and shade model.
+- The pattern is fully offline and asset-free, so no texture downloads or
+  extra packages are needed. Path batching avoids individual draw calls per
+  yarn intersection. Only the visible board bounds are traversed.
+- `ArtworkStylePreferences` continues to use the persisted
+  `pixelhub.artworkStyle.v1` value; changing style does not alter completion,
+  rewards, selected palette entry, animation frames, progress or favorites.
+- Unknown stored style IDs safely fall back to Pixel.
+
+This is a woven-thread visual effect, not physically simulated cloth.
+Quality/performance should be verified on representative low-end Android
+devices; unit and CI tests cover geometry, PNG integrity and style persistence.

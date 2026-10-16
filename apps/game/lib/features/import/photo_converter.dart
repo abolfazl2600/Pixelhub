@@ -5,6 +5,7 @@ import 'package:image/image.dart' as img;
 import 'package:level_schema/level_schema.dart';
 
 import 'diamond_photo_renderer.dart';
+import '../painting/woven_thread_pattern.dart';
 
 const maxPhotoBytes = 12 * 1024 * 1024;
 
@@ -246,93 +247,22 @@ Uint8List renderLevelPng(Map<String, Object> source) {
     interpolation: img.Interpolation.nearest,
   );
   if (style == 'canvas') {
-    // Raster equivalent of the artwork-space pigment and broken linen weave.
-    // Retain 1024px output and pure-Dart computation for isolate-safe export.
-    const pitch = 6;
-    final cellWidth = output.width ~/ level.width;
-    final cellHeight = output.height ~/ level.height;
+    // The same over-under yarn geometry used in the live painter. Pure Dart
+    // and deterministic, so isolate/Web export requires no Flutter engine.
+    final pitch = wovenThreadPitch(
+      output.width / level.width,
+      output.height / level.height,
+    );
     for (var y = 0; y < output.height; y++) {
-      final yi = y ~/ pitch;
-      final h = y % pitch;
       for (var x = 0; x < output.width; x++) {
-        final xi = x ~/ pitch;
-        final v = x % pitch;
         final original = output.getPixel(x, y);
-        var red = original.r.toDouble();
-        var green = original.g.toDouble();
-        var blue = original.b.toDouble();
-
-        // Uneven, transparent brush traces remain inside the paint cell.
-        if (cellWidth >= 9 && cellHeight >= 9) {
-          final column = x ~/ cellWidth;
-          final row = y ~/ cellHeight;
-          final variation = ((column * 37 + row * 59) & 15) / 15.0;
-          final u = (x % cellWidth) / cellWidth;
-          final t = (y % cellHeight) / cellHeight;
-          if (u >= .07 &&
-              u < .61 + variation * .22 &&
-              t >= .15 + variation * .16 &&
-              t < .25 + variation * .16) {
-            red = red * .867 + 255 * .133;
-            green = green * .867 + 255 * .133;
-            blue = blue * .867 + 255 * .133;
-          }
-          if (u >= .12 + variation * .10 &&
-              u < .63 + variation * .31 &&
-              t >= .58 + variation * .13 &&
-              t < .655 + variation * .13) {
-            red = red * .914 + 12 * .086;
-            green = green * .914 + 19 * .086;
-            blue = blue * .914 + 19 * .086;
-          }
-        }
-
-        // A gentle warm fabric ground still shows through opaque pigment.
-        red = red * .904 + 242 * .096;
-        green = green * .904 + 230 * .096;
-        blue = blue * .904 + 208 * .096;
-
-        final over = (xi + yi).isEven;
-        // Interlaced strands break at different positions instead of forming
-        // the harsh uninterrupted grid of the old Canvas renderer.
-        final shadow =
-            (v == 0 && (over ? h <= 4 : h <= 5) ? .32 : 0.0) +
-            (h == 0 && (over ? v <= 5 : v <= 4) ? .18 : 0.0);
-        if (shadow > 0) {
-          final factor = shadow.clamp(0.0, .48).toDouble();
-          red = red * (1 - factor) + 64 * factor;
-          green = green * (1 - factor) + 47 * factor;
-          blue = blue * (1 - factor) + 39 * factor;
-        }
-
-        final highlight =
-            (v == 1 && (over ? h >= 1 && h <= 3 : h >= 3) ? .37 : 0.0) +
-            (h == 1 && (over ? v >= 2 && v <= 5 : v >= 1 && v <= 3)
-                ? .22
-                : 0.0);
-        if (highlight > 0) {
-          final factor = highlight.clamp(0.0, .49).toDouble();
-          red = red * (1 - factor) + 255 * factor;
-          green = green * (1 - factor) + 251 * factor;
-          blue = blue * (1 - factor) + 231 * factor;
-        }
-        if (h == 3 && v >= 2 && v <= 4) {
-          red = red * .96 + 110 * .04;
-          green = green * .96 + 85 * .04;
-          blue = blue * .96 + 66 * .04;
-        }
-        if (((xi * 73 + yi * 137) & 15).isEven && v == 3 && h == 3) {
-          red = red * .81 + 255 * .19;
-          green = green * .81 + 249 * .19;
-          blue = blue * .81 + 229 * .19;
-        }
-
+        final light = wovenThreadLighting(x + .5, y + .5, pitch);
         output.setPixelRgb(
           x,
           y,
-          red.round().clamp(0, 255),
-          green.round().clamp(0, 255),
-          blue.round().clamp(0, 255),
+          shadeWovenChannel(original.r.toInt(), light),
+          shadeWovenChannel(original.g.toInt(), light),
+          shadeWovenChannel(original.b.toInt(), light),
         );
       }
     }

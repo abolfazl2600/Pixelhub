@@ -185,16 +185,7 @@ class _AnimationPainter extends CustomPainter {
           Rect.fromLTRB(left * w, y * h, x * w, (y + 1) * h),
           paint,
         );
-        if (renderStyle == ArtworkRenderStyle.canvas && w >= 9 && h >= 9) {
-          for (var column = left; column < x; column++) {
-            paintCanvasPigment(
-              canvas,
-              Rect.fromLTWH(column * w, y * h, w, h),
-              column: column,
-              row: y,
-            );
-          }
-        }
+
       }
     }
     artworkStylePainters[renderStyle]?.call(
