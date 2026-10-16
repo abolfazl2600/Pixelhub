@@ -184,72 +184,80 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
             ),
           ),
           Expanded(
-            child: ListView.separated(
+            child: SingleChildScrollView(
               key: const ValueKey('color-palette-scroll'),
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              itemCount: controller.level.palette.length,
-              separatorBuilder: (context, index) => const SizedBox(width: 8),
-              itemBuilder: (context, i) {
-                final color = Color(controller.level.palette[i]);
-                return Semantics(
-                  label: s.colorLabel(
-                    context.digits(i + 1),
-                    context.digits(session.remaining[i]),
-                  ),
-                  button: true,
-                  selected: session.selectedColor == i,
-                  child: ExcludeSemantics(
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        key: ValueKey('color-$i'),
-                        borderRadius: BorderRadius.circular(16),
-                        onTap: () => controller.selectColor(i),
-                        child: Container(
-                          width: 56,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: session.selectedColor == i
-                                  ? PixelTokens.green
-                                  : PixelTokens.backdrop,
-                              width: session.selectedColor == i ? 2 : 1,
+              child: Row(
+                children: [
+                  for (var i = 0; i < controller.level.palette.length; i++)
+                    Padding(
+                      padding: const EdgeInsetsDirectional.only(end: 8),
+                      child: Builder(
+                        builder: (context) {
+                          final color = Color(controller.level.palette[i]);
+                          return Semantics(
+                            label: s.colorLabel(
+                              context.digits(i + 1),
+                              context.digits(session.remaining[i]),
                             ),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CircleAvatar(
-                                radius: 14,
-                                backgroundColor: color,
-                                child: Text(
-                                  context.digits(i + 1),
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    color:
-                                        ThemeData.estimateBrightnessForColor(
-                                              color,
-                                            ) ==
-                                            Brightness.dark
-                                        ? Colors.white
-                                        : PixelTokens.ink,
+                            button: true,
+                            selected: session.selectedColor == i,
+                            child: ExcludeSemantics(
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  key: ValueKey('color-$i'),
+                                  borderRadius: BorderRadius.circular(16),
+                                  onTap: () => controller.selectColor(i),
+                                  child: Container(
+                                    width: 56,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(
+                                        color: session.selectedColor == i
+                                            ? PixelTokens.green
+                                            : PixelTokens.backdrop,
+                                        width: session.selectedColor == i ? 2 : 1,
+                                      ),
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 14,
+                                          backgroundColor: color,
+                                          child: Text(
+                                            context.digits(i + 1),
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w700,
+                                              color:
+                                                  ThemeData.estimateBrightnessForColor(
+                                                        color,
+                                                      ) ==
+                                                      Brightness.dark
+                                                  ? Colors.white
+                                                  : PixelTokens.ink,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          context.digits(session.remaining[i]),
+                                          style: const TextStyle(fontSize: 11),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 2),
-                              Text(
-                                context.digits(session.remaining[i]),
-                                style: const TextStyle(fontSize: 11),
-                              ),
-                            ],
-                          ),
-                        ),
+                            ),
+                          );
+                        },
                       ),
                     ),
-                  ),
-                );
-              },
+                ],
+              ),
             ),
           ),
         ],
