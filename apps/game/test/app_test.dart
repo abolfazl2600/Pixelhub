@@ -104,7 +104,10 @@ void main() {
       // Palette stays pinned regardless of the page's vertical scroll.
       final palette = find.byKey(const ValueKey('color-palette-scroll'));
       expect(palette, findsOneWidget);
-      expect(tester.getRect(palette).bottom, lessThanOrEqualTo(viewport.height));
+      expect(
+        tester.getRect(palette).bottom,
+        lessThanOrEqualTo(viewport.height),
+      );
       expect(tester.takeException(), isNull);
       expect(tester.getSize(frame).width, width);
     });
