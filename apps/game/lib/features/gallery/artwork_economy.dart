@@ -1,4 +1,5 @@
 import 'package:level_schema/level_schema.dart';
+import 'package:painting_engine/painting_engine.dart';
 
 import 'artwork_difficulty.dart';
 
@@ -32,3 +33,10 @@ int rewardForLevel(LevelDefinition level) =>
 /// Existing artwork with saved progress is grandfathered into ownership.
 bool alwaysFreeArtwork(String id) =>
     id == 'sunflower' || id.startsWith('private-');
+
+/// Coins are earned by finishing paintings, then optionally spent on tools.
+/// No subscriptions, advertising or remote inventory are required.
+int precisionToolPrice(PrecisionPaintTool tool) => switch (tool) {
+  PrecisionPaintTool.magicWand => 12,
+  PrecisionPaintTool.colorSplash => 6,
+};
