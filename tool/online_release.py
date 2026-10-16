@@ -323,8 +323,17 @@ def assemble(pack_dir, output_dir):
     for old in retired:
         if RETIRED_ONLINE_IDS[old] not in images:
             raise ValueError(f"Missing replacement for retired art: {old}")
-    catalog = {"schemaVersion": 1, "pictures": list(images.values()),
-               "retiredIds": retired}
+    # The original Web/Android clients only understand the Starry Night
+    # retirement. New IDs in retiredIds break their *entire* online catalog.
+    # Put later replacements in an additive field older clients ignore.
+    legacy_retired = [ident for ident in retired if ident == "online-starry-night"]
+    newer_retired = [ident for ident in retired if ident != "online-starry-night"]
+    catalog = {
+        "schemaVersion": 1,
+        "pictures": list(images.values()),
+        "retiredIds": legacy_retired,
+        "retiredIdsV2": newer_retired,
+    }
     (destination / "catalog.json").write_bytes(compact(catalog))
     print(f"Published {len(images)} online pictures.")
 
