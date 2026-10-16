@@ -401,8 +401,9 @@ class OnlineCatalogController extends ChangeNotifier {
       final legacyIds = legacyRetirement as List? ?? const [];
       final laterIds = laterRetirement as List? ?? const [];
       for (final id in [...legacyIds, ...laterIds]) {
-        final replacement =
-            id is String ? _retiredOnlineReplacements[id] : null;
+        final replacement = id is String
+            ? _retiredOnlineReplacements[id]
+            : null;
         if (replacement == null ||
             !ids.contains(replacement) ||
             ids.contains(id) ||
