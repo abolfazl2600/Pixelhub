@@ -160,6 +160,66 @@ void main() {
   );
 
   testWidgets(
+    'paid precision tools require a matching tap and never charge for drag',
+    (tester) async {
+      final storage = MemoryPreferences();
+      final controller = await pumpPainting(tester, storage: storage);
+      final magic = find.byKey(const ValueKey('magic-wand-tool'));
+      await tester.ensureVisible(magic);
+      await tester.tap(magic);
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const ValueKey('precision-tool-instructions')),
+        findsOneWidget,
+      );
+      final board = find.byKey(const ValueKey('painting-board'));
+      await tester.ensureVisible(board);
+      var rect = tester.getRect(board);
+      await tester.dragFrom(
+        rect.topLeft + Offset(rect.width * .25, rect.height * .25),
+        Offset(rect.width * .4, 0),
+      );
+      await tester.pumpAndSettle();
+      expect(controller.session!.completedCount, 0);
+      expect((await storage.readLibrary()).coins, 120);
+
+      // The top-right cell has the wrong color for the initial palette.
+      rect = tester.getRect(board);
+      await tester.tapAt(
+        rect.topLeft + Offset(rect.width * .75, rect.height * .25),
+      );
+      await tester.pumpAndSettle();
+      expect(controller.session!.completedCount, 0);
+      expect((await storage.readLibrary()).coins, 120);
+
+      rect = tester.getRect(board);
+      await tester.tapAt(
+        rect.topLeft + Offset(rect.width * .25, rect.height * .25),
+      );
+      await tester.pumpAndSettle();
+      expect(controller.session!.completedCount, 1);
+      expect((await storage.readLibrary()).coins, 108);
+      expect(controller.saveStatus, SaveStatus.saved);
+
+      final splash = find.byKey(const ValueKey('color-splash-tool'));
+      await tester.ensureVisible(splash);
+      await tester.tap(splash);
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(board);
+      rect = tester.getRect(board);
+      // The completed origin can still be tapped to reach a matching
+      // unpainted neighbor, but never triggers a second charge itself.
+      await tester.tapAt(
+        rect.topLeft + Offset(rect.width * .25, rect.height * .25),
+      );
+      await tester.pumpAndSettle();
+      expect(controller.session!.completedCount, 2);
+      expect((await storage.readLibrary()).coins, 102);
+      expect(controller.saveStatus, SaveStatus.saved);
+    },
+  );
+
+  testWidgets(
     'focus mode hides secondary controls, keeps coloring and restores them',
     (tester) async {
       final controller = await pumpPainting(tester);
