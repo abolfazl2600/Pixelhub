@@ -576,9 +576,9 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                       onSelected: (_) {
                         controller.endStroke();
                         setState(() {
-                           _moveMode = false;
-                           _activeTool = null;
-                         });
+                          _moveMode = false;
+                          _activeTool = null;
+                        });
                       },
                     ),
                     ChoiceChip(
@@ -587,9 +587,9 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                       onSelected: (_) {
                         controller.endStroke();
                         setState(() {
-                           _moveMode = true;
-                           _activeTool = null;
-                         });
+                          _moveMode = true;
+                          _activeTool = null;
+                        });
                       },
                     ),
                     ChoiceChip(
