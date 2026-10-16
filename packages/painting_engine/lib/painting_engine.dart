@@ -136,11 +136,11 @@ final class PaintingSession {
 
     if (tool == PrecisionPaintTool.colorSplash) {
       final targets = <int>[];
-      for (var row = (y - 1).clamp(0, level.height - 1);
-          row <= (y + 1).clamp(0, level.height - 1);
+      for (var row = (y - 1).clamp(0, level.height - 1).toInt();
+          row <= (y + 1).clamp(0, level.height - 1).toInt();
           row++) {
-        for (var col = (x - 1).clamp(0, level.width - 1);
-            col <= (x + 1).clamp(0, level.width - 1);
+        for (var col = (x - 1).clamp(0, level.width - 1).toInt();
+            col <= (x + 1).clamp(0, level.width - 1).toInt();
             col++) {
           final index = row * level.width + col;
           if (level.cells[index] == _selectedColor && !isCompleted(index)) {
