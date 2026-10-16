@@ -59,9 +59,23 @@ void main() {
     () async {
       final pixels = await renderFabric();
       int red(int x, int y) => pixels.getUint8((y * 126 + x) * 4);
-      // Pitch is 8.4 for 20px cells. Compare a yarn core and the cloth gap.
-      expect(red(4, 4), greaterThan(red(0, 0) + 10));
-      expect(red(71, 4), greaterThan(red(67, 0) + 10));
+      // Measure several warp/weft crossings instead of assuming a strand
+      // center always lands on one device pixel after anti-aliasing.
+      int contrast(int x0, int x1) {
+        var darkest = 255;
+        var lightest = 0;
+        for (var y = 2; y < 40; y += 2) {
+          for (var x = x0; x < x1; x += 2) {
+            final value = red(x, y);
+            if (value < darkest) darkest = value;
+            if (value > lightest) lightest = value;
+          }
+        }
+        return lightest - darkest;
+      }
+
+      expect(contrast(2, 60), greaterThan(25));
+      expect(contrast(68, 123), greaterThan(18));
       // Drawing is confined to its rectangle. The bottom rows are untouched.
       expect(red(22, 124), 0xeb);
       expect(red(100, 124), 0x34);

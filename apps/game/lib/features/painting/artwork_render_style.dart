@@ -95,15 +95,15 @@ void paintCanvasTexture(
   // Dark gaps are visible between yarns but do not replace the palette color.
   canvas.drawRect(
     bounds,
-    Paint()..color = Color.fromRGBO(20, 25, 30, .08 * strength),
+    Paint()..color = Color.fromRGBO(20, 25, 30, .10 * strength),
   );
-  stroke(under, .53, Color.fromRGBO(21, 23, 31, .31 * strength));
+  stroke(under, .53, Color.fromRGBO(21, 23, 31, .26 * strength));
   stroke(under, .38, Color.fromRGBO(225, 227, 225, .13 * strength));
   stroke(under, .12, Color.fromRGBO(255, 255, 252, .25 * strength));
   // Overlying yarn receives a stronger cast shadow and cylindrical highlight.
-  stroke(over, .58, Color.fromRGBO(17, 21, 28, .40 * strength));
+  stroke(over, .58, Color.fromRGBO(17, 21, 28, .30 * strength));
   stroke(over, .43, Color.fromRGBO(224, 228, 230, .17 * strength));
-  stroke(over, .16, Color.fromRGBO(255, 255, 250, .52 * strength));
+  stroke(over, .16, Color.fromRGBO(255, 255, 250, .62 * strength));
   stroke(ends, .045, Color.fromRGBO(255, 252, 245, .28 * strength));
   canvas.restore();
 }

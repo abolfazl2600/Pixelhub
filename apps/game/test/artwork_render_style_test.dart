@@ -78,7 +78,7 @@ void main() {
     expect(lightRaised.r.toInt() - lightRecess.r.toInt(), greaterThan(20));
     final darkRecess = canvasImage.getPixel(768, 120);
     final darkRaised = canvasImage.getPixel(774, 126);
-    expect(darkRaised.r.toInt() - darkRecess.r.toInt(), greaterThan(20));
+    expect(darkRaised.r.toInt() - darkRecess.r.toInt(), greaterThan(14));
     // Pixel mode must stay completely flat even where the yarn would rise.
     expect(pixelImage.getPixel(120, 120).r, pixelImage.getPixel(126, 126).r);
     expect(pixelImage.getPixel(768, 120).r, pixelImage.getPixel(774, 126).r);
