@@ -249,6 +249,20 @@ class LibraryController extends ChangeNotifier {
     if (sounds != null) unawaited(sounds!.play(SoundCue.coinPurchase));
   });
 
+  /// Debits a targeted tool only after persistent storage accepts the wallet.
+  /// Requests are serialized alongside artwork purchases and completion
+  /// rewards, so two quick taps cannot overspend the balance.
+  Future<void> spendToolCoins(int cost) => _mutate(() async {
+    if (cost <= 0) throw ArgumentError.value(cost, 'cost');
+    if (library.coins < cost) {
+      throw StateError('Insufficient coins');
+    }
+    final next = library.copyWith(coins: library.coins - cost);
+    await repository.writeLibrary(next);
+    library = next;
+    if (sounds != null) unawaited(sounds!.play(SoundCue.coinPurchase));
+  });
+
   /// Once per level ID, even after reset or app relaunch. A failed wallet
   /// write can be retried safely without duplicating a reward.
   Future<void> rewardCompletion(LevelDefinition level) => _mutate(() async {
