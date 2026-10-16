@@ -14,6 +14,7 @@ from online_release import assemble, sample
 from pixel_animation_recipes import ROOT, animation, compact
 from publish_animation_companions import publish
 from online_iranian_heritage_23_pack import generate_recipes
+from online_landmark_animations_10 import generate_recipes as generate_landmark_recipes
 
 
 class AnimationCompanionTests(unittest.TestCase):
@@ -42,6 +43,7 @@ class AnimationCompanionTests(unittest.TestCase):
             shutil.copy2(batch, self.batch_dir / batch.name)
         self.generated_dir = self.root / (self.id().split('.')[-1] + '-generated')
         generate_recipes(self.online, self.generated_dir)
+        generate_landmark_recipes(self.online, self.generated_dir)
         for batch in self.generated_dir.glob('online-*.json'):
             shutil.copy2(batch, self.batch_dir / batch.name)
 
