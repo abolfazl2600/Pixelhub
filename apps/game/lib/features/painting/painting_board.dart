@@ -19,6 +19,7 @@ class PaintingBoard extends StatefulWidget {
   });
   final PaintingController controller;
   final bool moveMode;
+
   /// The parent scroll view must not scroll during a canvas interaction.
   final ValueChanged<bool>? onInteractionChanged;
   final ArtworkRenderStyle renderStyle;

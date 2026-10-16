@@ -171,9 +171,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
       height: 108,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
-        border: const Border(
-          top: BorderSide(color: PixelTokens.backdrop),
-        ),
+        border: const Border(top: BorderSide(color: PixelTokens.backdrop)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -182,20 +180,14 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
             padding: const EdgeInsetsDirectional.only(start: 16, top: 6),
             child: Text(
               s.colors,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-              ),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
             ),
           ),
           Expanded(
             child: ListView.separated(
               key: const ValueKey('color-palette-scroll'),
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 4,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               itemCount: controller.level.palette.length,
               separatorBuilder: (context, index) => const SizedBox(width: 8),
               itemBuilder: (context, i) {
@@ -235,7 +227,8 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                                   context.digits(i + 1),
                                   style: TextStyle(
                                     fontWeight: FontWeight.w700,
-                                    color: ThemeData.estimateBrightnessForColor(
+                                    color:
+                                        ThemeData.estimateBrightnessForColor(
                                               color,
                                             ) ==
                                             Brightness.dark

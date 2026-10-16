@@ -324,9 +324,7 @@ void main() {
       final controller = await pumpPainting(tester, level: level);
       tester.view.physicalSize = const Size(390, 760);
       await tester.pumpAndSettle();
-      await tester.ensureVisible(
-        find.byKey(const ValueKey('painting-board')),
-      );
+      await tester.ensureVisible(find.byKey(const ValueKey('painting-board')));
       await tester.pumpAndSettle();
 
       final scrollable = tester.state<ScrollableState>(
@@ -353,7 +351,10 @@ void main() {
       expect(scrollable.position.pixels, before);
 
       // The color strip is outside the vertical scroller.
-      expect(find.byKey(const ValueKey('color-palette-scroll')), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('color-palette-scroll')),
+        findsOneWidget,
+      );
       expect(find.byKey(const ValueKey('color-0')), findsOneWidget);
       expect(
         tester.getRect(find.byKey(const ValueKey('color-0'))).bottom,
