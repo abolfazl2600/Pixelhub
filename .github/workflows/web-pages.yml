@@ -481,6 +481,8 @@ jobs:
             "$RUNNER_TEMP/pixelhub-release-packs" site/online
       - name: Generate checksum-bound recipes for new Iranian heritage animations
         run: python3 tool/online_iranian_heritage_23_pack.py recipes site/online tool/animation_batches
+      - name: Generate checksum-bound animations for ten world landmarks
+        run: python3 tool/online_landmark_animations_10.py site/online tool/animation_batches
       - name: Add checksum-bound animation companions to existing pictures
         run: python3 tool/publish_animation_companions.py site/online
       - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
