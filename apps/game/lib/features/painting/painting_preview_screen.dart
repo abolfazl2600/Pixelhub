@@ -1,6 +1,7 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:painting_engine/painting_engine.dart';
 
 import '../../core/local_diagnostics.dart';
 import '../../l10n/strings.dart';
@@ -67,6 +68,8 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
   bool _focusMode = false;
   bool _viewResult = false;
   bool _pointerOnCanvas = false;
+  PrecisionPaintTool? _activeTool;
+  bool _toolBusy = false;
 
   @override
   void initState() {
@@ -81,6 +84,8 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
   }
 
   void _bomb() {
+    if (_toolBusy) return;
+    if (_activeTool != null) setState(() => _activeTool = null);
     final count = widget.controller.useBomb();
     if (count == 0 || !mounted) return;
     widget.diagnostics.recordBomb();
@@ -100,6 +105,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
       _moveMode = false;
       _focusMode = false;
       _pointerOnCanvas = false;
+      _activeTool = null;
     }
   }
 
@@ -112,8 +118,71 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
     setState(() {
       _focusMode = focused;
       _pointerOnCanvas = false;
+      _activeTool = null;
       if (focused) _moveMode = false;
     });
+  }
+
+  void _togglePrecisionTool(PrecisionPaintTool tool) {
+    if (_toolBusy || widget.library.busy) return;
+    widget.controller.endStroke();
+    setState(() {
+      _activeTool = _activeTool == tool ? null : tool;
+      if (_activeTool != null) _moveMode = false;
+    });
+  }
+
+  /// Only spend coins for a valid, unfinished target. The serialized wallet
+  /// write completes before the progress bitset changes.
+  Future<void> _usePrecisionTool((int, int) cell) async {
+    final tool = _activeTool;
+    if (tool == null || _toolBusy || widget.library.busy) return;
+    final targets = widget.controller.previewTool(tool, cell.$1, cell.$2);
+    if (targets.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.strings.precisionToolNoTargets)),
+      );
+      return;
+    }
+    final cost = precisionToolPrice(tool);
+    if (widget.library.coins < cost) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.strings.precisionToolInsufficient)),
+      );
+      return;
+    }
+    setState(() => _toolBusy = true);
+    try {
+      await widget.library.spendToolCoins(cost);
+      // Sessions are cached by the parent, so apply the paid action even if
+      // navigation disposed this screen during the wallet write.
+      final filled = widget.controller.applyToolTargets(targets);
+      if (!mounted) return;
+      setState(() => _activeTool = null);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            context.strings.precisionToolFilled(
+              context.digits(filled),
+              context.digits(cost),
+            ),
+          ),
+        ),
+      );
+    } on Object {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            widget.library.coins < cost
+                ? context.strings.precisionToolInsufficient
+                : context.strings.precisionToolSaveFailed,
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _toolBusy = false);
+    }
   }
 
   void _hint() {
@@ -121,6 +190,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
   }
 
   Future<void> _reset() async {
+    if (_toolBusy) return;
     final s = context.strings;
     final confirmed = await showDialog<bool>(
       context: context,
@@ -140,12 +210,16 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
       ),
     );
     if (confirmed == true && mounted) {
-      setState(() => _viewResult = false);
+      setState(() {
+        _viewResult = false;
+        _activeTool = null;
+      });
       widget.controller.reset();
     }
   }
 
   void _back() {
+    if (_toolBusy) return;
     if (context.canPop()) {
       context.pop();
     } else {
@@ -220,7 +294,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                                 child: InkWell(
                                   key: ValueKey('color-$i'),
                                   borderRadius: BorderRadius.circular(16),
-                                  onTap: () => controller.selectColor(i),
+                                  onTap: _toolBusy ? null : () => controller.selectColor(i),
                                   child: Container(
                                     width: 56,
                                     decoration: BoxDecoration(
@@ -307,7 +381,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                     ? Icons.fullscreen_exit_rounded
                     : Icons.fullscreen_rounded,
               ),
-              onPressed: () => _setFocusMode(!_focusMode),
+              onPressed: _toolBusy ? null : () => _setFocusMode(!_focusMode),
             ),
         ],
       );
@@ -427,6 +501,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                               : availableSize,
                           onInteractionChanged: _canvasInteractionChanged,
                           renderStyle: widget.renderStyle,
+                          interactionLocked: _toolBusy,
                         ),
                       );
                     },
@@ -480,6 +555,11 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 4),
+                Text(
+                  '${s.walletCoins}: ${context.digits(widget.library.coins)}',
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
                 const SizedBox(height: 12),
                 Wrap(
                   spacing: 8,
@@ -491,7 +571,10 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                       selected: !_moveMode,
                       onSelected: (_) {
                         controller.endStroke();
-                        setState(() => _moveMode = false);
+                        setState(() {
+                           _moveMode = false;
+                           _activeTool = null;
+                         });
                       },
                     ),
                     ChoiceChip(
@@ -499,7 +582,10 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                       selected: _moveMode,
                       onSelected: (_) {
                         controller.endStroke();
-                        setState(() => _moveMode = true);
+                        setState(() {
+                           _moveMode = true;
+                           _activeTool = null;
+                         });
                       },
                     ),
                     ChoiceChip(
@@ -561,6 +647,92 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 10),
+                Text(
+                  s.precisionToolTitle,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        key: const ValueKey('magic-wand-tool'),
+                        onPressed: _toolBusy
+                            ? null
+                            : () => _togglePrecisionTool(
+                                PrecisionPaintTool.magicWand,
+                              ),
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor:
+                              _activeTool == PrecisionPaintTool.magicWand
+                              ? PixelTokens.lemon
+                              : null,
+                        ),
+                        icon: const Icon(Icons.auto_fix_high_rounded),
+                        label: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(s.magicWandTool, textAlign: TextAlign.center),
+                            Text(
+                              s.precisionToolCost(
+                                context.digits(
+                                  precisionToolPrice(
+                                    PrecisionPaintTool.magicWand,
+                                  ),
+                                ),
+                              ),
+                              style: const TextStyle(fontSize: 11),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        key: const ValueKey('color-splash-tool'),
+                        onPressed: _toolBusy
+                            ? null
+                            : () => _togglePrecisionTool(
+                                PrecisionPaintTool.colorSplash,
+                              ),
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor:
+                              _activeTool == PrecisionPaintTool.colorSplash
+                              ? PixelTokens.lemon
+                              : null,
+                        ),
+                        icon: const Icon(Icons.blur_on_rounded),
+                        label: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(s.colorSplashTool, textAlign: TextAlign.center),
+                            Text(
+                              s.precisionToolCost(
+                                context.digits(
+                                  precisionToolPrice(
+                                    PrecisionPaintTool.colorSplash,
+                                  ),
+                                ),
+                              ),
+                              style: const TextStyle(fontSize: 11),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                if (_activeTool != null) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    s.precisionToolInstructions,
+                    key: const ValueKey('precision-tool-instructions'),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                ],
                 const SizedBox(height: 4),
                 Text(
                   s.freeToolsNote,
@@ -593,6 +765,9 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                   moveMode: _moveMode,
                   onInteractionChanged: _canvasInteractionChanged,
                   renderStyle: widget.renderStyle,
+                  toolMode: _activeTool,
+                  onToolTap: _usePrecisionTool,
+                  interactionLocked: _toolBusy,
                 ),
                 const SizedBox(height: 16),
                 Text(
