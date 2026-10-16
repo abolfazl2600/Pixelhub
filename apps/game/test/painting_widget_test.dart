@@ -171,7 +171,10 @@ void main() {
 
       expect(find.byKey(const ValueKey('painting-board')), findsOneWidget);
       expect(find.byKey(const ValueKey('focus-progress')), findsOneWidget);
-      expect(find.byKey(const ValueKey('color-palette-scroll')), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('color-palette-scroll')),
+        findsOneWidget,
+      );
       expect(find.byKey(const ValueKey('hint-tool')), findsNothing);
       expect(find.byKey(const ValueKey('bomb-tool')), findsNothing);
       expect(find.byKey(const ValueKey('style-diamond')), findsNothing);
@@ -179,7 +182,9 @@ void main() {
       expect(find.byTooltip('بزرگ‌نمایی'), findsNothing);
       expect(find.byKey(const ValueKey('painting-scroll')), findsNothing);
 
-      final board = tester.getRect(find.byKey(const ValueKey('painting-board')));
+      final board = tester.getRect(
+        find.byKey(const ValueKey('painting-board')),
+      );
       await tester.tapAt(
         board.topLeft + Offset(board.width * .25, board.height * .25),
       );
@@ -192,7 +197,10 @@ void main() {
       expect(find.byKey(const ValueKey('hint-tool')), findsOneWidget);
       expect(find.byKey(const ValueKey('style-diamond')), findsOneWidget);
       expect(find.byKey(const ValueKey('painting-scroll')), findsOneWidget);
-      expect(find.byKey(const ValueKey('color-palette-scroll')), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('color-palette-scroll')),
+        findsOneWidget,
+      );
       expect(controller.session!.completedCount, 1);
     },
   );

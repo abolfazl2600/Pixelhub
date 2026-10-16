@@ -412,8 +412,8 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                 Expanded(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
-                      final availableSize = constraints.maxWidth <
-                              constraints.maxHeight
+                      final availableSize =
+                          constraints.maxWidth < constraints.maxHeight
                           ? constraints.maxWidth
                           : constraints.maxHeight;
                       return Center(
