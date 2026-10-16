@@ -71,13 +71,28 @@ def animation(level, recipe):
                         above = original[max(0, y - max(1, h // 32)) * w + x]
                         if above != 0 and max(palette[above]) >= 110:
                             cells[y * w + x] = above
-        elif motion in {"ripple", "glimmer", "flame", "steam", "rain", "sparkle"} and pose:
+        elif motion in {"ripple", "wave", "glimmer", "flame", "steam", "rain", "sparkle"} and pose:
             if motion == "ripple":
                 for x, y in selected:
                     r, g, b = palette[original[y * w + x]]
                     if b > r * 1.12 and b > 80 and (y + index) % max(3, h // 12) == 0:
                         sx = max(0, min(w - 1, x + (1 if pose > 0 else -1)))
                         cells[y * w + x] = original[y * w + sx]
+            elif motion == "wave":
+                # Flow colored water streaks sideways within the selected
+                # region. Sample only blue water from the original artwork;
+                # never smear neighboring architecture or sky into the sea.
+                for x, y in selected:
+                    color = original[y * w + x]
+                    r, g, b = palette[color]
+                    if b <= r * 1.12 or b <= 80:
+                        continue
+                    sx = max(0, min(w - 1, x + pose))
+                    candidate = original[y * w + sx]
+                    if candidate:
+                        cr, cg, cb = palette[candidate]
+                        if cb > cr * 1.12 and cb > 80:
+                            cells[y * w + x] = candidate
             elif motion == "flame":
                 for x, y in selected:
                     r, g, b = palette[original[y * w + x]]
