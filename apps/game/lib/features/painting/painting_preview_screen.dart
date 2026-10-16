@@ -296,7 +296,9 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                                 child: InkWell(
                                   key: ValueKey('color-$i'),
                                   borderRadius: BorderRadius.circular(16),
-                                  onTap: _toolBusy ? null : () => controller.selectColor(i),
+                                  onTap: _toolBusy
+                                       ? null
+                                       : () => controller.selectColor(i),
                                   child: Container(
                                     width: 56,
                                     decoration: BoxDecoration(
@@ -658,7 +660,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: OutlinedButton.icon(
+                      child: OutlinedButton(
                         key: const ValueKey('magic-wand-tool'),
                         onPressed: _toolBusy
                             ? null
@@ -670,11 +672,16 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                               _activeTool == PrecisionPaintTool.magicWand
                               ? PixelTokens.lemon
                               : null,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 4,
+                            vertical: 8,
+                          ),
                         ),
-                        icon: const Icon(Icons.auto_fix_high_rounded),
-                        label: Column(
+                        child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
+                            const Icon(Icons.auto_fix_high_rounded),
+                            const SizedBox(height: 3),
                             Text(s.magicWandTool, textAlign: TextAlign.center),
                             Text(
                               s.precisionToolCost(
@@ -692,7 +699,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                     ),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: OutlinedButton.icon(
+                      child: OutlinedButton(
                         key: const ValueKey('color-splash-tool'),
                         onPressed: _toolBusy
                             ? null
@@ -704,11 +711,16 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                               _activeTool == PrecisionPaintTool.colorSplash
                               ? PixelTokens.lemon
                               : null,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 4,
+                            vertical: 8,
+                          ),
                         ),
-                        icon: const Icon(Icons.blur_on_rounded),
-                        label: Column(
+                        child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
+                            const Icon(Icons.blur_on_rounded),
+                            const SizedBox(height: 3),
                             Text(s.colorSplashTool, textAlign: TextAlign.center),
                             Text(
                               s.precisionToolCost(
