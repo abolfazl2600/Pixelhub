@@ -65,6 +65,24 @@ class PaintingController extends ChangeNotifier {
     return true;
   }
 
+  /// Preview does not modify progress or consume coins.
+  List<int> previewTool(PrecisionPaintTool tool, int x, int y) {
+    if (status != PaintingStatus.ready || session == null) return const [];
+    return session!.previewTool(tool, x, y);
+  }
+
+  /// Called after a successful persisted coin debit. Paint all matching
+  /// targets together, then route through the existing autosave/reward flow.
+  int applyToolTargets(List<int> targets) {
+    if (status != PaintingStatus.ready || session == null) return 0;
+    final count = session!.paintToolTargets(targets);
+    if (count > 0) {
+      hintIndex = null;
+      _changed();
+    }
+    return count;
+  }
+
   /// Reveal a still-uncolored cell. This never alters saved progress.
   /// If the selected color has none left, select the next useful color.
   int? showHint() {
