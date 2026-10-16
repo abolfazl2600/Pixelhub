@@ -4,8 +4,7 @@ import 'dart:typed_data';
 import 'package:image/image.dart' as img;
 import 'package:level_schema/level_schema.dart';
 
-import 'diamond_photo_renderer.dart';
-import '../painting/woven_thread_pattern.dart';
+export '../painting/artwork_png_export.dart' show renderLevelPng;
 
 const maxPhotoBytes = 12 * 1024 * 1024;
 
@@ -211,61 +210,4 @@ final class _Bucket {
     }
   }
   return (channel, widest);
-}
-
-Uint8List renderLevelPng(Map<String, Object> source) {
-  final style = switch (source['renderStyle']) {
-    'canvas' => 'canvas',
-    'diamond' => 'diamond',
-    _ => 'pixel',
-  };
-  final levelJson = Map<String, Object>.from(source)..remove('renderStyle');
-  final level = LevelDefinition.fromJson(levelJson);
-  if (style == 'diamond') return img.encodePng(renderDiamondImage(level));
-  final image = img.Image(
-    width: level.width,
-    height: level.height,
-    numChannels: 3,
-  );
-  for (var y = 0; y < level.height; y++) {
-    for (var x = 0; x < level.width; x++) {
-      final color = level.palette[level.cells[y * level.width + x]];
-      image.setPixelRgb(
-        x,
-        y,
-        (color >> 16) & 255,
-        (color >> 8) & 255,
-        color & 255,
-      );
-    }
-  }
-  final scale = 1024 ~/ math.max(level.width, level.height);
-  final output = img.copyResize(
-    image,
-    width: level.width * scale,
-    height: level.height * scale,
-    interpolation: img.Interpolation.nearest,
-  );
-  if (style == 'canvas') {
-    // The same over-under yarn geometry used in the live painter. Pure Dart
-    // and deterministic, so isolate/Web export requires no Flutter engine.
-    final pitch = wovenThreadPitch(
-      output.width / level.width,
-      output.height / level.height,
-    );
-    for (var y = 0; y < output.height; y++) {
-      for (var x = 0; x < output.width; x++) {
-        final original = output.getPixel(x, y);
-        final light = wovenThreadLighting(x + .5, y + .5, pitch);
-        output.setPixelRgb(
-          x,
-          y,
-          shadeWovenChannel(original.r.toInt(), light),
-          shadeWovenChannel(original.g.toInt(), light),
-          shadeWovenChannel(original.b.toInt(), light),
-        );
-      }
-    }
-  }
-  return img.encodePng(output);
 }

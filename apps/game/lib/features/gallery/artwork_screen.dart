@@ -8,6 +8,7 @@ import 'export_button.dart';
 import 'artwork_economy.dart';
 import 'gallery_screen.dart';
 import 'library_controller.dart';
+import '../painting/artwork_render_style.dart';
 import '../painting/completed_artwork_preview.dart';
 
 class ArtworkScreen extends StatelessWidget {
@@ -16,10 +17,12 @@ class ArtworkScreen extends StatelessWidget {
     required this.library,
     required this.onDelete,
     this.animation,
+    this.renderStyle = ArtworkRenderStyle.pixel,
     super.key,
   });
   final LevelDefinition level;
   final PixelAnimation? animation;
+  final ArtworkRenderStyle renderStyle;
   final LibraryController library;
   final Future<void> Function(LevelDefinition) onDelete;
 
@@ -128,8 +131,9 @@ class ArtworkScreen extends StatelessWidget {
                     ? CompletedArtworkPreview(
                         level: level,
                         animation: animation,
+                        renderStyle: renderStyle,
                       )
-                    : PixelArtPreview(level: level),
+                    : PixelArtPreview(level: level, renderStyle: renderStyle),
               ),
               const SizedBox(height: 20),
               Text(
@@ -199,7 +203,8 @@ class ArtworkScreen extends StatelessWidget {
                   library.isFavorite(level) ? s.removeFavorite : s.addFavorite,
                 ),
               ),
-              if (library.isComplete(level)) ExportButton(level: level),
+              if (library.isComplete(level))
+                ExportButton(level: level, renderStyle: renderStyle),
               if (level.id.startsWith('private-') ||
                   level.id.startsWith('online-')) ...[
                 const SizedBox(height: 16),

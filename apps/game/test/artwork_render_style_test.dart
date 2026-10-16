@@ -4,6 +4,8 @@ import 'package:level_schema/level_schema.dart';
 import 'package:persistence/persistence.dart';
 import 'package:pixelhub/features/import/photo_converter.dart';
 import 'package:pixelhub/features/painting/artwork_render_style.dart';
+import 'package:pixelhub/features/painting/artwork_png_export.dart'
+    show artworkPngRenderers;
 
 LevelDefinition _level() => LevelDefinition(
   id: 'sunflower',
@@ -111,6 +113,26 @@ void main() {
     expect(
       renderLevelPng({...level, 'renderStyle': 'canvas'}),
       orderedEquals(canvas),
+    );
+  });
+  test('all painting styles have a registered PNG renderer', () {
+    expect(
+      artworkPngRenderers.keys.toSet(),
+      ArtworkRenderStyle.values.map((style) => style.storageId).toSet(),
+    );
+    final level = _level().toJson();
+    expect(
+      () => renderLevelPng({...level, 'renderStyle': 'future-texture'}),
+      throwsFormatException,
+    );
+    expect(
+      () => renderLevelPng({...level, 'renderStyle': 123}),
+      throwsFormatException,
+    );
+    // Older call sites without a style keep the original Pixel format.
+    expect(
+      renderLevelPng(level),
+      orderedEquals(renderLevelPng({...level, 'renderStyle': 'pixel'})),
     );
   });
 }

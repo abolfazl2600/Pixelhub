@@ -5,7 +5,7 @@ import 'package:level_schema/level_schema.dart';
 import '../../l10n/strings.dart';
 import '../painting/artwork_render_style.dart';
 import '../../platform_adapters/artwork_export.dart';
-import '../import/photo_converter.dart';
+import '../painting/artwork_png_export.dart';
 
 class ExportButton extends StatefulWidget {
   const ExportButton({
