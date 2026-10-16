@@ -17,7 +17,7 @@ def publish(destination, batch_dir=None):
     catalog_path = destination / 'catalog.json'
     catalog = json.loads(catalog_path.read_text('utf-8'))
     by_id = {item['id']: item for item in catalog['pictures']}
-    retired = set(catalog.get('retiredIds', []))
+    retired = set(catalog.get('retiredIds', [])) | set(catalog.get('retiredIdsV2', []))
     seen = set()
     count = 0
     for batch in sorted(batch_dir.glob('online-*.json')):

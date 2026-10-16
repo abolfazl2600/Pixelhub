@@ -99,7 +99,7 @@ class RequestedPictureReplacementsTests(unittest.TestCase):
             published = {x["id"]: x for x in catalog["pictures"]}
             for old, new in PREVIOUS.items():
                 self.assertNotIn(old, published)
-                self.assertIn(old, catalog["retiredIds"])
+                self.assertIn(old, catalog["retiredIdsV2"])
                 self.assertIn(new, published)
                 self.assertTrue((dest / f"levels/{old}-v1.json").exists())
                 self.assertTrue((dest / f"previews/{old}-v1.png").exists())

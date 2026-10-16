@@ -100,6 +100,43 @@ class ImmutableOnlineReleaseTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "animation digest"):
             assemble(self.packs, self.output)
 
+
+    def test_new_retirements_do_not_break_legacy_catalog_clients(self):
+        """Older clients reject any retiredIds entry except Starry Night."""
+        originals = [
+            "online-starry-night",
+            "online-flag-united-kingdom-10",
+            "online-flag-turkey-10",
+            "online-flag-iran-10",
+            "online-mona-lisa",
+        ]
+        replacements = [
+            "online-classic-starry-night-detailed",
+            "online-flag-united-kingdom-30",
+            "online-flag-turkey-40",
+            "online-flag-iran-40",
+            "online-mona-lisa-detailed-90",
+        ]
+        self.pack("pixelhub-content-originals-v1", [(name, 1) for name in originals])
+        self.pack("pixelhub-content-remakes-v1", [(name, 1) for name in replacements])
+        assemble(self.packs, self.output)
+        catalog = self.catalog()
+
+        self.assertEqual(catalog["retiredIds"], ["online-starry-night"])
+        self.assertEqual(
+            catalog["retiredIdsV2"],
+            sorted(name for name in originals if name != "online-starry-night"),
+        )
+        self.assertEqual(
+            {entry["id"] for entry in catalog["pictures"]},
+            set(replacements),
+        )
+        for name in originals:
+            self.assertTrue(
+                (self.output / f"levels/{name}-v1.json").exists(),
+                "Retirement must not delete published immutable level files",
+            )
+
     def test_distinct_ids_allow_similar_designs_and_retain_both(self):
         original = "online-landmark-tower"
         remake = "online-landmark-tower-redesigned"

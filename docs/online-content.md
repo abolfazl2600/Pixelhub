@@ -1328,3 +1328,24 @@ or that the content is already live on GitHub Pages.
   Level JSON, dimensions, and checksum validation remain strict.
 - Tests simulate corrupt frames, temporarily absent sidecars and subsequent
   retry, ensuring existing immutable published paintings are never modified.
+
+## Backward-compatible online retirement metadata (October 2026)
+
+The public catalog keeps `schemaVersion: 1` for already-installed Web and
+Android clients. Those clients only accept `online-starry-night` in the
+`retiredIds` array. Publishing additional IDs there prevented the **entire**
+online catalog from loading, even though the site and its downloadable assets
+were healthy. The publisher now splits retirement hints:
+
+- `retiredIds`: legacy-supported `online-starry-night` only.
+- `retiredIdsV2`: the remade UK, Turkey, Iran flags and Mona Lisa retired IDs.
+
+Older binaries ignore the new optional field and can keep downloading new
+paintings. New clients validate both lists against a fixed, trusted mapping
+from retired IDs to their published replacement IDs before removing local
+copies. Content IDs and immutable Release assets are unchanged.
+
+When retiring further paintings, **do not add new IDs to legacy
+`retiredIds`**. Extend the versioned hint field and compatible clients as
+appropriate. Python publisher and Flutter catalog tests cover the historical
+failure mode; successful Web CI is required before Pages publication.

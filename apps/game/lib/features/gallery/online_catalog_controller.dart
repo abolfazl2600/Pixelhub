@@ -9,6 +9,16 @@ import 'package:level_schema/level_schema.dart';
 
 import 'artwork_categories.dart';
 
+/// Only these known, immutable replacements may remove an existing download.
+/// Keep in sync with tool/online_release.py.
+const _retiredOnlineReplacements = <String, String>{
+  'online-starry-night': 'online-classic-starry-night-detailed',
+  'online-flag-united-kingdom-10': 'online-flag-united-kingdom-30',
+  'online-flag-turkey-10': 'online-flag-turkey-40',
+  'online-flag-iran-10': 'online-flag-iran-40',
+  'online-mona-lisa': 'online-mona-lisa-detailed-90',
+};
+
 /// Public, versioned files served by the same repository's GitHub Pages site.
 /// The base URL is replaceable without changing level IDs or saved progress.
 const onlineContentRoot = 'https://abolfazl2600.github.io/Pixelhub/online/';
@@ -379,20 +389,25 @@ class OnlineCatalogController extends ChangeNotifier {
         }
         result.add(entry);
       }
-      // Purge retired online downloads only after complete catalog validation.
-      // Current native binaries ignore the optional hint until an app update.
-      final retirement = json['retiredIds'];
-      if (retirement != null && retirement is! List) {
+      // The legacy retiredIds field cannot contain new IDs: older clients
+      // accept Starry Night only, rejecting the whole online catalog otherwise.
+      final legacyRetirement = json['retiredIds'];
+      final laterRetirement = json['retiredIdsV2'];
+      if ((legacyRetirement != null && legacyRetirement is! List) ||
+          (laterRetirement != null && laterRetirement is! List)) {
         throw const FormatException('Invalid retired online IDs.');
       }
       final retired = <String>{};
-      for (final id in (retirement as List? ?? const [])) {
-        if (id is! String ||
-            !RegExp(r'^online-[a-z0-9-]{1,64}$').hasMatch(id) ||
-            id != 'online-starry-night' ||
-            !ids.contains('online-classic-starry-night-detailed') ||
+      final legacyIds = legacyRetirement as List? ?? const [];
+      final laterIds = laterRetirement as List? ?? const [];
+      for (final id in [...legacyIds, ...laterIds]) {
+        final replacement = id is String
+            ? _retiredOnlineReplacements[id]
+            : null;
+        if (replacement == null ||
+            !ids.contains(replacement) ||
             ids.contains(id) ||
-            !retired.add(id)) {
+            !retired.add(id as String)) {
           throw const FormatException('Invalid retired online picture ID.');
         }
       }

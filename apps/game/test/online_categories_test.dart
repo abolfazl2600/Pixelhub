@@ -279,6 +279,106 @@ void main() {
   );
 
   test(
+    'all five retired artworks coexist with the new public catalog',
+    () async {
+      // The real site retired four remade artworks after the first, Starry
+      // Night-only client shipped. A regression here hides every online card.
+      const replacements = <String, String>{
+        'online-starry-night': 'online-classic-starry-night-detailed',
+        'online-flag-united-kingdom-10': 'online-flag-united-kingdom-30',
+        'online-flag-turkey-10': 'online-flag-turkey-40',
+        'online-flag-iran-10': 'online-flag-iran-40',
+        'online-mona-lisa': 'online-mona-lisa-detailed-90',
+      };
+      final store = MemoryPreferences();
+      for (final oldId in replacements.keys) {
+        await store.saveDownloadedLevel(
+          onlineFixture(oldId),
+          category: 'patterns',
+        );
+      }
+      final newLevels = [
+        for (final newId in replacements.values) onlineFixture(newId),
+      ];
+      final catalog = jsonEncode({
+        'schemaVersion': 1,
+        'pictures': [
+          for (final level in newLevels)
+            {
+              'id': level.id,
+              'version': level.contentVersion,
+              'title': level.title,
+              'titleEn': level.titleEn,
+              'category': 'patterns',
+              'width': level.width,
+              'height': level.height,
+              'bytes': utf8.encode(jsonEncode(level.toJson())).length,
+              'checksum': level.checksum,
+            },
+        ],
+        'retiredIds': ['online-starry-night'],
+        'retiredIdsV2': [
+          for (final oldId in replacements.keys)
+            if (oldId != 'online-starry-night') oldId,
+        ],
+      });
+      final client = MockClient(
+        (_) async => http.Response.bytes(utf8.encode(catalog), 200),
+      );
+      addTearDown(client.close);
+      final controller = OnlineCatalogController(store, client: client);
+      addTearDown(controller.dispose);
+      await controller.loadDownloaded();
+      expect(controller.downloaded, hasLength(5));
+      await controller.checkForUpdates();
+
+      expect(controller.status, OnlineCatalogStatus.ready);
+      expect(
+        controller.available.map((level) => level.id).toSet(),
+        replacements.values.toSet(),
+      );
+      expect(controller.downloaded, isEmpty);
+      expect(await store.readDownloadedLevels(), isEmpty);
+    },
+  );
+
+  test(
+    'legacy unsplit retirement lists remain readable by new clients',
+    () async {
+      final replacement = onlineFixture('online-flag-iran-40');
+      final metadata = jsonEncode({
+        'schemaVersion': 1,
+        'pictures': [
+          {
+            'id': replacement.id,
+            'version': 1,
+            'title': replacement.title,
+            'titleEn': replacement.titleEn,
+            'category': 'patterns',
+            'width': replacement.width,
+            'height': replacement.height,
+            'bytes': utf8.encode(jsonEncode(replacement.toJson())).length,
+            'checksum': replacement.checksum,
+          },
+        ],
+        'retiredIds': ['online-flag-iran-10'],
+      });
+      final client = MockClient(
+        (_) async => http.Response.bytes(utf8.encode(metadata), 200),
+      );
+      addTearDown(client.close);
+      final controller = OnlineCatalogController(
+        MemoryPreferences(),
+        client: client,
+      );
+      addTearDown(controller.dispose);
+      await controller.checkForUpdates();
+      expect(controller.status, OnlineCatalogStatus.ready);
+      expect(controller.available.single.id, replacement.id);
+    },
+  );
+
+  test(
     'invalid retirement metadata never deletes a downloaded painting',
     () async {
       final level = onlineFixture('online-starry-night');
