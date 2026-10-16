@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:painting_engine/painting_engine.dart';
 
 import '../../l10n/strings.dart';
 import 'artwork_render_style.dart';
@@ -17,6 +18,9 @@ class PaintingBoard extends StatefulWidget {
     this.showZoomControls = true,
     this.maxBoardSize,
     this.renderStyle = ArtworkRenderStyle.pixel,
+    this.toolMode,
+    this.onToolTap,
+    this.interactionLocked = false,
     super.key,
   });
   final PaintingController controller;
@@ -32,6 +36,9 @@ class PaintingBoard extends StatefulWidget {
   /// Optional limit for tight focus-mode viewports and landscape screens.
   final double? maxBoardSize;
   final ArtworkRenderStyle renderStyle;
+  final PrecisionPaintTool? toolMode;
+  final ValueChanged<(int, int)>? onToolTap;
+  final bool interactionLocked;
   @override
   State<PaintingBoard> createState() => _PaintingBoardState();
 }
@@ -66,6 +73,7 @@ class _PaintingBoardState extends State<PaintingBoard> {
   }
 
   void _down(PointerDownEvent event) {
+    if (widget.interactionLocked) return;
     _pointers.add(event.pointer);
     if (_pointers.length == 1) widget.onInteractionChanged?.call(true);
     if (_pointers.length > 1) {
@@ -85,10 +93,16 @@ class _PaintingBoardState extends State<PaintingBoard> {
   }
 
   void _move(PointerMoveEvent event) {
-    if (widget.moveMode || _multiTouch || _pointers.length != 1) return;
+    if (widget.interactionLocked || widget.moveMode || _multiTouch ||
+        _pointers.length != 1) {
+      return;
+    }
     if (_start == null) return;
     if (!_moved && (_start! - event.localPosition).distance < 4) return;
     _moved = true;
+    // A precision tool is activated by a single tap; dragging must not
+    // spend coins or accidentally paint cells.
+    if (widget.toolMode != null) return;
     final cell = _cell(event.localPosition);
     if (cell == null) {
       _last = null;
@@ -98,30 +112,37 @@ class _PaintingBoardState extends State<PaintingBoard> {
   }
 
   void _up(PointerUpEvent event) {
-    if (!widget.moveMode && !_multiTouch && !_moved) {
+    if (!widget.interactionLocked && !widget.moveMode &&
+        !_multiTouch && !_moved) {
       final cell = _cell(event.localPosition);
       if (cell != null) {
-        _last = cell;
-        final session = widget.controller.session!;
-        final index = cell.$2 * session.level.width + cell.$1;
-        if (!session.isCompleted(index) &&
-            session.level.cells[index] != session.selectedColor &&
-            DateTime.now().difference(_lastWarning).inMilliseconds > 1000) {
-          _lastWarning = DateTime.now();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(context.strings.wrongColor),
-              duration: const Duration(seconds: 1),
-            ),
-          );
+        if (widget.toolMode != null) {
+          // No stroke is started for a precision tool. The parent checks the
+          // target and persists the coin charge before applying any cells.
+          widget.onToolTap?.call(cell);
+        } else {
+          _last = cell;
+          final session = widget.controller.session!;
+          final index = cell.$2 * session.level.width + cell.$1;
+          if (!session.isCompleted(index) &&
+              session.level.cells[index] != session.selectedColor &&
+              DateTime.now().difference(_lastWarning).inMilliseconds > 1000) {
+            _lastWarning = DateTime.now();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(context.strings.wrongColor),
+                duration: const Duration(seconds: 1),
+              ),
+            );
+          }
+          _draw(cell);
         }
-        _draw(cell);
       }
     }
     _pointers.remove(event.pointer);
     if (_pointers.isEmpty) {
       widget.onInteractionChanged?.call(false);
-      widget.controller.endStroke();
+      if (!widget.interactionLocked) widget.controller.endStroke();
       _last = null;
       _start = null;
       _multiTouch = false;
