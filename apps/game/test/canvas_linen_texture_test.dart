@@ -54,6 +54,27 @@ void main() {
     expect(shadeWovenChannel(255, top), lessThanOrEqualTo(255));
   });
 
+  test('spun fibers add fine, deterministic relief along each strand', () {
+    // Follow a single raised vertical thread. Twisted fiber ribs should
+    // introduce multiple tonal variations, not one uniformly flat band.
+    final lightAlongYarn = [
+      for (var step = 0; step < 24; step++)
+        shadeWovenChannel(
+          110,
+          wovenThreadLighting(6, step * .35 + .5, 12),
+        ),
+    ];
+    expect(lightAlongYarn.toSet().length, greaterThan(6));
+    expect(
+      wovenThreadLighting(6, 4.5, 12),
+      wovenThreadLighting(6, 4.5, 12),
+    );
+    expect(
+      wovenThreadLighting(6, 4.5, 0),
+      (multiply: 1.0, lift: 0.0),
+    );
+  });
+
   test(
     'raised yarn is visible on pale and dark pigment, with no overflow',
     () async {
