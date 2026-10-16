@@ -168,12 +168,10 @@ jobs:
           SOURCE_SHA: ${{ steps.source.outputs.sha }}
           BUILD_KIND: ${{ inputs.build_kind }}
         run: |
+          printf '%s\n' "$SOURCE_SHA" > apps/game/build/app/outputs/flutter-apk/commit.txt
           if [[ "$BUILD_KIND" == "play-aab" ]]; then
-            path=apps/game/build/app/outputs/bundle/release
-          else
-            path=apps/game/build/app/outputs/flutter-apk
+            printf '%s\n' "$SOURCE_SHA" > apps/game/build/app/outputs/bundle/release/commit.txt
           fi
-          printf '%s\n' "$SOURCE_SHA" > "$path/commit.txt"
       - name: Upload preview APK
         if: ${{ inputs.build_kind == 'preview-apk' }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -184,14 +182,23 @@ jobs:
             apps/game/build/app/outputs/flutter-apk/commit.txt
           if-no-files-found: error
           retention-days: 14
-      - name: Upload signed store APK and Play AAB
+      - name: Upload signed store APK
         if: ${{ inputs.build_kind == 'play-aab' }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: pixelhub-store-release-v${{ steps.source.outputs.version }}-${{ steps.source.outputs.sha }}
+          name: pixelhub-store-apk-v${{ steps.source.outputs.version }}-${{ steps.source.outputs.sha }}
+          path: |
+            apps/game/build/app/outputs/flutter-apk/app-release.apk
+            apps/game/build/app/outputs/flutter-apk/commit.txt
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload signed Play AAB
+        if: ${{ inputs.build_kind == 'play-aab' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: pixelhub-play-aab-v${{ steps.source.outputs.version }}-${{ steps.source.outputs.sha }}
           path: |
             apps/game/build/app/outputs/bundle/release/app-release.aab
-            apps/game/build/app/outputs/flutter-apk/app-release.apk
             apps/game/build/app/outputs/bundle/release/commit.txt
             apps/game/build/play-listing/icon-512.png
           if-no-files-found: error
