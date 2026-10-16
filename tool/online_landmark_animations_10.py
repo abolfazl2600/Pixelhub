@@ -35,11 +35,11 @@ ANIMATIONS = {
         "durationMs": 170,
     },
     "online-world-sydney-opera-50": {
-        "motion": "ripple", "region": [0.02, 0.79, 0.98, 0.98],
+        "motion": "wave", "region": [0.02, 0.79, 0.98, 0.98],
         "durationMs": 180,
     },
     "online-world-golden-gate-50": {
-        "motion": "ripple", "region": [0.02, 0.77, 0.98, 0.98],
+        "motion": "wave", "region": [0.02, 0.77, 0.98, 0.98],
         "durationMs": 180,
     },
     "online-world-giza-pyramids-50": {
@@ -55,7 +55,7 @@ ANIMATIONS = {
         "durationMs": 175,
     },
     "online-world-marina-bay-sands-50": {
-        "motion": "ripple", "region": [0.02, 0.79, 0.98, 0.98],
+        "motion": "wave", "region": [0.02, 0.79, 0.98, 0.98],
         "durationMs": 180,
     },
 }
