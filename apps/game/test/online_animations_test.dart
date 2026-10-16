@@ -137,8 +137,16 @@ void main() {
         await online.checkForUpdates();
         expect(online.status, OnlineCatalogStatus.ready);
         expect(online.available, hasLength(1));
+        final framesReady = Completer<void>();
+        online.addListener(() {
+          if (online.animations.containsKey(level.id) &&
+              !framesReady.isCompleted) {
+            framesReady.complete();
+          }
+        });
         await online.download(online.available.single);
         expect(online.downloaded.single.id, level.id);
+        await framesReady.future.timeout(const Duration(seconds: 5));
         expect(online.animations[level.id]!.frameCount, count);
         expect(paths.any((path) => path.contains('/animations/')), isTrue);
         expect(online.animations[level.id]!.pixelsFor(level, 0)[0], 0);
@@ -288,7 +296,7 @@ void main() {
     expect(online.downloaded, hasLength(5));
   });
 
-  test('tampered animation rejects entire online download', () async {
+  test('tampered animation cannot block a valid still download', () async {
     final level = onlineFixture('online-animation-tampered');
     final levelBody = jsonEncode(level.toJson());
     final body = jsonEncode({
@@ -339,9 +347,9 @@ void main() {
     expect(online.status, OnlineCatalogStatus.ready);
     expect(online.available, hasLength(1));
     await online.download(online.available.single);
-    expect(online.downloaded, isEmpty);
-    expect(online.failedDownloadId, level.id);
-    expect(await store.readDownloadedLevels(), isEmpty);
+    expect(online.downloaded.single.id, level.id);
+    expect(online.failedDownloadId, isNull);
+    expect((await store.readDownloadedLevels()).single.id, level.id);
     expect((await store.readDownloadedAnimations([level])), isEmpty);
   });
 
@@ -414,5 +422,116 @@ void main() {
     await tester.pump();
     expect(find.byKey(const ValueKey('animation-frame')), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  test('invalid optional animation metadata leaves catalog downloadable', () async {
+    final level = onlineFixture('online-invalid-sidecar-metadata');
+    final levelBody = jsonEncode(level.toJson());
+    final catalog = jsonEncode({
+      'schemaVersion': 1,
+      'pictures': [
+        {
+          'id': level.id,
+          'version': level.contentVersion,
+          'title': level.title,
+          'titleEn': level.titleEn,
+          'category': 'nature',
+          'width': level.width,
+          'height': level.height,
+          'bytes': utf8.encode(levelBody).length,
+          'checksum': level.checksum,
+          'animation': {'frameCount': -1},
+        },
+      ],
+    });
+    final client = MockClient((request) async => http.Response(
+      request.url.path.endsWith('catalog.json') ? catalog : levelBody,
+      200,
+    ));
+    addTearDown(client.close);
+    final store = MemoryPreferences();
+    final online = OnlineCatalogController(store, client: client);
+    addTearDown(online.dispose);
+    await online.checkForUpdates();
+    expect(online.status, OnlineCatalogStatus.ready);
+    expect(online.available.single.animation, isNull);
+    await online.download(online.available.single);
+    expect(online.downloaded.single.id, level.id);
+  });
+
+  test('a missing animation retries on the next catalog refresh', () async {
+    final level = onlineFixture('online-sidecar-retry');
+    final levelBody = jsonEncode(level.toJson());
+    final framesBody = jsonEncode({
+      'schemaVersion': 1,
+      'levelId': level.id,
+      'levelVersion': level.contentVersion,
+      'levelChecksum': level.checksum,
+      'frameDurationMs': 120,
+      'frames': [
+        {'changes': <Object>[]},
+        {'changes': [[0, 1]]},
+      ],
+    });
+    final catalog = jsonEncode({
+      'schemaVersion': 1,
+      'pictures': [
+        {
+          'id': level.id,
+          'version': level.contentVersion,
+          'title': level.title,
+          'titleEn': level.titleEn,
+          'category': 'nature',
+          'width': level.width,
+          'height': level.height,
+          'bytes': utf8.encode(levelBody).length,
+          'checksum': level.checksum,
+          'animation': {
+            'bytes': utf8.encode(framesBody).length,
+            'sha256': sha256.convert(utf8.encode(framesBody)).toString(),
+            'frameCount': 2,
+          },
+        },
+      ],
+    });
+    var hasAnimation = false;
+    final failedOnce = Completer<void>();
+    final client = MockClient((request) async {
+      if (request.url.path.endsWith('/catalog.json')) {
+        return http.Response(catalog, 200);
+      }
+      if (request.url.path.contains('/levels/')) {
+        return http.Response(levelBody, 200);
+      }
+      if (!hasAnimation) {
+        if (!failedOnce.isCompleted) failedOnce.complete();
+        return http.Response('Missing', 404);
+      }
+      return http.Response(framesBody, 200);
+    });
+    addTearDown(client.close);
+    final store = MemoryPreferences();
+    final online = OnlineCatalogController(store, client: client);
+    addTearDown(online.dispose);
+    await online.checkForUpdates();
+    await online.download(online.available.single);
+    expect(online.downloaded.single.id, level.id);
+    await failedOnce.future.timeout(const Duration(seconds: 5));
+    // The optional worker finishes its failure handling before a later
+    // refresh schedules the retry.
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+    expect(online.animations, isEmpty);
+
+    hasAnimation = true;
+    final restored = Completer<void>();
+    online.addListener(() {
+      if (online.animations.containsKey(level.id) && !restored.isCompleted) {
+        restored.complete();
+      }
+    });
+    await online.checkForUpdates();
+    await restored.future.timeout(const Duration(seconds: 5));
+    expect(online.animations[level.id]!.frameCount, 2);
+    expect((await store.readDownloadedLevels()).single.id, level.id);
   });
 }

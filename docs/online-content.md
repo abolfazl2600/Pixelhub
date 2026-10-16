@@ -1315,3 +1315,16 @@ assembles it into the online gallery. Older published IDs and saved progress
 are preserved, and these downloadable assets are not bundled into APKs.
 Source merge alone does **not** establish that the Release has been created
 or that the content is already live on GitHub Pages.
+
+## Resilient painting downloads (October 2026)
+
+- A checksum-verified numbered painting is saved and becomes available for
+  offline coloring **before** its optional animation companion is fetched.
+  Animation network failures, 404s, invalid frame data and storage errors
+  cannot discard the valid painting or make the download button fail.
+- A missing animation is retried on a later catalog refresh. Both fresh
+  downloads and backfills share the same integrity-verifying animation worker.
+- Malformed optional animation metadata cannot invalidate the entire catalog.
+  Level JSON, dimensions, and checksum validation remain strict.
+- Tests simulate corrupt frames, temporarily absent sidecars and subsequent
+  retry, ensuring existing immutable published paintings are never modified.

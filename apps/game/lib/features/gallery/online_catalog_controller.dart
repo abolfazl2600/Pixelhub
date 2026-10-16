@@ -97,6 +97,17 @@ final class OnlinePicture {
         !RegExp(r'^[a-f0-9]{64}$').hasMatch(checksum)) {
       throw const FormatException('Invalid online picture entry.');
     }
+    // An animation is an optional companion, not a prerequisite for
+    // discovering or downloading its still painting. A malformed companion
+    // must not invalidate the entire online catalog.
+    OnlineAnimationInfo? animation;
+    if (value['animation'] != null) {
+      try {
+        animation = OnlineAnimationInfo.fromJson(value['animation']);
+      } on FormatException catch (error) {
+        debugPrint('Ignoring invalid animation metadata for $id: $error');
+      }
+    }
     return OnlinePicture._(
       id: id,
       version: version,
@@ -108,9 +119,7 @@ final class OnlinePicture {
       colorCount: colorCount is int ? colorCount : null,
       bytes: bytes,
       checksum: checksum,
-      animation: value['animation'] == null
-          ? null
-          : OnlineAnimationInfo.fromJson(value['animation']),
+      animation: animation,
     );
   }
 
@@ -221,45 +230,68 @@ class OnlineCatalogController extends ChangeNotifier {
     return animation;
   }
 
+  /// Animation downloads are best-effort: the authenticated still image is
+  /// saved first. Missing, invalid or temporarily unreachable frames can be
+  /// retried during a subsequent catalog refresh.
+  Future<void> _downloadOptionalAnimation(
+    OnlinePicture picture,
+    LevelDefinition level,
+  ) async {
+    if (_disposed ||
+        picture.animation == null ||
+        storage is! OnlineAnimationStorage ||
+        _animations.containsKey(level.id) ||
+        !_pendingAnimations.add(level.id)) {
+      return;
+    }
+    try {
+      final animation = await _fetchAnimation(picture, level);
+      if (_disposed || _downloaded[level.id] != level) return;
+      final animationStorage = storage as OnlineAnimationStorage;
+      await animationStorage.saveDownloadedAnimation(level, animation);
+      if (_disposed || _downloaded[level.id] != level) {
+        // Download removed while the sidecar was being persisted.
+        if (_downloaded[level.id] == null) {
+          await animationStorage.removeDownloadedAnimation(level.id);
+        }
+        return;
+      }
+      _animations[level.id] = animation;
+      _notify();
+    } on Object catch (error) {
+      debugPrint('Optional animation download failed for ${level.id}: $error');
+    } finally {
+      _pendingAnimations.remove(level.id);
+    }
+  }
+
   Future<void> _backfillAnimations(List<OnlinePicture> catalog) async {
     if (storage is! OnlineAnimationStorage || _backfillingAnimations) return;
     _backfillingAnimations = true;
-    final pending = catalog.where((picture) {
-      final level = _downloaded[picture.id];
-      return picture.animation != null &&
-          !_animations.containsKey(picture.id) &&
-          !_pendingAnimations.contains(picture.id) &&
-          level != null &&
-          level.contentVersion == picture.version &&
-          level.checksum == picture.checksum;
-    }).toList();
-    Future<void> worker() async {
-      while (!_disposed && pending.isNotEmpty) {
-        final picture = pending.removeLast();
+    try {
+      final pending = catalog.where((picture) {
         final level = _downloaded[picture.id];
-        if (level == null || !_pendingAnimations.add(picture.id)) continue;
-        try {
-          final animation = await _fetchAnimation(picture, level);
-          if (_disposed || _downloaded[level.id] != level) continue;
-          final animationStorage = storage as OnlineAnimationStorage;
-          await animationStorage.saveDownloadedAnimation(level, animation);
-          if (_downloaded[level.id] != level) {
-            await animationStorage.removeDownloadedAnimation(level.id);
-            continue;
+        return picture.animation != null &&
+            !_animations.containsKey(picture.id) &&
+            !_pendingAnimations.contains(picture.id) &&
+            level != null &&
+            level.contentVersion == picture.version &&
+            level.checksum == picture.checksum;
+      }).toList();
+      Future<void> worker() async {
+        while (!_disposed && pending.isNotEmpty) {
+          final picture = pending.removeLast();
+          final level = _downloaded[picture.id];
+          if (level != null) {
+            await _downloadOptionalAnimation(picture, level);
           }
-          if (_disposed) return;
-          _animations[level.id] = animation;
-          _notify();
-        } on Object {
-          // Keep existing paintings playable and retry on the next refresh.
-        } finally {
-          _pendingAnimations.remove(picture.id);
         }
       }
-    }
 
-    await Future.wait([for (var i = 0; i < 3; i++) worker()]);
-    _backfillingAnimations = false;
+      await Future.wait([for (var i = 0; i < 3; i++) worker()]);
+    } finally {
+      _backfillingAnimations = false;
+    }
   }
 
   Future<void> loadDownloaded() async {
@@ -426,32 +458,16 @@ class OnlineCatalogController extends ChangeNotifier {
           level.height != picture.height) {
         throw const FormatException('Downloaded level does not match catalog.');
       }
-      PixelAnimation? animation;
-      if (picture.animation != null) {
-        animation = await _fetchAnimation(picture, level);
-        await (storage as OnlineAnimationStorage).saveDownloadedAnimation(
-          level,
-          animation,
-        );
-      }
-      try {
-        await storage.saveDownloadedLevel(level, category: picture.category);
-      } on Object {
-        if (animation != null) {
-          try {
-            await (storage as OnlineAnimationStorage).removeDownloadedAnimation(
-              level.id,
-            );
-          } on Object {
-            // Orphan sidecars are ignored until the level is available.
-          }
-        }
-        rethrow;
-      }
+      // Persist the verified still image before attempting any optional
+      // animation. Never make painting depend on a separate network request.
+      await storage.saveDownloadedLevel(level, category: picture.category);
       if (_disposed) return;
-      if (animation != null) _animations[level.id] = animation;
       _downloaded[level.id] = level;
       _downloadedCategories[level.id] = picture.category;
+      _notify();
+      // Fetch optional frames in the background so the gallery can navigate
+      // to the saved picture immediately, even on slow or broken connections.
+      unawaited(_downloadOptionalAnimation(picture, level));
     } on Object catch (error) {
       debugPrint('Online picture download failed: $error');
       if (!_disposed) failedDownloadId = picture.id;
