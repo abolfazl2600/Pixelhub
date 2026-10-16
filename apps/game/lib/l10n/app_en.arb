@@ -172,9 +172,20 @@
   "offlinePreparing": "Preparing the app and bundled pictures for offline reopening…",
   "offlineReady": "Bundled pictures are ready for offline use. On Web, a new version activates after previous tabs are closed.",
   "offlineUnavailable": "Offline app caching is unavailable in this browser; online play and local data remain available.",
+  "magicWandTool": "Magic Wand",
+  "colorSplashTool": "Color Splash",
+  "precisionToolCost": "{cost} coins",
+  "@precisionToolCost": {"placeholders":{"cost":{"type":"String"}}},
+  "precisionToolInstructions": "Tap a cell matching your selected color. Tap the tool again to turn it off.",
+  "precisionToolNoTargets": "No unfinished cells matching the selected color here. No coins spent.",
+  "precisionToolFilled": "Colored {count} cells for {cost} coins.",
+  "@precisionToolFilled": {"placeholders":{"count":{"type":"String"},"cost":{"type":"String"}}},
+  "precisionToolInsufficient": "Not enough coins for this tool. Complete paintings to earn more; nothing was charged.",
+  "precisionToolSaveFailed": "Tool purchase could not be saved; no coins were charged and no cells were colored. Try again.",
+  "precisionToolTitle": "Precision tools",
   "hintTool": "Hint",
   "bombTool": "Bomb",
-  "freeToolsNote": "Hints and painting tools are free. Finish pictures to earn coins and points.",
+  "freeToolsNote": "Hint and Bomb are free. Magic Wand and Color Splash spend coins only when they color new cells.",
   "hintLocation": "Hint: row {row}, column {column}. The cell is marked in orange.",
   "@hintLocation": {
     "placeholders": {
@@ -270,7 +281,7 @@
   "artworkUnlocked": "Painting unlocked!",
   "artworkFree": "Free",
   "artworkOwned": "Owned",
-  "walletExplanation": "The sunflower and personal paintings are free. Earn coins and points once for each completed picture. Spend coins to unlock paintings; there are no real-money purchases.",
+  "walletExplanation": "The sunflower and personal pictures are free. Finishing each picture earns coins and points once. Spend coins on unlocking pictures or precision painting tools; no real-money purchases.",
   "coinSaveFailed": "Could not save the coins or purchase. Please retry.",
   "walletInitial": "Starting gift: 120 coins"
 }
