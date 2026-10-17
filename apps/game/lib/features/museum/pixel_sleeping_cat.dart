@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-/// An independently drawn 150 × 80 pixel sprite. The room and the sleeping body stay
+/// An independently drawn 192 × 112 pixel sprite. The room and the sleeping body stay
 /// static; only the tail layer changes on a slow, four-step loop.
 class PixelSleepingCat extends StatefulWidget {
   const PixelSleepingCat({super.key});
 
-  static const int pixelWidth = 150;
-  static const int pixelHeight = 80;
+  static const int pixelWidth = 192;
+  static const int pixelHeight = 112;
 
   @override
   State<PixelSleepingCat> createState() => _PixelSleepingCatState();
@@ -213,6 +213,37 @@ class PixelCatBodyPainter extends CustomPainter {
       pixel.fine(x, 70, 1, 2, outline);
       pixel.fine(x + 1, 68, 2, 1, light);
     }
+
+    // Real 192×112 detail pass: fine cheek freckles, broken tabby stripes,
+    // contrasting eyelids, outlined whiskers and tufts around both ears.
+    for (final x in [62, 75, 89, 104]) {
+      pixel.micro(x, 52, 2, 6, stripe);
+      pixel.micro(x + 1, 59, 1, 3, furShadow);
+      pixel.micro(x + 3, 50, 2, 1, cream);
+    }
+    for (final x in [136, 149, 161]) {
+      pixel.micro(x, 49, 2, 4, stripe);
+      pixel.micro(x + 1, 53, 1, 2, cream);
+    }
+    for (final x in [143, 163]) {
+      pixel.micro(x, 72, 9, 1, outline);
+      pixel.micro(x + 2, 73, 6, 1, furShadow);
+      pixel.micro(x + 4, 70, 4, 1, light);
+    }
+    for (final x in [134, 146, 158]) {
+      pixel.micro(x, 101, 1, 3, furShadow);
+      pixel.micro(x + 3, 99, 3, 1, light);
+    }
+    pixel.micro(174, 83, 5, 1, pink);
+    pixel.micro(176, 85, 1, 1, light);
+    pixel.micro(177, 78, 11, 1, cream);
+    pixel.micro(178, 80, 9, 1, outline);
+    pixel.micro(176, 88, 13, 1, outline);
+    pixel.micro(169, 92, 12, 1, furShadow);
+    pixel.micro(135, 36, 1, 6, light);
+    pixel.micro(171, 34, 1, 6, light);
+    pixel.micro(140, 42, 2, 4, pink);
+    pixel.micro(169, 43, 2, 4, pink);
   }
 
   @override
@@ -278,6 +309,15 @@ class PixelCatTailPainter extends CustomPainter {
       pixel.fine(x, 60, 2, 2, stripe);
       pixel.fine(x + 2, 62, 2, 1, furGold);
     }
+    // Independent one-pixel tail-tip glints follow each resting position.
+    final swishTop = switch (frame) {
+      0 => 42,
+      1 => 34,
+      _ => 25,
+    };
+    pixel.micro(13, swishTop, 4, 2, furGold);
+    pixel.micro(17, swishTop + 2, 2, 5, outline);
+    pixel.micro(21, swishTop + 6, 3, 1, stripe);
   }
 
   @override
@@ -305,7 +345,17 @@ class _CatPixels {
     fine(left, top, right - left, bottom - top, color);
   }
 
+  // The previous detail pass was authored at 150×80; keep its marks in
+  // the same relative places while adding genuinely finer new pixels.
   void fine(int x, int y, int width, int height, Color color) {
+    final left = (x * PixelSleepingCat.pixelWidth / 150).round();
+    final top = (y * PixelSleepingCat.pixelHeight / 80).round();
+    final right = ((x + width) * PixelSleepingCat.pixelWidth / 150).round();
+    final bottom = ((y + height) * PixelSleepingCat.pixelHeight / 80).round();
+    micro(left, top, right - left, bottom - top, color);
+  }
+
+  void micro(int x, int y, int width, int height, Color color) {
     if (width <= 0 || height <= 0) return;
     _paint.color = color;
     canvas.drawRect(
