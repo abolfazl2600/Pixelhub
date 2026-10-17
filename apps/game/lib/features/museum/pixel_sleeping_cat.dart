@@ -298,8 +298,8 @@ class _CatPixels {
   void draw(int x, int y, int width, int height, Color color) {
     final left = (x * PixelSleepingCat.pixelWidth / originalWidth).round();
     final top = (y * PixelSleepingCat.pixelHeight / originalHeight).round();
-    final right =
-        ((x + width) * PixelSleepingCat.pixelWidth / originalWidth).round();
+    final right = ((x + width) * PixelSleepingCat.pixelWidth / originalWidth)
+        .round();
     final bottom =
         ((y + height) * PixelSleepingCat.pixelHeight / originalHeight).round();
     fine(left, top, right - left, bottom - top, color);
