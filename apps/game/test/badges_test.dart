@@ -78,7 +78,7 @@ void main() {
 
       final client = MockClient((request) async {
         if (request.url.path.endsWith('/catalog.json')) {
-          return http.Response(catalog, 200);
+          return http.Response.bytes(utf8.encode(catalog), 200, headers: {'content-type': 'application/json; charset=utf-8'});
         }
         return http.Response('missing icon', 404);
       });
