@@ -302,6 +302,9 @@ class _AchievementCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final title = definition.titleFor(persian);
     final description = definition.descriptionFor(persian);
+    final completedCount = math.min(progress, definition.requiredCount);
+    final progressLabel =
+        '${context.digits(completedCount)}/${context.digits(definition.requiredCount)}';
     return Semantics(
       label: '$title، $description',
       child: DecoratedBox(
@@ -409,7 +412,7 @@ class _AchievementCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 5),
                       Text(
-                        '${context.digits(math.min(progress, definition.requiredCount))}/${context.digits(definition.requiredCount)}',
+                        progressLabel,
                         style: const TextStyle(
                           color: _BadgePalette.muted,
                           fontSize: 12,
