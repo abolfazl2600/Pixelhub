@@ -91,13 +91,7 @@ class MuseumRoomPainter extends CustomPainter {
       for (var band = 0; band < 10; band++) {
         final half = 3 + band;
         final yy = 24 + band * 4;
-        pixel(
-          cx - half,
-          yy,
-          half * 2,
-          4,
-          band.isEven ? plasterLight : plaster,
-        );
+        pixel(cx - half, yy, half * 2, 4, band.isEven ? plasterLight : plaster);
       }
       pixel(cx - 1, 23, 2, 2, gold);
     }
