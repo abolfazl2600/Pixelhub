@@ -641,9 +641,8 @@ final class MemoryPreferences
 
   @override
   @override
-  Future<MuseumLayout> readMuseum() async => MuseumLayout.fromJson(
-    museum.toJson(),
-  );
+  Future<MuseumLayout> readMuseum() async =>
+      MuseumLayout.fromJson(museum.toJson());
 
   @override
   Future<void> writeMuseum(MuseumLayout layout) async {
