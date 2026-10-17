@@ -136,7 +136,7 @@ class _BadgesScreenState extends State<BadgesScreen> {
                           gridDelegate:
                               SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: columns,
-                                childAspectRatio: .76,
+                                mainAxisExtent: 252,
                                 mainAxisSpacing: 12,
                                 crossAxisSpacing: 12,
                               ),

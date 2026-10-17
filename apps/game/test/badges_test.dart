@@ -132,6 +132,17 @@ void main() {
       );
       await badges.settle();
       expect(badges.earnedCount, 2);
+
+      // Award data is restored after constructing a new controller.
+      final restored = BadgeController(
+        library,
+        store,
+        baseUrl: Uri.parse('https://example.test/badges/'),
+        client: client,
+      );
+      addTearDown(restored.dispose);
+      await restored.initialize();
+      expect(restored.earnedCount, 2);
     },
   );
 
