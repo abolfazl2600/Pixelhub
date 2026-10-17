@@ -31,16 +31,19 @@ class MuseumRoomPainter extends CustomPainter {
     final plaster = switch (wall) {
       'blue' => const Color(0xffcbdce6),
       'sage' => const Color(0xffc8d3b9),
+      'emerald' => const Color(0xff16483c),
       _ => const Color(0xfff1dfc8),
     };
     final plasterShade = switch (wall) {
       'blue' => const Color(0xffb8cbd8),
       'sage' => const Color(0xffb5c4a4),
+      'emerald' => const Color(0xff0f352f),
       _ => const Color(0xffe8d1b3),
     };
     final plasterLight = switch (wall) {
       'blue' => const Color(0xffe2ebee),
       'sage' => const Color(0xffdee2cd),
+      'emerald' => const Color(0xff286050),
       _ => const Color(0xffffedda),
     };
     const outline = Color(0xff49352c);
