@@ -21,7 +21,11 @@ async function main() {
       p.on('request', r => { const u=new URL(r.url()); if(u.protocol.startsWith('http') && u.origin!==new URL(base).origin && !u.href.startsWith(onlineBase)) externalRequests.push(u.origin); });
     }
     watch(page);
-    const start = () => page.getByRole('button',{name:/شروع.*رنگ‌آمیزی|Start.*coloring/});
+    // Home now has one artwork card. Its action follows saved progress:
+    // start, continue, or view the result. Accept all three localized states.
+    const start = () => page.getByRole('button',{
+      name:/شروع.*رنگ‌آمیزی|ادامه نقاشی|دیدن نتیجه|Start.*coloring|Continue painting|View result/
+    });
     const back = () => page.getByRole('button',{name:/بازگشت به خانه|Back to Home/});
     const board = () => page.locator('[flt-semantics-identifier="painting-board"]');
     async function ready() {
