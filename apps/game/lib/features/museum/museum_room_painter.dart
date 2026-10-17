@@ -16,10 +16,10 @@ class MuseumRoomPainter extends CustomPainter {
       p.color = color;
       canvas.drawRect(
         Rect.fromLTWH(
-          x * cell,
-          y * yCell,
-          w * cell,
-          h * yCell,
+          (x * cell).toDouble(),
+          (y * yCell).toDouble(),
+          (w * cell).toDouble(),
+          (h * yCell).toDouble(),
         ),
         p,
       );
@@ -71,10 +71,10 @@ class MuseumRoomPainter extends CustomPainter {
         p.color = const Color(0xfffff5d6).withValues(alpha: alpha / 100);
         canvas.drawRect(
           Rect.fromLTWH(
-            (x - halfWidth) * cell,
-            (8 + band * 4) * yCell,
-            halfWidth * 2 * cell,
-            4 * yCell,
+            ((x - halfWidth) * cell).toDouble(),
+            ((8 + band * 4) * yCell).toDouble(),
+            (halfWidth * 2 * cell).toDouble(),
+            (4 * yCell).toDouble(),
           ),
           p,
         );
