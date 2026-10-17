@@ -129,7 +129,7 @@ void main() {
     await museum.place(2, level.id);
     for (final (theme, wall, frame) in [
       ('royal', 'emerald', 'gold'),
-      ('sky', 'blue', 'dark'),
+      ('sky', 'blue', 'gold'),
       ('botanical', 'sage', 'wood'),
       ('classic', 'cream', 'gold'),
     ]) {

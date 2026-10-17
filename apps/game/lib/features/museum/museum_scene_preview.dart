@@ -25,7 +25,7 @@ class MuseumScenePreview extends StatelessWidget {
       final y = dimensions.maxHeight / 88;
       final frameColor = switch (theme) {
         'royal' => const Color(0xffffd46c),
-        'sky' => const Color(0xffddebf2),
+        'sky' => const Color(0xffffd56a),
         'botanical' => const Color(0xff855b3b),
         _ => const Color(0xffbd874b),
       };

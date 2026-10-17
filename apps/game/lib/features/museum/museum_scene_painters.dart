@@ -205,6 +205,8 @@ class MuseumScenePixels {
   }
 
   void persianRug(Color border, Color field, Color accent, Color light) {
+    canvas.save();
+    canvas.translate(0, -8 * size.height / height);
     rect(25, 323, 206, 26, border);
     rect(29, 326, 198, 20, light);
     rect(34, 329, 188, 14, field);
@@ -225,6 +227,16 @@ class MuseumScenePixels {
     for (var x = 33; x < 225; x += 9) {
       rect(x, 349, 3, 2, light);
     }
+    // Geometric woven edge and individually placed carpet stitches.
+    for (var x = 29; x < 228; x += 5) {
+      rect(x, 325, 3, 1, accent);
+      rect(x + 2, 344, 2, 1, accent);
+    }
+    for (var y = 329; y < 344; y += 4) {
+      rect(27, y, 2, 2, field);
+      rect(227, y, 2, 2, field);
+    }
+    canvas.restore();
   }
 
   void plant(
@@ -236,6 +248,8 @@ class MuseumScenePixels {
     required Color light,
     int reach = 44,
   }) {
+    canvas.save();
+    canvas.translate(0, -6 * size.height / height);
     rect(cx - 11, 301, 22, 24, pot);
     rect(cx - 13, 299, 26, 4, rim);
     rect(cx - 9, 324, 18, 3, shade);
@@ -250,6 +264,16 @@ class MuseumScenePixels {
     }
     rect(cx - 6, 279 - reach, 12, 10, leaf);
     rect(cx - 2, 275 - reach, 5, 8, light);
+    // Leaf clusters have darker edges and tiny high-contrast tips.
+    for (final y in [264, 276, 287]) {
+      rect(cx - 16, y, 7, 3, shade);
+      rect(cx - 14, y, 8, 2, leaf);
+      rect(cx + 9, y - 3, 8, 3, shade);
+      rect(cx + 10, y - 4, 5, 2, light);
+    }
+    rect(cx - 6, 304, 2, 13, light);
+    rect(cx + 7, 308, 2, 11, shade);
+    canvas.restore();
   }
 
   void bench({
@@ -260,7 +284,10 @@ class MuseumScenePixels {
     required Color decoration,
     bool rattan = false,
   }) {
-    // Seat is positioned underneath the independent sleeping cat sprite.
+    // The cat is rendered by the parent scene painter above this bench,
+    // within the very same museum coordinate system.
+    canvas.save();
+    canvas.translate(0, -10 * size.height / height);
     rect(58, 289, 141, 7, shadow);
     rect(60, 286, 137, 7, wood);
     rect(65, 280, 127, 8, fabric);
@@ -286,6 +313,16 @@ class MuseumScenePixels {
       rect(83, 304, 92, 4, sheen);
       rect(85, 310, 88, 2, shadow);
     }
+    // Pixel joinery and fabric pins follow the reference bench details.
+    rect(67, 297, 122, 2, sheen);
+    for (final x in [66, 81, 174, 189]) {
+      rect(x, 293, 4, 4, decoration);
+      rect(x + 1, 294, 2, 2, shadow);
+    }
+    for (var x = 77; x < 184; x += 12) {
+      rect(x, 282, 2, 2, decoration);
+    }
+    canvas.restore();
   }
 }
 
@@ -409,6 +446,26 @@ class MuseumRoyalScenePainter extends MuseumScenePainter {
     p.rect(0, 21, 256, 3, gold);
     p.rect(0, 24, 256, 2, highlight);
     p.rect(0, 27, 256, 3, walnut);
+    // Three stepped light cones sit behind the paintings, matching the
+    // reference's warm museum spotlights without blurry gradients.
+    for (final cx in [52, 128, 204]) {
+      for (var row = 0; row < 7; row++) {
+        final spread = 6 + row * 3;
+        p.rect(
+          cx - spread,
+          39 + row * 4,
+          spread * 2,
+          3,
+          const Color(0x1278c4a0),
+        );
+      }
+    }
+    // Tall recessed panels and discreet vertical bevels anchor each frame.
+    for (final x in [17, 94, 171]) {
+      p.rect(x, 40, 68, 209, const Color(0x29012220));
+      p.rect(x + 2, 42, 64, 205, const Color(0x190f9175));
+      p.rect(x + 3, 45, 1, 195, const Color(0x284eb39a));
+    }
     // Velvet damask: heraldic motifs and pinstripe stems between frames.
     for (var y = 43; y < 276; y += 33) {
       for (var x = 19 + ((y ~/ 33).isEven ? 0 : 17); x < 242; x += 34) {
@@ -432,6 +489,14 @@ class MuseumRoyalScenePainter extends MuseumScenePainter {
       p.lamp(cx, 31, walnut, gold, highlight);
       p.rect(cx - 3, 142, 6, 2, gold);
       p.rect(cx - 1, 144, 2, 2, highlight);
+    }
+    // Carved walnut wainscot below the lower row of frames.
+    p.rect(9, 249, 238, 27, const Color(0xff41271f));
+    for (final x in [13, 93, 173]) {
+      p.trim(x, 252, 70, 20, const Color(0xff241913),
+          const Color(0xff613b2a));
+      p.rect(x + 5, 256, 60, 1, const Color(0xff90623b));
+      p.rect(x + 5, 268, 60, 1, const Color(0xff30221c));
     }
     p.rect(0, 278, 256, 5, walnut);
     for (var x = 14; x < 245; x += 20) {
@@ -505,6 +570,22 @@ class MuseumSkyScenePainter extends MuseumScenePainter {
       p.rect(cx - 6, 12, 9, 3, const Color(0xfff6faf5));
       p.rect(cx + 6, 19, 7, 2, const Color(0xffd9eef0));
     }
+    // A low-resolution leafy horizon and cloud highlights: each window
+    // retains the reference's crisp pale-blue sky rather than a flat stripe.
+    for (final left in [12, 70, 131, 192]) {
+      for (var n = 0; n < 11; n++) {
+        final x = left + n * 5;
+        final high = 3 + ((n * 7 + left) % 7);
+        p.rect(x, 35 - high, 6, high, const Color(0xff73a787));
+        p.rect(x + 1, 34 - high, 3, 2, const Color(0xffa6c7a1));
+        p.rect(x + 1, 34, 5, 1, const Color(0xff3e7d68));
+      }
+    }
+    for (final cx in [38, 101, 163, 221]) {
+      p.rect(cx - 7, 11, 14, 2, const Color(0xfff7fcf5));
+      p.rect(cx - 10, 16, 19, 3, const Color(0xfff7fcf5));
+      p.rect(cx - 13, 20, 27, 2, const Color(0xffe3f6fa));
+    }
     p.rect(0, 36, 256, 5, cream);
     p.rect(0, 41, 256, 2, slate);
     p.rect(0, 44, 256, 3, const Color(0xffeaf3f0));
@@ -521,13 +602,25 @@ class MuseumSkyScenePainter extends MuseumScenePainter {
         p.rect(x + 7, y + 7, 2, 3, const Color(0xffb7d4df));
       }
     }
+    // Subtle wall inlay: light frames around each gallery bay and tiny
+    // blue cross tiles, leaving open space for the framed paintings.
+    for (final cx in [51, 128, 205]) {
+      for (final y in [70, 143, 222, 246]) {
+        p.rect(cx - 30, y, 5, 1, const Color(0xfff5fdfd));
+        p.rect(cx + 25, y, 5, 1, const Color(0xfff5fdfd));
+        p.rect(cx - 28, y + 3, 1, 4, const Color(0xff90c0d5));
+      }
+    }
     for (final x in [0, 247]) {
       p.rect(x, 0, 9, 287, const Color(0xffd7e0dc));
       p.rect(x + 2, 48, 2, 235, cream);
       p.rect(x + 6, 51, 1, 228, slate);
     }
-    for (final cx in [48, 128, 208]) {
-      p.lamp(cx, 45, const Color(0xff7c634d), const Color(0xffd6ae66), cream);
+    for (final cx in [52, 128, 204]) {
+      p.lamp(cx, 45, const Color(0xff7c634d),
+          const Color(0xffd6ae66), cream);
+      p.rect(cx - 10, 60, 20, 1, const Color(0x55ffffff));
+      p.rect(cx - 15, 70, 30, 1, const Color(0x32ffffff));
     }
     p.rect(0, 280, 256, 6, const Color(0xffe7eeeb));
     p.floor(

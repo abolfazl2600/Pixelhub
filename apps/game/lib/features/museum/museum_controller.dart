@@ -93,8 +93,7 @@ class MuseumController extends ChangeNotifier {
       _ => 'cream',
     };
     final frame = switch (theme) {
-      'classic' || 'royal' => 'gold',
-      'sky' => 'dark',
+      'classic' || 'royal' || 'sky' => 'gold',
       _ => 'wood',
     };
     return current.copyWith(theme: theme, wall: wall, frame: frame);
