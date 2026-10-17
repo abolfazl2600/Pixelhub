@@ -57,7 +57,13 @@ void main() {
     expect(find.byKey(const ValueKey('museum-frames-button')), findsOneWidget);
     expect(find.byKey(const ValueKey('museum-walls-button')), findsOneWidget);
     expect(find.byKey(const ValueKey('museum-arrange-button')), findsOneWidget);
-    expect(find.byType(MuseumRoomPainter), findsNothing);
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is CustomPaint && widget.painter is MuseumRoomPainter,
+      ),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 
