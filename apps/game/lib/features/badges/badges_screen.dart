@@ -302,7 +302,9 @@ class _AchievementCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final title = definition.titleFor(persian);
     final description = definition.descriptionFor(persian);
-    final completedCount = math.min(progress, definition.requiredCount);
+    final completedCount = earned
+        ? definition.requiredCount
+        : math.min(progress, definition.requiredCount);
     final progressLabel =
         '${context.digits(completedCount)}/${context.digits(definition.requiredCount)}';
     return Semantics(
