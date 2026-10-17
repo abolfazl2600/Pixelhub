@@ -114,6 +114,16 @@ class MuseumRoomPainter extends CustomPainter {
     rect(24, 78, 4, 1, darkWood);
     rect(36, 78, 4, 1, darkWood);
 
+    // Small sleeping pixel cat on the bench, matching the cozy mockup.
+    rect(30, 68, 7, 2, const Color(0xffe8d1ad));
+    rect(29, 69, 9, 1, const Color(0xfff7e4c6));
+    rect(35, 66, 3, 4, const Color(0xffefcfac));
+    rect(35, 65, 1, 2, const Color(0xffcc8859));
+    rect(37, 65, 1, 2, const Color(0xffcc8859));
+    rect(31, 67, 3, 1, const Color(0xffc98859));
+    rect(36, 68, 1, 1, const Color(0xff4f3834));
+    rect(38, 69, 2, 1, const Color(0xffbc785a));
+
     // Simple potted pixel plants at the edges of the room.
     for (final x in [5, 58]) {
       rect(x - 3, 72, 6, 5, const Color(0xff477d92));
