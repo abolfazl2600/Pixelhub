@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'museum_pixel_grid.dart';
+
 /// Extra décor drawn over the static room, but underneath the user's framed
 /// paintings and animated sleeping cat. All geometry is quantized to the
-/// 128×172 logical pixel grid. These are four usable room designs, not baked-in
+/// 180×240 logical pixel grid. These are four usable room designs, not baked-in
 /// screenshots containing someone else's artwork.
 class MuseumThemeDetailsPainter extends CustomPainter {
   const MuseumThemeDetailsPainter(this.theme);
@@ -11,13 +13,11 @@ class MuseumThemeDetailsPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final dx = size.width / 128;
-    final dy = size.height / 172;
-    final paint = Paint()..isAntiAlias = false;
-    void block(int x, int y, int w, int h, Color color) {
-      paint.color = color;
-      canvas.drawRect(Rect.fromLTWH(x * dx, y * dy, w * dx, h * dy), paint);
-    }
+    final pixels = MuseumPixelGrid(canvas, size);
+    void block(int x, int y, int w, int h, Color color) =>
+        pixels.legacy(x, y, w, h, color);
+    void fine(int x, int y, int w, int h, Color color) =>
+        pixels.fine(x, y, w, h, color);
 
     const gold = Color(0xffd5a044);
     const brightGold = Color(0xffffe19a);
@@ -46,6 +46,21 @@ class MuseumThemeDetailsPainter extends CustomPainter {
         for (var x = 28; x < 100; x += 12) {
           block(x, 158, 3, 2, brightGold);
           block(x + 2, 168, 2, 1, brightGold);
+        }
+        // Fine coffered cornice, gilt inlays and picture-light studs.
+        for (var x = 13; x < 168; x += 12) {
+          fine(x, 17, 4, 1, brightGold);
+          fine(x + 2, 19, 2, 2, darkGold);
+          fine(x + 5, 22, 1, 1, gold);
+        }
+        for (final cx in [28, 90, 152]) {
+          fine(cx - 7, 8, 14, 1, darkGold);
+          fine(cx - 5, 10, 10, 1, brightGold);
+          fine(cx - 1, 13, 2, 3, gold);
+        }
+        for (var x = 37; x < 141; x += 10) {
+          fine(x, 226, 3, 1, brightGold);
+          fine(x + 4, 231, 1, 2, darkGold);
         }
       case 'royal':
         // Rich emerald wall has a gold-art-deco crown, corner flutes,
@@ -84,6 +99,29 @@ class MuseumThemeDetailsPainter extends CustomPainter {
         for (var x = 51; x < 80; x += 7) {
           block(x, 140, 2, 1, gold);
         }
+        // Art-deco emerald gallery: narrow gold fluting, sconces and
+        // tiny geometric filigree accents, all one or two new pixels wide.
+        for (var x = 12; x < 168; x += 14) {
+          fine(x, 18, 3, 1, brightGold);
+          fine(x + 4, 21, 1, 3, darkGold);
+          fine(x + 2, 26, 2, 1, gold);
+        }
+        for (final x in [12, 165]) {
+          for (var y = 41; y < 190; y += 15) {
+            fine(x, y, 2, 4, brightGold);
+            fine(x + 1, y + 2, 1, 1, darkGold);
+            fine(x - 2, y + 7, 5, 1, gold);
+          }
+        }
+        for (var x = 37; x < 150; x += 13) {
+          fine(x, 224, 3, 1, brightGold);
+          fine(x + 2, 228, 1, 3, darkGold);
+          fine(x - 1, 233, 4, 1, gold);
+        }
+        for (final cx in [28, 90, 152]) {
+          fine(cx - 3, 30, 6, 1, brightGold);
+          fine(cx, 32, 1, 4, gold);
+        }
       case 'sky':
         // Skylight with blue sky and pixel clouds, minimalist trim, plus
         // a light geometric rug in place of the heavy Persian carpet.
@@ -118,6 +156,23 @@ class MuseumThemeDetailsPainter extends CustomPainter {
         }
         block(45, 137, 42, 4, const Color(0xff80aebf));
         block(47, 136, 38, 1, const Color(0xffe9f4ed));
+        // Clouds now have one-pixel scalloped edges and the skylight shows
+        // thin reflections, while a finer woven diamond rug stays light.
+        for (final cx in [28, 90, 152]) {
+          fine(cx - 13, 5, 10, 1, const Color(0xffeff8f4));
+          fine(cx - 8, 4, 5, 1, const Color(0xfffcfdf9));
+          fine(cx - 4, 6, 8, 1, const Color(0xfff7f9ef));
+          fine(cx + 7, 9, 1, 2, const Color(0xff4c9bc4));
+        }
+        for (var x = 14; x < 169; x += 17) {
+          fine(x, 17, 8, 1, const Color(0xfff0f9f6));
+          fine(x + 5, 18, 1, 2, const Color(0xff90b7c9));
+        }
+        for (var x = 40; x < 143; x += 14) {
+          fine(x, 223, 1, 7, const Color(0xff89b7c7));
+          fine(x - 3, 226, 7, 1, const Color(0xff89b7c7));
+          fine(x, 226, 1, 1, const Color(0xfff9fff6));
+        }
       case 'botanical':
         // Living vines, flowering branches, natural timber and an olive rug.
         block(7, 9, 114, 2, const Color(0xff785638));
@@ -155,6 +210,28 @@ class MuseumThemeDetailsPainter extends CustomPainter {
         }
         block(45, 137, 42, 4, const Color(0xff77966e));
         block(47, 136, 38, 1, const Color(0xffd3dab0));
+        // Delicate creeping vines, leaf veins and small blossom petals.
+        for (final x in [12, 166]) {
+          for (var y = 31; y < 191; y += 13) {
+            fine(x, y, 1, 7, shadowLeaf);
+            fine(x - 5, y + 2, 6, 2, lightLeaf);
+            fine(x - 3, y + 3, 2, 1, const Color(0xffd5e5ab));
+            fine(x + 1, y + 5, 6, 2, green);
+            fine(x + 3, y + 5, 2, 1, lightLeaf);
+            if (y.isOdd) {
+              fine(x + 4, y + 4, 2, 2, const Color(0xffe7adbb));
+              fine(x + 5, y + 3, 1, 1, const Color(0xffffe7c9));
+            }
+          }
+        }
+        for (var x = 16; x < 165; x += 10) {
+          fine(x, 20, 5, 1, lightLeaf);
+          fine(x + 2, 18, 1, 3, shadowLeaf);
+        }
+        for (var x = 40; x < 150; x += 12) {
+          fine(x, 224, 3, 1, const Color(0xffdce5a7));
+          fine(x + 2, 227, 2, 2, const Color(0xff3f6e53));
+        }
     }
   }
 
