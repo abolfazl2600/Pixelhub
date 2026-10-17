@@ -3,8 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:painting_engine/painting_engine.dart';
 import 'package:persistence/persistence.dart';
 import 'package:pixelhub/app/pixelhub_app.dart';
-import 'package:pixelhub/features/museum/museum_room_painter.dart';
-import 'package:pixelhub/features/museum/museum_theme_painter.dart';
+import 'package:pixelhub/features/museum/museum_scene_painters.dart';
 import 'package:pixelhub/features/museum/pixel_sleeping_cat.dart';
 
 import 'bootstrap_test.dart' show TestRepository, fixture;
@@ -39,7 +38,7 @@ Future<void> completeTestPicture(MemoryPreferences store) async {
 }
 
 void main() {
-  testWidgets('all four high-detail museum rooms paint at 180x240', (
+  testWidgets('four independent museum scenes render at 256x352', (
     tester,
   ) async {
     for (final (theme, wall) in [
@@ -51,29 +50,41 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: Center(
-              child: SizedBox(
-                width: 360,
-                height: 480,
-                child: Stack(
-                  children: [
-                    Positioned.fill(
-                      child: CustomPaint(painter: MuseumRoomPainter(wall)),
-                    ),
-                    Positioned.fill(
-                      child: CustomPaint(
-                        painter: MuseumThemeDetailsPainter(theme),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            body: SizedBox(
+              width: 256,
+              height: 352,
+              child: CustomPaint(painter: museumSceneFor(theme, wall)),
             ),
           ),
         ),
       );
       expect(tester.takeException(), isNull, reason: theme);
     }
+    expect(
+      museumSceneFor('classic', 'cream'),
+      isA<MuseumClassicScenePainter>(),
+    );
+    expect(
+      museumSceneFor('royal', 'emerald'),
+      isA<MuseumRoyalScenePainter>(),
+    );
+    expect(museumSceneFor('sky', 'blue'), isA<MuseumSkyScenePainter>());
+    expect(
+      museumSceneFor('botanical', 'sage'),
+      isA<MuseumBotanicalScenePainter>(),
+    );
+    expect(
+      const MuseumRoyalScenePainter(
+        'emerald',
+      ).shouldRepaint(const MuseumRoyalScenePainter('emerald')),
+      isFalse,
+    );
+    expect(
+      const MuseumRoyalScenePainter(
+        'emerald',
+      ).shouldRepaint(const MuseumSkyScenePainter('blue')),
+      isTrue,
+    );
   });
 
   testWidgets('the museum starts empty, with six pixels slots and controls', (
@@ -99,19 +110,14 @@ void main() {
     expect(
       find.byWidgetPredicate(
         (widget) =>
-            widget is CustomPaint && widget.painter is MuseumRoomPainter,
+            widget is CustomPaint && widget.painter is MuseumScenePainter,
       ),
       findsOneWidget,
     );
-    expect(MuseumRoomPainter.pixelWidth, 180);
-    expect(MuseumRoomPainter.pixelHeight, 240);
-    expect(PixelSleepingCat.pixelWidth, 150);
-    expect(PixelSleepingCat.pixelHeight, 80);
-    // Approximately 40% more pixels across each axis, not an enlarged bitmap.
-    expect(180 / 128, closeTo(1.4, .01));
-    expect(240 / 172, closeTo(1.4, .01));
-    expect(150 / 104, closeTo(1.4, .05));
-    expect(80 / 56, closeTo(1.4, .05));
+    expect(MuseumScenePainter.pixelWidth, 256);
+    expect(MuseumScenePainter.pixelHeight, 352);
+    expect(PixelSleepingCat.pixelWidth, 192);
+    expect(PixelSleepingCat.pixelHeight, 112);
     expect(find.byKey(const ValueKey('museum-sleeping-cat')), findsOneWidget);
     expect(
       find.byWidgetPredicate(
@@ -148,7 +154,7 @@ void main() {
       find.byWidgetPredicate(
         (widget) =>
             widget is CustomPaint &&
-            widget.painter is MuseumThemeThumbnailPainter,
+            widget.painter is MuseumScenePainter,
       ),
       findsWidgets,
     );
@@ -163,8 +169,7 @@ void main() {
       find.byWidgetPredicate(
         (widget) =>
             widget is CustomPaint &&
-            widget.painter is MuseumThemeDetailsPainter &&
-            (widget.painter! as MuseumThemeDetailsPainter).theme == 'royal',
+            widget.painter is MuseumRoyalScenePainter,
       ),
       findsOneWidget,
     );
@@ -206,9 +211,9 @@ void main() {
 
     // The static scenery and sleeping body never need an animation tick.
     expect(
-      const MuseumRoomPainter(
+      const MuseumBotanicalScenePainter(
         'sage',
-      ).shouldRepaint(const MuseumRoomPainter('sage')),
+      ).shouldRepaint(const MuseumBotanicalScenePainter('sage')),
       isFalse,
     );
     expect(
