@@ -15,12 +15,7 @@ typedef YarnLighting = ({double multiply, double lift});
 
 /// A gently twisted fiber ridge. The diagonal phase follows the yarn and
 /// varies between intersections, avoiding a flat, mechanically striped look.
-double _fiberRidge(
-  double along,
-  double across,
-  int column,
-  int row,
-) {
+double _fiberRidge(double along, double across, int column, int row) {
   final phase = along * 3.5 + across * 2.1 + (column * 7 + row * 11) * .07;
   final fraction = phase - phase.floor();
   return 1 - 4 * (fraction - .5).abs();
