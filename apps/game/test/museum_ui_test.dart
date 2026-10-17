@@ -4,6 +4,7 @@ import 'package:painting_engine/painting_engine.dart';
 import 'package:persistence/persistence.dart';
 import 'package:pixelhub/app/pixelhub_app.dart';
 import 'package:pixelhub/features/museum/museum_room_painter.dart';
+import 'package:pixelhub/features/museum/pixel_sleeping_cat.dart';
 
 import 'bootstrap_test.dart' show TestRepository, fixture;
 
@@ -64,6 +65,71 @@ void main() {
       ),
       findsOneWidget,
     );
+    expect(MuseumRoomPainter.pixelWidth, 128);
+    expect(MuseumRoomPainter.pixelHeight, 172);
+    expect(
+      find.byKey(const ValueKey('museum-sleeping-cat')),
+      findsOneWidget,
+    );
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is CustomPaint && widget.painter is PixelCatBodyPainter,
+      ),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the sleeping cat flicks only its pixel tail slowly', (
+    tester,
+  ) async {
+    final store = MemoryPreferences();
+    await pumpMuseumApp(tester, store, initialRoute: '/museum');
+
+    int tailFrame() {
+      final paint = tester.widget<CustomPaint>(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is CustomPaint && widget.painter is PixelCatTailPainter,
+        ),
+      );
+      return (paint.painter! as PixelCatTailPainter).frame;
+    }
+
+    expect(tailFrame(), 0);
+    await tester.pump(const Duration(milliseconds: 1100));
+    expect(tailFrame(), 1);
+    await tester.pump(const Duration(milliseconds: 1100));
+    expect(tailFrame(), 2);
+    await tester.pump(const Duration(milliseconds: 1100));
+    expect(tailFrame(), 1);
+    await tester.pump(const Duration(milliseconds: 1100));
+    expect(tailFrame(), 0);
+
+    // The static scenery and sleeping body never need an animation tick.
+    expect(
+      const MuseumRoomPainter('sage').shouldRepaint(
+        const MuseumRoomPainter('sage'),
+      ),
+      isFalse,
+    );
+    expect(
+      const PixelCatBodyPainter().shouldRepaint(
+        const PixelCatBodyPainter(),
+      ),
+      isFalse,
+    );
+    expect(
+      const PixelCatTailPainter(1).shouldRepaint(
+        const PixelCatTailPainter(0),
+      ),
+      isTrue,
+    );
+
+    // Disposing the museum must cancel its periodic sprite updates.
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump(const Duration(seconds: 5));
     expect(tester.takeException(), isNull);
   });
 
