@@ -422,7 +422,12 @@ void main() {
 
   testWidgets('pinch cannot paint and Move mode cannot paint', (tester) async {
     final controller = await pumpPainting(tester);
-    final board = tester.getRect(find.byKey(const ValueKey('painting-board')));
+    final boardFinder = find.byKey(const ValueKey('painting-board'));
+    // Normal painting has tools above the canvas: the test must hit the
+    // visible board instead of sending pointers into a clipped scroll area.
+    await tester.ensureVisible(boardFinder);
+    await tester.pumpAndSettle();
+    final board = tester.getRect(boardFinder);
     final first = await tester.startGesture(
       board.center - const Offset(30, 0),
       pointer: 1,
@@ -448,7 +453,12 @@ void main() {
     );
     await tester.tap(find.text('حرکت / زوم'));
     await tester.pumpAndSettle();
-    await tester.dragFrom(board.center, const Offset(30, 0));
+    await tester.ensureVisible(boardFinder);
+    await tester.pumpAndSettle();
+    await tester.dragFrom(
+      tester.getRect(boardFinder).center,
+      const Offset(30, 0),
+    );
     await tester.pumpAndSettle();
     expect(controller.session!.completedCount, 0);
   });
