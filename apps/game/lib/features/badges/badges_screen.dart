@@ -138,7 +138,7 @@ class _BadgesScreenState extends State<BadgesScreen> {
                             final badge = controller.badges[index];
                             final earned = controller.isEarned(badge);
                             return _AchievementCard(
-                              key: ValueKey('badge-' + badge.id),
+                              key: ValueKey('badge-${badge.id}'),
                               definition: badge,
                               earned: earned,
                               iconBytes: earned
@@ -238,10 +238,7 @@ class _BadgeProgressHeader extends StatelessWidget {
                   const SizedBox(height: 9),
                   Text(
                     persian
-                        ? context.digits(earned) +
-                              ' از ' +
-                              context.digits(total) +
-                              ' نشان دریافت شده'
+                        ? '${context.digits(earned)} از ${context.digits(total)} نشان دریافت شده'
                         : '$earned of $total earned',
                     style: const TextStyle(
                       color: _BadgePalette.ink,
@@ -305,7 +302,7 @@ class _AchievementCard extends StatelessWidget {
         : (persian ? 'نشان ناشناخته' : 'Mystery badge');
     final description = definition.descriptionFor(persian);
     return Semantics(
-      label: title + '، ' + description,
+      label: '$title، $description',
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: earned ? const Color(0xfff0f9f0) : const Color(0xfffffefb),
