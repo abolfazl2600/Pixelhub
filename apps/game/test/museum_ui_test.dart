@@ -4,6 +4,7 @@ import 'package:painting_engine/painting_engine.dart';
 import 'package:persistence/persistence.dart';
 import 'package:pixelhub/app/pixelhub_app.dart';
 import 'package:pixelhub/features/museum/museum_room_painter.dart';
+import 'package:pixelhub/features/museum/museum_theme_painter.dart';
 import 'package:pixelhub/features/museum/pixel_sleeping_cat.dart';
 
 import 'bootstrap_test.dart' show TestRepository, fixture;
@@ -77,6 +78,66 @@ void main() {
       ),
       findsOneWidget,
     );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('four pixel room styles can be selected and restored', (
+    tester,
+  ) async {
+    final store = MemoryPreferences();
+    await completeTestPicture(store);
+    await pumpMuseumApp(tester, store, initialRoute: '/museum');
+
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('museum-themes-button')),
+      180,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.byKey(const ValueKey('museum-themes-button')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('طرح موزه'), findsOneWidget);
+    expect(find.byKey(const ValueKey('museum-theme-classic')), findsOneWidget);
+    expect(find.byKey(const ValueKey('museum-theme-royal')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('museum-theme-sky'), skipOffstage: false),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('museum-theme-botanical'), skipOffstage: false),
+      findsOneWidget,
+    );
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is CustomPaint &&
+            widget.painter is MuseumThemeThumbnailPainter,
+      ),
+      findsWidgets,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('museum-theme-royal')));
+    await tester.pumpAndSettle();
+    final royal = await store.readMuseum();
+    expect(royal.theme, 'royal');
+    expect(royal.wall, 'emerald');
+    expect(royal.frame, 'gold');
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is CustomPaint &&
+            widget.painter is MuseumThemeDetailsPainter &&
+            (widget.painter! as MuseumThemeDetailsPainter).theme == 'royal',
+      ),
+      findsOneWidget,
+    );
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpAndSettle();
+    await pumpMuseumApp(tester, store, initialRoute: '/museum');
+    expect((await store.readMuseum()).theme, 'royal');
+    expect((await store.readMuseum()).slots, everyElement(isNull));
+    expect(find.byKey(const ValueKey('museum-sleeping-cat')), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
