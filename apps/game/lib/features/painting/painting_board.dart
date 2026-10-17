@@ -93,7 +93,9 @@ class _PaintingBoardState extends State<PaintingBoard> {
   }
 
   void _move(PointerMoveEvent event) {
-    if (widget.interactionLocked || widget.moveMode || _multiTouch ||
+    if (widget.interactionLocked ||
+        widget.moveMode ||
+        _multiTouch ||
         _pointers.length != 1) {
       return;
     }
@@ -112,8 +114,10 @@ class _PaintingBoardState extends State<PaintingBoard> {
   }
 
   void _up(PointerUpEvent event) {
-    if (!widget.interactionLocked && !widget.moveMode &&
-        !_multiTouch && !_moved) {
+    if (!widget.interactionLocked &&
+        !widget.moveMode &&
+        !_multiTouch &&
+        !_moved) {
       final cell = _cell(event.localPosition);
       if (cell != null) {
         if (widget.toolMode != null) {
