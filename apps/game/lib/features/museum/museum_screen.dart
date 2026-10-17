@@ -558,14 +558,11 @@ class _MuseumScreenState extends State<MuseumScreen> {
                             for (var i = 0; i < 6; i++)
                               Positioned(
                                 left: (4 + (i % 3) * 20) * unit,
-                                top:
-                                    (i ~/ 3 == 0
-                                            ? (layout.theme == 'sky' ? 14 : 13)
-                                            : (layout.theme == 'royal' ? 39 : 38)) *
-                                        unit +
-                                    (layout.arrangement == 'staggered'
-                                        ? (i % 3 == 1 ? 3 : 0) * unit
-                                        : 0),
+                                top: _museumSlotTop(
+                                  layout.theme,
+                                  layout.arrangement,
+                                  i,
+                                ) * unit,
                                 width: 16 * unit,
                                 child: _MuseumSlot(
                                   index: i,
@@ -699,6 +696,13 @@ class _MuseumScreenState extends State<MuseumScreen> {
       );
     },
   );
+}
+
+double _museumSlotTop(String theme, String arrangement, int index) {
+  final row = index ~/ 3 == 0
+      ? (theme == 'sky' ? 14.0 : 13.0)
+      : (theme == 'royal' ? 39.0 : 38.0);
+  return row + (arrangement == 'staggered' && index % 3 == 1 ? 3 : 0);
 }
 
 Widget _museumPickerHeading(BuildContext context, String title) => Padding(
