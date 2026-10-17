@@ -600,7 +600,7 @@ class _MuseumSlot extends StatelessWidget {
                 style: TextStyle(
                   color: const Color(0xff4e3323),
                   fontWeight: FontWeight.bold,
-                  fontSize: math.max(7, unit * 1.25),
+                  fontSize: math.max(7.0, unit * 1.25),
                   height: 1.2,
                 ),
               ),
