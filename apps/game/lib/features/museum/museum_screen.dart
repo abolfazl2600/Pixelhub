@@ -567,10 +567,10 @@ class _MuseumSlot extends StatelessWidget {
             Container(
               width: 16 * unit,
               height: 17.7 * unit,
-              padding: EdgeInsets.all(unit * .85),
+              padding: EdgeInsets.all(unit * .5),
               decoration: BoxDecoration(
                 color: colors.$1,
-                border: Border.all(color: colors.$2, width: unit * .55),
+                border: Border.all(color: colors.$2, width: unit * .3),
                 boxShadow: [
                   BoxShadow(
                     color: colors.$3,
@@ -579,20 +579,34 @@ class _MuseumSlot extends StatelessWidget {
                   ),
                 ],
               ),
+              // Thin stepped highlight and dark inner lip match the denser
+              // 128 × 172 pixel room, without filtering the painting itself.
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  color: const Color(0xffbfa687),
-                  border: Border.all(color: colors.$3, width: unit * .42),
+                  color: colors.$2,
+                  border: Border.all(color: colors.$3, width: unit * .25),
                 ),
-                child: level == null
-                    ? Center(
-                        child: Icon(
-                          Icons.add_rounded,
-                          size: 6 * unit,
-                          color: const Color(0xff745b48),
-                        ),
-                      )
-                    : PixelArtPreview(level: level!),
+                child: Padding(
+                  padding: EdgeInsets.all(unit * .3),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: const Color(0xffbfa687),
+                      border: Border.all(
+                        color: colors.$1,
+                        width: unit * .22,
+                      ),
+                    ),
+                    child: level == null
+                        ? Center(
+                            child: Icon(
+                              Icons.add_rounded,
+                              size: 6 * unit,
+                              color: const Color(0xff745b48),
+                            ),
+                          )
+                        : PixelArtPreview(level: level!),
+                  ),
+                ),
               ),
             ),
             SizedBox(height: unit * .65),
