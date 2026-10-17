@@ -112,12 +112,7 @@ void main() {
       width: 5,
       height: 4,
       palette: [0xff112233, 0xffeecc99],
-      cells: [
-        0, 0, 1, 0, 0,
-        0, 1, 1, 0, 0,
-        0, 0, 1, 0, 1,
-        1, 0, 1, 0, 0,
-      ],
+      cells: [0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0],
     );
     final storage = MemoryPreferences();
     final controller = PaintingController(level, storage);
@@ -130,7 +125,10 @@ void main() {
       hasLength(6),
     );
     expect(controller.previewTool(PrecisionPaintTool.magicWand, 2, 0), isEmpty);
-    expect(controller.previewTool(PrecisionPaintTool.magicWand, -1, 0), isEmpty);
+    expect(
+      controller.previewTool(PrecisionPaintTool.magicWand, -1, 0),
+      isEmpty,
+    );
     expect(session.revision, initialRevision);
     expect(session.completedCount, 0);
 
@@ -141,18 +139,10 @@ void main() {
       controller.previewTool(PrecisionPaintTool.colorSplash, 0, 0),
       unorderedEquals([1, 5]),
     );
-    final splash = controller.previewTool(
-      PrecisionPaintTool.colorSplash,
-      0,
-      0,
-    );
+    final splash = controller.previewTool(PrecisionPaintTool.colorSplash, 0, 0);
     expect(controller.applyToolTargets(splash), 2);
     expect(session.completedCount, 3);
-    final wand = controller.previewTool(
-      PrecisionPaintTool.magicWand,
-      0,
-      0,
-    );
+    final wand = controller.previewTool(PrecisionPaintTool.magicWand, 0, 0);
     expect(wand, unorderedEquals([10, 11, 16]));
     expect(controller.applyToolTargets(wand), 3);
     expect(controller.previewTool(PrecisionPaintTool.magicWand, 0, 0), isEmpty);
