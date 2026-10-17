@@ -456,92 +456,89 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     ),
   );
 
-  Widget _route({
-    String? id,
-    String? museumArtworkId,
-    String page = 'home',
-  }) => ListenableBuilder(
-    listenable: _routeChanges,
-    builder: (context, _) {
-      // Privacy is reachable even when the picture catalog fails to load.
-      if (page == 'privacy') return const PrivacyScreen();
-      if (_bootstrap.status == BootstrapStatus.loading) {
-        return const _SplashScreen();
-      }
-      if (_bootstrap.status == BootstrapStatus.error) {
-        return _LoadError(onRetry: _bootstrap.load);
-      }
-      if (page == 'gallery' || page == 'my-gallery') {
-        return GalleryScreen(
-          library: _library,
-          online: _online,
-          personal: page == 'my-gallery',
-        );
-      }
-      if (page == 'museum') {
-        return MuseumScreen(
-          museum: _museum,
-          library: _library,
-          animationFor: _animationFor,
-          addArtworkId: museumArtworkId,
-        );
-      }
-      if (page == 'profile') {
-        return ProfileScreen(
-          library: _library,
-          diagnostics: _diagnostics,
-          onLanguageToggle: _toggleLanguage,
-        );
-      }
-      if (page == 'settings') {
-        return SettingsScreen(
-          library: _library,
-          sounds: _sounds,
-          onClear: _clearLocalData,
-        );
-      }
-      if (page == 'import' || (id?.startsWith('private-') ?? false)) {
-        if (_library.status == LibraryStatus.loading) {
-          return const _SplashScreen();
-        }
-        if (_library.status == LibraryStatus.error) {
-          return _LoadError(
-            onRetry: _library.load,
-            message: context.strings.libraryLoadError,
+  Widget _route({String? id, String? museumArtworkId, String page = 'home'}) =>
+      ListenableBuilder(
+        listenable: _routeChanges,
+        builder: (context, _) {
+          // Privacy is reachable even when the picture catalog fails to load.
+          if (page == 'privacy') return const PrivacyScreen();
+          if (_bootstrap.status == BootstrapStatus.loading) {
+            return const _SplashScreen();
+          }
+          if (_bootstrap.status == BootstrapStatus.error) {
+            return _LoadError(onRetry: _bootstrap.load);
+          }
+          if (page == 'gallery' || page == 'my-gallery') {
+            return GalleryScreen(
+              library: _library,
+              online: _online,
+              personal: page == 'my-gallery',
+            );
+          }
+          if (page == 'museum') {
+            return MuseumScreen(
+              museum: _museum,
+              library: _library,
+              animationFor: _animationFor,
+              addArtworkId: museumArtworkId,
+            );
+          }
+          if (page == 'profile') {
+            return ProfileScreen(
+              library: _library,
+              diagnostics: _diagnostics,
+              onLanguageToggle: _toggleLanguage,
+            );
+          }
+          if (page == 'settings') {
+            return SettingsScreen(
+              library: _library,
+              sounds: _sounds,
+              onClear: _clearLocalData,
+            );
+          }
+          if (page == 'import' || (id?.startsWith('private-') ?? false)) {
+            if (_library.status == LibraryStatus.loading) {
+              return const _SplashScreen();
+            }
+            if (_library.status == LibraryStatus.error) {
+              return _LoadError(
+                onRetry: _library.load,
+                message: context.strings.libraryLoadError,
+              );
+            }
+          }
+          if (page == 'import') {
+            return ImportScreen(library: _library);
+          }
+          if (id == null) {
+            return HomeScreen(levels: _bootstrap.levels, library: _library);
+          }
+          final matches = _library.levels.where((level) => level.id == id);
+          if (matches.isEmpty) {
+            return _notFound(context);
+          }
+          if (page == 'artwork' ||
+              (page == 'painting' && !_library.canPaint(matches.first))) {
+            return ArtworkScreen(
+              level: matches.first,
+              library: _library,
+              animation: _animationFor(matches.first),
+              renderStyle: _renderStyle,
+              onDelete: _deleteArtwork,
+            );
+          }
+          return PaintingPreviewScreen(
+            controller: _controller(matches.first),
+            library: _library,
+            animation: _animationFor(matches.first),
+            diagnostics: _diagnostics,
+            renderStyle: _renderStyle,
+            onRenderStyleChanged: (style) => unawaited(_setArtworkStyle(style)),
+            onOpened: () => unawaited(_library.markOpened(matches.first)),
           );
-        }
-      }
-      if (page == 'import') {
-        return ImportScreen(library: _library);
-      }
-      if (id == null) {
-        return HomeScreen(levels: _bootstrap.levels, library: _library);
-      }
-      final matches = _library.levels.where((level) => level.id == id);
-      if (matches.isEmpty) {
-        return _notFound(context);
-      }
-      if (page == 'artwork' ||
-          (page == 'painting' && !_library.canPaint(matches.first))) {
-        return ArtworkScreen(
-          level: matches.first,
-          library: _library,
-          animation: _animationFor(matches.first),
-          renderStyle: _renderStyle,
-          onDelete: _deleteArtwork,
-        );
-      }
-      return PaintingPreviewScreen(
-        controller: _controller(matches.first),
-        library: _library,
-        animation: _animationFor(matches.first),
-        diagnostics: _diagnostics,
-        renderStyle: _renderStyle,
-        onRenderStyleChanged: (style) => unawaited(_setArtworkStyle(style)),
-        onOpened: () => unawaited(_library.markOpened(matches.first)),
+        },
       );
-    },
-  );
 
   @override
   Widget build(BuildContext context) => MaterialApp.router(
