@@ -465,6 +465,12 @@ class _MuseumScreenState extends State<MuseumScreen> {
       final shown = museum.visibleSlots;
       final count = shown.whereType<String>().length;
       final layout = museum.layout;
+      final themeName = switch (layout.theme) {
+        'royal' => s.museumThemeRoyal,
+        'sky' => s.museumThemeSky,
+        'botanical' => s.museumThemeBotanical,
+        _ => s.museumThemeClassic,
+      };
       final pending = _completedArtwork(_pendingArtId);
       return Scaffold(
         appBar: AppBar(
@@ -596,14 +602,7 @@ class _MuseumScreenState extends State<MuseumScreen> {
                     key: const ValueKey('museum-themes-button'),
                     onPressed: museum.busy ? null : _chooseTheme,
                     icon: const Icon(Icons.auto_awesome_mosaic_rounded),
-                    label: Text(
-                      '${s.museumThemes}: ${switch (layout.theme) {
-                        'royal' => s.museumThemeRoyal,
-                        'sky' => s.museumThemeSky,
-                        'botanical' => s.museumThemeBotanical,
-                        _ => s.museumThemeClassic,
-                      }}',
-                    ),
+                    label: Text('${s.museumThemes}: $themeName'),
                   ),
                   const SizedBox(height: 10),
                   Row(
