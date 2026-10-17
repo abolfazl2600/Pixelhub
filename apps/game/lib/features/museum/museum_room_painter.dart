@@ -1,140 +1,208 @@
 import 'package:flutter/material.dart';
 
-/// Lightweight, fully procedural pixel room: no network images, textures,
-/// raster uploads, filters or continuously animated background.
+/// A crisp 128 × 172 pixel-art room (2 × the original detail density).
+///
+/// Slot placement still uses the original 64 × 86 coordinates in MuseumScreen,
+/// so existing layouts, frames and saved arrangements do not need migration.
+/// The scenery is static. The sleeping cat and its tail are separate layers.
 class MuseumRoomPainter extends CustomPainter {
   const MuseumRoomPainter(this.wall);
+
+  static const int pixelWidth = 128;
+  static const int pixelHeight = 172;
+
   final String wall;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final cell = size.width / 64;
-    final yCell = size.height / 86;
-    final p = Paint()..isAntiAlias = false;
+    final dx = size.width / pixelWidth;
+    final dy = size.height / pixelHeight;
+    final brush = Paint()..isAntiAlias = false;
 
-    void rect(num x, num y, num w, num h, Color color) {
-      p.color = color;
+    // Deliberately draw every detail on an integer pixel grid.
+    void pixel(int x, int y, int width, int height, Color color) {
+      brush.color = color;
       canvas.drawRect(
-        Rect.fromLTWH(
-          (x * cell).toDouble(),
-          (y * yCell).toDouble(),
-          (w * cell).toDouble(),
-          (h * yCell).toDouble(),
-        ),
-        p,
+        Rect.fromLTWH(x * dx, y * dy, width * dx, height * dy),
+        brush,
       );
     }
 
-    final base = switch (wall) {
+    final plaster = switch (wall) {
       'blue' => const Color(0xffcbdce6),
       'sage' => const Color(0xffc8d3b9),
       _ => const Color(0xfff1dfc8),
     };
-    final shadow = switch (wall) {
+    final plasterShade = switch (wall) {
       'blue' => const Color(0xffb8cbd8),
       'sage' => const Color(0xffb5c4a4),
       _ => const Color(0xffe8d1b3),
     };
-    final highlight = switch (wall) {
+    final plasterLight = switch (wall) {
       'blue' => const Color(0xffe2ebee),
       'sage' => const Color(0xffdee2cd),
       _ => const Color(0xffffedda),
     };
-    const darkWood = Color(0xff65422f);
-    const wood = Color(0xff976039);
-    const edge = Color(0xff51372c);
-    const gold = Color(0xffdb9e53);
+    const outline = Color(0xff49352c);
+    const walnut = Color(0xff69462e);
+    const mahogany = Color(0xff925634);
+    const timber = Color(0xffad764b);
+    const honey = Color(0xffdfaa60);
+    const cream = Color(0xffffe5b9);
+    const gold = Color(0xfff2ca7d);
 
-    // Pixel wall, stepped wall corners and sparse dithered masonry.
-    rect(0, 0, 64, 70, base);
-    for (var row = 2; row < 68; row += 6) {
-      for (var col = (row.isEven ? 3 : 8); col < 62; col += 11) {
-        rect(col, row, 2, 1, row % 3 == 0 ? shadow : highlight);
+    // Masonry texture uses the new 1–3-pixel details, not larger
+    // rectangles simply scaled up from the previous low-resolution room.
+    pixel(0, 0, pixelWidth, 143, plaster);
+    for (var row = 17; row < 137; row += 12) {
+      final shift = (row ~/ 12).isEven ? 3 : 11;
+      for (var x = shift; x < 125; x += 21) {
+        pixel(x, row, 8, 1, plasterLight);
+        pixel(x + 8, row + 1, 4, 1, plasterShade);
+        pixel(x + 17, row + 6, 1, 4, plasterShade);
+        pixel(x + 1, row + 5, 2, 1, plasterLight);
       }
     }
-    rect(0, 0, 64, 3, edge);
-    rect(0, 3, 64, 2, darkWood);
-    rect(0, 5, 64, 1, gold);
-    rect(0, 6, 64, 1, shadow);
-    rect(0, 0, 2, 70, wood);
-    rect(2, 0, 1, 70, gold);
-    rect(61, 0, 1, 70, gold);
-    rect(62, 0, 2, 70, wood);
+    // Raised corner pillars, stepped moldings and an inset ceiling cornice.
+    pixel(0, 0, 128, 7, outline);
+    pixel(0, 7, 128, 4, walnut);
+    pixel(0, 11, 128, 2, honey);
+    pixel(0, 13, 128, 2, mahogany);
+    pixel(0, 15, 128, 1, plasterShade);
+    pixel(0, 0, 5, 144, mahogany);
+    pixel(5, 16, 2, 127, honey);
+    pixel(7, 16, 1, 127, walnut);
+    pixel(120, 16, 1, 127, walnut);
+    pixel(121, 16, 2, 127, honey);
+    pixel(123, 0, 5, 144, mahogany);
+    for (final x in [1, 124]) {
+      for (var y = 20; y < 137; y += 15) {
+        pixel(x, y, 2, 2, timber);
+      }
+    }
 
-    // Hard-edged spotlights, drawn behind the framed artwork.
-    for (final x in [10, 32, 54]) {
-      rect(x - 2, 6, 4, 1, darkWood);
-      rect(x - 1, 7, 2, 1, gold);
-      for (var band = 0; band < 11; band++) {
-        final halfWidth = 2 + band ~/ 2;
-        final alpha = 19 - band;
-        p.color = const Color(0xfffff5d6).withValues(alpha: alpha / 100);
-        canvas.drawRect(
-          Rect.fromLTWH(
-            ((x - halfWidth) * cell).toDouble(),
-            ((8 + band * 4) * yCell).toDouble(),
-            (halfWidth * 2 * cell).toDouble(),
-            (4 * yCell).toDouble(),
-          ),
-          p,
+    // Three faceted, stepped spotlight cones. Each band is a solid color,
+    // so no blurred gradients or antialiased rays soften the pixel style.
+    for (final cx in [20, 64, 108]) {
+      pixel(cx - 5, 16, 10, 2, outline);
+      pixel(cx - 4, 18, 8, 2, walnut);
+      pixel(cx - 3, 20, 6, 2, honey);
+      pixel(cx - 1, 22, 2, 2, cream);
+      for (var band = 0; band < 10; band++) {
+        final half = 3 + band;
+        final yy = 24 + band * 4;
+        pixel(
+          cx - half,
+          yy,
+          half * 2,
+          4,
+          band.isEven ? plasterLight : plaster,
         );
       }
+      pixel(cx - 1, 23, 2, 2, gold);
     }
 
-    // Baseboard and timber floor are intentionally crisp rectangles.
-    rect(0, 68, 64, 2, wood);
-    rect(0, 70, 64, 1, edge);
-    rect(0, 71, 64, 15, const Color(0xffbc865b));
-    for (var i = 0; i < 5; i++) {
-      rect(0, 71 + i * 3, 64, 1, const Color(0xffa57450));
-    }
-    for (var i = 0; i < 10; i++) {
-      rect((i * 13) % 64, 72 + (i % 5) * 3, 1, 2, wood);
-    }
-
-    // Persian-inspired stepped pixel rug.
-    rect(10, 77, 44, 8, edge);
-    rect(12, 78, 40, 6, const Color(0xffa74d47));
-    rect(14, 79, 36, 4, const Color(0xffd28a64));
-    rect(16, 80, 32, 2, const Color(0xff673e64));
-    for (var x = 18; x < 48; x += 6) {
-      rect(x, 80, 2, 2, const Color(0xffeac795));
+    // Three narrow decorative wall panels, mostly concealed by the art.
+    for (final x in [9, 49, 89]) {
+      pixel(x, 27, 30, 1, plasterShade);
+      pixel(x, 28, 1, 91, plasterShade);
+      pixel(x + 29, 28, 1, 91, plasterShade);
+      pixel(x + 1, 118, 28, 1, plasterLight);
+      for (var y = 32; y <= 112; y += 10) {
+        pixel(x + 2, y, 2, 1, plasterLight);
+        pixel(x + 26, y + 4, 1, 2, plasterShade);
+      }
     }
 
-    // Pixel wooden bench, below frames so it does not hide the artwork.
-    rect(23, 71, 18, 2, edge);
-    rect(22, 72, 20, 2, darkWood);
-    rect(23, 70, 18, 2, const Color(0xffaf5263));
-    rect(24, 69, 16, 1, const Color(0xffd78280));
-    for (var x = 26; x <= 38; x += 4) {
-      rect(x, 71, 1, 1, const Color(0xffe3a283));
+    // Fine carved wooden skirting and horizontal shadows.
+    pixel(0, 138, 128, 2, outline);
+    pixel(0, 140, 128, 3, walnut);
+    pixel(0, 143, 128, 2, honey);
+    pixel(0, 145, 128, 2, mahogany);
+    pixel(0, 147, 128, 25, const Color(0xffc18b5d));
+    for (var y = 148; y < 172; y += 6) {
+      pixel(0, y, 128, 1, timber);
+      pixel(0, y + 1, 128, 1, const Color(0xffd5a276));
     }
-    rect(25, 74, 2, 5, edge);
-    rect(37, 74, 2, 5, edge);
-    rect(24, 78, 4, 1, darkWood);
-    rect(36, 78, 4, 1, darkWood);
+    for (var row = 0; row < 4; row++) {
+      final y = 149 + row * 6;
+      for (var x = ((row % 2) * 13); x < 128; x += 26) {
+        pixel(x, y + 2, 1, 4, walnut);
+        pixel(x + 5, y + 3, 7, 1, timber);
+        pixel(x + 16, y + 4, 2, 1, mahogany);
+        pixel(x + 1, y + 1, 1, 1, gold);
+      }
+    }
 
-    // Small sleeping pixel cat on the bench, matching the cozy mockup.
-    rect(30, 68, 7, 2, const Color(0xffe8d1ad));
-    rect(29, 69, 9, 1, const Color(0xfff7e4c6));
-    rect(35, 66, 3, 4, const Color(0xffefcfac));
-    rect(35, 65, 1, 2, const Color(0xffcc8859));
-    rect(37, 65, 1, 2, const Color(0xffcc8859));
-    rect(31, 67, 3, 1, const Color(0xffc98859));
-    rect(36, 68, 1, 1, const Color(0xff4f3834));
-    rect(38, 69, 2, 1, const Color(0xffbc785a));
+    // Layered traditional Persian carpet: stepped geometry + fine border.
+    const rugDark = Color(0xff573950);
+    const rugRed = Color(0xffb35557);
+    const rugOrange = Color(0xffdb8e63);
+    pixel(18, 157, 92, 13, outline);
+    pixel(20, 158, 88, 11, rugDark);
+    pixel(22, 159, 84, 9, rugRed);
+    pixel(25, 160, 78, 7, rugOrange);
+    pixel(28, 161, 72, 5, rugDark);
+    pixel(30, 162, 68, 3, const Color(0xffd69e78));
+    for (var x = 32; x < 98; x += 8) {
+      pixel(x, 160, 3, 1, cream);
+      pixel(x + 3, 166, 2, 1, gold);
+      pixel(x + 2, 162, 2, 2, rugRed);
+    }
+    for (final x in [42, 64, 86]) {
+      pixel(x, 161, 2, 5, gold);
+      pixel(x - 3, 163, 8, 1, gold);
+    }
+    for (var x = 22; x < 108; x += 6) {
+      pixel(x, 170, 2, 1, cream);
+    }
 
-    // Simple potted pixel plants at the edges of the room.
-    for (final x in [5, 58]) {
-      rect(x - 3, 72, 6, 5, const Color(0xff477d92));
-      rect(x - 2, 76, 4, 1, const Color(0xff2e5267));
-      rect(x - 3, 72, 6, 1, const Color(0xffa8dee0));
-      rect(x, 61, 1, 12, const Color(0xff406b4b));
-      rect(x - 4, 63, 5, 2, const Color(0xff5d965d));
-      rect(x + 1, 65, 4, 2, const Color(0xff3a7652));
-      rect(x - 3, 59, 4, 3, const Color(0xff6daa69));
-      rect(x + 1, 58, 3, 4, const Color(0xff477f52));
-      rect(x - 1, 55, 3, 5, const Color(0xff538a50));
+    // Detailed wood bench with upholstered seat, edging and curved feet.
+    // Its dimensions deliberately leave room above for a readable pixel cat.
+    pixel(42, 143, 48, 3, outline);
+    pixel(43, 140, 46, 4, walnut);
+    pixel(45, 137, 42, 5, const Color(0xffb85f69));
+    pixel(47, 136, 38, 2, const Color(0xffe3948c));
+    pixel(46, 141, 40, 1, const Color(0xffda8180));
+    for (var x = 51; x <= 79; x += 7) {
+      pixel(x, 139, 2, 2, gold);
+    }
+    pixel(44, 145, 45, 3, mahogany);
+    pixel(48, 148, 5, 12, walnut);
+    pixel(78, 148, 5, 12, walnut);
+    pixel(46, 158, 8, 2, outline);
+    pixel(77, 158, 8, 2, outline);
+    pixel(50, 151, 30, 2, honey);
+    pixel(50, 153, 30, 1, walnut);
+    pixel(52, 149, 2, 1, honey);
+    pixel(77, 149, 2, 1, honey);
+
+    // Variegated leafy plants; each pot has stepped rims and small glints.
+    for (final cx in [12, 116]) {
+      const stem = Color(0xff356b50);
+      const leaf = Color(0xff538e61);
+      const leafLight = Color(0xff83b876);
+      const leafShade = Color(0xff2e694b);
+      const pot = Color(0xff3c7690);
+      pixel(cx - 7, 143, 14, 12, pot);
+      pixel(cx - 6, 154, 12, 2, const Color(0xff264b61));
+      pixel(cx - 8, 141, 16, 3, const Color(0xff8ac6cc));
+      pixel(cx - 7, 144, 2, 9, const Color(0xff68aeb7));
+      pixel(cx + 4, 145, 2, 7, const Color(0xff315d74));
+      pixel(cx - 5, 140, 10, 1, const Color(0xff584535));
+      pixel(cx - 1, 118, 2, 24, stem);
+      pixel(cx - 2, 122, 2, 3, leafLight);
+      pixel(cx - 8, 127, 8, 3, leaf);
+      pixel(cx - 11, 124, 7, 4, leafLight);
+      pixel(cx - 7, 122, 4, 2, leafShade);
+      pixel(cx + 1, 130, 10, 4, leaf);
+      pixel(cx + 7, 127, 6, 3, leafLight);
+      pixel(cx + 5, 133, 4, 3, leafShade);
+      pixel(cx - 5, 117, 7, 3, leaf);
+      pixel(cx - 7, 113, 6, 4, leafLight);
+      pixel(cx + 1, 114, 6, 5, leafShade);
+      pixel(cx - 1, 109, 4, 7, leaf);
+      pixel(cx, 111, 2, 3, leafLight);
     }
   }
 
