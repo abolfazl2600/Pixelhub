@@ -86,7 +86,8 @@ final class LocalPreferences
         OnlineLevelStorage,
         OnlineAnimationStorage,
         ArtworkStylePreferences,
-        SoundEffectsPreferences {
+        SoundEffectsPreferences,
+        MuseumRepository {
   LocalPreferences({SharedPreferencesAsync? preferences})
     : _preferences = preferences ?? SharedPreferencesAsync();
   final SharedPreferencesAsync _preferences;
@@ -429,6 +430,22 @@ final class LocalPreferences
       _enqueue(() => _preferences.remove(_key(level.id, level.contentVersion)));
 
   @override
+  static const _museumKey = 'pixelhub.museum.v1';
+
+  @override
+  Future<MuseumLayout> readMuseum() async {
+    await _writes;
+    final value = await _preferences.getString(_museumKey);
+    if (value == null) return MuseumLayout();
+    return MuseumLayout.fromJson(jsonDecode(value) as Map<String, Object?>);
+  }
+
+  @override
+  Future<void> writeMuseum(MuseumLayout layout) => _enqueue(
+    () => _preferences.setString(_museumKey, jsonEncode(layout.toJson())),
+  );
+
+  @override
   Future<void> clearPixelhubData() => _enqueue(() async {
     // Do not clear unrelated plugin/application preferences on the same origin.
     final keys = await _preferences.getKeys();
@@ -460,6 +477,7 @@ final class MemoryPreferences
   final Map<String, LevelDefinition> _downloads = {};
   final Map<String, String> _downloadCategories = {};
   final Map<String, PixelAnimation> _downloadAnimations = {};
+  MuseumLayout museum = MuseumLayout();
 
   @override
   Future<Map<String, PixelAnimation>> readDownloadedAnimations(
@@ -621,6 +639,17 @@ final class MemoryPreferences
   }
 
   @override
+  @override
+  Future<MuseumLayout> readMuseum() async => MuseumLayout.fromJson(
+    museum.toJson(),
+  );
+
+  @override
+  Future<void> writeMuseum(MuseumLayout layout) async {
+    museum = MuseumLayout.fromJson(layout.toJson());
+  }
+
+  @override
   Future<void> clearPixelhubData() async {
     _records.clear();
     _outboxes.clear();
@@ -632,5 +661,6 @@ final class MemoryPreferences
     artworkStyle = null;
     soundEffectsEnabled = null;
     recentArtworkId = null;
+    museum = MuseumLayout();
   }
 }
