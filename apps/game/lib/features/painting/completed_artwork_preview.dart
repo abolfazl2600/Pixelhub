@@ -121,11 +121,7 @@ class _CompletedArtworkPreviewState extends State<CompletedArtworkPreview> {
               ),
               ChoiceChip(
                 key: const ValueKey('animated-artwork'),
-                label: Text(
-                  persian
-                      ? 'تصویر متحرک (${context.digits(animation.frameCount)} فریم)'
-                      : 'Animated (${context.digits(animation.frameCount)} frames)',
-                ),
+                label: Text(persian ? 'تصویر متحرک' : 'Animated'),
                 avatar: const Icon(Icons.play_circle_outline, size: 20),
                 selected: _animated,
                 onSelected: (_) => _switchMode(true),
