@@ -85,13 +85,11 @@ class MuseumComposedScenePainter extends CustomPainter {
     );
     PixelCatTailPainter(tailFrame).paint(
       canvas,
-      const Size(PixelSleepingCat.pixelWidth.toDouble(),
-          PixelSleepingCat.pixelHeight.toDouble()),
+      const Size(192, 112),
     );
     const PixelCatBodyPainter().paint(
       canvas,
-      const Size(PixelSleepingCat.pixelWidth.toDouble(),
-          PixelSleepingCat.pixelHeight.toDouble()),
+      const Size(192, 112),
     );
     canvas.restore();
   }
