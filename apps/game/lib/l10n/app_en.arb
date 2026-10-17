@@ -316,5 +316,12 @@
   "museumInThisFrame": "Hanging in this frame",
   "museumOnWallSlot": "On the wall · Frame {slot} — tap to move",
   "@museumOnWallSlot": {"placeholders":{"slot":{"type":"String"}}},
-  "museumReadyToHang": "Not on the wall yet"
+  "museumReadyToHang": "Not on the wall yet",
+  "museumThemes": "Museum designs",
+  "museumThemesHelp": "Four pixel-art museum rooms. Your displayed paintings stay in place.",
+  "museumThemeClassic": "Cozy classic",
+  "museumThemeRoyal": "Royal emerald",
+  "museumThemeSky": "Soft sky",
+  "museumThemeBotanical": "Botanical garden",
+  "museumWallEmerald": "Deep emerald"
 }
