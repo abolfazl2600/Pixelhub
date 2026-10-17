@@ -140,6 +140,12 @@ class HomeScreen extends StatelessWidget {
                     label: Text(s.myGallery),
                   ),
                   OutlinedButton.icon(
+                    key: const ValueKey('open-museum'),
+                    onPressed: () => context.push('/museum'),
+                    icon: const Icon(Icons.museum_outlined),
+                    label: Text(s.museumTitle),
+                  ),
+                  OutlinedButton.icon(
                     onPressed: () => context.push('/import'),
                     icon: const Icon(Icons.add_photo_alternate_outlined),
                     label: Text(s.importPhoto),
