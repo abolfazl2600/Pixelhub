@@ -100,7 +100,9 @@ class _BadgesScreenState extends State<BadgesScreen> {
                                     persian
                                         ? 'مجموعه نشان‌های من'
                                         : 'My badge collection',
-                                    style: Theme.of(context).textTheme.titleLarge,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleLarge,
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
@@ -110,7 +112,9 @@ class _BadgesScreenState extends State<BadgesScreen> {
                                   ),
                                   const SizedBox(height: 12),
                                   LinearProgressIndicator(
-                                    value: badges.earnedCount / badges.badges.length,
+                                    value:
+                                        badges.earnedCount /
+                                        badges.badges.length,
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
@@ -129,102 +133,108 @@ class _BadgesScreenState extends State<BadgesScreen> {
                           horizontal: PixelTokens.space,
                         ),
                         sliver: SliverGrid(
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: columns,
-                            childAspectRatio: .76,
-                            mainAxisSpacing: 12,
-                            crossAxisSpacing: 12,
-                          ),
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) {
-                              final badge = badges.badges[index];
-                              final earned = badges.isEarned(badge);
-                              final bytes = earned ? badges.imageFor(badge) : null;
-                              return Card(
-                                key: ValueKey('badge-${badge.id}'),
-                                color: earned
-                                    ? null
-                                    : Theme.of(context)
-                                          .colorScheme
-                                          .surfaceContainerHighest,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        width: 76,
-                                        height: 76,
-                                        alignment: Alignment.center,
-                                        decoration: BoxDecoration(
-                                          color: earned
-                                              ? PixelTokens.lemon
-                                              : Colors.black12,
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                        child: bytes != null
-                                            ? Image.memory(
-                                                bytes,
-                                                width: 64,
-                                                height: 64,
-                                                filterQuality: FilterQuality.none,
-                                                gaplessPlayback: true,
-                                              )
-                                            : Icon(
-                                                earned
-                                                    ? Icons.workspace_premium_outlined
-                                                    : Icons.help_outline_rounded,
-                                                color: earned
-                                                    ? PixelTokens.green
-                                                    : Colors.grey.shade600,
-                                                size: 46,
-                                              ),
-                                      ),
-                                      const SizedBox(height: 12),
-                                      Text(
-                                        earned
-                                            ? badge.titleFor(persian)
-                                            : (persian
-                                                  ? 'نشان ناشناخته'
-                                                  : 'Mystery badge'),
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w800,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      const SizedBox(height: 6),
-                                      Flexible(
-                                        child: Text(
-                                          earned
-                                              ? badge.descriptionFor(persian)
-                                              : (persian
-                                                    ? 'هنوز کشف نشده'
-                                                    : 'Not discovered yet'),
-                                          textAlign: TextAlign.center,
-                                          maxLines: 3,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: Theme.of(context).textTheme.bodySmall,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 6),
-                                      Icon(
-                                        earned
-                                            ? Icons.verified_rounded
-                                            : Icons.lock_outline_rounded,
-                                        size: 20,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: columns,
+                                childAspectRatio: .76,
+                                mainAxisSpacing: 12,
+                                crossAxisSpacing: 12,
+                              ),
+                          delegate: SliverChildBuilderDelegate((
+                            context,
+                            index,
+                          ) {
+                            final badge = badges.badges[index];
+                            final earned = badges.isEarned(badge);
+                            final bytes = earned
+                                ? badges.imageFor(badge)
+                                : null;
+                            return Card(
+                              key: ValueKey('badge-${badge.id}'),
+                              color: earned
+                                  ? null
+                                  : Theme.of(
+                                      context,
+                                    ).colorScheme.surfaceContainerHighest,
+                              child: Padding(
+                                padding: const EdgeInsets.all(10),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      width: 76,
+                                      height: 76,
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
                                         color: earned
-                                            ? PixelTokens.green
-                                            : Colors.grey,
+                                            ? PixelTokens.lemon
+                                            : Colors.black12,
+                                        borderRadius: BorderRadius.circular(12),
                                       ),
-                                    ],
-                                  ),
+                                      child: bytes != null
+                                          ? Image.memory(
+                                              bytes,
+                                              width: 64,
+                                              height: 64,
+                                              filterQuality: FilterQuality.none,
+                                              gaplessPlayback: true,
+                                            )
+                                          : Icon(
+                                              earned
+                                                  ? Icons
+                                                        .workspace_premium_outlined
+                                                  : Icons.help_outline_rounded,
+                                              color: earned
+                                                  ? PixelTokens.green
+                                                  : Colors.grey.shade600,
+                                              size: 46,
+                                            ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      earned
+                                          ? badge.titleFor(persian)
+                                          : (persian
+                                                ? 'نشان ناشناخته'
+                                                : 'Mystery badge'),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Flexible(
+                                      child: Text(
+                                        earned
+                                            ? badge.descriptionFor(persian)
+                                            : (persian
+                                                  ? 'هنوز کشف نشده'
+                                                  : 'Not discovered yet'),
+                                        textAlign: TextAlign.center,
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.bodySmall,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Icon(
+                                      earned
+                                          ? Icons.verified_rounded
+                                          : Icons.lock_outline_rounded,
+                                      size: 20,
+                                      color: earned
+                                          ? PixelTokens.green
+                                          : Colors.grey,
+                                    ),
+                                  ],
                                 ),
-                              );
-                            },
-                            childCount: badges.badges.length,
-                          ),
+                              ),
+                            );
+                          }, childCount: badges.badges.length),
                         ),
                       ),
                       const SliverToBoxAdapter(child: SizedBox(height: 24)),

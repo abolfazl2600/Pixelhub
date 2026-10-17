@@ -119,7 +119,9 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     );
     _badges = BadgeController(
       _library,
-      preferences is BadgeStorage ? preferences as BadgeStorage : MemoryPreferences(),
+      preferences is BadgeStorage
+          ? preferences as BadgeStorage
+          : MemoryPreferences(),
     );
     unawaited(_badges.initialize());
     _online = OnlineCatalogController(

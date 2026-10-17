@@ -9,7 +9,8 @@ import 'package:persistence/persistence.dart';
 
 import '../gallery/library_controller.dart';
 
-const badgeContentRoot = 'https://abolfazl2600.github.io/Pixelhub/online/badges/';
+const badgeContentRoot =
+    'https://abolfazl2600.github.io/Pixelhub/online/badges/';
 
 /// A mission definition is delivered separately from the installed game.
 /// Stable IDs let awards survive new releases and temporary disconnections.
@@ -114,9 +115,10 @@ List<BadgeDefinition> parseBadgeCatalog(String source) {
     throw const FormatException('Invalid achievement catalog size');
   }
   final result = badges
-      .map((value) => BadgeDefinition.fromJson(
-            Map<String, dynamic>.from(value as Map),
-          ))
+      .map(
+        (value) =>
+            BadgeDefinition.fromJson(Map<String, dynamic>.from(value as Map)),
+      )
       .toList(growable: false);
   if (result.map((badge) => badge.id).toSet().length != result.length) {
     throw const FormatException('Duplicate achievement ID');
@@ -132,9 +134,9 @@ class BadgeController extends ChangeNotifier {
     this.storage, {
     Uri? baseUrl,
     http.Client? client,
-  })  : _baseUrl = baseUrl ?? Uri.parse(badgeContentRoot),
-        _client = client ?? http.Client(),
-        _ownsClient = client == null {
+  }) : _baseUrl = baseUrl ?? Uri.parse(badgeContentRoot),
+       _client = client ?? http.Client(),
+       _ownsClient = client == null {
     library.addListener(_onLibraryChanged);
   }
 

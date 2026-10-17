@@ -117,9 +117,8 @@ final class LocalPreferences
   }
 
   @override
-  Future<void> writeBadgeCatalog(String catalog) => _enqueue(
-    () => _preferences.setString(_badgeCatalogKey, catalog),
-  );
+  Future<void> writeBadgeCatalog(String catalog) =>
+      _enqueue(() => _preferences.setString(_badgeCatalogKey, catalog));
 
   @override
   Future<Set<String>> readEarnedBadges() async {
@@ -133,7 +132,10 @@ final class LocalPreferences
 
   @override
   Future<void> writeEarnedBadges(Set<String> ids) => _enqueue(
-    () => _preferences.setString(_badgeEarnedKey, jsonEncode(ids.toList()..sort())),
+    () => _preferences.setString(
+      _badgeEarnedKey,
+      jsonEncode(ids.toList()..sort()),
+    ),
   );
 
   @override

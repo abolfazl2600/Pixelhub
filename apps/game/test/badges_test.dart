@@ -65,74 +65,88 @@ const catalog = '''
 ''';
 
 void main() {
-  test('online badges unlock after one and five distinct completed animals',
-      () async {
-    final store = MemoryPreferences();
-    final library = LibraryController(store, store);
-    final levels = List.generate(5, animal);
-    library.setCatalog(levels, {});
-    library.setOnlineCategories({for (final item in levels) item.id: 'animals'});
+  test(
+    'online badges unlock after one and five distinct completed animals',
+    () async {
+      final store = MemoryPreferences();
+      final library = LibraryController(store, store);
+      final levels = List.generate(5, animal);
+      library.setCatalog(levels, {});
+      library.setOnlineCategories({
+        for (final item in levels) item.id: 'animals',
+      });
 
-    final client = MockClient((request) async {
-      if (request.url.path.endsWith('/catalog.json')) {
-        return http.Response(catalog, 200);
+      final client = MockClient((request) async {
+        if (request.url.path.endsWith('/catalog.json')) {
+          return http.Response(catalog, 200);
+        }
+        return http.Response('missing icon', 404);
+      });
+      final badges = BadgeController(
+        library,
+        store,
+        baseUrl: Uri.parse('https://example.test/badges/'),
+        client: client,
+      );
+      addTearDown(() {
+        badges.dispose();
+        library.dispose();
+        client.close();
+      });
+      await badges.initialize();
+      await badges.refresh();
+      // Remote refresh starts during initialize, so wait for its completion.
+      while (badges.refreshing) {
+        await Future<void>.delayed(const Duration(milliseconds: 1));
       }
-      return http.Response('missing icon', 404);
-    });
-    final badges = BadgeController(
-      library,
-      store,
-      baseUrl: Uri.parse('https://example.test/badges/'),
-      client: client,
-    );
-    addTearDown(() {
-      badges.dispose();
-      library.dispose();
-      client.close();
-    });
-    await badges.initialize();
-    await badges.refresh();
-    // Remote refresh starts during initialize, so wait for its completion.
-    while (badges.refreshing) {
-      await Future<void>.delayed(const Duration(milliseconds: 1));
-    }
-    expect(badges.badges.length, 2);
-    expect(badges.earnedCount, 0);
+      expect(badges.badges.length, 2);
+      expect(badges.earnedCount, 0);
 
-    library.updateProgress(finished(levels.first));
-    await badges.settle();
-    expect(badges.isEarned(badges.badges.first), isTrue);
-    expect(badges.isEarned(badges.badges.last), isFalse);
-    expect(await store.readEarnedBadges(), contains('animal_first'));
+      library.updateProgress(finished(levels.first));
+      await badges.settle();
+      expect(badges.isEarned(badges.badges.first), isTrue);
+      expect(badges.isEarned(badges.badges.last), isFalse);
+      expect(await store.readEarnedBadges(), contains('animal_first'));
 
-    for (final item in levels.skip(1)) {
-      library.updateProgress(finished(item));
-    }
-    await badges.settle();
-    expect(badges.earnedCount, 2);
-    expect(await store.readEarnedBadges(),
-        containsAll(<String>['animal_first', 'animal_five']));
+      for (final item in levels.skip(1)) {
+        library.updateProgress(finished(item));
+      }
+      await badges.settle();
+      expect(badges.earnedCount, 2);
+      expect(
+        await store.readEarnedBadges(),
+        containsAll(<String>['animal_first', 'animal_five']),
+      );
 
-    // Resetting visible progress cannot take away an already earned badge.
-    library.updateProgress(ProgressSnapshot(
-      levelId: levels.first.id,
-      levelVersion: levels.first.contentVersion,
-      levelChecksum: levels.first.checksum,
-      cellCount: 4,
-      generation: 1,
-      revision: 2,
-      bits: Uint8List.fromList([0]),
-    ));
-    await badges.settle();
-    expect(badges.earnedCount, 2);
-  });
+      // Resetting visible progress cannot take away an already earned badge.
+      library.updateProgress(
+        ProgressSnapshot(
+          levelId: levels.first.id,
+          levelVersion: levels.first.contentVersion,
+          levelChecksum: levels.first.checksum,
+          cellCount: 4,
+          generation: 1,
+          revision: 2,
+          bits: Uint8List.fromList([0]),
+        ),
+      );
+      await badges.settle();
+      expect(badges.earnedCount, 2);
+    },
+  );
 
   test('reject duplicate or unsafe remote icon definitions', () {
     expect(parseBadgeCatalog(catalog).first.requiredCount, 1);
-    final unsafe = catalog.replaceFirst('images/animal_first.png', '../evil.png');
+    final unsafe = catalog.replaceFirst(
+      'images/animal_first.png',
+      '../evil.png',
+    );
     expect(() => parseBadgeCatalog(unsafe), throwsFormatException);
     final duplicate = jsonDecode(catalog) as Map<String, dynamic>;
     (duplicate['badges'] as List).add((duplicate['badges'] as List).first);
-    expect(() => parseBadgeCatalog(jsonEncode(duplicate)), throwsFormatException);
+    expect(
+      () => parseBadgeCatalog(jsonEncode(duplicate)),
+      throwsFormatException,
+    );
   });
 }
