@@ -591,10 +591,7 @@ class _MuseumSlot extends StatelessWidget {
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       color: const Color(0xffbfa687),
-                      border: Border.all(
-                        color: colors.$1,
-                        width: unit * .22,
-                      ),
+                      border: Border.all(color: colors.$1, width: unit * .22),
                     ),
                     child: level == null
                         ? Center(
