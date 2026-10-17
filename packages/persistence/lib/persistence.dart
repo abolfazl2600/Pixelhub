@@ -56,13 +56,9 @@ final class AssetLevelRepository
       decoded.map((id, value) {
         final data = value! as Map<String, Object?>;
         final category = data['category']! as String;
-        if (!{
-          'nature',
-          'animals',
-          'objects',
-          'patterns',
-          'space',
-        }.contains(category)) {
+        // Keep bundled categories aligned with the seven public categories
+        // shared by the online catalog (excluding user-private pictures).
+        if (!onlinePictureCategories.contains(category)) {
           throw const FormatException('Invalid catalog category.');
         }
         return MapEntry(
