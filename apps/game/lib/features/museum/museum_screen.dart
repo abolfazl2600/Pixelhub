@@ -553,9 +553,9 @@ Widget _museumPickerHeading(BuildContext context, String title) => Padding(
   padding: const EdgeInsets.fromLTRB(18, 14, 18, 6),
   child: Text(
     title,
-    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-      fontWeight: FontWeight.w800,
-    ),
+    style: Theme.of(
+      context,
+    ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
   ),
 );
 
