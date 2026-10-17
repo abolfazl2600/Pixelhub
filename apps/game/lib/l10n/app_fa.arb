@@ -310,5 +310,11 @@
   "@museumChooseSlot": {"placeholders":{"title":{"type":"String"}}},
   "museumSaveError": "ذخیره تغییرات موزه انجام نشد. دوباره تلاش کنید.",
   "museumLoadError": "بارگذاری موزه انجام نشد.",
-  "museumClose": "بستن"
+  "museumClose": "بستن",
+  "museumHungArtworks": "تابلوهای نصب‌شده در موزه",
+  "museumAvailableArtworks": "نقاشی‌های آماده نصب",
+  "museumInThisFrame": "در همین قاب نصب شده",
+  "museumOnWallSlot": "روی دیوار · قاب {slot} — برای جابه‌جایی لمس کنید",
+  "@museumOnWallSlot": {"placeholders":{"slot":{"type":"String"}}},
+  "museumReadyToHang": "هنوز روی دیوار نیست"
 }
