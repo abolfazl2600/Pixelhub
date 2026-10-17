@@ -442,6 +442,9 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
           },
           onView: () => setState(() => _viewResult = true),
           onNext: () => context.go('/'),
+          onAddToMuseum: () => context.go(
+            '/museum?artwork=${controller.level.id}',
+          ),
         );
       }
       if (_focusMode) {
@@ -814,6 +817,7 @@ class CompletionScreen extends StatelessWidget {
     required this.onRetryReward,
     required this.onView,
     required this.onNext,
+    this.onAddToMuseum,
     super.key,
   });
   final PaintingController controller;
@@ -827,6 +831,7 @@ class CompletionScreen extends StatelessWidget {
   final VoidCallback onRetryReward;
   final VoidCallback onView;
   final VoidCallback onNext;
+  final VoidCallback? onAddToMuseum;
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: appBar,
@@ -917,6 +922,15 @@ class CompletionScreen extends StatelessWidget {
             saveState,
             const SizedBox(height: 16),
             ExportButton(level: controller.level, renderStyle: renderStyle),
+            if (onAddToMuseum != null) ...[
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                key: const ValueKey('completion-add-to-museum'),
+                onPressed: onAddToMuseum,
+                icon: const Icon(Icons.museum_outlined),
+                label: Text(context.strings.museumAddArtwork),
+              ),
+            ],
             const SizedBox(height: 8),
             FilledButton(
               onPressed: onNext,
