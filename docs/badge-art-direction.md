@@ -41,7 +41,7 @@ The current visual reference is the **seven-category first-tier pixel diorama se
 
 ### Reusable art brief
 
-> Create a single large, collectible PixelHub achievement medal: richly detailed, crisp 128×128 logical-grid pixel art scaled to a 512×512 PNG by nearest-neighbor; ornate but controlled circular layered metal frame, compact laurel wreath, tiny jewel at the top, short ribbon tails, prominent instantly recognizable central symbol for [MISSION]. Carefully shaded metal and gem facets with hard-edged pixels. **Strictly transparent RGBA background (alpha 0 outside badge), no scenery, no square backdrop, no lettering, no blurry gradients, no anti-aliasing.** Match the established PixelHub 12-medal design family.
+> Create a single collectible PixelHub achievement badge: crisp 128×128 logical-grid pixel art scaled to a 512×512 PNG by nearest-neighbor; a slim category-colored frame with restrained leaf accents and a large, unmistakable central scene for [MISSION]. Limit gold and decorative flourishes so every badge looks distinct. **Strictly transparent RGBA background (alpha 0 outside badge), no scenery, no square backdrop, no lettering, no blurry gradients, no anti-aliasing.** Match the current PixelHub seven-category first-tier pixel-diorama medal family; keep ornaments light and omit all caption plates.
 
 
 ## Implemented first-tier category badges (October 2026)
