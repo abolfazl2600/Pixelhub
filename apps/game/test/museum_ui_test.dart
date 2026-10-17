@@ -141,6 +141,13 @@ void main() {
       180,
       scrollable: find.byType(Scrollable).first,
     );
+    // The 800x600 widget-test viewport may place the button just below
+    // the visible edge after scrollUntilVisible's initial movement.
+    await tester.drag(
+      find.byType(Scrollable).first,
+      const Offset(0, -160),
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('museum-themes-button')));
     await tester.pumpAndSettle();
 
