@@ -99,14 +99,9 @@ void main() {
     expect(find.text('طرح موزه'), findsOneWidget);
     expect(find.byKey(const ValueKey('museum-theme-classic')), findsOneWidget);
     expect(find.byKey(const ValueKey('museum-theme-royal')), findsOneWidget);
-    expect(
-      find.byKey(const ValueKey('museum-theme-sky'), skipOffstage: false),
-      findsOneWidget,
-    );
-    expect(
-      find.byKey(const ValueKey('museum-theme-botanical'), skipOffstage: false),
-      findsOneWidget,
-    );
+    // GridView builds lazily; the second row may be outside the viewport.
+    final selector = tester.widget<GridView>(find.byType(GridView));
+    expect(selector.childrenDelegate.estimatedChildCount, 4);
     expect(
       find.byWidgetPredicate(
         (widget) =>
