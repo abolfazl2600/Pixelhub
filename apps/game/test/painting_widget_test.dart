@@ -436,9 +436,25 @@ void main() {
       board.center + const Offset(30, 0),
       pointer: 2,
     );
-    await first.moveBy(const Offset(-25, 0));
-    await second.moveBy(const Offset(25, 0));
+    // Give the scale recognizer a frame to join the gesture arena before
+    // moving both fingers in several steps. A single abrupt pair of moves
+    // can be interpreted as unrelated drags in a nested scrollable.
     await tester.pump();
+    await first.moveBy(const Offset(-20, 0));
+    await second.moveBy(const Offset(20, 0));
+    await tester.pump(const Duration(milliseconds: 16));
+    await first.moveBy(const Offset(-20, 0));
+    await second.moveBy(const Offset(20, 0));
+    await tester.pump(const Duration(milliseconds: 16));
+    expect(
+      tester
+          .widget<InteractiveViewer>(find.byType(InteractiveViewer))
+          .transformationController!
+          .value
+          .getMaxScaleOnAxis(),
+      greaterThan(1),
+      reason: 'Two-finger scale should apply before releasing the pointers',
+    );
     await first.up();
     await second.up();
     await tester.pumpAndSettle();
