@@ -99,31 +99,38 @@ void main() {
   });
 
   test('museum storage errors do not alter the in-memory arrangement', () async {
-    final store = _FailingMuseumStorage();
+    final store = MemoryPreferences();
+    final failingRepository = _FailingMuseumStorage(store);
     final level = fixture();
     final library = LibraryController(store, store);
     addTearDown(library.dispose);
     library.setCatalog([level], {});
     await library.load();
-    final museum = MuseumController(store, library);
+    final museum = MuseumController(failingRepository, library);
     addTearDown(museum.dispose);
     await museum.load();
     expect(museum.layout.wall, 'cream');
     await expectLater(museum.setWall('sage'), throwsStateError);
     expect(museum.layout.wall, 'cream');
     expect(museum.busy, isFalse);
-    store.fail = false;
+    failingRepository.fail = false;
     await museum.setWall('sage');
     expect(museum.layout.wall, 'sage');
   });
 }
 
-class _FailingMuseumStorage extends MemoryPreferences {
+class _FailingMuseumStorage implements MuseumRepository {
+  _FailingMuseumStorage(this.storage);
+
+  final MemoryPreferences storage;
   bool fail = true;
+
+  @override
+  Future<MuseumLayout> readMuseum() => storage.readMuseum();
 
   @override
   Future<void> writeMuseum(MuseumLayout layout) {
     if (fail) return Future.error(StateError('Disk not writable'));
-    return super.writeMuseum(layout);
+    return storage.writeMuseum(layout);
   }
 }
