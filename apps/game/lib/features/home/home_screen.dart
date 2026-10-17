@@ -72,10 +72,6 @@ class HomeScreen extends StatelessWidget {
                           style: const TextStyle(fontWeight: FontWeight.w700),
                         ),
                       ),
-                      Text(
-                        '${s.walletPoints}: ${context.digits(library.totalPoints)}',
-                        style: const TextStyle(fontSize: 12),
-                      ),
                     ],
                   ),
                 ),
