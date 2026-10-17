@@ -66,10 +66,15 @@ void main() {
       ),
       findsOneWidget,
     );
-    expect(MuseumRoomPainter.pixelWidth, 128);
-    expect(MuseumRoomPainter.pixelHeight, 172);
-    expect(PixelSleepingCat.pixelWidth, 104);
-    expect(PixelSleepingCat.pixelHeight, 56);
+    expect(MuseumRoomPainter.pixelWidth, 180);
+    expect(MuseumRoomPainter.pixelHeight, 240);
+    expect(PixelSleepingCat.pixelWidth, 150);
+    expect(PixelSleepingCat.pixelHeight, 80);
+    // Approximately 40% more pixels across each axis, not an enlarged bitmap.
+    expect(180 / 128, closeTo(1.4, .01));
+    expect(240 / 172, closeTo(1.4, .01));
+    expect(150 / 104, closeTo(1.4, .05));
+    expect(80 / 56, closeTo(1.4, .05));
     expect(find.byKey(const ValueKey('museum-sleeping-cat')), findsOneWidget);
     expect(
       find.byWidgetPredicate(
