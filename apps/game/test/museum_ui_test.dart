@@ -58,9 +58,7 @@ void main() {
                 child: Stack(
                   children: [
                     Positioned.fill(
-                      child: CustomPaint(
-                        painter: MuseumRoomPainter(wall),
-                      ),
+                      child: CustomPaint(painter: MuseumRoomPainter(wall)),
                     ),
                     Positioned.fill(
                       child: CustomPaint(
