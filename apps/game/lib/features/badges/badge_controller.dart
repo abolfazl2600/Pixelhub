@@ -227,7 +227,9 @@ class BadgeController extends ChangeNotifier {
       if (_disposed || generation != _generation) return;
       await storage.writeBadgeCatalog(source);
       if (_disposed || generation != _generation) return;
-      final previousHashes = {for (final badge in badges) badge.id: badge.sha256};
+      final previousHashes = {
+        for (final badge in badges) badge.id: badge.sha256,
+      };
       for (final badge in parsed) {
         if (previousHashes[badge.id] != badge.sha256) {
           _images.remove(badge.id);
