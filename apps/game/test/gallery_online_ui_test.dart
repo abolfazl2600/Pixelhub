@@ -45,7 +45,9 @@ MockClient catalogClient() {
 
 void main() {
   for (final language in ['fa', 'en']) {
-    testWidgets('gallery wallet displays coins only ($language)', (tester) async {
+    testWidgets('gallery wallet displays coins only ($language)', (
+      tester,
+    ) async {
       final store = MemoryPreferences();
       await store.writeLibrary(ArtworkLibrary(coins: 87, totalPoints: 1234));
       final library = LibraryController(store, store);
