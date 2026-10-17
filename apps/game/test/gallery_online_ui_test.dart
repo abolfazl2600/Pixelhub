@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:game_domain/game_domain.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -43,6 +44,41 @@ MockClient catalogClient() {
 }
 
 void main() {
+  for (final language in ['fa', 'en']) {
+    testWidgets('gallery wallet displays coins only ($language)', (tester) async {
+      final store = MemoryPreferences();
+      await store.writeLibrary(ArtworkLibrary(coins: 87, totalPoints: 1234));
+      final library = LibraryController(store, store);
+      addTearDown(library.dispose);
+      library.setCatalog([fixture()], {});
+      await library.load();
+      final client = catalogClient();
+      addTearDown(client.close);
+      final online = OnlineCatalogController(
+        store,
+        client: client,
+        baseUrl: Uri.parse('https://example.test/online/'),
+      );
+      addTearDown(online.dispose);
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: Locale(language),
+          supportedLocales: AppLocalizations.supportedLocales,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          home: GalleryScreen(library: library, online: online),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final coinLabel = language == 'fa' ? 'سکه‌های من' : 'My coins';
+      final pointsLabel = language == 'fa' ? 'امتیاز کل' : 'Total points';
+      expect(find.textContaining(coinLabel), findsOneWidget);
+      expect(find.textContaining(language == 'fa' ? '۸۷' : '87'), findsWidgets);
+      expect(find.textContaining(pointsLabel), findsNothing);
+      expect((await store.readLibrary()).totalPoints, 1234);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets('online artwork follows the local category and is paginated', (
     tester,
   ) async {
