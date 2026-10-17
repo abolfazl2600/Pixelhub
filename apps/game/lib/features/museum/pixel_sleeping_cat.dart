@@ -342,7 +342,10 @@ class _CatPixels {
         .round();
     final bottom =
         ((y + height) * PixelSleepingCat.pixelHeight / originalHeight).round();
-    fine(left, top, right - left, bottom - top, color);
+    // draw() already converts 104×56 authoring units into native 192×112
+    // sprite pixels. Calling fine() here scales a second time, displacing
+    // the body, ears and paws beyond their intended positions.
+    micro(left, top, right - left, bottom - top, color);
   }
 
   // The previous detail pass was authored at 150×80; keep its marks in
