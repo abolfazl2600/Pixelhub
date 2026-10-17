@@ -183,20 +183,22 @@ void main() {
   testWidgets(
     'cat body uses native pixel coordinates without rescaling twice',
     (tester) async {
-      final recorder = ui.PictureRecorder();
-      const size = Size(192, 112);
-      const PixelCatBodyPainter().paint(Canvas(recorder), size);
-      final image = await recorder.endRecording().toImage(192, 112);
-      final pixels = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
-      expect(pixels, isNotNull);
-      final bytes = pixels!.buffer.asUint8List();
+      final bytes = await tester.runAsync(() async {
+        final recorder = ui.PictureRecorder();
+        const size = Size(192, 112);
+        const PixelCatBodyPainter().paint(Canvas(recorder), size);
+        final image = await recorder.endRecording().toImage(192, 112);
+        final pixels = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+        final data = pixels!.buffer.asUint8List();
+        image.dispose();
+        return data;
+      });
+      expect(bytes, isNotNull);
 
-      // The back begins at logical (40, 20), which must map to native
-      // coordinates around (74, 40); the erroneous double scale leaves this
-      // interior point transparent and paints the shape too far to the right.
-      expect(bytes[(45 * 192 + 80) * 4 + 3], 255);
+      // A native pixel inside the back must be opaque. Double scaling
+      // leaves this point transparent and moves the cat out of place.
+      expect(bytes![(45 * 192 + 80) * 4 + 3], 255);
       expect(bytes[(3 * 192 + 3) * 4 + 3], 0);
-      image.dispose();
     },
   );
 
