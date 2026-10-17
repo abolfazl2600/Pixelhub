@@ -179,7 +179,7 @@ class HomeScreen extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              isComplete ? s.completedWorks : s.continuePainting,
+                              isComplete ? s.completedWorks : s.inProgress,
                               style: const TextStyle(
                                 fontWeight: FontWeight.w600,
                               ),
