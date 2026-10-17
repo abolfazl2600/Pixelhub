@@ -11,6 +11,7 @@ import '../painting/completed_artwork_preview.dart';
 import 'museum_controller.dart';
 import 'pixel_sleeping_cat.dart';
 import 'museum_scene_painters.dart';
+import 'museum_scene_preview.dart';
 
 /// Offline-first, two-dimensional pixel gallery. The screen never writes a
 /// painting or unlock; it only saves which completed artworks hang on a wall.
@@ -357,16 +358,13 @@ class _MuseumScreenState extends State<MuseumScreen> {
                             children: [
                               Expanded(
                                 child: SizedBox.expand(
-                                  child: CustomPaint(
-                                    painter: museumSceneFor(
-                                      id,
-                                      switch (id) {
-                                        'royal' => 'emerald',
-                                        'sky' => 'blue',
-                                        'botanical' => 'sage',
-                                        _ => 'cream',
-                                      },
-                                    ),
+                                  child: MuseumScenePreview(
+                                    theme: id,
+                                    levels: [
+                                      for (final artworkId
+                                          in widget.museum.visibleSlots)
+                                        _completedArtwork(artworkId),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -783,13 +781,28 @@ class _MuseumSlot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = switch (frame) {
-      'gold' => (
+    final colors = switch ((theme, frame)) {
+      ('royal', 'gold') => (
+        const Color(0xffac741e),
+        const Color(0xffffd56a),
+        const Color(0xff3e291d),
+      ),
+      ('sky', 'dark') => (
+        const Color(0xffd3e8ed),
+        const Color(0xfff2f6ee),
+        const Color(0xff557889),
+      ),
+      ('botanical', 'wood') => (
+        const Color(0xff855835),
+        const Color(0xffcb9d67),
+        const Color(0xff4d3424),
+      ),
+      (_, 'gold') => (
         const Color(0xffc58a35),
         const Color(0xffffdc79),
         const Color(0xff744929),
       ),
-      'dark' => (
+      (_, 'dark') => (
         const Color(0xff343d46),
         const Color(0xff69737a),
         const Color(0xff202630),
