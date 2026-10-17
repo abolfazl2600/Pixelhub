@@ -234,10 +234,11 @@ void main() {
       isFalse,
     );
     expect(
-      const MuseumComposedScenePainter('royal', 'emerald', tailFrame: 1)
-          .shouldRepaint(
-            const MuseumComposedScenePainter('royal', 'emerald'),
-          ),
+      const MuseumComposedScenePainter(
+        'royal',
+        'emerald',
+        tailFrame: 1,
+      ).shouldRepaint(const MuseumComposedScenePainter('royal', 'emerald')),
       isTrue,
     );
 

@@ -26,7 +26,6 @@ MuseumScenePainter museumSceneFor(String theme, String wall) => switch (theme) {
   _ => MuseumClassicScenePainter(wall),
 };
 
-
 /// Shared 64 × 88 composition coordinates used by full-size and thumbnail rooms.
 /// Six frames never move independently of their labels or cat-safe lower space.
 abstract final class MuseumSceneLayout {
@@ -43,7 +42,11 @@ abstract final class MuseumSceneLayout {
     final first = index < 3;
     final row = first
         ? (theme == 'sky' ? 15.0 : 12.0)
-        : (theme == 'royal' ? 35.0 : theme == 'sky' ? 38.0 : 36.0);
+        : (theme == 'royal'
+              ? 35.0
+              : theme == 'sky'
+              ? 38.0
+              : 36.0);
     return row +
         (arrangement == 'staggered' && index % 3 == 1
             ? (first ? 1.25 : -0.75)
@@ -76,21 +79,17 @@ class MuseumComposedScenePainter extends CustomPainter {
       y * size.height / MuseumScenePainter.pixelHeight,
     );
     canvas.scale(
-      w * size.width /
+      w *
+          size.width /
           MuseumScenePainter.pixelWidth /
           PixelSleepingCat.pixelWidth,
-      h * size.height /
+      h *
+          size.height /
           MuseumScenePainter.pixelHeight /
           PixelSleepingCat.pixelHeight,
     );
-    PixelCatTailPainter(tailFrame).paint(
-      canvas,
-      const Size(192, 112),
-    );
-    const PixelCatBodyPainter().paint(
-      canvas,
-      const Size(192, 112),
-    );
+    PixelCatTailPainter(tailFrame).paint(canvas, const Size(192, 112));
+    const PixelCatBodyPainter().paint(canvas, const Size(192, 112));
     canvas.restore();
   }
 
@@ -493,8 +492,7 @@ class MuseumRoyalScenePainter extends MuseumScenePainter {
     // Carved walnut wainscot below the lower row of frames.
     p.rect(9, 249, 238, 27, const Color(0xff41271f));
     for (final x in [13, 93, 173]) {
-      p.trim(x, 252, 70, 20, const Color(0xff241913),
-          const Color(0xff613b2a));
+      p.trim(x, 252, 70, 20, const Color(0xff241913), const Color(0xff613b2a));
       p.rect(x + 5, 256, 60, 1, const Color(0xff90623b));
       p.rect(x + 5, 268, 60, 1, const Color(0xff30221c));
     }
@@ -617,8 +615,7 @@ class MuseumSkyScenePainter extends MuseumScenePainter {
       p.rect(x + 6, 51, 1, 228, slate);
     }
     for (final cx in [52, 128, 204]) {
-      p.lamp(cx, 45, const Color(0xff7c634d),
-          const Color(0xffd6ae66), cream);
+      p.lamp(cx, 45, const Color(0xff7c634d), const Color(0xffd6ae66), cream);
       p.rect(cx - 10, 60, 20, 1, const Color(0x55ffffff));
       p.rect(cx - 15, 70, 30, 1, const Color(0x32ffffff));
     }

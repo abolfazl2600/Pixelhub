@@ -39,7 +39,9 @@ class MuseumScenePreview extends StatelessWidget {
         clipBehavior: Clip.hardEdge,
         children: [
           Positioned.fill(
-            child: CustomPaint(painter: MuseumComposedScenePainter(theme, wall)),
+            child: CustomPaint(
+              painter: MuseumComposedScenePainter(theme, wall),
+            ),
           ),
           for (var i = 0; i < 6; i++)
             Positioned(
@@ -63,7 +65,6 @@ class MuseumScenePreview extends StatelessWidget {
                 ),
               ),
             ),
-
         ],
       );
     },

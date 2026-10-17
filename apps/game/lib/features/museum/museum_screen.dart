@@ -553,11 +553,13 @@ class _MuseumScreenState extends State<MuseumScreen> {
                             for (var i = 0; i < 6; i++)
                               Positioned(
                                 left: MuseumSceneLayout.left(i) * unit,
-                                top: MuseumSceneLayout.top(
-                                  layout.theme,
-                                  layout.arrangement,
-                                  i,
-                                ) * unit,
+                                top:
+                                    MuseumSceneLayout.top(
+                                      layout.theme,
+                                      layout.arrangement,
+                                      i,
+                                    ) *
+                                    unit,
                                 width: MuseumSceneLayout.frameWidth * unit,
                                 child: _MuseumSlot(
                                   index: i,
