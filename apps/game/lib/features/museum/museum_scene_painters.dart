@@ -365,7 +365,6 @@ class MuseumSkyScenePainter extends MuseumScenePainter {
     const cream = Color(0xfffcf7ea);
     const blue = Color(0xff80bedc);
     const slate = Color(0xff729db1);
-    const timber = Color(0xffbe8d64);
     p.rect(0, 0, 256, 285, plaster);
     // The large blue skylight replaces the wooden coffered ceiling.
     p.rect(0, 0, 256, 8, const Color(0xff967053));
