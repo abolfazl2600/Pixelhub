@@ -194,11 +194,12 @@ void main() {
         return data;
       });
       expect(bytes, isNotNull);
+      final rgba = bytes!;
 
       // A native pixel inside the back must be opaque. Double scaling
       // leaves this point transparent and moves the cat out of place.
-      expect(bytes![(45 * 192 + 80) * 4 + 3], 255);
-      expect(bytes[(3 * 192 + 3) * 4 + 3], 0);
+      expect(rgba[(45 * 192 + 80) * 4 + 3], 255);
+      expect(rgba[(3 * 192 + 3) * 4 + 3], 0);
     },
   );
 
