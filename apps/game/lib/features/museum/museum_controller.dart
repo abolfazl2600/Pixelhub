@@ -83,6 +83,23 @@ class MuseumController extends ChangeNotifier {
   Future<void> swap(int first, int second) =>
       _edit((current) => current.swap(first, second));
 
+  /// Theme presets update the room and frame but never change artwork slots
+  /// or their saved positions. Individual wall/frame controls remain usable.
+  Future<void> setTheme(String theme) => _edit((current) {
+    final wall = switch (theme) {
+      'royal' => 'emerald',
+      'sky' => 'blue',
+      'botanical' => 'sage',
+      _ => 'cream',
+    };
+    final frame = switch (theme) {
+      'classic' || 'royal' => 'gold',
+      'sky' => 'dark',
+      _ => 'wood',
+    };
+    return current.copyWith(theme: theme, wall: wall, frame: frame);
+  });
+
   Future<void> setWall(String wall) =>
       _edit((current) => current.copyWith(wall: wall));
 
