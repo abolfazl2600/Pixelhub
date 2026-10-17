@@ -4,7 +4,7 @@
 
 ## 1. Approved art direction
 
-The visual reference is the final 12-medal grid approved in the PixelHub design conversation on 2026-10-17: enlarged circular medals with a bold central emblem, multi-layered metallic rim, optional laurel wreath, top jewel, small bottom ribbons, selective highlights and deep, clean pixel-art shadows. Keep the rich detail **inside the badge silhouette**; remove the reference sheet's dark navy backdrop completely.
+The current visual reference is the **seven-category first-tier pixel diorama set** approved on 2026-10-17: distinct subject-specific framed medallions (fox, sprout, treasure chest, artist's palette, Azadi Tower, geometric tile, rocket), subtle gold trim, restrained leaf motifs, no text banner, clear square pixels, and generous transparent padding. The older heavy-gold ornate-medal concept is superseded for these category-first awards. Keep the rich detail **inside the badge silhouette**; remove the reference sheet's dark navy backdrop completely.
 
 - **Individual asset, not a sprite sheet:** one medal per PNG. Sprite sheets are allowed for previews only.
 - **Transparent canvas:** RGBA/alpha transparency, with alpha 0 **everywhere outside the badge silhouette** (including all four corners). No dark background, solid square, vignette, rectangular plate, halo, drop shadow on a canvas or checkerboard baked into the image. The colored circular/inner medallion backing **inside** the medal is permitted and is not a background.
@@ -12,7 +12,7 @@ The visual reference is the final 12-medal grid approved in the PixelHub design 
 - **Visual hierarchy:** a clearly readable central symbol occupies ~55–65% of the medal's inner disc; the rim and laurel wreath frame rather than overpower it. Medal silhouette should fill ~85–92% of the canvas with transparent padding for consistent sizing.
 - **Craftsmanship:** layered gold/silver/bronze/colored metal using 2–4 hard-edged shade tones per material; crisp pixel-level sparkle, bevel, gemstone facets and short leaf segments. Use intentional light direction (upper-left) and one coherent outline thickness.
 - **Consistency:** match circular silhouette, top jewel placement, ribbon size, pixel block scale, laurel style and lighting across categories. Subject changes should be legible even at 72×72 UI pixels.
-- **Palette:** restrained, typically 16–32 colors plus transparency per badge; use category-appropriate accent colors. Gold, silver and bronze may indicate increasingly difficult missions, but existing IDs/rewards are authoritative.
+- **Palette:** restrained, typically 16–64 colors plus transparency per badge; use category-appropriate accent colors. Gold, silver and bronze may indicate increasingly difficult missions, but existing IDs/rewards are authoritative.
 - **No typography or numerals baked into PNG:** title, description, progress and required count remain localizable application text.
 
 ### Suggested symbolic motifs
@@ -43,9 +43,26 @@ The visual reference is the final 12-medal grid approved in the PixelHub design 
 
 > Create a single large, collectible PixelHub achievement medal: richly detailed, crisp 128×128 logical-grid pixel art scaled to a 512×512 PNG by nearest-neighbor; ornate but controlled circular layered metal frame, compact laurel wreath, tiny jewel at the top, short ribbon tails, prominent instantly recognizable central symbol for [MISSION]. Carefully shaded metal and gem facets with hard-edged pixels. **Strictly transparent RGBA background (alpha 0 outside badge), no scenery, no square backdrop, no lettering, no blurry gradients, no anti-aliasing.** Match the established PixelHub 12-medal design family.
 
+
+## Implemented first-tier category badges (October 2026)
+
+Seven individually cropped, transparent 512×512, nearest-neighbor pixel-art PNGs are stored at `badge_content/images/*_first.png` and served through the existing online badge catalog. No icons are bundled in the APK. The public catalogue retains the previous 5-/10-completion achievements and all stable existing IDs.
+
+| Badge ID | Category | Symbol | Trigger |
+| --- | --- | --- | --- |
+| `animal_first` | animals | Fox | Complete 1 unique animal painting |
+| `nature_first` | nature | Seedling | Complete 1 unique nature painting |
+| `objects_first` | objects | Treasure chest | Complete 1 unique objects painting |
+| `masterpieces_first` | masterpieces | Artist's tools | Complete 1 unique masterpiece painting |
+| `persian_architecture_first` | persian_architecture | Azadi Tower | Complete 1 unique Iranian architecture painting |
+| `patterns_first` | patterns | Geometric rosette | Complete 1 unique patterns painting |
+| `space_first` | space | Rocket | Complete 1 unique space painting |
+
+Mission names, descriptions and progress appear as UI text **outside** the PNG, even before earning. Earned badges use the large transparent image; locked entries use a placeholder until earned. An earned badge survives a refresh and new icon checksums cause an icon reload, without changing a user's award ID. Publication requires successful main-branch GitHub Pages deployment; a commit alone does not verify live availability.
+
 ## 2. Current implementation and boundaries
 
-The current remote achievement catalog (`badge_content/catalog.json`) contains **five existing mission definitions**: `animal_first` (1 animal), `animal_five` (5 animals), `animal_ten` (10 animals), `nature_five` (5 nature pictures) and `masterpieces_five` (5 masterpieces). These existing IDs must remain stable; redesigning their art is a separate asset and checksum update, not an award reset.
+The current remote achievement catalog (`badge_content/catalog.json`) originally contained **five mission definitions**: `animal_first` (1 animal), `animal_five` (5 animals), `animal_ten` (10 animals), `nature_five` (5 nature pictures) and `masterpieces_five` (5 masterpieces). These existing IDs must remain stable; redesigning their art is a separate asset and checksum update, not an award reset.
 
 As of this specification, the badge engine counts **distinct completed pictures by a single category**. A catalog-only addition can introduce other category-count thresholds using the existing schema; **cross-category achievements, all-picture totals, texture/style-based goals, tool constraints, daily streaks, animation, and museum tasks require new tracking/rules and should not be represented as working via a catalog-only change**. New badge entries also require their actual optimized image files, correct hashes and successful publication. The remote catalog currently limits records to 64.
 

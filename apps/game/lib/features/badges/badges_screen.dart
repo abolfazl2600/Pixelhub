@@ -105,8 +105,8 @@ class _BadgesScreenState extends State<BadgesScreen> {
                   // Two legible columns on phones; three on tablets/desktop.
                   final columns = constraints.maxWidth >= 700 ? 3 : 2;
                   final cardHeight = constraints.maxWidth >= 700
-                      ? 266.0
-                      : 282.0;
+                      ? 293.0
+                      : 315.0;
                   return CustomScrollView(
                     key: const ValueKey('badges-scroll'),
                     physics: const AlwaysScrollableScrollPhysics(),
@@ -141,6 +141,7 @@ class _BadgesScreenState extends State<BadgesScreen> {
                               key: ValueKey('badge-${badge.id}'),
                               definition: badge,
                               earned: earned,
+                              progress: controller.progressFor(badge),
                               iconBytes: earned
                                   ? controller.imageFor(badge)
                                   : null,
@@ -285,6 +286,7 @@ class _AchievementCard extends StatelessWidget {
   const _AchievementCard({
     required this.definition,
     required this.earned,
+    required this.progress,
     required this.iconBytes,
     required this.persian,
     super.key,
@@ -292,14 +294,13 @@ class _AchievementCard extends StatelessWidget {
 
   final BadgeDefinition definition;
   final bool earned;
+  final int progress;
   final Uint8List? iconBytes;
   final bool persian;
 
   @override
   Widget build(BuildContext context) {
-    final title = earned
-        ? definition.titleFor(persian)
-        : (persian ? 'نشان ناشناخته' : 'Mystery badge');
+    final title = definition.titleFor(persian);
     final description = definition.descriptionFor(persian);
     return Semantics(
       label: '$title، $description',
@@ -340,13 +341,13 @@ class _AchievementCard extends StatelessWidget {
                 children: [
                   Align(
                     child: Container(
-                      width: 85,
-                      height: 85,
+                      width: 113,
+                      height: 113,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
                         color: earned
-                            ? const Color(0xfffff0b9)
+                            ? Colors.transparent
                             : const Color(0xfff3f4f0),
                       ),
                       child: earned
@@ -358,8 +359,8 @@ class _AchievementCard extends StatelessWidget {
                                   )
                                 : Image.memory(
                                     iconBytes!,
-                                    width: 70,
-                                    height: 70,
+                                    width: 111,
+                                    height: 111,
                                     filterQuality: FilterQuality.none,
                                     gaplessPlayback: true,
                                   ))
@@ -394,14 +395,28 @@ class _AchievementCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  Icon(
-                    earned
-                        ? Icons.verified_rounded
-                        : Icons.lock_outline_rounded,
-                    color: earned
-                        ? _BadgePalette.green
-                        : const Color(0xff9fa6a1),
-                    size: 23,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        earned
+                            ? Icons.verified_rounded
+                            : Icons.lock_outline_rounded,
+                        color: earned
+                            ? _BadgePalette.green
+                            : const Color(0xff9fa6a1),
+                        size: 20,
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        '${context.digits(math.min(progress, definition.requiredCount))}/${context.digits(definition.requiredCount)}',
+                        style: const TextStyle(
+                          color: _BadgePalette.muted,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

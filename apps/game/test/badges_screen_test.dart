@@ -86,12 +86,14 @@ void main() {
         expect(find.byKey(const ValueKey('badge-animal_five')), findsOneWidget);
         if (locale.languageCode == 'fa') {
           expect(find.text('اولین دوست حیوانات'), findsOneWidget);
-          expect(find.text('نشان ناشناخته'), findsOneWidget);
+          expect(find.text('دوستدار حیوانات'), findsOneWidget);
+          expect(find.text('۰/۵'), findsOneWidget);
           expect(find.text('پنج نقاشی حیوان را تکمیل کن.'), findsOneWidget);
           expect(find.text('هنوز کشف نشده'), findsNothing);
         } else {
           expect(find.text('First Animal Friend'), findsOneWidget);
-          expect(find.text('Mystery badge'), findsOneWidget);
+          expect(find.text('Animal Lover'), findsOneWidget);
+          expect(find.text('0/5'), findsOneWidget);
           expect(find.text('Complete five animal paintings.'), findsOneWidget);
           expect(find.text('Not discovered yet'), findsNothing);
         }
