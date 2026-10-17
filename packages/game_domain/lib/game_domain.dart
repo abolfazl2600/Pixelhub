@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:level_schema/level_schema.dart';
 
 export 'artwork.dart';
+export 'museum.dart';
 
 part 'progress_sync.dart';
 part 'progress_outbox.dart';
