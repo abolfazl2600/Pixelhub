@@ -104,7 +104,9 @@ class _BadgesScreenState extends State<BadgesScreen> {
                 builder: (context, constraints) {
                   // Two legible columns on phones; three on tablets/desktop.
                   final columns = constraints.maxWidth >= 700 ? 3 : 2;
-                  final cardHeight = constraints.maxWidth >= 700 ? 266.0 : 282.0;
+                  final cardHeight = constraints.maxWidth >= 700
+                      ? 266.0
+                      : 282.0;
                   return CustomScrollView(
                     key: const ValueKey('badges-scroll'),
                     physics: const AlwaysScrollableScrollPhysics(),
@@ -122,26 +124,29 @@ class _BadgesScreenState extends State<BadgesScreen> {
                       SliverPadding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         sliver: SliverGrid(
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: columns,
-                            mainAxisExtent: cardHeight,
-                            mainAxisSpacing: 14,
-                            crossAxisSpacing: 14,
-                          ),
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) {
-                              final badge = controller.badges[index];
-                              final earned = controller.isEarned(badge);
-                              return _AchievementCard(
-                                key: ValueKey('badge-' + badge.id),
-                                definition: badge,
-                                earned: earned,
-                                iconBytes: earned ? controller.imageFor(badge) : null,
-                                persian: persian,
-                              );
-                            },
-                            childCount: controller.badges.length,
-                          ),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: columns,
+                                mainAxisExtent: cardHeight,
+                                mainAxisSpacing: 14,
+                                crossAxisSpacing: 14,
+                              ),
+                          delegate: SliverChildBuilderDelegate((
+                            context,
+                            index,
+                          ) {
+                            final badge = controller.badges[index];
+                            final earned = controller.isEarned(badge);
+                            return _AchievementCard(
+                              key: ValueKey('badge-' + badge.id),
+                              definition: badge,
+                              earned: earned,
+                              iconBytes: earned
+                                  ? controller.imageFor(badge)
+                                  : null,
+                              persian: persian,
+                            );
+                          }, childCount: controller.badges.length),
                         ),
                       ),
                       const SliverToBoxAdapter(child: SizedBox(height: 30)),
@@ -204,10 +209,7 @@ class _BadgeProgressHeader extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 22,
-                vertical: 25,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 25),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -396,7 +398,9 @@ class _AchievementCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Icon(
-                    earned ? Icons.verified_rounded : Icons.lock_outline_rounded,
+                    earned
+                        ? Icons.verified_rounded
+                        : Icons.lock_outline_rounded,
                     color: earned
                         ? _BadgePalette.green
                         : const Color(0xff9fa6a1),
@@ -446,20 +450,13 @@ class _MysteryPainter extends CustomPainter {
     for (var i = 0; i < 12; i++) {
       final angle = i * math.pi / 6;
       canvas.drawCircle(
-        center + Offset(
-          24 * math.cos(angle),
-          24 * math.sin(angle),
-        ),
+        center + Offset(24 * math.cos(angle), 24 * math.sin(angle)),
         11,
         outer,
       );
     }
     canvas.drawCircle(center, 29, outer);
-    canvas.drawCircle(
-      center,
-      21,
-      Paint()..color = const Color(0xffeff1ed),
-    );
+    canvas.drawCircle(center, 21, Paint()..color = const Color(0xffeff1ed));
     canvas.drawCircle(
       center,
       21,

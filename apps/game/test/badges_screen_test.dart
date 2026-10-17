@@ -83,10 +83,7 @@ void main() {
           find.byKey(const ValueKey('badge-animal_first')),
           findsOneWidget,
         );
-        expect(
-          find.byKey(const ValueKey('badge-animal_five')),
-          findsOneWidget,
-        );
+        expect(find.byKey(const ValueKey('badge-animal_five')), findsOneWidget);
         if (locale.languageCode == 'fa') {
           expect(find.text('اولین دوست حیوانات'), findsOneWidget);
           expect(find.text('نشان ناشناخته'), findsOneWidget);
