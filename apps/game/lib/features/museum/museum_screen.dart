@@ -100,7 +100,8 @@ class _MuseumScreenState extends State<MuseumScreen> {
     final available = completed
         .where((level) => !installedSlots.contains(level.id))
         .toList(growable: false);
-    final availableHeaderIndex = alreadyHung.length + (alreadyHung.isNotEmpty ? 1 : 0);
+    final availableHeaderIndex =
+        alreadyHung.length + (alreadyHung.isNotEmpty ? 1 : 0);
     final s = context.strings;
     final selection = await showModalBottomSheet<String>(
       context: context,
