@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:level_schema/level_schema.dart';
-import 'package:pixelhub/features/gallery/artwork_categories.dart';
 import 'package:persistence/persistence.dart';
+import 'package:pixelhub/features/gallery/artwork_categories.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -40,7 +40,9 @@ void main() {
     },
   );
 
-  test('every public gallery category has four bundled offline pictures', () async {
+  test(
+    'every public gallery category has four bundled offline pictures',
+    () async {
     const newIds = <String>{
       'offline-mona-lisa',
       'offline-starry-night',
@@ -83,7 +85,8 @@ void main() {
     expect(counts['masterpieces'], 4);
     expect(counts['persian_architecture'], 4);
     expect(counts['patterns'], 4);
-  });
+    },
+  );
 
   test('unsupported schema and malformed cells are rejected', () async {
     final source = await rootBundle.loadString(LevelAssets.sunflower);
