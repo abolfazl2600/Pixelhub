@@ -235,9 +235,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(
         find.text(
-          language == 'fa'
-              ? 'در همین قاب نصب شده'
-              : 'Hanging in this frame',
+          language == 'fa' ? 'در همین قاب نصب شده' : 'Hanging in this frame',
         ),
         findsOneWidget,
       );
