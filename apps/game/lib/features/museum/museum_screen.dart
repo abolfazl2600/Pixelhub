@@ -9,6 +9,7 @@ import '../../l10n/strings.dart';
 import '../gallery/library_controller.dart';
 import '../painting/completed_artwork_preview.dart';
 import 'museum_controller.dart';
+import 'pixel_sleeping_cat.dart';
 import 'museum_room_painter.dart';
 
 /// Offline-first, two-dimensional pixel gallery. The screen never writes a
@@ -359,6 +360,20 @@ class _MuseumScreenState extends State<MuseumScreen> {
                                   },
                                 ),
                               ),
+                            // Independent overlay: the scene and six framed
+                            // artworks never repaint when the sleeping cat
+                            // flicks its tail every few seconds.
+                            Positioned(
+                              left: 20 * unit,
+                              top: 58 * unit,
+                              width: 26 * unit,
+                              height: 14 * unit,
+                              child: const IgnorePointer(
+                                child: PixelSleepingCat(
+                                  key: ValueKey('museum-sleeping-cat'),
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       );
