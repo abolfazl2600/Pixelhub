@@ -310,5 +310,11 @@
   "@museumChooseSlot": {"placeholders":{"title":{"type":"String"}}},
   "museumSaveError": "Could not save your museum. Try again.",
   "museumLoadError": "Could not load your museum.",
-  "museumClose": "Close"
+  "museumClose": "Close",
+  "museumHungArtworks": "Already on the museum wall",
+  "museumAvailableArtworks": "Available to hang",
+  "museumInThisFrame": "Hanging in this frame",
+  "museumOnWallSlot": "On the wall · Frame {slot} — tap to move",
+  "@museumOnWallSlot": {"placeholders":{"slot":{"type":"String"}}},
+  "museumReadyToHang": "Not on the wall yet"
 }
