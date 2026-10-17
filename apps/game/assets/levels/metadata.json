@@ -269,5 +269,95 @@
       "lighthouse",
       "seascape"
     ]
+  },
+  "offline-mona-lisa": {
+    "category": "masterpieces",
+    "tags": [
+      "masterpieces",
+      "mona lisa",
+      "داوینچی",
+      "renaissance",
+      "portrait"
+    ]
+  },
+  "offline-starry-night": {
+    "category": "masterpieces",
+    "tags": [
+      "masterpieces",
+      "starry night",
+      "ون گوگ",
+      "van gogh",
+      "night"
+    ]
+  },
+  "offline-great-wave": {
+    "category": "masterpieces",
+    "tags": [
+      "masterpieces",
+      "great wave",
+      "هوکوسای",
+      "hokusai",
+      "sea"
+    ]
+  },
+  "offline-girl-pearl": {
+    "category": "masterpieces",
+    "tags": [
+      "masterpieces",
+      "girl pearl earring",
+      "ورمیر",
+      "vermeer",
+      "portrait"
+    ]
+  },
+  "offline-azadi-tower": {
+    "category": "persian_architecture",
+    "tags": [
+      "persian_architecture",
+      "azadi tower",
+      "برج آزادی",
+      "تهران",
+      "tehran"
+    ]
+  },
+  "offline-persepolis": {
+    "category": "persian_architecture",
+    "tags": [
+      "persian_architecture",
+      "persepolis",
+      "تخت جمشید",
+      "شیراز",
+      "shiraz"
+    ]
+  },
+  "offline-siosepol": {
+    "category": "persian_architecture",
+    "tags": [
+      "persian_architecture",
+      "si o se pol",
+      "سی و سه پل",
+      "اصفهان",
+      "isfahan"
+    ]
+  },
+  "offline-nasir-molk": {
+    "category": "persian_architecture",
+    "tags": [
+      "persian_architecture",
+      "nasir al molk",
+      "مسجد نصیرالملک",
+      "شیراز",
+      "stained glass"
+    ]
+  },
+  "offline-shamsa": {
+    "category": "patterns",
+    "tags": [
+      "patterns",
+      "shamsa",
+      "شمسه",
+      "geometric",
+      "iranian"
+    ]
   }
 }
