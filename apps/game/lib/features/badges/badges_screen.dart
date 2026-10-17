@@ -23,7 +23,6 @@ abstract final class _BadgePalette {
   static const background = Color(0xfffaf9f5);
   static const ink = Color(0xff234239);
   static const muted = Color(0xff68766d);
-  static const sage = Color(0xffecf4ec);
   static const green = Color(0xff348560);
   static const border = Color(0xffe3e8df);
   static const mystery = Color(0xffd8dcd8);
