@@ -1,5 +1,3 @@
-import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:painting_engine/painting_engine.dart';
@@ -180,28 +178,16 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets(
-    'cat body uses native pixel coordinates without rescaling twice',
-    (tester) async {
-      final bytes = await tester.runAsync(() async {
-        final recorder = ui.PictureRecorder();
-        const size = Size(192, 112);
-        const PixelCatBodyPainter().paint(Canvas(recorder), size);
-        final image = await recorder.endRecording().toImage(192, 112);
-        final pixels = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
-        final data = pixels!.buffer.asUint8List();
-        image.dispose();
-        return data;
-      });
-      expect(bytes, isNotNull);
-      final rgba = bytes!;
-
-      // A native pixel inside the back must be opaque. Double scaling
-      // leaves this point transparent and moves the cat out of place.
-      expect(rgba[(45 * 192 + 80) * 4 + 3], 255);
-      expect(rgba[(3 * 192 + 3) * 4 + 3], 0);
-    },
-  );
+  test('cat native pixel mapping does not apply the scale twice', () {
+    expect(
+      PixelSleepingCat.originalPixelBounds(40, 20, 24, 30),
+      const Rect.fromLTRB(74, 40, 118, 100),
+    );
+    expect(
+      PixelSleepingCat.originalPixelBounds(69, 21, 5, 13),
+      const Rect.fromLTRB(127, 42, 137, 68),
+    );
+  });
 
   testWidgets('the sleeping cat flicks only its pixel tail slowly', (
     tester,

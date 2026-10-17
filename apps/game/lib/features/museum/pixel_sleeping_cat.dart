@@ -10,6 +10,16 @@ class PixelSleepingCat extends StatefulWidget {
   static const int pixelWidth = 192;
   static const int pixelHeight = 112;
 
+  /// Convert the original 104×56 body coordinates to the native 192×112 grid.
+  /// This shared mapping is also exercised by a synchronous regression test.
+  static Rect originalPixelBounds(int x, int y, int width, int height) =>
+      Rect.fromLTRB(
+        (x * pixelWidth / 104).roundToDouble(),
+        (y * pixelHeight / 56).roundToDouble(),
+        ((x + width) * pixelWidth / 104).roundToDouble(),
+        ((y + height) * pixelHeight / 56).roundToDouble(),
+      );
+
   @override
   State<PixelSleepingCat> createState() => _PixelSleepingCatState();
 }
@@ -331,21 +341,18 @@ class _CatPixels {
   final Size size;
   final Paint _paint = Paint()..isAntiAlias = false;
 
-  static const originalWidth = 104;
-  static const originalHeight = 56;
-
   // Quantize both rectangle edges to prevent blurry fractional sprite pixels.
   void draw(int x, int y, int width, int height, Color color) {
-    final left = (x * PixelSleepingCat.pixelWidth / originalWidth).round();
-    final top = (y * PixelSleepingCat.pixelHeight / originalHeight).round();
-    final right = ((x + width) * PixelSleepingCat.pixelWidth / originalWidth)
-        .round();
-    final bottom =
-        ((y + height) * PixelSleepingCat.pixelHeight / originalHeight).round();
-    // draw() already converts 104×56 authoring units into native 192×112
-    // sprite pixels. Calling fine() here scales a second time, displacing
-    // the body, ears and paws beyond their intended positions.
-    micro(left, top, right - left, bottom - top, color);
+    // Avoid a second pass through fine(), which scales 150×80 pixels and
+    // displaces legacy body rectangles past the native sprite boundaries.
+    final bounds = PixelSleepingCat.originalPixelBounds(x, y, width, height);
+    micro(
+      bounds.left.toInt(),
+      bounds.top.toInt(),
+      bounds.width.toInt(),
+      bounds.height.toInt(),
+      color,
+    );
   }
 
   // The previous detail pass was authored at 150×80; keep its marks in
