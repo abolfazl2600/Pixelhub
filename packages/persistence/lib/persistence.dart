@@ -429,7 +429,6 @@ final class LocalPreferences
   Future<void> removeProgress(LevelDefinition level) =>
       _enqueue(() => _preferences.remove(_key(level.id, level.contentVersion)));
 
-  @override
   static const _museumKey = 'pixelhub.museum.v1';
 
   @override
@@ -639,7 +638,6 @@ final class MemoryPreferences
     _records.remove(_key(level.id, level.contentVersion));
   }
 
-  @override
   @override
   Future<MuseumLayout> readMuseum() async =>
       MuseumLayout.fromJson(museum.toJson());
