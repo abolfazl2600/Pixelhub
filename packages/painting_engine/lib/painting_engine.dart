@@ -1,10 +1,10 @@
 import 'dart:typed_data';
 
-/// Paid, targeted tools. Ordinary painting remains free.
-enum PrecisionPaintTool { magicWand, colorSplash }
-
 import 'package:game_domain/game_domain.dart';
 import 'package:level_schema/level_schema.dart';
+
+/// Paid, targeted tools. Ordinary painting remains free.
+enum PrecisionPaintTool { magicWand, colorSplash }
 
 /// One shared Android/Web engine, independent of Flutter and storage plugins.
 final class PaintingSession {
