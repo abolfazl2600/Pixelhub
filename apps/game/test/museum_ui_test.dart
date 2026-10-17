@@ -81,8 +81,12 @@ void main() {
     await tester.pumpAndSettle();
     expect((await store.readMuseum()).slots.first, 'sunflower');
 
-    await tester.ensureVisible(
+    // ListView lazily builds the controls below the tall pixel room.
+    // Scroll to construct the toolbar before interacting with it.
+    await tester.scrollUntilVisible(
       find.byKey(const ValueKey('museum-walls-button')),
+      180,
+      scrollable: find.byType(Scrollable).first,
     );
     await tester.tap(find.byKey(const ValueKey('museum-walls-button')));
     await tester.pumpAndSettle();
