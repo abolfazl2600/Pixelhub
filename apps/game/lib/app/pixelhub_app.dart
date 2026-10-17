@@ -10,6 +10,8 @@ import 'package:level_schema/level_schema.dart';
 import 'package:persistence/persistence.dart';
 
 import '../features/home/home_screen.dart';
+import '../features/museum/museum_controller.dart';
+import '../features/museum/museum_screen.dart';
 import '../core/local_diagnostics.dart';
 import '../core/game_sounds.dart';
 import '../features/profile/profile_screen.dart';
@@ -60,6 +62,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
   late final ProgressRepository _progress;
   late final PreferencesRepository _preferences;
   late final LibraryController _library;
+  late final MuseumController _museum;
   late final GameSounds _sounds;
   late final OnlineCatalogController _online;
   final ValueNotifier<Map<String, PixelAnimation>> _bundledAnimations =
@@ -105,6 +108,12 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
           ? preferences as RecentArtworkRepository
           : null,
     );
+    _museum = MuseumController(
+      preferences is MuseumRepository
+          ? preferences as MuseumRepository
+          : MemoryPreferences(),
+      _library,
+    );
     _online = OnlineCatalogController(
       preferences is OnlineLevelStorage
           ? preferences as OnlineLevelStorage
@@ -133,6 +142,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     _routeChanges = Listenable.merge([
       _bootstrap,
       _library,
+      _museum,
       _online,
       _bundledAnimations,
       _styleChanges,
@@ -156,6 +166,13 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
             GoRoute(
               path: 'import',
               builder: (context, state) => _route(page: 'import'),
+            ),
+            GoRoute(
+              path: 'museum',
+              builder: (context, state) => _route(
+                page: 'museum',
+                museumArtworkId: state.uri.queryParameters['artwork'],
+              ),
             ),
             GoRoute(
               path: 'profile',
@@ -192,6 +209,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     unawaited(_loadArtworkStyle());
     unawaited(_library.loadRecentArtwork());
     unawaited(_library.load());
+    unawaited(_museum.load());
     unawaited(_bootstrap.load());
     unawaited(prepareOfflineApp());
   }
@@ -382,6 +400,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
 
   Future<void> _clearLocalData() async {
     await _languageWrites;
+    await _museum.settle();
     await Future.wait(_sessions.values.map((controller) => controller.flush()));
     for (final controller in _sessions.values) {
       controller.dispose();
@@ -389,6 +408,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     _sessions.clear();
     try {
       await _library.clear();
+      _museum.resetAfterClear();
       await _sounds.setEnabled(true);
       _online.clearDownloaded();
     } on Object {
@@ -436,7 +456,11 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     ),
   );
 
-  Widget _route({String? id, String page = 'home'}) => ListenableBuilder(
+  Widget _route({
+    String? id,
+    String? museumArtworkId,
+    String page = 'home',
+  }) => ListenableBuilder(
     listenable: _routeChanges,
     builder: (context, _) {
       // Privacy is reachable even when the picture catalog fails to load.
@@ -452,6 +476,14 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
           library: _library,
           online: _online,
           personal: page == 'my-gallery',
+        );
+      }
+      if (page == 'museum') {
+        return MuseumScreen(
+          museum: _museum,
+          library: _library,
+          animationFor: _animationFor,
+          addArtworkId: museumArtworkId,
         );
       }
       if (page == 'profile') {
@@ -530,6 +562,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     _styleChanges.dispose();
     _bootstrap.dispose();
     _library.dispose();
+    _museum.dispose();
     _sounds.dispose();
     _online.dispose();
     _bundledAnimations.dispose();
