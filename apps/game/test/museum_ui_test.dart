@@ -39,6 +39,45 @@ Future<void> completeTestPicture(MemoryPreferences store) async {
 }
 
 void main() {
+  testWidgets('all four high-detail museum rooms paint at 180x240', (
+    tester,
+  ) async {
+    for (final (theme, wall) in [
+      ('classic', 'cream'),
+      ('royal', 'emerald'),
+      ('sky', 'blue'),
+      ('botanical', 'sage'),
+    ]) {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: SizedBox(
+                width: 360,
+                height: 480,
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: CustomPaint(
+                        painter: MuseumRoomPainter(wall),
+                      ),
+                    ),
+                    Positioned.fill(
+                      child: CustomPaint(
+                        painter: MuseumThemeDetailsPainter(theme),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      expect(tester.takeException(), isNull, reason: theme);
+    }
+  });
+
   testWidgets('the museum starts empty, with six pixels slots and controls', (
     tester,
   ) async {
