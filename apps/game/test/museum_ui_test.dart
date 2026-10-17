@@ -64,10 +64,7 @@ void main() {
       museumSceneFor('classic', 'cream'),
       isA<MuseumClassicScenePainter>(),
     );
-    expect(
-      museumSceneFor('royal', 'emerald'),
-      isA<MuseumRoyalScenePainter>(),
-    );
+    expect(museumSceneFor('royal', 'emerald'), isA<MuseumRoyalScenePainter>());
     expect(museumSceneFor('sky', 'blue'), isA<MuseumSkyScenePainter>());
     expect(
       museumSceneFor('botanical', 'sage'),
@@ -168,8 +165,7 @@ void main() {
     expect(
       find.byWidgetPredicate(
         (widget) =>
-            widget is CustomPaint &&
-            widget.painter is MuseumRoyalScenePainter,
+            widget is CustomPaint && widget.painter is MuseumRoyalScenePainter,
       ),
       findsOneWidget,
     );
