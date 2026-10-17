@@ -183,6 +183,18 @@ class LibraryController extends ChangeNotifier {
     return _recentWrites;
   }
 
+  /// The last artwork the user opened to paint, regardless of whether it is
+  /// unfinished, unstarted, or complete. Only currently available, accessible
+  /// levels qualify; removed downloads and private artworks fall back safely.
+  LevelDefinition? get recentlyOpenedLevel {
+    final id = _recentArtworkId;
+    if (id == null) return null;
+    for (final level in levels) {
+      if (level.id == id && canPaint(level)) return level;
+    }
+    return null;
+  }
+
   LevelDefinition? get continueLevel {
     bool unfinished(LevelDefinition level) {
       if (damagedProgress.contains(level.id)) return false;
