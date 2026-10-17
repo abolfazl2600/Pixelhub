@@ -58,9 +58,9 @@ class _MuseumScreenState extends State<MuseumScreen> {
 
   void _error() {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.strings.museumSaveError)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(context.strings.museumSaveError)));
   }
 
   Future<bool> _save(Future<void> Function() operation) async {
@@ -336,7 +336,8 @@ class _MuseumScreenState extends State<MuseumScreen> {
                             for (var i = 0; i < 6; i++)
                               Positioned(
                                 left: (4 + (i % 3) * 20) * unit,
-                                top: (i ~/ 3 == 0 ? 13 : 38) * unit +
+                                top:
+                                    (i ~/ 3 == 0 ? 13 : 38) * unit +
                                     (layout.arrangement == 'staggered'
                                         ? (i % 3 == 1 ? 3 : 0) * unit
                                         : 0),
@@ -456,11 +457,7 @@ BoxDecoration _pixelBox(Color color) => BoxDecoration(
   color: color,
   border: Border.all(color: const Color(0xff77523d), width: 3),
   boxShadow: const [
-    BoxShadow(
-      color: Color(0xffad886b),
-      offset: Offset(3, 3),
-      blurRadius: 0,
-    ),
+    BoxShadow(color: Color(0xffad886b), offset: Offset(3, 3), blurRadius: 0),
   ],
 );
 
@@ -494,10 +491,7 @@ class _PixelMenuButton extends StatelessWidget {
               text,
               textAlign: TextAlign.center,
               maxLines: 1,
-              style: const TextStyle(
-                fontWeight: FontWeight.w800,
-                fontSize: 12,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12),
             ),
           ],
         ),
