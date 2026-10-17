@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart'
     show TargetPlatform, debugDefaultTargetPlatformOverride;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:game_domain/game_domain.dart';
+import 'package:go_router/go_router.dart';
 import 'package:persistence/persistence.dart';
 import 'package:pixelhub/app/pixelhub_app.dart';
 import 'package:pixelhub/core/pixel_art_preview.dart';
@@ -56,6 +58,45 @@ void main() {
     expect(find.text('کمی مکث،\nکمی رنگ.'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  for (final language in ['fa', 'en']) {
+    testWidgets('coins only are displayed in Home and Profile ($language)', (
+      tester,
+    ) async {
+      final store = MemoryPreferences();
+      await store.writeLibrary(ArtworkLibrary(coins: 87, totalPoints: 1234));
+      await store.writeLanguage(language);
+      final repository = TestRepository();
+      await tester.pumpWidget(
+        PixelhubApp(
+          repository: repository,
+          progressRepository: store,
+          artworkRepository: store,
+          preferences: store,
+        ),
+      );
+      repository.requests.single.complete(fixture());
+      await tester.pumpAndSettle();
+
+      final coinLabel = language == 'fa' ? 'سکه‌های من' : 'My coins';
+      final pointLabel = language == 'fa' ? 'امتیاز کل' : 'Total points';
+      final coinDigits = language == 'fa' ? '۸۷' : '87';
+      expect(find.textContaining(coinLabel), findsOneWidget);
+      expect(find.textContaining(coinDigits), findsWidgets);
+      expect(find.textContaining(pointLabel), findsNothing);
+
+      GoRouter.of(
+        tester.element(find.byKey(const ValueKey('home-scroll'))),
+      ).go('/profile');
+      await tester.pumpAndSettle();
+      expect(find.text(coinLabel), findsOneWidget);
+      expect(find.text(coinDigits), findsOneWidget);
+      expect(find.textContaining(pointLabel), findsNothing);
+      expect((await store.readLibrary()).totalPoints, 1234);
+      expect((await store.readLibrary()).coins, 87);
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   testWidgets('failed bootstrap presents a working retry', (tester) async {
     final repository = TestRepository();
