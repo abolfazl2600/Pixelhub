@@ -16,10 +16,7 @@ class MuseumThemeDetailsPainter extends CustomPainter {
     final paint = Paint()..isAntiAlias = false;
     void block(int x, int y, int w, int h, Color color) {
       paint.color = color;
-      canvas.drawRect(
-        Rect.fromLTWH(x * dx, y * dy, w * dx, h * dy),
-        paint,
-      );
+      canvas.drawRect(Rect.fromLTWH(x * dx, y * dy, w * dx, h * dy), paint);
     }
 
     const gold = Color(0xffd5a044);
@@ -180,10 +177,7 @@ class MuseumThemeThumbnailPainter extends CustomPainter {
     final paint = Paint()..isAntiAlias = false;
     void block(int x, int y, int w, int h, Color color) {
       paint.color = color;
-      canvas.drawRect(
-        Rect.fromLTWH(x * dx, y * dy, w * dx, h * dy),
-        paint,
-      );
+      canvas.drawRect(Rect.fromLTWH(x * dx, y * dy, w * dx, h * dy), paint);
     }
 
     final wall = switch (theme) {
@@ -218,14 +212,20 @@ class MuseumThemeThumbnailPainter extends CustomPainter {
       block(x + 1, y + 1, 15, 15, const Color(0xff3c302a));
       block(x, y, 15, 15, trim);
       block(x + 2, y + 2, 11, 11, const Color(0xffffedd1));
-      block(x + 4, y + 5, 7, 5, [
-        const Color(0xffdc7754),
-        const Color(0xff8aa9c9),
-        const Color(0xffc38eac),
-        const Color(0xffedbb4a),
-        const Color(0xff79a977),
-        const Color(0xffd87c6c),
-      ][i]);
+      block(
+        x + 4,
+        y + 5,
+        7,
+        5,
+        [
+          const Color(0xffdc7754),
+          const Color(0xff8aa9c9),
+          const Color(0xffc38eac),
+          const Color(0xffedbb4a),
+          const Color(0xff79a977),
+          const Color(0xffd87c6c),
+        ][i],
+      );
     }
     block(0, 55, 64, 17, floor);
     block(9, 63, 46, 8, trim);
