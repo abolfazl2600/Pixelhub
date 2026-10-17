@@ -10,8 +10,7 @@ import '../gallery/library_controller.dart';
 import '../painting/completed_artwork_preview.dart';
 import 'museum_controller.dart';
 import 'pixel_sleeping_cat.dart';
-import 'museum_room_painter.dart';
-import 'museum_theme_painter.dart';
+import 'museum_scene_painters.dart';
 
 /// Offline-first, two-dimensional pixel gallery. The screen never writes a
 /// painting or unlock; it only saves which completed artworks hang on a wall.
@@ -359,7 +358,15 @@ class _MuseumScreenState extends State<MuseumScreen> {
                               Expanded(
                                 child: SizedBox.expand(
                                   child: CustomPaint(
-                                    painter: MuseumThemeThumbnailPainter(id),
+                                    painter: museumSceneFor(
+                                      id,
+                                      switch (id) {
+                                        'royal' => 'emerald',
+                                        'sky' => 'blue',
+                                        'botanical' => 'sage',
+                                        _ => 'cream',
+                                      },
+                                    ),
                                   ),
                                 ),
                               ),
@@ -537,18 +544,16 @@ class _MuseumScreenState extends State<MuseumScreen> {
                       return SizedBox(
                         key: const ValueKey('museum-pixel-room'),
                         width: width,
-                        height: 86 * unit,
+                        height: 88 * unit,
                         child: Stack(
                           children: [
                             Positioned.fill(
-                              child: CustomPaint(
-                                painter: MuseumRoomPainter(layout.wall),
-                              ),
-                            ),
-                            Positioned.fill(
-                              child: CustomPaint(
-                                painter: MuseumThemeDetailsPainter(
-                                  layout.theme,
+                              child: RepaintBoundary(
+                                child: CustomPaint(
+                                  painter: museumSceneFor(
+                                    layout.theme,
+                                    layout.wall,
+                                  ),
                                 ),
                               ),
                             ),
@@ -556,7 +561,10 @@ class _MuseumScreenState extends State<MuseumScreen> {
                               Positioned(
                                 left: (4 + (i % 3) * 20) * unit,
                                 top:
-                                    (i ~/ 3 == 0 ? 13 : 38) * unit +
+                                    (i ~/ 3 == 0
+                                            ? (layout.theme == 'sky' ? 14 : 13)
+                                            : (layout.theme == 'royal' ? 39 : 38)) *
+                                        unit +
                                     (layout.arrangement == 'staggered'
                                         ? (i % 3 == 1 ? 3 : 0) * unit
                                         : 0),
@@ -565,6 +573,7 @@ class _MuseumScreenState extends State<MuseumScreen> {
                                   index: i,
                                   unit: unit,
                                   frame: layout.frame,
+                                  theme: layout.theme,
                                   level: _completedArtwork(shown[i]),
                                   animation: shown[i] == null
                                       ? null
@@ -582,10 +591,10 @@ class _MuseumScreenState extends State<MuseumScreen> {
                             // artworks never repaint when the sleeping cat
                             // flicks its tail every few seconds.
                             Positioned(
-                              left: 20 * unit,
-                              top: 58 * unit,
-                              width: 26 * unit,
-                              height: 14 * unit,
+                              left: 17 * unit,
+                              top: 54 * unit,
+                              width: 30 * unit,
+                              height: 17.5 * unit,
                               child: const IgnorePointer(
                                 child: PixelSleepingCat(
                                   key: ValueKey('museum-sleeping-cat'),
@@ -756,6 +765,7 @@ class _MuseumSlot extends StatelessWidget {
     required this.index,
     required this.unit,
     required this.frame,
+    required this.theme,
     required this.level,
     required this.animation,
     required this.onTap,
@@ -765,6 +775,7 @@ class _MuseumSlot extends StatelessWidget {
   final int index;
   final double unit;
   final String frame;
+  final String theme;
   final LevelDefinition? level;
   final PixelAnimation? animation;
   final VoidCallback onTap;
