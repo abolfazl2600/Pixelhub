@@ -558,11 +558,13 @@ class _MuseumScreenState extends State<MuseumScreen> {
                             for (var i = 0; i < 6; i++)
                               Positioned(
                                 left: (4 + (i % 3) * 20) * unit,
-                                top: _museumSlotTop(
-                                  layout.theme,
-                                  layout.arrangement,
-                                  i,
-                                ) * unit,
+                                top:
+                                    _museumSlotTop(
+                                      layout.theme,
+                                      layout.arrangement,
+                                      i,
+                                    ) *
+                                    unit,
                                 width: 16 * unit,
                                 child: _MuseumSlot(
                                   index: i,
