@@ -67,10 +67,7 @@ void main() {
     );
     expect(MuseumRoomPainter.pixelWidth, 128);
     expect(MuseumRoomPainter.pixelHeight, 172);
-    expect(
-      find.byKey(const ValueKey('museum-sleeping-cat')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const ValueKey('museum-sleeping-cat')), findsOneWidget);
     expect(
       find.byWidgetPredicate(
         (widget) =>
@@ -109,21 +106,17 @@ void main() {
 
     // The static scenery and sleeping body never need an animation tick.
     expect(
-      const MuseumRoomPainter('sage').shouldRepaint(
-        const MuseumRoomPainter('sage'),
-      ),
+      const MuseumRoomPainter(
+        'sage',
+      ).shouldRepaint(const MuseumRoomPainter('sage')),
       isFalse,
     );
     expect(
-      const PixelCatBodyPainter().shouldRepaint(
-        const PixelCatBodyPainter(),
-      ),
+      const PixelCatBodyPainter().shouldRepaint(const PixelCatBodyPainter()),
       isFalse,
     );
     expect(
-      const PixelCatTailPainter(1).shouldRepaint(
-        const PixelCatTailPainter(0),
-      ),
+      const PixelCatTailPainter(1).shouldRepaint(const PixelCatTailPainter(0)),
       isTrue,
     );
 
