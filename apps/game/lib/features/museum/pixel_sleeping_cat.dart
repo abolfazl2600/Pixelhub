@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-/// An independent 104 × 56 pixel sprite. The room and the sleeping body stay
+/// An independently drawn 150 × 80 pixel sprite. The room and the sleeping body stay
 /// static; only the tail layer changes on a slow, four-step loop.
 class PixelSleepingCat extends StatefulWidget {
   const PixelSleepingCat({super.key});
 
-  static const int pixelWidth = 104;
-  static const int pixelHeight = 56;
+  static const int pixelWidth = 150;
+  static const int pixelHeight = 80;
 
   @override
   State<PixelSleepingCat> createState() => _PixelSleepingCatState();
@@ -174,6 +174,45 @@ class PixelCatBodyPainter extends CustomPainter {
     pixel.draw(100, 45, 3, 1, outline);
     pixel.draw(76, 39, 3, 1, furShadow);
     pixel.draw(73, 42, 5, 1, furShadow);
+
+    // 150×80-only details. These are NEW 1px marks, not upscaled copies:
+    // ear tufts, small forehead stripes, eyelids, whisker roots and fur.
+    for (final x in [109, 113, 130, 134]) {
+      pixel.fine(x, 26, 1, 3, furShadow);
+      pixel.fine(x + 1, 29, 1, 2, cream);
+    }
+    pixel.fine(111, 23, 1, 5, light);
+    pixel.fine(133, 22, 1, 5, light);
+    pixel.fine(117, 37, 1, 4, stripe);
+    pixel.fine(122, 40, 1, 3, stripe);
+    pixel.fine(128, 37, 1, 5, stripe);
+    for (final x in [56, 64, 74, 84]) {
+      pixel.fine(x, 39, 1, 6, stripe);
+      pixel.fine(x + 1, 43, 1, 3, furShadow);
+      pixel.fine(x + 2, 38, 2, 1, cream);
+    }
+    for (var x = 43; x < 88; x += 7) {
+      pixel.fine(x, 64, 3, 1, light);
+      pixel.fine(x + 2, 66, 2, 1, furShadow);
+    }
+    // Short curved sleeping eyelids, nose highlights and facial whiskers.
+    for (final x in [114, 127]) {
+      pixel.fine(x, 51, 7, 1, outline);
+      pixel.fine(x + 1, 52, 5, 1, furShadow);
+      pixel.fine(x + 2, 50, 3, 1, cream);
+    }
+    pixel.fine(140, 55, 3, 1, pink);
+    pixel.fine(143, 56, 1, 1, light);
+    pixel.fine(137, 59, 3, 1, outline);
+    pixel.fine(143, 51, 6, 1, cream);
+    pixel.fine(144, 53, 5, 1, furShadow);
+    pixel.fine(143, 63, 6, 1, outline);
+    pixel.fine(136, 62, 4, 1, furShadow);
+    // Distinct curled paws with tiny toe dividers.
+    for (final x in [97, 102, 116, 121]) {
+      pixel.fine(x, 70, 1, 2, outline);
+      pixel.fine(x + 1, 68, 2, 1, light);
+    }
   }
 
   @override
@@ -224,6 +263,21 @@ class PixelCatTailPainter extends CustomPainter {
       pixel.draw(9, 13, 2, 6, stripe);
       pixel.draw(16, 26, 3, 2, stripe);
     }
+
+    // Fine tabby bands at the NEW pixel scale follow the three tail poses.
+    final tipY = switch (frame) {
+      0 => 33,
+      1 => 27,
+      _ => 18,
+    };
+    pixel.fine(12, tipY, 5, 1, stripe);
+    pixel.fine(13, tipY + 1, 3, 1, furGold);
+    pixel.fine(17, tipY + 4, 2, 3, outline);
+    pixel.fine(20, tipY + 7, 2, 1, furGold);
+    for (var x = 27; x <= 40; x += 6) {
+      pixel.fine(x, 60, 2, 2, stripe);
+      pixel.fine(x + 2, 62, 2, 1, furGold);
+    }
   }
 
   @override
@@ -237,7 +291,22 @@ class _CatPixels {
   final Size size;
   final Paint _paint = Paint()..isAntiAlias = false;
 
+  static const originalWidth = 104;
+  static const originalHeight = 56;
+
+  // Quantize both rectangle edges to prevent blurry fractional sprite pixels.
   void draw(int x, int y, int width, int height, Color color) {
+    final left = (x * PixelSleepingCat.pixelWidth / originalWidth).round();
+    final top = (y * PixelSleepingCat.pixelHeight / originalHeight).round();
+    final right =
+        ((x + width) * PixelSleepingCat.pixelWidth / originalWidth).round();
+    final bottom =
+        ((y + height) * PixelSleepingCat.pixelHeight / originalHeight).round();
+    fine(left, top, right - left, bottom - top, color);
+  }
+
+  void fine(int x, int y, int width, int height, Color color) {
+    if (width <= 0 || height <= 0) return;
     _paint.color = color;
     canvas.drawRect(
       Rect.fromLTWH(
