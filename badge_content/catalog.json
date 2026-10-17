@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "badges": [
+    {
+      "id": "animal_first",
+      "titleFa": "اولین دوست حیوانات",
+      "titleEn": "First Animal Friend",
+      "descriptionFa": "اولین نقاشی حیوان را تکمیل کن.",
+      "descriptionEn": "Complete your first animal picture.",
+      "category": "animals",
+      "required": 1,
+      "image": "images/animal_first.png",
+      "bytes": 436,
+      "sha256": "4a627b6817ece8b0b488569761d0146ed244907fc400b280468d75b80ad0e998"
+    },
+    {
+      "id": "animal_five",
+      "titleFa": "دوستدار حیوانات",
+      "titleEn": "Animal Lover",
+      "descriptionFa": "پنج نقاشی حیوان را تکمیل کن.",
+      "descriptionEn": "Complete five animal pictures.",
+      "category": "animals",
+      "required": 5,
+      "image": "images/animal_five.png",
+      "bytes": 447,
+      "sha256": "73a524a6c6ce036ba8764e4ef62b165ac6b1e6ec56912813096223919e92ba63"
+    },
+    {
+      "id": "animal_ten",
+      "titleFa": "نگهبان حیات وحش",
+      "titleEn": "Wildlife Guardian",
+      "descriptionFa": "ده نقاشی حیوان را تکمیل کن.",
+      "descriptionEn": "Complete ten animal pictures.",
+      "category": "animals",
+      "required": 10,
+      "image": "images/animal_ten.png",
+      "bytes": 441,
+      "sha256": "78cc3f28edbf93190011dfc20f5a08e440f4d3d43909cb071a5846e1173d2fb2"
+    },
+    {
+      "id": "nature_five",
+      "titleFa": "دوست طبیعت",
+      "titleEn": "Nature Explorer",
+      "descriptionFa": "پنج نقاشی طبیعت را تکمیل کن.",
+      "descriptionEn": "Complete five nature pictures.",
+      "category": "nature",
+      "required": 5,
+      "image": "images/nature_five.png",
+      "bytes": 474,
+      "sha256": "5b7ebaca43d5d90fef5053e537fa468484730519b9a26ee56089a09d1b27d5bd"
+    },
+    {
+      "id": "masterpieces_five",
+      "titleFa": "هنردوست",
+      "titleEn": "Art Connoisseur",
+      "descriptionFa": "پنج اثر هنری معروف را تکمیل کن.",
+      "descriptionEn": "Complete five masterpieces.",
+      "category": "masterpieces",
+      "required": 5,
+      "image": "images/masterpieces_five.png",
+      "bytes": 527,
+      "sha256": "3e48bbfe62b556d0f25649cc4fcdf9d58882a057a292febc963ff1a9f7a0dbe5"
+    }
+  ]
+}
