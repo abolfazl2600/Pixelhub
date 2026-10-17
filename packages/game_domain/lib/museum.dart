@@ -6,7 +6,9 @@ final class MuseumLayout {
     this.frame = 'wood',
     this.arrangement = 'grid',
     List<String?>? slots,
-  }) : slots = List.unmodifiable(slots ?? List<String?>.filled(6, null)) {
+  }) : slots = List<String?>.unmodifiable(
+         slots ?? List<String?>.filled(6, null),
+       ) {
     if (!walls.contains(wall) ||
         !frames.contains(frame) ||
         !arrangements.contains(arrangement) ||
