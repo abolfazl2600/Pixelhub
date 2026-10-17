@@ -466,7 +466,8 @@ final class MemoryPreferences
         OnlineLevelStorage,
         OnlineAnimationStorage,
         ArtworkStylePreferences,
-        SoundEffectsPreferences {
+        SoundEffectsPreferences,
+        MuseumRepository {
   final Map<String, ProgressSnapshot> _records = {};
   String? language;
   String? artworkStyle;
