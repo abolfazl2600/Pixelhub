@@ -316,5 +316,12 @@
   "museumInThisFrame": "در همین قاب نصب شده",
   "museumOnWallSlot": "روی دیوار · قاب {slot} — برای جابه‌جایی لمس کنید",
   "@museumOnWallSlot": {"placeholders":{"slot":{"type":"String"}}},
-  "museumReadyToHang": "هنوز روی دیوار نیست"
+  "museumReadyToHang": "هنوز روی دیوار نیست",
+  "museumThemes": "طرح موزه",
+  "museumThemesHelp": "چهار سبک پیکسلی برای اتاق موزه؛ تابلوهای نصب‌شده جابه‌جا نمی‌شوند.",
+  "museumThemeClassic": "کلاسیک گرم",
+  "museumThemeRoyal": "زمردی سلطنتی",
+  "museumThemeSky": "آسمانی مینیمال",
+  "museumThemeBotanical": "باغ گیاهان",
+  "museumWallEmerald": "زمردی تیره"
 }
