@@ -11,6 +11,7 @@ import '../painting/completed_artwork_preview.dart';
 import 'museum_controller.dart';
 import 'pixel_sleeping_cat.dart';
 import 'museum_room_painter.dart';
+import 'museum_theme_painter.dart';
 
 /// Offline-first, two-dimensional pixel gallery. The screen never writes a
 /// painting or unlock; it only saves which completed artworks hang on a wall.
@@ -277,6 +278,129 @@ class _MuseumScreenState extends State<MuseumScreen> {
     );
   }
 
+  Future<void> _chooseTheme() async {
+    final strings = context.strings;
+    final current = widget.museum.layout.theme;
+    final options = [
+      ('classic', strings.museumThemeClassic),
+      ('royal', strings.museumThemeRoyal),
+      ('sky', strings.museumThemeSky),
+      ('botanical', strings.museumThemeBotanical),
+    ];
+    final chosen = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) => SafeArea(
+        child: SizedBox(
+          height: math.min(MediaQuery.sizeOf(sheetContext).height * .75, 610.0),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(18, 14, 12, 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        strings.museumThemes,
+                        style: Theme.of(sheetContext).textTheme.titleLarge,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(sheetContext),
+                      icon: const Icon(Icons.close_rounded),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 18),
+                child: Text(
+                  strings.museumThemesHelp,
+                  style: Theme.of(sheetContext).textTheme.bodySmall,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Expanded(
+                child: GridView.builder(
+                  padding: const EdgeInsets.fromLTRB(14, 0, 14, 20),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: .72,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                  ),
+                  itemCount: options.length,
+                  itemBuilder: (context, index) {
+                    final (id, label) = options[index];
+                    final selected = id == current;
+                    final scheme = Theme.of(sheetContext).colorScheme;
+                    return Material(
+                      color: selected
+                          ? scheme.primaryContainer
+                          : scheme.surfaceContainerLowest,
+                      borderRadius: BorderRadius.circular(12),
+                      child: InkWell(
+                        key: ValueKey('museum-theme-$id'),
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () => Navigator.pop(sheetContext, id),
+                        child: Container(
+                          padding: const EdgeInsets.all(9),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: selected
+                                  ? scheme.primary
+                                  : scheme.outlineVariant,
+                              width: selected ? 2.5 : 1,
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: SizedBox.expand(
+                                  child: CustomPaint(
+                                    painter: MuseumThemeThumbnailPainter(id),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      label,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  if (selected)
+                                    Icon(
+                                      Icons.check_circle,
+                                      size: 19,
+                                      color: scheme.primary,
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (!mounted || chosen == null || chosen == current) return;
+    await _save(() => widget.museum.setTheme(chosen));
+  }
+
   Future<void> _chooseStyle({
     required String title,
     required List<(String, String)> options,
@@ -415,7 +539,14 @@ class _MuseumScreenState extends State<MuseumScreen> {
                                 painter: MuseumRoomPainter(layout.wall),
                               ),
                             ),
-                            for (var i = 0; i < 6; i++)
+                            Positioned.fill(
+                              child: CustomPaint(
+                                painter: MuseumThemeDetailsPainter(
+                                  layout.theme,
+                                ),
+                              ),
+                            ),
+                            for (var i = 0; i < 6; i++
                               Positioned(
                                 left: (4 + (i % 3) * 20) * unit,
                                 top:
@@ -461,6 +592,20 @@ class _MuseumScreenState extends State<MuseumScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
+                  OutlinedButton.icon(
+                    key: const ValueKey('museum-themes-button'),
+                    onPressed: museum.busy ? null : _chooseTheme,
+                    icon: const Icon(Icons.auto_awesome_mosaic_rounded),
+                    label: Text(
+                      '${s.museumThemes}: ${switch (layout.theme) {
+                        'royal' => s.museumThemeRoyal,
+                        'sky' => s.museumThemeSky,
+                        'botanical' => s.museumThemeBotanical,
+                        _ => s.museumThemeClassic,
+                      }}',
+                    ),
+                  ),
+                  const SizedBox(height: 10),
                   Row(
                     children: [
                       Expanded(
@@ -497,6 +642,7 @@ class _MuseumScreenState extends State<MuseumScreen> {
                                     ('cream', s.museumWallCream),
                                     ('blue', s.museumWallBlue),
                                     ('sage', s.museumWallSage),
+                                    ('emerald', s.museumWallEmerald),
                                   ],
                                   onSelect: museum.setWall,
                                 ),
