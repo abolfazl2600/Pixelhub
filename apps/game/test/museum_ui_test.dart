@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:painting_engine/painting_engine.dart';
@@ -176,6 +178,25 @@ void main() {
     expect((await store.readMuseum()).slots, everyElement(isNull));
     expect(find.byKey(const ValueKey('museum-sleeping-cat')), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('cat body uses native pixel coordinates without rescaling twice', (
+    tester,
+  ) async {
+    final recorder = ui.PictureRecorder();
+    const size = Size(192, 112);
+    const PixelCatBodyPainter().paint(Canvas(recorder), size);
+    final image = await recorder.endRecording().toImage(192, 112);
+    final pixels = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+    expect(pixels, isNotNull);
+    final bytes = pixels!.buffer.asUint8List();
+
+    // The back begins at logical (40, 20), which must map to native
+    // coordinates around (74, 40); the erroneous double scale leaves this
+    // interior point transparent and paints the shape too far to the right.
+    expect(bytes[(45 * 192 + 80) * 4 + 3], 255);
+    expect(bytes[(3 * 192 + 3) * 4 + 3], 0);
+    image.dispose();
   });
 
   testWidgets('the sleeping cat flicks only its pixel tail slowly', (
