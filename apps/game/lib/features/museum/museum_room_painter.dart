@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-/// A crisp 128 × 172 pixel-art room (2 × the original detail density).
+import 'museum_pixel_grid.dart';
+
+/// A crisp 180 × 240 pixel-art room with fine new architectural details.
 ///
 /// Slot placement still uses the original 64 × 86 coordinates in MuseumScreen,
 /// so existing layouts, frames and saved arrangements do not need migration.
@@ -8,25 +10,21 @@ import 'package:flutter/material.dart';
 class MuseumRoomPainter extends CustomPainter {
   const MuseumRoomPainter(this.wall);
 
-  static const int pixelWidth = 128;
-  static const int pixelHeight = 172;
+  static const int pixelWidth = MuseumPixelGrid.width;
+  static const int pixelHeight = MuseumPixelGrid.height;
 
   final String wall;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final dx = size.width / pixelWidth;
-    final dy = size.height / pixelHeight;
-    final brush = Paint()..isAntiAlias = false;
+    final pixels = MuseumPixelGrid(canvas, size);
 
-    // Deliberately draw every detail on an integer pixel grid.
-    void pixel(int x, int y, int width, int height, Color color) {
-      brush.color = color;
-      canvas.drawRect(
-        Rect.fromLTWH(x * dx, y * dy, width * dx, height * dy),
-        brush,
-      );
-    }
+    // Keep the six original frame locations while snapping old outlines
+    // individually to 180×240 grid edges. Fine marks are genuinely new pixels.
+    void pixel(int x, int y, int w, int h, Color color) =>
+        pixels.legacy(x, y, w, h, color);
+    void fine(int x, int y, int w, int h, Color color) =>
+        pixels.fine(x, y, w, h, color);
 
     final plaster = switch (wall) {
       'blue' => const Color(0xffcbdce6),
@@ -56,7 +54,7 @@ class MuseumRoomPainter extends CustomPainter {
 
     // Masonry texture uses the new 1–3-pixel details, not larger
     // rectangles simply scaled up from the previous low-resolution room.
-    pixel(0, 0, pixelWidth, 143, plaster);
+    pixel(0, 0, 128, 143, plaster);
     for (var row = 17; row < 137; row += 12) {
       final shift = (row ~/ 12).isEven ? 3 : 11;
       for (var x = shift; x < 125; x += 21) {
@@ -200,6 +198,87 @@ class MuseumRoomPainter extends CustomPainter {
       pixel(cx + 1, 114, 6, 5, leafShade);
       pixel(cx - 1, 109, 4, 7, leaf);
       pixel(cx, 111, 2, 3, leafLight);
+    }
+
+    // High-resolution architectural pass: wall grain and recessed joins.
+    // The old 128×172 drawing remains a layout guide, but these 1px details
+    // are authored on the new 180×240 grid, rather than merely upscaled.
+    for (var row = 25; row < 191; row += 11) {
+      for (var x = 12 + (row ~/ 11 % 3) * 5; x < 171; x += 27) {
+        fine(x, row, 5, 1, plasterLight);
+        fine(x + 5, row + 1, 2, 1, plasterShade);
+        fine(x + 14, row + 4, 1, 3, plasterShade);
+        fine(x + 2, row + 7, 2, 1, plasterLight);
+      }
+    }
+    // Chiseled corners, tiny brass inlays and cabinetwork on the pilasters.
+    for (final x in [4, 174]) {
+      for (var y = 32; y < 193; y += 19) {
+        fine(x, y, 2, 4, walnut);
+        fine(x + 1, y + 1, 1, 2, gold);
+        fine(x, y + 6, 3, 1, honey);
+      }
+    }
+    for (var x = 12; x < 170; x += 9) {
+      fine(x, 15, 3, 1, gold);
+      fine(x + 2, 19, 2, 1, walnut);
+      fine(x + 1, 22, 1, 1, cream);
+    }
+    // The light fixtures now contain small facets and stepped brass rivets.
+    for (final cx in [28, 90, 152]) {
+      fine(cx - 6, 25, 12, 1, walnut);
+      fine(cx - 4, 26, 8, 2, honey);
+      fine(cx - 2, 29, 4, 1, cream);
+      fine(cx, 31, 1, 3, gold);
+      fine(cx - 9, 39, 2, 2, plasterLight);
+      fine(cx + 8, 41, 1, 3, plasterLight);
+    }
+    // Woodgrain knots and plank joints are visible at this pixel density.
+    for (var row = 0; row < 5; row++) {
+      final y = 207 + row * 7;
+      for (var x = 8 + (row.isEven ? 0 : 12); x < 178; x += 34) {
+        fine(x, y, 9, 1, honey);
+        fine(x + 12, y + 1, 4, 1, mahogany);
+        fine(x + 21, y + 3, 1, 2, walnut);
+        fine(x + 23, y + 3, 1, 1, cream);
+      }
+    }
+    // Detailed Persian carpet: fine weave, border stitches and diamonds.
+    for (var x = 32; x <= 148; x += 6) {
+      fine(x, 221, 2, 1, cream);
+      fine(x + 2, 235, 2, 1, honey);
+      fine(x + 3, 223, 1, 2, rugDark);
+      fine(x, 233, 1, 2, rugOrange);
+    }
+    for (final cx in [55, 89, 123]) {
+      fine(cx, 225, 2, 5, cream);
+      fine(cx - 4, 227, 10, 1, cream);
+      fine(cx - 2, 226, 6, 3, rugRed);
+      fine(cx, 226, 2, 3, gold);
+    }
+    // Upholstery stitching and carved bench ornamentation.
+    for (var x = 68; x < 118; x += 8) {
+      fine(x, 192, 1, 2, cream);
+      fine(x + 3, 197, 2, 1, honey);
+      fine(x + 1, 200, 3, 1, walnut);
+    }
+    for (final x in [69, 113]) {
+      fine(x, 212, 2, 7, mahogany);
+      fine(x + 1, 213, 1, 4, honey);
+      fine(x - 2, 221, 6, 1, outline);
+    }
+    // Plants: distinct leaf veins, paired tiny leaves and glazed pots.
+    for (final cx in [17, 163]) {
+      for (var y = 158; y <= 194; y += 9) {
+        fine(cx - 7, y, 8, 2, const Color(0xff6ca76f));
+        fine(cx - 6, y + 1, 4, 1, const Color(0xffbbd491));
+        fine(cx + 1, y + 4, 7, 2, const Color(0xff366e51));
+        fine(cx + 2, y + 4, 4, 1, const Color(0xff9cca8e));
+      }
+      fine(cx - 6, 203, 12, 1, const Color(0xffbadfe0));
+      fine(cx - 7, 207, 1, 8, const Color(0xff74afc5));
+      fine(cx + 5, 208, 1, 6, const Color(0xff2d5977));
+      fine(cx - 4, 217, 8, 1, outline);
     }
   }
 
