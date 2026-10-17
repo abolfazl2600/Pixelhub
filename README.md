@@ -4,7 +4,7 @@ Pixelhub is a shared Flutter pixel-coloring game for Android and Web. V3 adds a 
 
 ## Play and language
 
-Pick one of 40 original bundled pictures, then **Start / resume coloring**. Choose a numbered color and tap or drag over matching cells. A fast stroke fills the intervening matching cells. Wrong colors never count.
+Pick one of 49 bundled pictures across all seven public categories (at least four in each), then **Start / resume coloring**. Nine of the pictures are new original pixel-art interpretations of famous paintings, Iranian landmarks and a traditional Shamsa ornament; they are included with the app and do **not** require downloading online picture packs. Choose a numbered color and tap or drag over matching cells. A fast stroke fills the intervening matching cells. Wrong colors never count.
 
 Use **Move / zoom** to pan, pinch with two fingers to zoom, or use the zoom/fit buttons. Pinching does not paint. Undo history is no longer retained in the painting engine; Reset still requires confirmation. An in-progress touch stroke can still be cancelled to avoid accidental multi-touch marks. The engine keeps internal reversible stroke tracking for gesture cancellation and backward compatibility. A completion screen appears after every cell is colored, including background color 1.
 
