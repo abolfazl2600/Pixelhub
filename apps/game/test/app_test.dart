@@ -89,6 +89,12 @@ void main() {
         tester.element(find.byKey(const ValueKey('home-scroll'))),
       ).go('/profile');
       await tester.pumpAndSettle();
+      // The profile metrics appear below the header in a lazily built list.
+      await tester.scrollUntilVisible(
+        find.text(coinLabel),
+        180,
+        scrollable: find.byType(Scrollable).first,
+      );
       expect(find.text(coinLabel), findsOneWidget);
       expect(find.text(coinDigits), findsOneWidget);
       expect(find.textContaining(pointLabel), findsNothing);
