@@ -623,10 +623,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
                             '${s.walletCoins}: ${context.digits(library.coins)}',
                             style: const TextStyle(fontWeight: FontWeight.w700),
                           ),
-                          Text(
-                            '${s.walletPoints}: ${context.digits(library.totalPoints)}',
-                            style: const TextStyle(fontSize: 12),
-                          ),
                         ],
                       ),
                       const SizedBox(height: 12),
