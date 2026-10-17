@@ -3,13 +3,15 @@
 final class MuseumLayout {
   MuseumLayout({
     this.wall = 'cream',
+    this.theme = 'classic',
     this.frame = 'wood',
     this.arrangement = 'grid',
     List<String?>? slots,
   }) : slots = List<String?>.unmodifiable(
          slots ?? List<String?>.filled(6, null),
        ) {
-    if (!walls.contains(wall) ||
+    if (!themes.contains(theme) ||
+        !walls.contains(wall) ||
         !frames.contains(frame) ||
         !arrangements.contains(arrangement) ||
         this.slots.length != 6 ||
@@ -22,11 +24,14 @@ final class MuseumLayout {
     }
   }
 
-  static const walls = {'cream', 'blue', 'sage'};
+  /// Four visual rooms from the original PixelHub museum concept designs.
+  static const themes = {'classic', 'royal', 'sky', 'botanical'};
+  static const walls = {'cream', 'blue', 'sage', 'emerald'};
   static const frames = {'wood', 'gold', 'dark'};
   static const arrangements = {'grid', 'staggered'};
 
   final String wall;
+  final String theme;
   final String frame;
   final String arrangement;
   final List<String?> slots;
@@ -38,6 +43,8 @@ final class MuseumLayout {
       }
       return MuseumLayout(
         wall: json['wall']! as String,
+        // Legacy schema v1 layouts predate the selectable museum themes.
+        theme: (json['theme'] ?? 'classic') as String,
         frame: json['frame']! as String,
         arrangement: json['arrangement']! as String,
         slots: (json['slots']! as List<Object?>).cast<String?>(),
@@ -50,6 +57,7 @@ final class MuseumLayout {
   Map<String, Object?> toJson() => {
     'schemaVersion': 1,
     'wall': wall,
+    'theme': theme,
     'frame': frame,
     'arrangement': arrangement,
     'slots': slots,
@@ -57,11 +65,13 @@ final class MuseumLayout {
 
   MuseumLayout copyWith({
     String? wall,
+    String? theme,
     String? frame,
     String? arrangement,
     List<String?>? slots,
   }) => MuseumLayout(
     wall: wall ?? this.wall,
+    theme: theme ?? this.theme,
     frame: frame ?? this.frame,
     arrangement: arrangement ?? this.arrangement,
     slots: slots ?? this.slots,
