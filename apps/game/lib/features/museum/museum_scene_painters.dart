@@ -222,7 +222,11 @@ class MuseumClassicScenePainter extends MuseumScenePainter {
     }
     p.rect(0, 280, 256, 4, walnut);
     p.rect(0, 284, 256, 2, gilded);
-    p.floor(const Color(0xffb9794d), const Color(0xff7a492d), const Color(0xffe0a777));
+    p.floor(
+      const Color(0xffb9794d),
+      const Color(0xff7a492d),
+      const Color(0xffe0a777),
+    );
     for (final x in [25, 231]) {
       p.plant(
         x,
@@ -241,7 +245,12 @@ class MuseumClassicScenePainter extends MuseumScenePainter {
       sheen: const Color(0xffe48a82),
       decoration: lightGold,
     );
-    p.persianRug(const Color(0xff503148), const Color(0xff7c263f), const Color(0xffc06d46), lightGold);
+    p.persianRug(
+      const Color(0xff503148),
+      const Color(0xff7c263f),
+      const Color(0xffc06d46),
+      lightGold,
+    );
   }
 }
 
@@ -303,7 +312,11 @@ class MuseumRoyalScenePainter extends MuseumScenePainter {
     for (var x = 14; x < 245; x += 20) {
       p.rect(x, 280, 12, 2, gold);
     }
-    p.floor(const Color(0xff734023), const Color(0xff402315), const Color(0xffae6a36));
+    p.floor(
+      const Color(0xff734023),
+      const Color(0xff402315),
+      const Color(0xffae6a36),
+    );
     for (final x in [23, 233]) {
       p.plant(
         x,
@@ -326,7 +339,12 @@ class MuseumRoyalScenePainter extends MuseumScenePainter {
     );
     p.rect(124, 300, 8, 6, highlight);
     p.rect(126, 302, 4, 2, deep);
-    p.persianRug(const Color(0xff38192c), const Color(0xff075147), const Color(0xff8c2642), highlight);
+    p.persianRug(
+      const Color(0xff38192c),
+      const Color(0xff075147),
+      const Color(0xff8c2642),
+      highlight,
+    );
   }
 }
 
@@ -388,7 +406,11 @@ class MuseumSkyScenePainter extends MuseumScenePainter {
       p.lamp(cx, 45, const Color(0xff7c634d), const Color(0xffd6ae66), cream);
     }
     p.rect(0, 280, 256, 6, const Color(0xffe7eeeb));
-    p.floor(const Color(0xffd3ae88), const Color(0xffa07d60), const Color(0xfff0d4ad));
+    p.floor(
+      const Color(0xffd3ae88),
+      const Color(0xffa07d60),
+      const Color(0xfff0d4ad),
+    );
     for (final x in [22, 234]) {
       p.plant(
         x,
@@ -407,7 +429,12 @@ class MuseumSkyScenePainter extends MuseumScenePainter {
       sheen: cream,
       decoration: const Color(0xffc7e1e3),
     );
-    p.persianRug(const Color(0xff91b6ca), cream, const Color(0xff99cbe1), const Color(0xff5788ad));
+    p.persianRug(
+      const Color(0xff91b6ca),
+      cream,
+      const Color(0xff99cbe1),
+      const Color(0xff5788ad),
+    );
   }
 }
 
@@ -485,7 +512,11 @@ class MuseumBotanicalScenePainter extends MuseumScenePainter {
       p.rect(x, 280, 15, 2, wood);
       p.rect(x + 2, 283, 11, 1, honey);
     }
-    p.floor(const Color(0xffb78655), const Color(0xff805436), const Color(0xffdfad78));
+    p.floor(
+      const Color(0xffb78655),
+      const Color(0xff805436),
+      const Color(0xffdfad78),
+    );
     for (final x in [22, 234]) {
       p.plant(
         x,
@@ -510,7 +541,12 @@ class MuseumBotanicalScenePainter extends MuseumScenePainter {
       decoration: cream,
       rattan: true,
     );
-    p.persianRug(const Color(0xff5b653c), const Color(0xff79945c), const Color(0xff345d3f), cream);
+    p.persianRug(
+      const Color(0xff5b653c),
+      const Color(0xff79945c),
+      const Color(0xff345d3f),
+      cream,
+    );
     // Daisy motifs on the rug; tiny ivory petals read as botanical embroidery.
     for (final cx in [56, 110, 166, 207]) {
       p.rect(cx, 331, 3, 10, cream);
