@@ -552,7 +552,7 @@ class _MuseumScreenState extends State<MuseumScreen> {
                                 ),
                               ),
                             ),
-                            for (var i = 0; i < 6; i++
+                            for (var i = 0; i < 6; i++)
                               Positioned(
                                 left: (4 + (i % 3) * 20) * unit,
                                 top:
