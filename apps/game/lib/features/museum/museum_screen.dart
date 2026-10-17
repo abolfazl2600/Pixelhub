@@ -93,6 +93,14 @@ class _MuseumScreenState extends State<MuseumScreen> {
         .where(widget.library.isComplete)
         .toList(growable: false);
     final selectedId = widget.museum.layout.slots[index];
+    final installedSlots = widget.museum.visibleSlots;
+    final alreadyHung = completed
+        .where((level) => installedSlots.contains(level.id))
+        .toList(growable: false);
+    final available = completed
+        .where((level) => !installedSlots.contains(level.id))
+        .toList(growable: false);
+    final availableHeaderIndex = alreadyHung.length + (alreadyHung.isNotEmpty ? 1 : 0);
     final s = context.strings;
     final selection = await showModalBottomSheet<String>(
       context: context,
@@ -138,25 +146,97 @@ class _MuseumScreenState extends State<MuseumScreen> {
                         ),
                       )
                     : ListView.builder(
-                        itemCount: completed.length,
+                        itemCount:
+                            completed.length +
+                            (alreadyHung.isNotEmpty ? 1 : 0) +
+                            (available.isNotEmpty ? 1 : 0),
                         itemBuilder: (context, item) {
-                          final level = completed[item];
-                          return ListTile(
-                            key: ValueKey('museum-choice-${level.id}'),
-                            leading: SizedBox(
-                              width: 54,
-                              height: 54,
-                              child: PixelArtPreview(level: level),
+                          if (alreadyHung.isNotEmpty && item == 0) {
+                            return _museumPickerHeading(
+                              sheetContext,
+                              s.museumHungArtworks,
+                            );
+                          }
+                          if (available.isNotEmpty &&
+                              item == availableHeaderIndex) {
+                            return _museumPickerHeading(
+                              sheetContext,
+                              s.museumAvailableArtworks,
+                            );
+                          }
+                          final artworkIndex =
+                              item -
+                              (alreadyHung.isNotEmpty ? 1 : 0) -
+                              (available.isNotEmpty &&
+                                      item > availableHeaderIndex
+                                  ? 1
+                                  : 0);
+                          final level = artworkIndex < alreadyHung.length
+                              ? alreadyHung[artworkIndex]
+                              : available[artworkIndex - alreadyHung.length];
+                          final hungIndex = installedSlots.indexOf(level.id);
+                          final isCurrentSlot = hungIndex == index;
+                          final isHung = hungIndex >= 0;
+                          final scheme = Theme.of(sheetContext).colorScheme;
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 3,
                             ),
-                            title: Text(
-                              level.titleFor(
-                                sheetContext.isPersian ? 'fa' : 'en',
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: isCurrentSlot
+                                    ? scheme.primaryContainer
+                                    : isHung
+                                    ? scheme.secondaryContainer
+                                    : scheme.surface,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: isHung
+                                      ? scheme.primary.withValues(alpha: .45)
+                                      : scheme.outlineVariant,
+                                ),
+                              ),
+                              child: ListTile(
+                                key: ValueKey('museum-choice-${level.id}'),
+                                leading: SizedBox(
+                                  width: 54,
+                                  height: 54,
+                                  child: PixelArtPreview(level: level),
+                                ),
+                                title: Text(
+                                  level.titleFor(
+                                    sheetContext.isPersian ? 'fa' : 'en',
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  isCurrentSlot
+                                      ? s.museumInThisFrame
+                                      : isHung
+                                      ? s.museumOnWallSlot(
+                                          sheetContext.digits(hungIndex + 1),
+                                        )
+                                      : s.museumReadyToHang,
+                                  style: TextStyle(
+                                    fontWeight: isHung
+                                        ? FontWeight.w600
+                                        : FontWeight.normal,
+                                  ),
+                                ),
+                                trailing: Icon(
+                                  isCurrentSlot
+                                      ? Icons.check_circle_rounded
+                                      : isHung
+                                      ? Icons.collections_bookmark_rounded
+                                      : Icons.add_circle_outline_rounded,
+                                  color: isHung
+                                      ? scheme.primary
+                                      : scheme.onSurfaceVariant,
+                                ),
+                                onTap: () =>
+                                    Navigator.pop(sheetContext, level.id),
                               ),
                             ),
-                            trailing: selectedId == level.id
-                                ? const Icon(Icons.check_rounded)
-                                : const Icon(Icons.add_rounded),
-                            onTap: () => Navigator.pop(sheetContext, level.id),
                           );
                         },
                       ),
@@ -166,7 +246,7 @@ class _MuseumScreenState extends State<MuseumScreen> {
         ),
       ),
     );
-    if (!mounted || selection == null) return;
+    if (!mounted || selection == null || selection == selectedId) return;
     if (selection == '#remove') {
       await _save(() => widget.museum.remove(index));
     } else {
@@ -467,6 +547,16 @@ class _MuseumScreenState extends State<MuseumScreen> {
     },
   );
 }
+
+Widget _museumPickerHeading(BuildContext context, String title) => Padding(
+  padding: const EdgeInsets.fromLTRB(18, 14, 18, 6),
+  child: Text(
+    title,
+    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+      fontWeight: FontWeight.w800,
+    ),
+  ),
+);
 
 BoxDecoration _pixelBox(Color color) => BoxDecoration(
   color: color,
