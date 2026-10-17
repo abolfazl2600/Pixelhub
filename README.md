@@ -54,6 +54,10 @@ Published assets and live download behavior have not been manually validated in
 this development session; check GitHub Actions and the Pages catalog before
 claiming the sample is publicly available.
 
+## Achievement badge art standard
+
+The definitive badge art direction is the **large, high-detail, crisp pixel-art medal with a fully transparent PNG background**, delivered as a separate image per badge. See [Badge visual standard and mission roadmap](docs/badge-art-direction.md). This is a visual specification; proposed future badges are not automatically implemented or published.
+
 ## V4 development status
 
 The next roadmap stage is account-based progress synchronization. A pure conflict-resolution contract now lives in `packages/game_domain/lib/progress_sync.dart` (ADR 0004): disjoint completed cells merge within the same server reset generation, while a Reset invalidates older-generation writes. This is **domain groundwork only**, not an online feature. The [backend contract files](backend/README.md) now include a draft OpenAPI document and unexecuted PostgreSQL migration with an idempotency ledger schema. A separate account-scoped durable FIFO outbox now persists queued operations on Android/Web, but no UI or network adapter uses it yet. Auth, a running API, network sync, guest migration, account deletion and cross-device verification are still pending. Personal photo originals remain local.
