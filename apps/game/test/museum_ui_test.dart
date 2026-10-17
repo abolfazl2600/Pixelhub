@@ -81,7 +81,9 @@ void main() {
     await tester.pumpAndSettle();
     expect((await store.readMuseum()).slots.first, 'sunflower');
 
-    await tester.ensureVisible(find.byKey(const ValueKey('museum-walls-button')));
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('museum-walls-button')),
+    );
     await tester.tap(find.byKey(const ValueKey('museum-walls-button')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('museum-option-sage')));
@@ -128,10 +130,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('museum-slot-2')));
     await tester.pumpAndSettle();
     expect((await store.readMuseum()).slots[2], 'sunflower');
-    expect(
-      find.byKey(const ValueKey('museum-pending-artwork')),
-      findsNothing,
-    );
+    expect(find.byKey(const ValueKey('museum-pending-artwork')), findsNothing);
     expect(tester.takeException(), isNull);
   });
 }
