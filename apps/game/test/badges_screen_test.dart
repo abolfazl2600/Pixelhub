@@ -69,7 +69,11 @@ void main() {
           MaterialApp(
             locale: locale,
             supportedLocales: const [Locale('fa'), Locale('en')],
-            localizationsDelegates: GlobalMaterialLocalizations.delegates,
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
             home: BadgesScreen(badges: controller),
           ),
         );
