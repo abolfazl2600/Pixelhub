@@ -228,10 +228,7 @@ void main() {
     expect(find.text('Continue painting'), findsOneWidget);
     expect(find.text('Sunflower'), findsWidgets);
     expect(find.text('25%'), findsOneWidget);
-    expect(
-      find.byKey(const ValueKey('home-featured-artwork')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const ValueKey('home-featured-artwork')), findsOneWidget);
     expect(find.byType(PixelArtPreview), findsOneWidget);
 
     await tester.ensureVisible(find.byKey(const ValueKey('open-preview')));
@@ -244,10 +241,7 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pumpAndSettle();
     await openApp();
-    expect(
-      find.byKey(const ValueKey('home-featured-artwork')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const ValueKey('home-featured-artwork')), findsOneWidget);
     expect(find.byType(PixelArtPreview), findsOneWidget);
     expect(find.text('Continue painting'), findsOneWidget);
     expect(tester.takeException(), isNull);
