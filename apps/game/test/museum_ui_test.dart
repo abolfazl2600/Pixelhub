@@ -67,6 +67,8 @@ void main() {
     );
     expect(MuseumRoomPainter.pixelWidth, 128);
     expect(MuseumRoomPainter.pixelHeight, 172);
+    expect(PixelSleepingCat.pixelWidth, 104);
+    expect(PixelSleepingCat.pixelHeight, 56);
     expect(find.byKey(const ValueKey('museum-sleeping-cat')), findsOneWidget);
     expect(
       find.byWidgetPredicate(
@@ -175,6 +177,76 @@ void main() {
     expect((await store.readMuseum()).arrangement, 'staggered');
     expect(tester.takeException(), isNull);
   });
+
+  for (final language in ['fa', 'en']) {
+    testWidgets('museum picker marks already hung artworks ($language)', (
+      tester,
+    ) async {
+      final store = MemoryPreferences();
+      await store.writeLanguage(language);
+      await completeTestPicture(store);
+      await pumpMuseumApp(tester, store, initialRoute: '/museum');
+
+      await tester.tap(find.byKey(const ValueKey('museum-slot-0')));
+      await tester.pumpAndSettle();
+      final choice = find.byKey(const ValueKey('museum-choice-sunflower'));
+      expect(
+        find.text(
+          language == 'fa' ? 'نقاشی‌های آماده نصب' : 'Available to hang',
+        ),
+        findsOneWidget,
+      );
+      await tester.tap(choice);
+      await tester.pumpAndSettle();
+
+      // A mounted artwork stays in the picker for other slots, but is
+      // distinguished from an unmounted painting and identifies its frame.
+      await tester.tap(find.byKey(const ValueKey('museum-slot-1')));
+      await tester.pumpAndSettle();
+      expect(
+        find.text(
+          language == 'fa'
+              ? 'تابلوهای نصب‌شده در موزه'
+              : 'Already on the museum wall',
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.text(
+          language == 'fa'
+              ? 'روی دیوار · قاب ۱ — برای جابه‌جایی لمس کنید'
+              : 'On the wall · Frame 1 — tap to move',
+        ),
+        findsOneWidget,
+      );
+      expect(
+        (tester.widget<ListTile>(choice).trailing! as Icon).icon,
+        Icons.collections_bookmark_rounded,
+      );
+
+      await tester.tap(choice);
+      await tester.pumpAndSettle();
+      final moved = await store.readMuseum();
+      expect(moved.slots[0], isNull);
+      expect(moved.slots[1], 'sunflower');
+      expect(moved.slots.where((id) => id == 'sunflower'), hasLength(1));
+
+      await tester.tap(find.byKey(const ValueKey('museum-slot-1')));
+      await tester.pumpAndSettle();
+      expect(
+        find.text(
+          language == 'fa'
+              ? 'در همین قاب نصب شده'
+              : 'Hanging in this frame',
+        ),
+        findsOneWidget,
+      );
+      expect(
+        (tester.widget<ListTile>(choice).trailing! as Icon).icon,
+        Icons.check_circle_rounded,
+      );
+    });
+  }
 
   testWidgets('completed-art deep link lets player choose museum slot', (
     tester,
