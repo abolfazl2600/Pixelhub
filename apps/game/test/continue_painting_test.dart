@@ -103,6 +103,37 @@ void main() {
     },
   );
 
+  test('a newly opened picture is featured even before any coloring', () async {
+    final store = MemoryPreferences();
+    final first = fixture();
+    final second = anotherLevel('second');
+    final library = LibraryController(
+      store,
+      store,
+      recentArtworkRepository: store,
+    );
+    addTearDown(library.dispose);
+    library.setCatalog([first, second], {});
+    await library.load();
+    expect(library.recentlyOpenedLevel, isNull);
+    await library.unlock(second);
+    await library.markOpened(second);
+    expect(library.recentlyOpenedLevel?.id, second.id);
+    expect(library.completed(second), 0);
+
+    final reopened = LibraryController(
+      store,
+      store,
+      recentArtworkRepository: store,
+    );
+    addTearDown(reopened.dispose);
+    reopened.setCatalog([first, second], {});
+    await reopened.load();
+    await reopened.loadRecentArtwork();
+    expect(reopened.recentlyOpenedLevel?.id, second.id);
+    expect(reopened.completed(second), 0);
+  });
+
   test('deleted, unavailable, and mismatched artwork cannot appear', () async {
     final store = MemoryPreferences();
     final first = fixture();
