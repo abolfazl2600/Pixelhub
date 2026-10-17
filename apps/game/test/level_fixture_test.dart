@@ -43,48 +43,48 @@ void main() {
   test(
     'every public gallery category has four bundled offline pictures',
     () async {
-    const newIds = <String>{
-      'offline-mona-lisa',
-      'offline-starry-night',
-      'offline-great-wave',
-      'offline-girl-pearl',
-      'offline-azadi-tower',
-      'offline-persepolis',
-      'offline-siosepol',
-      'offline-nasir-molk',
-      'offline-shamsa',
-    };
-    final repository = AssetLevelRepository();
-    final levels = await repository.loadLevels();
-    final metadata = await repository.loadMetadata();
-    final counts = <String, int>{
-      for (final category in publicArtworkCategories) category: 0,
-    };
+      const newIds = <String>{
+        'offline-mona-lisa',
+        'offline-starry-night',
+        'offline-great-wave',
+        'offline-girl-pearl',
+        'offline-azadi-tower',
+        'offline-persepolis',
+        'offline-siosepol',
+        'offline-nasir-molk',
+        'offline-shamsa',
+      };
+      final repository = AssetLevelRepository();
+      final levels = await repository.loadLevels();
+      final metadata = await repository.loadMetadata();
+      final counts = <String, int>{
+        for (final category in publicArtworkCategories) category: 0,
+      };
 
-    expect(levels.map((art) => art.id).toSet(), hasLength(49));
-    expect(
-      levels.where((art) => newIds.contains(art.id)).length,
-      newIds.length,
-    );
-    for (final level in levels) {
-      final category = metadata[level.id]?.category;
+      expect(levels.map((art) => art.id).toSet(), hasLength(49));
       expect(
-        counts.containsKey(category),
-        isTrue,
-        reason: 'Bundled level ${level.id} needs a public category.',
+        levels.where((art) => newIds.contains(art.id)).length,
+        newIds.length,
       );
-      counts[category!] = counts[category]! + 1;
-    }
-    for (final category in publicArtworkCategories) {
-      expect(
-        counts[category],
-        greaterThanOrEqualTo(4),
-        reason: '$category must be usable with no network downloads.',
-      );
-    }
-    expect(counts['masterpieces'], 4);
-    expect(counts['persian_architecture'], 4);
-    expect(counts['patterns'], 4);
+      for (final level in levels) {
+        final category = metadata[level.id]?.category;
+        expect(
+          counts.containsKey(category),
+          isTrue,
+          reason: 'Bundled level ${level.id} needs a public category.',
+        );
+        counts[category!] = counts[category]! + 1;
+      }
+      for (final category in publicArtworkCategories) {
+        expect(
+          counts[category],
+          greaterThanOrEqualTo(4),
+          reason: '$category must be usable with no network downloads.',
+        );
+      }
+      expect(counts['masterpieces'], 4);
+      expect(counts['persian_architecture'], 4);
+      expect(counts['patterns'], 4);
     },
   );
 
