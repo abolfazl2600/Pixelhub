@@ -297,8 +297,8 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                                   key: ValueKey('color-$i'),
                                   borderRadius: BorderRadius.circular(16),
                                   onTap: _toolBusy
-                                       ? null
-                                       : () => controller.selectColor(i),
+                                      ? null
+                                      : () => controller.selectColor(i),
                                   child: Container(
                                     width: 56,
                                     decoration: BoxDecoration(
@@ -442,9 +442,8 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
           },
           onView: () => setState(() => _viewResult = true),
           onNext: () => context.go('/'),
-          onAddToMuseum: () => context.go(
-            '/museum?artwork=${controller.level.id}',
-          ),
+          onAddToMuseum: () =>
+              context.go('/museum?artwork=${controller.level.id}'),
         );
       }
       if (_focusMode) {
@@ -724,7 +723,10 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                           children: [
                             const Icon(Icons.blur_on_rounded),
                             const SizedBox(height: 3),
-                            Text(s.colorSplashTool, textAlign: TextAlign.center),
+                            Text(
+                              s.colorSplashTool,
+                              textAlign: TextAlign.center,
+                            ),
                             Text(
                               s.precisionToolCost(
                                 context.digits(
