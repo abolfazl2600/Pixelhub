@@ -105,11 +105,6 @@ class ProfileScreen extends StatelessWidget {
                   title: s.walletCoins,
                   value: context.digits(library.coins),
                 ),
-                _MetricTile(
-                  icon: Icons.stars_outlined,
-                  title: s.walletPoints,
-                  value: context.digits(library.totalPoints),
-                ),
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.all(16),
