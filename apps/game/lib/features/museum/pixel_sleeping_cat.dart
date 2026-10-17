@@ -7,6 +7,9 @@ import 'package:flutter/material.dart';
 class PixelSleepingCat extends StatefulWidget {
   const PixelSleepingCat({super.key});
 
+  static const int pixelWidth = 104;
+  static const int pixelHeight = 56;
+
   @override
   State<PixelSleepingCat> createState() => _PixelSleepingCatState();
 }
@@ -238,10 +241,10 @@ class _CatPixels {
     _paint.color = color;
     canvas.drawRect(
       Rect.fromLTWH(
-        x * size.width / 104,
-        y * size.height / 56,
-        width * size.width / 104,
-        height * size.height / 56,
+        x * size.width / PixelSleepingCat.pixelWidth,
+        y * size.height / PixelSleepingCat.pixelHeight,
+        width * size.width / PixelSleepingCat.pixelWidth,
+        height * size.height / PixelSleepingCat.pixelHeight,
       ),
       _paint,
     );
