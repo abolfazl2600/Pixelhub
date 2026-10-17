@@ -12,6 +12,7 @@ void main() {
     'museum layout is versioned, validates IDs and never duplicates art',
     () {
       final initial = MuseumLayout();
+      expect(initial.theme, 'classic');
       expect(initial.slots, hasLength(6));
       expect(initial.slots.every((id) => id == null), isTrue);
       expect(() => initial.slots[0] = 'sunflower', throwsUnsupportedError);
@@ -25,14 +26,22 @@ void main() {
 
       final custom = moved.copyWith(
         wall: 'sage',
+        theme: 'botanical',
         frame: 'gold',
         arrangement: 'staggered',
       );
       final saved = MuseumLayout.fromJson(custom.toJson());
       expect(saved.wall, 'sage');
+      expect(saved.theme, 'botanical');
       expect(saved.frame, 'gold');
       expect(saved.arrangement, 'staggered');
       expect(saved.slots.last, 'sunflower');
+
+      // Existing users stored schema v1 before the theme field existed.
+      final olderData = Map<String, Object?>.of(saved.toJson())
+        ..remove('theme');
+      expect(MuseumLayout.fromJson(olderData).theme, 'classic');
+      expect(MuseumLayout.fromJson(olderData).slots.last, 'sunflower');
 
       expect(() => MuseumLayout(slots: ['sunflower']), throwsFormatException);
       expect(
@@ -41,6 +50,7 @@ void main() {
       );
       expect(() => initial.place(6, null), throwsRangeError);
       expect(() => MuseumLayout(wall: 'invalid'), throwsFormatException);
+      expect(() => MuseumLayout(theme: 'invalid'), throwsFormatException);
       expect(
         () => MuseumLayout.fromJson({...saved.toJson(), 'schemaVersion': 2}),
         throwsFormatException,
@@ -96,6 +106,57 @@ void main() {
     expect((await store.readMuseum()).slots[0], isNull);
     await store.clearPixelhubData();
     expect((await store.readMuseum()).slots, everyElement(isNull));
+  });
+
+  test('museum theme presets persist without altering hung artwork', () async {
+    final store = MemoryPreferences();
+    final library = LibraryController(store, store);
+    addTearDown(library.dispose);
+    final level = fixture();
+    library.setCatalog([level], {});
+    await library.load();
+
+    final session = PaintingSession(level);
+    for (var i = 0; i < level.cells.length; i++) {
+      session.selectColor(level.cells[i]);
+      session.paintCell(i);
+    }
+    library.updateProgress(session.snapshot);
+
+    final museum = MuseumController(store, library);
+    addTearDown(museum.dispose);
+    await museum.load();
+    await museum.place(2, level.id);
+    for (final (theme, wall, frame) in [
+      ('royal', 'emerald', 'gold'),
+      ('sky', 'blue', 'dark'),
+      ('botanical', 'sage', 'wood'),
+      ('classic', 'cream', 'gold'),
+    ]) {
+      await museum.setTheme(theme);
+      final layout = await store.readMuseum();
+      expect(layout.theme, theme);
+      expect(layout.wall, wall);
+      expect(layout.frame, frame);
+      expect(layout.slots[2], level.id);
+      expect(layout.slots.whereType<String>(), hasLength(1));
+    }
+
+    // Manual frame and wall settings are independent of the chosen scene.
+    await museum.setTheme('royal');
+    await museum.setFrame('wood');
+    await museum.setWall('cream');
+    final retained = await store.readMuseum();
+    expect(retained.theme, 'royal');
+    expect(retained.wall, 'cream');
+    expect(retained.frame, 'wood');
+    expect(retained.slots[2], level.id);
+
+    final restored = MuseumController(store, library);
+    addTearDown(restored.dispose);
+    await restored.load();
+    expect(restored.layout.theme, 'royal');
+    expect(restored.visibleSlots[2], level.id);
   });
 
   test(
