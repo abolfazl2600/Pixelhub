@@ -6,6 +6,7 @@ import 'package:painting_engine/painting_engine.dart';
 import 'package:persistence/persistence.dart';
 import 'package:pixelhub/app/pixelhub_app.dart';
 import 'package:pixelhub/features/gallery/library_controller.dart';
+import 'package:pixelhub/core/pixel_art_preview.dart';
 import 'package:pixelhub/features/painting/painting_preview_screen.dart';
 
 import 'bootstrap_test.dart' show TestRepository, fixture;
@@ -21,6 +22,18 @@ LevelDefinition anotherLevel(String id) => LevelDefinition(
   palette: [0xfff8edb7, 0xff316349],
   cells: [0, 1, 1, 0],
 );
+
+class _MultipleLevels implements LevelRepository {
+  _MultipleLevels(this.levels);
+
+  final List<LevelDefinition> levels;
+
+  @override
+  Future<LevelDefinition> loadPreview() async => levels.first;
+
+  @override
+  Future<List<LevelDefinition>> loadLevels() async => levels;
+}
 
 ProgressSnapshot partiallyPainted(LevelDefinition level) {
   final session = PaintingSession(level);
@@ -60,9 +73,11 @@ void main() {
       await library.loadRecentArtwork();
       await loadProgress();
       expect(library.continueLevel?.id, first.id);
+      expect(library.recentlyOpenedLevel, isNull);
 
       await library.markOpened(second);
       expect(library.continueLevel?.id, second.id);
+      expect(library.recentlyOpenedLevel?.id, second.id);
 
       final reopened = LibraryController(
         store,
@@ -76,8 +91,12 @@ void main() {
       await loadProgress();
       expect(reopened.continueLevel?.id, second.id);
       expect(reopened.continuePercent(second), 25);
+      expect(reopened.recentlyOpenedLevel?.id, second.id);
 
       reopened.updateProgress(fullyPainted(second));
+      // A completed most-recent artwork stays featured; it must not jump
+      // back to a different older unfinished painting.
+      expect(reopened.recentlyOpenedLevel?.id, second.id);
       expect(reopened.continueLevel?.id, first.id);
       reopened.updateProgress(PaintingSession(first).snapshot);
       expect(reopened.continueLevel, isNull);
@@ -105,7 +124,9 @@ void main() {
 
     await library.markOpened(online);
     expect(library.continueLevel?.id, online.id);
+    expect(library.recentlyOpenedLevel?.id, online.id);
     library.setDownloadedOnline([]);
+    expect(library.recentlyOpenedLevel, isNull);
     expect(library.continueLevel?.id, first.id);
 
     await library.add(
@@ -122,7 +143,9 @@ void main() {
     library.updateProgress(partiallyPainted(personal));
     await library.markOpened(personal);
     expect(library.continueLevel?.id, personal.id);
+    expect(library.recentlyOpenedLevel?.id, personal.id);
     await library.delete(personal);
+    expect(library.recentlyOpenedLevel, isNull);
     expect(library.continueLevel?.id, first.id);
 
     // An older picture version cannot reuse another version's saved bits.
@@ -144,6 +167,7 @@ void main() {
     await library.clear();
     expect(await store.readRecentArtworkId(), isNull);
     expect(library.continueLevel, isNull);
+    expect(library.recentlyOpenedLevel, isNull);
   });
 
   testWidgets('Continue navigates to saved progress, also after restart', (
@@ -174,14 +198,13 @@ void main() {
     expect(find.text('Sunflower'), findsWidgets);
     expect(find.text('25%'), findsOneWidget);
     expect(
-      find.byKey(const ValueKey('continue-painting-card')),
+      find.byKey(const ValueKey('home-featured-artwork')),
       findsOneWidget,
     );
+    expect(find.byType(PixelArtPreview), findsOneWidget);
 
-    await tester.ensureVisible(
-      find.byKey(const ValueKey('continue-painting-button')),
-    );
-    await tester.tap(find.byKey(const ValueKey('continue-painting-button')));
+    await tester.ensureVisible(find.byKey(const ValueKey('open-preview')));
+    await tester.tap(find.byKey(const ValueKey('open-preview')));
     await tester.pumpAndSettle();
     expect(find.byType(PaintingPreviewScreen), findsOneWidget);
     expect(find.textContaining('Colored: 1 of 4'), findsOneWidget);
@@ -191,9 +214,10 @@ void main() {
     await tester.pumpAndSettle();
     await openApp();
     expect(
-      find.byKey(const ValueKey('continue-painting-card')),
+      find.byKey(const ValueKey('home-featured-artwork')),
       findsOneWidget,
     );
+    expect(find.byType(PixelArtPreview), findsOneWidget);
     expect(find.text('Continue painting'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
@@ -222,12 +246,11 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('ادامه نقاشی'), findsOneWidget);
       expect(
-        find.byKey(const ValueKey('continue-painting-card')),
+        find.byKey(const ValueKey('home-featured-artwork')),
         findsOneWidget,
       );
-      await tester.ensureVisible(
-        find.byKey(const ValueKey('continue-painting-button')),
-      );
+      expect(find.byType(PixelArtPreview), findsOneWidget);
+      await tester.ensureVisible(find.byKey(const ValueKey('open-preview')));
       expect(tester.takeException(), isNull);
     });
   }
@@ -249,6 +272,58 @@ void main() {
     );
     repository.requests.single.complete(level);
     await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('continue-painting-card')), findsNothing);
+    expect(find.byKey(const ValueKey('home-featured-artwork')), findsOneWidget);
+    expect(find.byType(PixelArtPreview), findsOneWidget);
+    expect(find.text('ادامه نقاشی'), findsNothing);
+  });
+
+  testWidgets('only the last opened picture is featured, even if completed', (
+    tester,
+  ) async {
+    final store = MemoryPreferences();
+    final first = fixture();
+    final second = anotherLevel('second');
+    await store.write(partiallyPainted(first));
+    await store.write(fullyPainted(second));
+    await store.writeRecentArtworkId(second.id);
+    await store.writeLanguage('en');
+    final repository = _MultipleLevels([first, second]);
+
+    await tester.pumpWidget(
+      PixelhubApp(
+        repository: repository,
+        progressRepository: store,
+        artworkRepository: store,
+        preferences: store,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('home-featured-artwork')), findsOneWidget);
+    expect(find.byType(PixelArtPreview), findsOneWidget);
+    expect(find.text('Second picture'), findsOneWidget);
+    expect(find.text('Sunflower'), findsNothing);
+    expect(find.text('100%'), findsOneWidget);
+    expect(find.text('View result'), findsOneWidget);
+
+    await tester.ensureVisible(find.byKey(const ValueKey('open-preview')));
+    await tester.tap(find.byKey(const ValueKey('open-preview')));
+    await tester.pumpAndSettle();
+    expect(find.byType(PaintingPreviewScreen), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpAndSettle();
+    await tester.pumpWidget(
+      PixelhubApp(
+        repository: _MultipleLevels([first, second]),
+        progressRepository: store,
+        artworkRepository: store,
+        preferences: store,
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Second picture'), findsOneWidget);
+    expect(find.byType(PixelArtPreview), findsOneWidget);
+    expect(find.byKey(const ValueKey('home-featured-artwork')), findsOneWidget);
   });
 }
