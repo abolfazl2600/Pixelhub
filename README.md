@@ -12,6 +12,8 @@ Use **Move / zoom** to pan, pinch with two fingers to zoom, or use the zoom/fit 
 
 Use **English** / **فارسی** in the header to switch language. Text, direction, numbers, image titles and dialogs update together; the choice is remembered. A fresh installation starts in Persian regardless of the device/browser language.
 
+The Home screen features **one artwork card**, showing the most recently opened painting (including completed pictures and downloaded/personal art while available). Its progress and action label follow the saved state. New installs or unavailable/deleted recent pictures fall back to the bundled sunflower; the old second Continue card has been removed. The recent artwork ID persists locally across app restarts.
+
 Progress is autosaved per picture/version: Android DataStore via SharedPreferencesAsync, or browser localStorage. Wait for **Saved** before closing; pending/failed writes are shown with retry. Interrupted writes can only guarantee the last acknowledged save. Browser/app data deletion or storage eviction removes local progress; there is no cloud backup or account yet. Viewport zoom is not persisted across process restarts.
 
 ## Gallery, photos and export
