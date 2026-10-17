@@ -11,6 +11,8 @@ import 'package:persistence/persistence.dart';
 
 import '../features/home/home_screen.dart';
 import '../features/museum/museum_controller.dart';
+import '../features/badges/badge_controller.dart';
+import '../features/badges/badges_screen.dart';
 import '../features/museum/museum_screen.dart';
 import '../core/local_diagnostics.dart';
 import '../core/game_sounds.dart';
@@ -63,6 +65,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
   late final PreferencesRepository _preferences;
   late final LibraryController _library;
   late final MuseumController _museum;
+  late final BadgeController _badges;
   late final GameSounds _sounds;
   late final OnlineCatalogController _online;
   final ValueNotifier<Map<String, PixelAnimation>> _bundledAnimations =
@@ -114,6 +117,11 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
           : MemoryPreferences(),
       _library,
     );
+    _badges = BadgeController(
+      _library,
+      preferences is BadgeStorage ? preferences as BadgeStorage : MemoryPreferences(),
+    );
+    unawaited(_badges.initialize());
     _online = OnlineCatalogController(
       preferences is OnlineLevelStorage
           ? preferences as OnlineLevelStorage
@@ -143,6 +151,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       _bootstrap,
       _library,
       _museum,
+      _badges,
       _online,
       _bundledAnimations,
       _styleChanges,
@@ -177,6 +186,10 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
             GoRoute(
               path: 'profile',
               builder: (context, state) => _route(page: 'profile'),
+            ),
+            GoRoute(
+              path: 'badges',
+              builder: (context, state) => _route(page: 'badges'),
             ),
             GoRoute(
               path: 'privacy',
@@ -401,6 +414,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
   Future<void> _clearLocalData() async {
     await _languageWrites;
     await _museum.settle();
+    await _badges.settle();
     await Future.wait(_sessions.values.map((controller) => controller.flush()));
     for (final controller in _sessions.values) {
       controller.dispose();
@@ -409,6 +423,8 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     try {
       await _library.clear();
       _museum.resetAfterClear();
+      _badges.resetAfterClear();
+      unawaited(_badges.refresh());
       await _sounds.setEnabled(true);
       _online.clearDownloaded();
     } on Object {
@@ -483,10 +499,14 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
               addArtworkId: museumArtworkId,
             );
           }
+          if (page == 'badges') {
+            return BadgesScreen(badges: _badges);
+          }
           if (page == 'profile') {
             return ProfileScreen(
               library: _library,
               diagnostics: _diagnostics,
+              badges: _badges,
               onLanguageToggle: _toggleLanguage,
             );
           }
@@ -560,6 +580,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     _bootstrap.dispose();
     _library.dispose();
     _museum.dispose();
+    _badges.dispose();
     _sounds.dispose();
     _online.dispose();
     _bundledAnimations.dispose();
