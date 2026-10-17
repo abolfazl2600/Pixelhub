@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
-/// Each museum design paints a separate architectural scene. The completed
-/// paintings, labels, six hit targets and animated cat are Flutter overlays.
-/// Nothing in the background contains a baked-in or fake completed painting.
+import 'pixel_sleeping_cat.dart';
+
+/// The museum's architecture, furniture and cat form one pixel-art scene.
+/// Artwork slots are interactive overlays, never baked into the room artwork.
 abstract class MuseumScenePainter extends CustomPainter {
   const MuseumScenePainter(this.wall);
 
@@ -22,6 +25,130 @@ MuseumScenePainter museumSceneFor(String theme, String wall) => switch (theme) {
   'botanical' => MuseumBotanicalScenePainter(wall),
   _ => MuseumClassicScenePainter(wall),
 };
+
+
+/// Shared 64 × 88 composition coordinates used by full-size and thumbnail rooms.
+/// Six frames never move independently of their labels or cat-safe lower space.
+abstract final class MuseumSceneLayout {
+  static const double frameWidth = 15;
+  static const double frameHeight = 16.5;
+
+  static double left(int index) => switch (index % 3) {
+    0 => 5.5,
+    1 => 24,
+    _ => 43.5,
+  };
+
+  static double top(String theme, String arrangement, int index) {
+    final first = index < 3;
+    final row = first
+        ? (theme == 'sky' ? 15.0 : 12.0)
+        : (theme == 'royal' ? 35.0 : theme == 'sky' ? 38.0 : 36.0);
+    return row +
+        (arrangement == 'staggered' && index % 3 == 1
+            ? (first ? 1.25 : -0.75)
+            : 0.0);
+  }
+}
+
+/// One painter owns both the architectural scene and the sleeping cat.
+/// In particular the cat is NOT a separately positioned widget that can drift
+/// over a frame when the layout or display dimensions change.
+class MuseumComposedScenePainter extends CustomPainter {
+  const MuseumComposedScenePainter(this.theme, this.wall, {this.tailFrame = 0});
+
+  final String theme;
+  final String wall;
+  final int tailFrame;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    museumSceneFor(theme, wall).paint(canvas, size);
+    // The 192 × 112 authoring sprite is drawn into the museum's 256 × 352
+    // integer grid, with no filtering or separately sized Flutter overlay.
+    const x = 64.0;
+    const y = 211.0;
+    const w = 128.0;
+    const h = 71.0;
+    canvas.save();
+    canvas.translate(
+      x * size.width / MuseumScenePainter.pixelWidth,
+      y * size.height / MuseumScenePainter.pixelHeight,
+    );
+    canvas.scale(
+      w * size.width /
+          MuseumScenePainter.pixelWidth /
+          PixelSleepingCat.pixelWidth,
+      h * size.height /
+          MuseumScenePainter.pixelHeight /
+          PixelSleepingCat.pixelHeight,
+    );
+    PixelCatTailPainter(tailFrame).paint(
+      canvas,
+      const Size(PixelSleepingCat.pixelWidth.toDouble(),
+          PixelSleepingCat.pixelHeight.toDouble()),
+    );
+    const PixelCatBodyPainter().paint(
+      canvas,
+      const Size(PixelSleepingCat.pixelWidth.toDouble(),
+          PixelSleepingCat.pixelHeight.toDouble()),
+    );
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant MuseumComposedScenePainter old) =>
+      old.theme != theme || old.wall != wall || old.tailFrame != tailFrame;
+}
+
+/// A single repaint target for the complete room. The tail changes at most
+/// once per 1.1 seconds; regular frames do not redraw the museum.
+class MuseumSceneCanvas extends StatefulWidget {
+  const MuseumSceneCanvas({required this.theme, required this.wall, super.key});
+
+  final String theme;
+  final String wall;
+
+  @override
+  State<MuseumSceneCanvas> createState() => _MuseumSceneCanvasState();
+}
+
+class _MuseumSceneCanvasState extends State<MuseumSceneCanvas> {
+  static const sequence = [0, 1, 2, 1];
+  Timer? _timer;
+  int _step = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(milliseconds: 1100), (_) {
+      if (!mounted ||
+          !TickerMode.of(context) ||
+          (MediaQuery.maybeOf(context)?.disableAnimations ?? false)) {
+        return;
+      }
+      setState(() => _step = (_step + 1) % sequence.length);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => RepaintBoundary(
+    child: CustomPaint(
+      key: const ValueKey('museum-sleeping-cat'),
+      painter: MuseumComposedScenePainter(
+        widget.theme,
+        widget.wall,
+        tailFrame: sequence[_step],
+      ),
+    ),
+  );
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+}
 
 /// Integer aligned 256 × 352 canvas. Shapes never use gradients or smoothing.
 class MuseumScenePixels {

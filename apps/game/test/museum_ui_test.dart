@@ -107,7 +107,8 @@ void main() {
     expect(
       find.byWidgetPredicate(
         (widget) =>
-            widget is CustomPaint && widget.painter is MuseumScenePainter,
+            widget is CustomPaint &&
+            widget.painter is MuseumComposedScenePainter,
       ),
       findsOneWidget,
     );
@@ -116,10 +117,12 @@ void main() {
     expect(PixelSleepingCat.pixelWidth, 192);
     expect(PixelSleepingCat.pixelHeight, 112);
     expect(find.byKey(const ValueKey('museum-sleeping-cat')), findsOneWidget);
+    expect(find.byType(PixelSleepingCat), findsNothing);
     expect(
       find.byWidgetPredicate(
         (widget) =>
-            widget is CustomPaint && widget.painter is PixelCatBodyPainter,
+            widget is CustomPaint &&
+            widget.painter is MuseumComposedScenePainter,
       ),
       findsOneWidget,
     );
@@ -150,7 +153,8 @@ void main() {
     expect(
       find.byWidgetPredicate(
         (widget) =>
-            widget is CustomPaint && widget.painter is MuseumScenePainter,
+            widget is CustomPaint &&
+            widget.painter is MuseumComposedScenePainter,
       ),
       findsWidgets,
     );
@@ -164,7 +168,9 @@ void main() {
     expect(
       find.byWidgetPredicate(
         (widget) =>
-            widget is CustomPaint && widget.painter is MuseumRoyalScenePainter,
+            widget is CustomPaint &&
+            widget.painter is MuseumComposedScenePainter &&
+            (widget.painter! as MuseumComposedScenePainter).theme == 'royal',
       ),
       findsOneWidget,
     );
@@ -199,10 +205,11 @@ void main() {
       final paint = tester.widget<CustomPaint>(
         find.byWidgetPredicate(
           (widget) =>
-              widget is CustomPaint && widget.painter is PixelCatTailPainter,
+              widget is CustomPaint &&
+              widget.painter is MuseumComposedScenePainter,
         ),
       );
-      return (paint.painter! as PixelCatTailPainter).frame;
+      return (paint.painter! as MuseumComposedScenePainter).tailFrame;
     }
 
     expect(tailFrame(), 0);
@@ -215,7 +222,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 1100));
     expect(tailFrame(), 0);
 
-    // The static scenery and sleeping body never need an animation tick.
+    // Tail animation is part of the same scene, never a separate widget.
     expect(
       const MuseumBotanicalScenePainter(
         'sage',
@@ -227,7 +234,10 @@ void main() {
       isFalse,
     );
     expect(
-      const PixelCatTailPainter(1).shouldRepaint(const PixelCatTailPainter(0)),
+      const MuseumComposedScenePainter('royal', 'emerald', tailFrame: 1)
+          .shouldRepaint(
+            const MuseumComposedScenePainter('royal', 'emerald'),
+          ),
       isTrue,
     );
 

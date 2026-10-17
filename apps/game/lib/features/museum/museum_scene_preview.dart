@@ -5,7 +5,6 @@ import 'package:level_schema/level_schema.dart';
 
 import '../../core/pixel_art_preview.dart';
 import 'museum_scene_painters.dart';
-import 'pixel_sleeping_cat.dart';
 
 /// The same scene painter as the full room, previewed with the user's actual
 /// finished paintings. Empty slots are blank; no screenshot artwork is baked in.
@@ -40,14 +39,14 @@ class MuseumScenePreview extends StatelessWidget {
         clipBehavior: Clip.hardEdge,
         children: [
           Positioned.fill(
-            child: CustomPaint(painter: museumSceneFor(theme, wall)),
+            child: CustomPaint(painter: MuseumComposedScenePainter(theme, wall)),
           ),
           for (var i = 0; i < 6; i++)
             Positioned(
-              left: (4 + (i % 3) * 20) * x,
-              top: (i ~/ 3 == 0 ? (theme == 'sky' ? 14 : 13) : 38) * y,
-              width: 16 * x,
-              height: 18 * y,
+              left: MuseumSceneLayout.left(i) * x,
+              top: MuseumSceneLayout.top(theme, 'grid', i) * y,
+              width: MuseumSceneLayout.frameWidth * x,
+              height: MuseumSceneLayout.frameHeight * y,
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   border: Border.all(
@@ -64,24 +63,7 @@ class MuseumScenePreview extends StatelessWidget {
                 ),
               ),
             ),
-          Positioned(
-            left: 17 * x,
-            top: 54 * y,
-            width: 30 * x,
-            height: 17.5 * y,
-            child: IgnorePointer(
-              child: Stack(
-                children: const [
-                  Positioned.fill(
-                    child: CustomPaint(painter: PixelCatTailPainter(0)),
-                  ),
-                  Positioned.fill(
-                    child: CustomPaint(painter: PixelCatBodyPainter()),
-                  ),
-                ],
-              ),
-            ),
-          ),
+
         ],
       );
     },

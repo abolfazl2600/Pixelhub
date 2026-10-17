@@ -9,7 +9,6 @@ import '../../l10n/strings.dart';
 import '../gallery/library_controller.dart';
 import '../painting/completed_artwork_preview.dart';
 import 'museum_controller.dart';
-import 'pixel_sleeping_cat.dart';
 import 'museum_scene_painters.dart';
 import 'museum_scene_preview.dart';
 
@@ -546,26 +545,20 @@ class _MuseumScreenState extends State<MuseumScreen> {
                         child: Stack(
                           children: [
                             Positioned.fill(
-                              child: RepaintBoundary(
-                                child: CustomPaint(
-                                  painter: museumSceneFor(
-                                    layout.theme,
-                                    layout.wall,
-                                  ),
-                                ),
+                              child: MuseumSceneCanvas(
+                                theme: layout.theme,
+                                wall: layout.wall,
                               ),
                             ),
                             for (var i = 0; i < 6; i++)
                               Positioned(
-                                left: (4 + (i % 3) * 20) * unit,
-                                top:
-                                    _museumSlotTop(
-                                      layout.theme,
-                                      layout.arrangement,
-                                      i,
-                                    ) *
-                                    unit,
-                                width: 16 * unit,
+                                left: MuseumSceneLayout.left(i) * unit,
+                                top: MuseumSceneLayout.top(
+                                  layout.theme,
+                                  layout.arrangement,
+                                  i,
+                                ) * unit,
+                                width: MuseumSceneLayout.frameWidth * unit,
                                 child: _MuseumSlot(
                                   index: i,
                                   unit: unit,
@@ -584,20 +577,6 @@ class _MuseumScreenState extends State<MuseumScreen> {
                                   },
                                 ),
                               ),
-                            // Independent overlay: the scene and six framed
-                            // artworks never repaint when the sleeping cat
-                            // flicks its tail every few seconds.
-                            Positioned(
-                              left: 17 * unit,
-                              top: 54 * unit,
-                              width: 30 * unit,
-                              height: 17.5 * unit,
-                              child: const IgnorePointer(
-                                child: PixelSleepingCat(
-                                  key: ValueKey('museum-sleeping-cat'),
-                                ),
-                              ),
-                            ),
                           ],
                         ),
                       );
@@ -698,13 +677,6 @@ class _MuseumScreenState extends State<MuseumScreen> {
       );
     },
   );
-}
-
-double _museumSlotTop(String theme, String arrangement, int index) {
-  final row = index ~/ 3 == 0
-      ? (theme == 'sky' ? 14.0 : 13.0)
-      : (theme == 'royal' ? 39.0 : 38.0);
-  return row + (arrangement == 'staggered' && index % 3 == 1 ? 3 : 0);
 }
 
 Widget _museumPickerHeading(BuildContext context, String title) => Padding(
@@ -831,8 +803,8 @@ class _MuseumSlot extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              width: 16 * unit,
-              height: 17.7 * unit,
+              width: MuseumSceneLayout.frameWidth * unit,
+              height: MuseumSceneLayout.frameHeight * unit,
               padding: EdgeInsets.all(unit * .5),
               decoration: BoxDecoration(
                 color: colors.$1,
@@ -891,7 +863,7 @@ class _MuseumSlot extends StatelessWidget {
                 ),
               ),
             ),
-            if (animation != null && level != null)
+            if (level != null)
               Icon(
                 Icons.play_circle_fill_rounded,
                 size: unit * 2.8,
