@@ -235,5 +235,27 @@ for i, (name, fa, en, category) in enumerate(ITEMS):
         destination.write_text(json.dumps(level, ensure_ascii=False, separators=(',', ':'))+'\n')
     CATALOG.append(name+'.json')
     metadata[name] = {'category': category, 'tags': [category, name]}
+# New offline-only art is authored separately and kept immutable. A subsequent
+# V3 catalog regeneration must preserve these assets and their categories.
+# The offline list intentionally excludes 'personal': imported pictures belong
+# to each user and are not part of the public bundled category catalog.
+BUNDLED_OFFLINE_CATEGORY_PACK = {
+    'offline-mona-lisa': ('masterpieces', ['mona lisa', 'داوینچی', 'renaissance', 'portrait']),
+    'offline-starry-night': ('masterpieces', ['starry night', 'ون گوگ', 'van gogh', 'night']),
+    'offline-great-wave': ('masterpieces', ['great wave', 'هوکوسای', 'hokusai', 'sea']),
+    'offline-girl-pearl': ('masterpieces', ['girl pearl earring', 'ورمیر', 'vermeer', 'portrait']),
+    'offline-azadi-tower': ('persian_architecture', ['azadi tower', 'برج آزادی', 'تهران', 'tehran']),
+    'offline-persepolis': ('persian_architecture', ['persepolis', 'تخت جمشید', 'شیراز', 'shiraz']),
+    'offline-siosepol': ('persian_architecture', ['si o se pol', 'سی و سه پل', 'اصفهان', 'isfahan']),
+    'offline-nasir-molk': ('persian_architecture', ['nasir al molk', 'مسجد نصیرالملک', 'شیراز', 'stained glass']),
+    'offline-shamsa': ('patterns', ['shamsa', 'شمسه', 'geometric', 'iranian']),
+}
+for level_id, (category, tags) in BUNDLED_OFFLINE_CATEGORY_PACK.items():
+    filename = f'{level_id}.json'
+    if not (ROOT / filename).is_file():
+        raise FileNotFoundError(f'Missing immutable offline painting: {filename}')
+    CATALOG.append(filename)
+    metadata[level_id] = {'category': category, 'tags': [category, *tags]}
+
 (ROOT/'catalog.json').write_text(json.dumps(CATALOG, indent=2)+'\n')
 (ROOT/'metadata.json').write_text(json.dumps(metadata, ensure_ascii=False, indent=2)+'\n')
