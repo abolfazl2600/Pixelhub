@@ -99,7 +99,7 @@ void main() {
       while (badges.refreshing) {
         await Future<void>.delayed(const Duration(milliseconds: 1));
       }
-      expect(badges.badges.length, 2);
+      expect(badges.badges.length, 2, reason: '${badges.lastLoadError}');
       expect(badges.earnedCount, 0);
 
       library.updateProgress(finished(levels.first));

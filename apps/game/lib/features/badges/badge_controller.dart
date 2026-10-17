@@ -153,6 +153,7 @@ class BadgeController extends ChangeNotifier {
   bool _initialized = false;
   bool refreshing = false;
   bool loadFailed = false;
+  Object? lastLoadError;
   bool _disposed = false;
   int _generation = 0;
 
@@ -211,6 +212,7 @@ class BadgeController extends ChangeNotifier {
     if (refreshing || _disposed) return;
     refreshing = true;
     loadFailed = false;
+    lastLoadError = null;
     final generation = _generation;
     _notify();
     try {
@@ -231,8 +233,11 @@ class BadgeController extends ChangeNotifier {
       for (final badge in badges.where(isEarned)) {
         unawaited(_loadIcon(badge));
       }
-    } on Object {
-      if (!_disposed && generation == _generation) loadFailed = true;
+    } on Object catch (error) {
+      if (!_disposed && generation == _generation) {
+        loadFailed = true;
+        lastLoadError = error;
+      }
     } finally {
       if (!_disposed && generation == _generation) {
         refreshing = false;
