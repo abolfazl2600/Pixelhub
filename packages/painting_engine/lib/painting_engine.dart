@@ -123,11 +123,7 @@ final class PaintingSession {
   /// The tapped cell must have the selected palette color. Already completed
   /// cells of that color can connect a region, but are never charged/painted
   /// again. The result is read-only to callers; computing it changes nothing.
-  List<int> previewTool(
-    PrecisionPaintTool tool,
-    int x,
-    int y,
-  ) {
+  List<int> previewTool(PrecisionPaintTool tool, int x, int y) {
     if (x < 0 || y < 0 || x >= level.width || y >= level.height) {
       return const [];
     }
@@ -136,12 +132,16 @@ final class PaintingSession {
 
     if (tool == PrecisionPaintTool.colorSplash) {
       final targets = <int>[];
-      for (var row = (y - 1).clamp(0, level.height - 1).toInt();
-          row <= (y + 1).clamp(0, level.height - 1).toInt();
-          row++) {
-        for (var col = (x - 1).clamp(0, level.width - 1).toInt();
-            col <= (x + 1).clamp(0, level.width - 1).toInt();
-            col++) {
+      for (
+        var row = (y - 1).clamp(0, level.height - 1).toInt();
+        row <= (y + 1).clamp(0, level.height - 1).toInt();
+        row++
+      ) {
+        for (
+          var col = (x - 1).clamp(0, level.width - 1).toInt();
+          col <= (x + 1).clamp(0, level.width - 1).toInt();
+          col++
+        ) {
           final index = row * level.width + col;
           if (level.cells[index] == _selectedColor && !isCompleted(index)) {
             targets.add(index);
