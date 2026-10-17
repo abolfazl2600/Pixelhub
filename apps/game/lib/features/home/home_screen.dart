@@ -146,6 +146,12 @@ class HomeScreen extends StatelessWidget {
                     label: Text(s.museumTitle),
                   ),
                   OutlinedButton.icon(
+                    key: const ValueKey('open-badges'),
+                    onPressed: () => context.push('/badges'),
+                    icon: const Icon(Icons.workspace_premium_outlined),
+                    label: Text(context.isPersian ? 'نشان‌ها' : 'Badges'),
+                  ),
+                  OutlinedButton.icon(
                     onPressed: () => context.push('/import'),
                     icon: const Icon(Icons.add_photo_alternate_outlined),
                     label: Text(s.importPhoto),

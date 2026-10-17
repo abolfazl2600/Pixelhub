@@ -6,6 +6,16 @@ import 'package:level_schema/level_schema.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Optional offline preference for bundled game event sounds.
+/// Cache for remote achievement metadata, unlocked IDs and pixel-art icons.
+abstract interface class BadgeStorage {
+  Future<String?> readBadgeCatalog();
+  Future<void> writeBadgeCatalog(String catalog);
+  Future<Set<String>> readEarnedBadges();
+  Future<void> writeEarnedBadges(Set<String> ids);
+  Future<Uint8List?> readBadgeImage(String id);
+  Future<void> writeBadgeImage(String id, Uint8List image);
+}
+
 abstract interface class SoundEffectsPreferences {
   Future<bool?> readSoundEffectsEnabled();
   Future<void> writeSoundEffectsEnabled(bool enabled);
@@ -87,11 +97,57 @@ final class LocalPreferences
         OnlineAnimationStorage,
         ArtworkStylePreferences,
         SoundEffectsPreferences,
+        BadgeStorage,
         MuseumRepository {
   LocalPreferences({SharedPreferencesAsync? preferences})
     : _preferences = preferences ?? SharedPreferencesAsync();
   final SharedPreferencesAsync _preferences;
   Future<void> _writes = Future.value();
+
+  static const _badgeCatalogKey = 'pixelhub.badges.catalog.v1';
+  static const _badgeEarnedKey = 'pixelhub.badges.earned.v1';
+
+  String _badgeImageKey(String id) => 'pixelhub.badges.image.v1.$id';
+
+  @override
+  Future<String?> readBadgeCatalog() async {
+    await _writes;
+    return _preferences.getString(_badgeCatalogKey);
+  }
+
+  @override
+  Future<void> writeBadgeCatalog(String catalog) =>
+      _enqueue(() => _preferences.setString(_badgeCatalogKey, catalog));
+
+  @override
+  Future<Set<String>> readEarnedBadges() async {
+    await _writes;
+    final raw = await _preferences.getString(_badgeEarnedKey);
+    if (raw == null) return {};
+    final decoded = jsonDecode(raw);
+    if (decoded is! List) throw const FormatException('Invalid badge data');
+    return decoded.whereType<String>().toSet();
+  }
+
+  @override
+  Future<void> writeEarnedBadges(Set<String> ids) => _enqueue(
+    () => _preferences.setString(
+      _badgeEarnedKey,
+      jsonEncode(ids.toList()..sort()),
+    ),
+  );
+
+  @override
+  Future<Uint8List?> readBadgeImage(String id) async {
+    await _writes;
+    final raw = await _preferences.getString(_badgeImageKey(id));
+    return raw == null ? null : base64Decode(raw);
+  }
+
+  @override
+  Future<void> writeBadgeImage(String id, Uint8List image) => _enqueue(
+    () => _preferences.setString(_badgeImageKey(id), base64Encode(image)),
+  );
 
   String _key(String id, int version) => 'pixelhub.progress.v1.$id.$version';
 
@@ -466,6 +522,7 @@ final class MemoryPreferences
         OnlineAnimationStorage,
         ArtworkStylePreferences,
         SoundEffectsPreferences,
+        BadgeStorage,
         MuseumRepository {
   final Map<String, ProgressSnapshot> _records = {};
   String? language;
@@ -478,6 +535,33 @@ final class MemoryPreferences
   final Map<String, String> _downloadCategories = {};
   final Map<String, PixelAnimation> _downloadAnimations = {};
   MuseumLayout museum = MuseumLayout();
+  String? _badgeCatalog;
+  Set<String> _earnedBadges = {};
+  final Map<String, Uint8List> _badgeImages = {};
+
+  @override
+  Future<String?> readBadgeCatalog() async => _badgeCatalog;
+
+  @override
+  Future<void> writeBadgeCatalog(String catalog) async {
+    _badgeCatalog = catalog;
+  }
+
+  @override
+  Future<Set<String>> readEarnedBadges() async => {..._earnedBadges};
+
+  @override
+  Future<void> writeEarnedBadges(Set<String> ids) async {
+    _earnedBadges = {...ids};
+  }
+
+  @override
+  Future<Uint8List?> readBadgeImage(String id) async => _badgeImages[id];
+
+  @override
+  Future<void> writeBadgeImage(String id, Uint8List image) async {
+    _badgeImages[id] = Uint8List.fromList(image);
+  }
 
   @override
   Future<Map<String, PixelAnimation>> readDownloadedAnimations(
@@ -660,5 +744,8 @@ final class MemoryPreferences
     soundEffectsEnabled = null;
     recentArtworkId = null;
     museum = MuseumLayout();
+    _badgeCatalog = null;
+    _earnedBadges.clear();
+    _badgeImages.clear();
   }
 }

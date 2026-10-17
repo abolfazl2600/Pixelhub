@@ -479,6 +479,10 @@ jobs:
             --jq '.[] | select(.isDraft == false and .isPrerelease == false and (.tagName | startswith("pixelhub-content-"))) | .tagName')
           python3 tool/online_release.py assemble \
             "$RUNNER_TEMP/pixelhub-release-packs" site/online
+      - name: Publish remote achievement badges
+        run: |
+          mkdir -p site/online/badges
+          cp -R badge_content/. site/online/badges/
       - name: Generate checksum-bound recipes for new Iranian heritage animations
         run: python3 tool/online_iranian_heritage_23_pack.py recipes site/online tool/animation_batches
       - name: Generate checksum-bound animations for ten world landmarks

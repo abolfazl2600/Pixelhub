@@ -6,18 +6,21 @@ import '../../app/language_button.dart';
 import '../../core/local_diagnostics.dart';
 import '../../l10n/strings.dart';
 import '../gallery/library_controller.dart';
+import '../badges/badge_controller.dart';
 
 /// Local guest profile with an offline earned-coins wallet.
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({
     required this.library,
     required this.diagnostics,
+    this.badges,
     required this.onLanguageToggle,
     super.key,
   });
 
   final LibraryController library;
   final LocalDiagnostics diagnostics;
+  final BadgeController? badges;
   final VoidCallback onLanguageToggle;
 
   @override
@@ -73,6 +76,28 @@ class ProfileScreen extends StatelessWidget {
                     trailing: LanguageButton(onToggle: onLanguageToggle),
                   ),
                 ),
+                if (badges != null) ...[
+                  const SizedBox(height: 12),
+                  Card(
+                    child: ListTile(
+                      key: const ValueKey('profile-badges'),
+                      leading: const Icon(
+                        Icons.workspace_premium_outlined,
+                        color: PixelTokens.green,
+                      ),
+                      title: Text(
+                        context.isPersian ? 'نشان‌های افتخار' : 'Achievements',
+                      ),
+                      subtitle: Text(
+                        context.isPersian
+                            ? 'نشان‌های کشف‌شده و مأموریت‌های پنهان'
+                            : 'Unlocked badges and hidden missions',
+                      ),
+                      trailing: const Icon(Icons.chevron_left_rounded),
+                      onTap: () => context.push('/badges'),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 18),
                 Text(
                   s.localProgressTitle,

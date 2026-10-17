@@ -924,6 +924,17 @@ class CompletionScreen extends StatelessWidget {
             saveState,
             const SizedBox(height: 16),
             ExportButton(level: controller.level, renderStyle: renderStyle),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              key: const ValueKey('completion-open-badges'),
+              onPressed: () => context.push('/badges'),
+              icon: const Icon(Icons.workspace_premium_outlined),
+              label: Text(
+                context.isPersian
+                    ? 'مشاهده نشان‌های افتخار'
+                    : 'View achievements',
+              ),
+            ),
             if (onAddToMuseum != null) ...[
               const SizedBox(height: 8),
               OutlinedButton.icon(
