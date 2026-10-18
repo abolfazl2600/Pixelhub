@@ -74,11 +74,24 @@ def call_api(
         with urllib.request.urlopen(request, timeout=300) as response:
             payload = response.read()
     except urllib.error.HTTPError as error:
-        # Do not echo the HTTP response body; it may contain account data.
-        raise PublishError(
-            f"Pishkhan {endpoint} returned HTTP {error.code}. "
-            "Check the app-scoped token and release state in Pishkhan."
-        ) from None
+        # Read only a small, structured provider error. Never dump raw HTTP
+        # responses (or headers), which could expose account information.
+        response_body = error.read(4096)
+        details = ""
+        try:
+            payload = json.loads(response_body)
+            if isinstance(payload, dict):
+                # These response fields carry the useful validation reason
+                # without leaking unrelated metadata from the provider.
+                allowed = ("type", "message", "detail", "error", "errors")
+                filtered = {key: payload[key] for key in allowed if key in payload}
+                if filtered:
+                    details = json.dumps(filtered, ensure_ascii=False)
+        except (ValueError, UnicodeDecodeError, TypeError):
+            pass
+        details = " ".join(details.replace(secret, "[REDACTED]").split())[:450]
+        suffix = f" Provider message: {details}" if details else " No structured error details returned."
+        raise PublishError(f"Pishkhan {endpoint} returned HTTP {error.code}.{suffix}") from None
     except urllib.error.URLError as error:
         raise PublishError(f"Pishkhan {endpoint} request failed: network error.") from error
 
@@ -101,6 +114,11 @@ def require_success(endpoint: str, result: dict) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--apk", type=Path, required=True, help="Signed APK from this workflow")
+    parser.add_argument(
+        "--resume-existing-draft",
+        action="store_true",
+        help="Explicitly reuse an existing uncommitted Bazaar draft; never create a new draft in this mode",
+    )
     arguments = parser.parse_args()
 
     secret = os.environ.get("CAFEBAZAAR_PISHKHAN_API_SECRET", "").strip()
@@ -122,17 +140,28 @@ def main() -> int:
     print(f"Prepared release {version or '(unknown version)'} for {EXPECTED_PACKAGE}")
     print(f"Signed APK SHA-256: {sha256}")
 
-    # A previous failed run or a manual draft must never be silently mutated.
+    # Explicit opt-in is required before continuing an existing draft.
+    # This is especially important after a failed upload that may have
+    # already created a release. Never silently mutate someone else's draft.
     pending = call_api("GET", "last-uncommitted/", secret)
-    if pending.get("type") != "not-exists":
-        raise PublishError(
-            "Cafe Bazaar already has an uncommitted release (or its state is unclear). "
-            "Review/resolve that draft in Pishkhan before starting a new publication."
-        )
-    print("No uncommitted release found.")
-
-    require_success("create release", call_api("POST", "", secret, json_data={}))
-    print("Created a new Cafe Bazaar draft release.")
+    pending_type = pending.get("type")
+    if arguments.resume_existing_draft:
+        if pending_type != "success":
+            raise PublishError(
+                "Resume requested, but Pishkhan did not confirm an existing "
+                "uncommitted draft. Check the release state manually."
+            )
+        print("Reusing an existing uncommitted Cafe Bazaar draft by explicit operator request.")
+    else:
+        if pending_type != "not-exists":
+            raise PublishError(
+                "A Cafe Bazaar draft exists or its state is unclear. "
+                "Inspect the draft in Pishkhan first. To continue THAT draft "
+                "instead of creating another one, select resume_existing_draft "
+                "in a NEW manual workflow dispatch."
+            )
+        require_success("create release", call_api("POST", "", secret, json_data={}))
+        print("Created a new Cafe Bazaar draft release.")
     # Do not retry POST operations automatically: the server may have accepted
     # one even when a client-side timeout occurred.
     require_success("upload APK", call_api("POST", "upload/", secret, apk_file=arguments.apk))
