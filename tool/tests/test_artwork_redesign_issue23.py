@@ -10,6 +10,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 from online_release import assemble, checksum
 from online_masterworks_pack import create_pack as original_masterworks_pack
 from online_requested_remakes_pack import create_pack as requested_remakes_pack
+from online_classics_detailed_96_5_pack import create_pack as five_detailed_classics
 from online_starry_night_replacement_pack import (
     ID, create_pack as detailed_pack, draw,
 )
@@ -86,6 +87,9 @@ class ArtworkRedesignTests(unittest.TestCase):
             # immutable replacement when assembling this historical fixture.
             requested_remakes_pack(
                 root / "packs/pixelhub-content-requested-remakes-4-v1/content.zip"
+            )
+            five_detailed_classics(
+                root / "packs/pixelhub-content-detailed-classics-96-5-v1/content.zip"
             )
             with zipfile.ZipFile(new) as archive:
                 manifest = json.loads(archive.read("catalog.json"))
