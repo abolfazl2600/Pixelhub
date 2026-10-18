@@ -26,8 +26,15 @@ This is a **standalone** GitHub Actions workflow for Cafe Bazaar. It does
 4. Ensure the APK signing **certificate matches any already-published
    Cafe Bazaar version** of the same package. The Google Play *upload key*
    is not necessarily the same as Play's *app-signing key*.
-5. Increase `version: x.y.z+N` in `apps/game/pubspec.yaml` before submitting
-   an update; Bazaar requires a higher Android version code.
+5. Before every new store release, increase **both** parts of
+   `version: x.y.z+N` in `apps/game/pubspec.yaml`:
+   - `x.y.z` is the public version name displayed by Bazaar (e.g. `0.4.1`).
+   - `N` is Android's internal `versionCode` (e.g. `8`), which must be
+     strictly greater than the highest version code previously submitted
+     for this app. Check the version history in Pishkhan before publishing.
+   Example: after `0.4.0+7`, use `0.4.1+8` for the next release.
+   The workflow builds exactly the version committed to `main`; it does
+   **not** auto-increment numbers or initiate publication by itself.
 
 ## Publish a version
 
