@@ -41,7 +41,7 @@ void main() {
   );
 
   test(
-    'six refined pictures replace their original offline catalog entries',
+    'seven refined pictures replace their original offline catalog entries',
     () async {
       const dimensions = <String, int>{
         'butterfly': 32,
@@ -49,13 +49,18 @@ void main() {
         'saturn': 32,
         'umbrella': 32,
         'diamond': 32,
-        'offline-mona-lisa': 64,
+        'offline-mona-lisa': 85,
+        'offline-azadi-tower': 85,
       };
       final library = await AssetLevelRepository().loadLevels();
       final byId = {for (final level in library) level.id: level};
       for (final entry in dimensions.entries) {
         final art = byId[entry.key]!;
-        expect(art.contentVersion, 2, reason: entry.key);
+        expect(
+          art.contentVersion,
+          entry.key == 'offline-mona-lisa' ? 3 : 2,
+          reason: entry.key,
+        );
         expect(art.width, entry.value, reason: entry.key);
         expect(art.height, entry.value, reason: entry.key);
         expect(art.cells, hasLength(entry.value * entry.value));
@@ -63,7 +68,7 @@ void main() {
         expect(art.cells.toSet().length, greaterThanOrEqualTo(6));
         expect(LevelDefinition.fromJson(art.toJson()).checksum, art.checksum);
       }
-      expect(library.where((art) => dimensions.containsKey(art.id)).length, 6);
+      expect(library.where((art) => dimensions.containsKey(art.id)).length, 7);
     },
   );
 

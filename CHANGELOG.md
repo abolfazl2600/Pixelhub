@@ -1,5 +1,7 @@
 ## Unreleased — achievement badge presentation
 
+- Replaced the bundled Mona Lisa (content v3) and Azadi Tower (content v2) with individually detailed 85×85 pixel grids. Existing artwork IDs, gallery categories, titles, and economics remain unchanged; prior incomplete progress for these two grids is intentionally not mapped to the new cell layouts.
+
 - Increased the achievement artwork's responsive display limit from 156 to 270 logical pixels, giving larger medals more vertical room on wider displays; small cards retain legible mission text and progress. Medals continue to render without a separate square background tile or decorative watermark.
 
 ## 0.3.2+5 — Google Play upload candidate (source prepared; not released)
