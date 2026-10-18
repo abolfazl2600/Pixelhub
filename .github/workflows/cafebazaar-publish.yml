@@ -22,6 +22,11 @@ on:
         required: true
         type: boolean
         default: false
+      resume_existing_draft:
+        description: 'Continue an existing uncommitted Bazaar draft (only after checking it in Pishkhan)'
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -176,6 +181,11 @@ jobs:
           CAFEBAZAAR_CHANGELOG_EN: ${{ inputs.changelog_en }}
           CAFEBAZAAR_DEVELOPER_NOTE: ${{ inputs.developer_note }}
           RELEASE_VERSION: ${{ steps.source.outputs.version }}
+          RESUME_EXISTING_DRAFT: ${{ inputs.resume_existing_draft }}
         run: |
-          python3 tool/publish_cafebazaar.py \
-            --apk apps/game/build/app/outputs/flutter-apk/app-release.apk
+          set -euo pipefail
+          args=(--apk apps/game/build/app/outputs/flutter-apk/app-release.apk)
+          if [[ "$RESUME_EXISTING_DRAFT" == "true" ]]; then
+            args+=(--resume-existing-draft)
+          fi
+          python3 tool/publish_cafebazaar.py "${args[@]}"
