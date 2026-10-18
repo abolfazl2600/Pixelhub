@@ -1,0 +1,181 @@
+name: Publish Cafe Bazaar (manual)
+
+# This workflow is intentionally independent of the Play/preview Android workflow.
+# Only a maintainer-initiated dispatch on main can submit a release.
+on:
+  workflow_dispatch:
+    inputs:
+      changelog_fa:
+        description: 'Persian release notes shown in Cafe Bazaar (required)'
+        required: true
+        type: string
+      changelog_en:
+        description: 'English release notes (optional)'
+        required: false
+        type: string
+      developer_note:
+        description: 'Private note to Cafe Bazaar reviewers (optional)'
+        required: false
+        type: string
+      confirm_publish:
+        description: 'I authorize submission AND automatic publication after Bazaar approval'
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pixelhub-cafebazaar-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Build, sign and submit Android release to Cafe Bazaar
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Confirm manual production release
+        env:
+          CONFIRM_PUBLISH: ${{ inputs.confirm_publish }}
+          RELEASE_NOTES_FA: ${{ inputs.changelog_fa }}
+          BAZAAR_SECRET: ${{ secrets.CAFEBAZAAR_PISHKHAN_API_SECRET }}
+          KEYSTORE_B64: ${{ secrets.PIXELHUB_UPLOAD_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.PIXELHUB_UPLOAD_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.PIXELHUB_UPLOAD_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.PIXELHUB_UPLOAD_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_REF" != "refs/heads/main" ]]; then
+            echo "::error::Cafe Bazaar releases must be dispatched from main."
+            exit 1
+          fi
+          if [[ "$CONFIRM_PUBLISH" != "true" ]]; then
+            echo "::error::Select the confirm_publish checkbox to authorize this release."
+            exit 1
+          fi
+          if [[ -z "${RELEASE_NOTES_FA//[[:space:]]/}" ]]; then
+            echo "::error::Persian release notes are required."
+            exit 1
+          fi
+          for var in BAZAAR_SECRET KEYSTORE_B64 STORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
+            if [[ -z "${!var}" ]]; then
+              echo "::error::A required release secret is missing: $var"
+              exit 1
+            fi
+          done
+
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Record source commit and version
+        id: source
+        run: |
+          set -euo pipefail
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          python3 - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          text = Path("apps/game/pubspec.yaml").read_text(encoding="utf-8")
+          match = re.search(r"^version:\s*(\d+\.\d+\.\d+\+\d+)\s*$", text, re.M)
+          if not match:
+              raise SystemExit("Expected an explicit semver+build version in pubspec.yaml")
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              output.write(f"version={match.group(1)}\n")
+          PY
+
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        with:
+          flutter-version: '3.35.7'
+          channel: stable
+          cache: true
+
+      - name: Validate release source
+        run: bash tool/validate.sh
+
+      - name: Generate current launcher assets
+        working-directory: apps/game
+        run: dart run tool/generate_launcher_icons.dart
+
+      - name: Decode release signing key securely
+        env:
+          KEYSTORE_B64: ${{ secrets.PIXELHUB_UPLOAD_KEYSTORE_BASE64 }}
+        run: |
+          python3 - <<'PY'
+          import base64
+          import os
+          from pathlib import Path
+
+          target = Path(os.environ["RUNNER_TEMP"]) / "pixelhub-upload.jks"
+          target.write_bytes(base64.b64decode(os.environ["KEYSTORE_B64"], validate=True))
+          target.chmod(0o600)
+          if not target.stat().st_size:
+              raise SystemExit("Decoded signing key is empty")
+          PY
+
+      - name: Build signed store APK
+        working-directory: apps/game
+        env:
+          PIXELHUB_RELEASE_STORE_FILE: ${{ runner.temp }}/pixelhub-upload.jks
+          PIXELHUB_RELEASE_STORE_PASSWORD: ${{ secrets.PIXELHUB_UPLOAD_STORE_PASSWORD }}
+          PIXELHUB_RELEASE_KEY_ALIAS: ${{ secrets.PIXELHUB_UPLOAD_KEY_ALIAS }}
+          PIXELHUB_RELEASE_KEY_PASSWORD: ${{ secrets.PIXELHUB_UPLOAD_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -s "$PIXELHUB_RELEASE_STORE_FILE"
+          flutter build apk --release --no-pub
+
+      - name: Verify signature, package ID and release artifact
+        working-directory: apps/game
+        run: |
+          set -euo pipefail
+          apk="build/app/outputs/flutter-apk/app-release.apk"
+          test -s "$apk"
+          apksigner="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
+          aapt="$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -n 1)"
+          test -x "$apksigner"
+          test -x "$aapt"
+          "$apksigner" verify --verbose --print-certs "$apk"
+          package_line="$("$aapt" dump badging "$apk" | grep '^package: ')"
+          if [[ "$package_line" != *"name='io.github.abolfazl2600.pixelhub'"* ]]; then
+            echo "::error::Unexpected Android application ID."
+            exit 1
+          fi
+          echo "$package_line"
+          sha256sum "$apk"
+
+      - name: Record commit metadata
+        env:
+          SOURCE_SHA: ${{ steps.source.outputs.sha }}
+        run: |
+          printf '%s\n' "$SOURCE_SHA" > apps/game/build/app/outputs/flutter-apk/commit.txt
+
+      - name: Retain signed APK for release traceability
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: pixelhub-cafebazaar-apk-v${{ steps.source.outputs.version }}-${{ steps.source.outputs.sha }}
+          path: |
+            apps/game/build/app/outputs/flutter-apk/app-release.apk
+            apps/game/build/app/outputs/flutter-apk/commit.txt
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Submit to Cafe Bazaar and request automatic publication after approval
+        env:
+          CAFEBAZAAR_PISHKHAN_API_SECRET: ${{ secrets.CAFEBAZAAR_PISHKHAN_API_SECRET }}
+          CAFEBAZAAR_CHANGELOG_FA: ${{ inputs.changelog_fa }}
+          CAFEBAZAAR_CHANGELOG_EN: ${{ inputs.changelog_en }}
+          CAFEBAZAAR_DEVELOPER_NOTE: ${{ inputs.developer_note }}
+          RELEASE_VERSION: ${{ steps.source.outputs.version }}
+        run: |
+          python3 tool/publish_cafebazaar.py \
+            --apk apps/game/build/app/outputs/flutter-apk/app-release.apk
