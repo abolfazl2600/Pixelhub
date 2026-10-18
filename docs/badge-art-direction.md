@@ -37,7 +37,7 @@ The current visual reference is the **seven-category first-tier pixel diorama se
 4. Prefer palette-indexed PNG with an alpha entry, if supported, to reduce download size. The current client validates image byte length and SHA-256, and caps each PNG at **32,768 bytes**; **do not assume a 512×512 PNG is accepted unless the optimized file actually meets that limit**. If it does not, alter the asset-production strategy or explicitly update and validate the client/catalog limits before publication.
 5. Update `badge_content/catalog.json` image size and checksum **together** with the final PNG and use a stable image/manifest deployment process. Do not claim publication simply because a Git commit exists.
 6. Keep all images remotely distributed and cached on device for earned awards, with user-facing loading messages that do not name the content host.
-7. Keep every badge's **title and useful description** visible in the collection, including unearned badges, alongside progress `x / required`; use “دریافت نشده” / “Not earned” rather than “هنوز کشف نشده” / “Undiscovered”. Do not treat the image's visual mystery treatment as permission to hide the mission's actual objective. **Note:** this is a desired UI guideline; the current implementation may still hide some metadata until a separate UI change.
+7. Keep every badge's **title and useful description** visible in the collection, including unearned badges, alongside progress `x / required`; use “دریافت نشده” / “Not earned” rather than “هنوز کشف نشده” / “Undiscovered”. Do not treat the image's visual mystery treatment as permission to hide the mission's actual objective. The collection screen displays each badge's localized title, mission description and progress for both locked and earned entries, without using the “undiscovered” label.
 
 ### Reusable art brief
 
@@ -46,7 +46,7 @@ The current visual reference is the **seven-category first-tier pixel diorama se
 
 ## Implemented first-tier category badges (October 2026)
 
-Seven individually cropped, transparent 512×512, nearest-neighbor pixel-art PNGs are stored at `badge_content/images/*_first.png` and served through the existing online badge catalog. No icons are bundled in the APK. The public catalogue retains the previous 5-/10-completion achievements and all stable existing IDs.
+Seven individually cropped, transparent 512×512, nearest-neighbor pixel-art PNGs are stored at `badge_content/images/*_first.png` and served through the existing online badge catalog. No icons are bundled in the APK. In the collection UI, earned artwork is rendered directly without a separate square icon tile or decorative watermark behind transparent pixels; its display size adapts to the available card width. The public catalogue retains the previous 5-/10-completion achievements and all stable existing IDs.
 
 | Badge ID | Category | Symbol | Trigger |
 | --- | --- | --- | --- |
