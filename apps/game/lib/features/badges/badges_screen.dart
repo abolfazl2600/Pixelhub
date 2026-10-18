@@ -336,7 +336,7 @@ class _AchievementCard extends StatelessWidget {
                     builder: (context, constraints) {
                       // Let the medal use the available card width instead of
                       // putting it inside a fixed square tile.
-                      final medalSize = math.min(156.0, constraints.maxWidth);
+                      final medalSize = math.min(156.0, constraints.maxWidth).toDouble();
                       return SizedBox(
                         height: medalSize,
                         child: Center(
