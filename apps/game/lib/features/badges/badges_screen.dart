@@ -340,25 +340,27 @@ class _AchievementCard extends StatelessWidget {
                     builder: (context, constraints) {
                       // Let the medal use the available card width instead of
                       // putting it inside a fixed square tile.
-                      final medalSize = math.min(270.0, constraints.maxWidth).toDouble();
+                      final medalSize = math
+                          .min(270.0, constraints.maxWidth)
+                          .toDouble();
                       return SizedBox(
                         height: medalSize,
                         child: Center(
                           child: earned
                               ? (iconBytes == null
-                                  ? const Icon(
-                                      Icons.workspace_premium_outlined,
-                                      color: _BadgePalette.green,
-                                      size: 68,
-                                    )
-                                  : Image.memory(
-                                      iconBytes!,
-                                      width: medalSize,
-                                      height: medalSize,
-                                      fit: BoxFit.contain,
-                                      filterQuality: FilterQuality.none,
-                                      gaplessPlayback: true,
-                                    ))
+                                    ? const Icon(
+                                        Icons.workspace_premium_outlined,
+                                        color: _BadgePalette.green,
+                                        size: 68,
+                                      )
+                                    : Image.memory(
+                                        iconBytes!,
+                                        width: medalSize,
+                                        height: medalSize,
+                                        fit: BoxFit.contain,
+                                        filterQuality: FilterQuality.none,
+                                        gaplessPlayback: true,
+                                      ))
                               : _MysteryEmblem(size: medalSize * 0.84),
                         ),
                       );
@@ -463,10 +465,7 @@ class _MysteryPainter extends CustomPainter {
       final angle = i * math.pi / 6;
       canvas.drawCircle(
         center +
-            Offset(
-              24 * scale * math.cos(angle),
-              24 * scale * math.sin(angle),
-            ),
+            Offset(24 * scale * math.cos(angle), 24 * scale * math.sin(angle)),
         11 * scale,
         outer,
       );
