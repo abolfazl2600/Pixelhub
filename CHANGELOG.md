@@ -1,3 +1,7 @@
+## Unreleased — achievement badge presentation
+
+- Enlarged achievement artwork responsively and removed the separate square icon tile and decorative watermark behind transparent badge images. Kept card backgrounds, mission descriptions, progress and lock states intact.
+
 ## 0.3.2+5 — Google Play upload candidate (source prepared; not released)
 
 - Updated release-candidate build number while preserving the stable Android application ID.
