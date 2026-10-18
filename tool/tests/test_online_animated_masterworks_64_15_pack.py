@@ -15,6 +15,7 @@ from online_animated_masterworks_64_15_pack import (
     PREFIX, animation_frames, animation_pose, create_pack, draw_scene,
 )
 from online_release import assemble, checksum, validated_animation
+from online_animated_masterworks_70_7_pack import PREFIX as DETAILED_PREFIX, create_pack as detailed_classics
 
 
 class AnimatedFifteenClassicPackTests(unittest.TestCase):
@@ -64,6 +65,8 @@ class AnimatedFifteenClassicPackTests(unittest.TestCase):
             root = pathlib.Path(work)
             zip_path = root / "pixelhub-content-animated-classics-64-15-v1" / "content.zip"
             create_pack(zip_path)
+            replacement_zip = root / "pixelhub-content-animated-classics-70-7-v1" / "content.zip"
+            detailed_classics(replacement_zip)
             with zipfile.ZipFile(zip_path) as archive:
                 manifest = json.loads(archive.read("catalog.json"))
                 self.assertEqual(manifest["schemaVersion"],1)
@@ -102,9 +105,11 @@ class AnimatedFifteenClassicPackTests(unittest.TestCase):
             assemble(root,output)
             catalog = json.loads((output/"catalog.json").read_text(encoding="utf8"))
             online = [p for p in catalog["pictures"] if p["id"].startswith(PREFIX)]
-            self.assertEqual(len(online),15)
-            self.assertTrue(all(p["animation"]["frameCount"] == 8 for p in online))
-            for entry in online:
+            detailed = [p for p in catalog["pictures"] if p["id"].startswith(DETAILED_PREFIX)]
+            self.assertEqual(len(online), 8)
+            self.assertEqual(len(detailed), 7)
+            self.assertTrue(all(p["animation"]["frameCount"] == 8 for p in online + detailed))
+            for entry in online + detailed:
                 stem = entry["id"]+"-v1"
                 self.assertTrue((output/"previews"/(stem+".png")).exists())
                 self.assertTrue((output/"animations"/(stem+".json")).exists())
