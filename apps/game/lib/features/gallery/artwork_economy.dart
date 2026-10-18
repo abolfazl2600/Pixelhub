@@ -6,7 +6,14 @@ import 'artwork_difficulty.dart';
 /// Local earned coins only: no billing, ads or network dependency.
 /// Different paintings of the same difficulty can still have different prices.
 int artworkPrice(String id, ArtworkDifficulty difficulty) {
-  final hash = id.codeUnits.fold<int>(
+  // Redesigns keep the previous artwork's price to avoid an economy change.
+  final pricingId = switch (id) {
+    'online-elephant-detailed' => 'online-elephant',
+    'online-penguin-detailed' => 'online-penguin',
+    'online-parrot-detailed' => 'online-parrot',
+    _ => id,
+  };
+  final hash = pricingId.codeUnits.fold<int>(
     0,
     (sum, unit) => (sum * 31 + unit) % 997,
   );

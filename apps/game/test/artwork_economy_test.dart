@@ -45,6 +45,19 @@ void main() {
       );
       expect(alwaysFreeArtwork('sunflower'), isTrue);
       expect(alwaysFreeArtwork('private-own-art'), isTrue);
+      for (final pair in {
+        'online-elephant-detailed': 'online-elephant',
+        'online-penguin-detailed': 'online-penguin',
+        'online-parrot-detailed': 'online-parrot',
+      }.entries) {
+        final redesigned = _art(pair.key, 48, 16);
+        expect(difficultyForLevel(redesigned), ArtworkDifficulty.hard);
+        expect(
+          priceForLevel(redesigned),
+          artworkPrice(pair.value, ArtworkDifficulty.hard),
+        );
+        expect(rewardForLevel(redesigned), 125);
+      }
     },
   );
 

@@ -250,8 +250,12 @@ BUNDLED_OFFLINE_CATEGORY_PACK = {
     'offline-nasir-molk': ('persian_architecture', ['nasir al molk', 'مسجد نصیرالملک', 'شیراز', 'stained glass']),
     'offline-shamsa': ('patterns', ['shamsa', 'شمسه', 'geometric', 'iranian']),
 }
+BUNDLED_OFFLINE_FILENAMES = {
+    # Keep the artwork ID stable while shipping the redesigned grid as v2.
+    'offline-nasir-molk': 'offline-nasir-molk-v2.json',
+}
 for level_id, (category, tags) in BUNDLED_OFFLINE_CATEGORY_PACK.items():
-    filename = f'{level_id}.json'
+    filename = BUNDLED_OFFLINE_FILENAMES.get(level_id, f'{level_id}.json')
     if not (ROOT / filename).is_file():
         raise FileNotFoundError(f'Missing immutable offline painting: {filename}')
     CATALOG.append(filename)

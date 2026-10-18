@@ -17,6 +17,9 @@ const _retiredOnlineReplacements = <String, String>{
   'online-flag-turkey-10': 'online-flag-turkey-40',
   'online-flag-iran-10': 'online-flag-iran-40',
   'online-mona-lisa': 'online-mona-lisa-detailed-90',
+  'online-elephant': 'online-elephant-detailed',
+  'online-penguin': 'online-penguin-detailed',
+  'online-parrot': 'online-parrot-detailed',
 };
 
 /// Public, versioned files served by the same repository's GitHub Pages site.

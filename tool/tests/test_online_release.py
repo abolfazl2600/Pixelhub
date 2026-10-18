@@ -109,6 +109,9 @@ class ImmutableOnlineReleaseTests(unittest.TestCase):
             "online-flag-turkey-10",
             "online-flag-iran-10",
             "online-mona-lisa",
+            "online-elephant",
+            "online-penguin",
+            "online-parrot",
         ]
         replacements = [
             "online-classic-starry-night-detailed",
@@ -116,6 +119,9 @@ class ImmutableOnlineReleaseTests(unittest.TestCase):
             "online-flag-turkey-40",
             "online-flag-iran-40",
             "online-mona-lisa-detailed-90",
+            "online-elephant-detailed",
+            "online-penguin-detailed",
+            "online-parrot-detailed",
         ]
         self.pack("pixelhub-content-originals-v1", [(name, 1) for name in originals])
         self.pack("pixelhub-content-remakes-v1", [(name, 1) for name in replacements])

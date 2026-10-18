@@ -11,6 +11,8 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 
 from online_flags_20_pack import create_pack as historical_flags
 from online_masterworks_pack import create_pack as historical_masterworks
+from online_animals_pack import create_pack as historical_animals
+from online_animal_redesigns_pack import ARTWORKS as ANIMAL_ARTWORKS, create_pack as animal_redesigns
 from online_starry_night_replacement_pack import create_pack as detailed_starry
 from online_release import RETIRED_ONLINE_IDS, assemble, checksum
 from online_requested_remakes_pack import (
@@ -23,6 +25,9 @@ PREVIOUS = {
     "online-flag-turkey-10": "online-flag-turkey-40",
     "online-flag-iran-10": "online-flag-iran-40",
     "online-mona-lisa": "online-mona-lisa-detailed-90",
+    "online-elephant": "online-elephant-detailed",
+    "online-penguin": "online-penguin-detailed",
+    "online-parrot": "online-parrot-detailed",
 }
 
 
@@ -79,6 +84,35 @@ class RequestedPictureReplacementsTests(unittest.TestCase):
                         self.assertEqual(struct.unpack(">II", image[16:24]),
                                          (expected, expected))
 
+    def test_detailed_animal_replacements_are_valid_48x48_levels(self):
+        expected = {
+            "online-elephant-detailed",
+            "online-penguin-detailed",
+            "online-parrot-detailed",
+        }
+        self.assertEqual({item[0] for item in ANIMAL_ARTWORKS}, expected)
+        with tempfile.TemporaryDirectory() as t:
+            path = pathlib.Path(t) / "content.zip"
+            animal_redesigns(path)
+            with zipfile.ZipFile(path) as archive:
+                manifest = json.loads(archive.read("catalog.json"))
+                self.assertEqual(len(manifest["pictures"]), 3)
+                self.assertEqual(len(archive.namelist()), 7)
+                for item in manifest["pictures"]:
+                    with self.subTest(picture=item["id"]):
+                        self.assertEqual((item["width"], item["height"]), (48, 48))
+                        self.assertEqual(item["category"], "animals")
+                        stem = item["id"] + "-v1"
+                        raw = archive.read("levels/" + stem + ".json")
+                        level = json.loads(raw)
+                        self.assertEqual(len(level["cells"]), 48 * 48)
+                        self.assertGreaterEqual(len(set(level["cells"])), 12)
+                        self.assertEqual(level["checksum"], checksum(level))
+                        self.assertEqual(level["checksum"], item["checksum"])
+                        self.assertEqual(len(raw), item["bytes"])
+                        preview = archive.read("previews/" + stem + ".png")
+                        self.assertEqual(struct.unpack(">II", preview[16:24]), (48, 48))
+
     def test_historic_images_are_retired_not_duplicated_or_mutated(self):
         for old, fresh in PREVIOUS.items():
             self.assertEqual(RETIRED_ONLINE_IDS[old], fresh)
@@ -90,6 +124,8 @@ class RequestedPictureReplacementsTests(unittest.TestCase):
                 ("pixelhub-content-masterworks-6-v1", historical_masterworks),
                 ("pixelhub-content-starry-night-detailed-1-v1", detailed_starry),
                 ("pixelhub-content-requested-remakes-4-v1", create_pack),
+                ("pixelhub-content-animals-10-v1", historical_animals),
+                ("pixelhub-content-animal-redesigns-3-v1", animal_redesigns),
             ]:
                 path = packs / tag / "content.zip"
                 generator(path)
@@ -106,6 +142,22 @@ class RequestedPictureReplacementsTests(unittest.TestCase):
                 self.assertTrue((dest / f"levels/{new}-v1.json").exists())
             self.assertEqual(published["online-mona-lisa-detailed-90"]["width"],
                              90)
+
+    def test_offline_nasir_molk_redesign_is_versioned_and_catalogued(self):
+        levels = ROOT / "apps/game/assets/levels"
+        catalog = json.loads((levels / "catalog.json").read_text("utf8"))
+        metadata = json.loads((levels / "metadata.json").read_text("utf8"))
+        self.assertIn("offline-nasir-molk-v2.json", catalog)
+        self.assertNotIn("offline-nasir-molk.json", catalog)
+        self.assertTrue((levels / "offline-nasir-molk.json").is_file())
+        level = json.loads((levels / "offline-nasir-molk-v2.json").read_text("utf8"))
+        self.assertEqual(level["levelId"], "offline-nasir-molk")
+        self.assertEqual(level["levelVersion"], 2)
+        self.assertEqual((level["width"], level["height"]), (64, 64))
+        self.assertEqual(len(level["cells"]), 64 * 64)
+        self.assertEqual(len(level["palette"]), 16)
+        self.assertEqual(level["checksum"], checksum(level))
+        self.assertEqual(metadata["offline-nasir-molk"]["category"], "persian_architecture")
 
     def test_snowflake_removed_and_lighthouse_replaces_catalog_position(self):
         levels = ROOT / "apps/game/assets/levels"
