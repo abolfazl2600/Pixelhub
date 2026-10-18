@@ -37,15 +37,20 @@ This is a **standalone** GitHub Actions workflow for Cafe Bazaar. It does
    and an optional private reviewer note. These are manually provided at
    dispatch, not read from commits or changelogs.
 4. Check **I authorize submission AND automatic publication after Bazaar approval**.
-5. Click **Run workflow**.
+5. Leave **resume_existing_draft** unchecked for a new publication. Check it
+   **only after manually confirming the existing uncommitted release in
+   Pishkhan** (e.g., after a previous run created a draft but upload failed).
+6. Click **Run workflow**.
 
 The workflow runs the existing release validation, builds **only one
 release APK**, verifies its APK signature and Android package ID, and
 retains the exact signed artifact and commit SHA for 14 days. It then:
 
-1. Checks whether an uncommitted Pishkhan release already exists; if so it
-   **fails without changing that draft**.
-2. Creates a new Pishkhan release.
+1. Checks the uncommitted Pishkhan release state. For an ordinary
+   publication it **refuses to change an existing draft**; if the
+   `resume_existing_draft` checkbox was explicitly selected, it requires an
+   existing draft and does **not** create a second one.
+2. Creates a Pishkhan release only when there is no draft and resume is off.
 3. Uploads only `app-release.apk` with architecture `all`.
 4. Commits the release with **auto_publish=true** and
    **staged_rollout_percentage=100**, including the manually entered notes.
@@ -63,7 +68,19 @@ The workflow deliberately cannot bypass Bazaar review or policy checks.
 - The secret is never written to the repository or artifacts.
 - The uploader does **not** automatically retry state-changing HTTP POSTs.
   If a network failure happens *after* draft creation, visit Pishkhan to
-  inspect/resolve the draft before manually rerunning.
+  inspect the draft before manually rerunning.
+- If an APK upload fails with HTTP 400, the workflow now shows the provider's
+  structured error message (if present) without dumping raw response headers
+  or bodies. Check that message for the exact reason (package/ABI/version
+  code/signature or other validation).
+- **Specific recovery for run 39099143415:** a signed version 0.4.0+6 APK
+  was built and a Bazaar draft was created, but the upload returned HTTP 400.
+  Do **not** start a new release blindly. Inspect that draft in Pishkhan, then
+  select **resume_existing_draft** for a new manually-dispatched run to retry
+  the upload to that draft. If the draft was discarded in Pishkhan instead,
+  leave that checkbox off.
+- Resume is an operator-approved mutation of an existing uncommitted release;
+  do not select it when a different release is being edited in Pishkhan.
 - A missing/invalid Pishkhan token, conflicting draft, invalid version code,
   wrong signing certificate or package not registered in Pishkhan will stop
   the submission. The API is the final authority on release acceptance.
