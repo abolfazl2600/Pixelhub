@@ -112,6 +112,13 @@ class ImmutableOnlineReleaseTests(unittest.TestCase):
             "online-elephant",
             "online-penguin",
             "online-parrot",
+            "online-classic-animated64-primavera",
+            "online-classic-animated64-tower-babel",
+            "online-classic-animated64-hunters-snow",
+            "online-classic-animated64-ophelia",
+            "online-classic-animated64-lady-shalott",
+            "online-classic-animated64-olympia",
+            "online-classic-animated64-luncheon-grass",
         ]
         replacements = [
             "online-classic-starry-night-detailed",
@@ -122,6 +129,13 @@ class ImmutableOnlineReleaseTests(unittest.TestCase):
             "online-elephant-detailed",
             "online-penguin-detailed",
             "online-parrot-detailed",
+            "online-classic-animated70-primavera",
+            "online-classic-animated70-tower-babel",
+            "online-classic-animated70-hunters-snow",
+            "online-classic-animated70-ophelia",
+            "online-classic-animated70-lady-shalott",
+            "online-classic-animated70-olympia",
+            "online-classic-animated70-luncheon-grass",
         ]
         self.pack("pixelhub-content-originals-v1", [(name, 1) for name in originals])
         self.pack("pixelhub-content-remakes-v1", [(name, 1) for name in replacements])

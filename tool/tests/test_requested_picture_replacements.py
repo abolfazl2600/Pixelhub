@@ -12,6 +12,8 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 from online_flags_20_pack import create_pack as historical_flags
 from online_masterworks_pack import create_pack as historical_masterworks
 from online_animals_pack import create_pack as historical_animals
+from online_animated_masterworks_64_15_pack import create_pack as historical_classics
+from online_animated_masterworks_70_7_pack import SELECTED_SLUGS as DETAILED_CLASSIC_SLUGS, create_pack as detailed_classics
 from online_animal_redesigns_pack import ARTWORKS as ANIMAL_ARTWORKS, create_pack as animal_redesigns
 from online_starry_night_replacement_pack import create_pack as detailed_starry
 from online_release import RETIRED_ONLINE_IDS, assemble, checksum
@@ -28,6 +30,13 @@ PREVIOUS = {
     "online-elephant": "online-elephant-detailed",
     "online-penguin": "online-penguin-detailed",
     "online-parrot": "online-parrot-detailed",
+    "online-classic-animated64-primavera": "online-classic-animated70-primavera",
+    "online-classic-animated64-tower-babel": "online-classic-animated70-tower-babel",
+    "online-classic-animated64-hunters-snow": "online-classic-animated70-hunters-snow",
+    "online-classic-animated64-ophelia": "online-classic-animated70-ophelia",
+    "online-classic-animated64-lady-shalott": "online-classic-animated70-lady-shalott",
+    "online-classic-animated64-olympia": "online-classic-animated70-olympia",
+    "online-classic-animated64-luncheon-grass": "online-classic-animated70-luncheon-grass",
 }
 
 
@@ -126,6 +135,8 @@ class RequestedPictureReplacementsTests(unittest.TestCase):
                 ("pixelhub-content-requested-remakes-4-v1", create_pack),
                 ("pixelhub-content-animals-10-v1", historical_animals),
                 ("pixelhub-content-animal-redesigns-3-v1", animal_redesigns),
+                ("pixelhub-content-animated-classics-64-15-v1", historical_classics),
+                ("pixelhub-content-animated-classics-70-7-v1", detailed_classics),
             ]:
                 path = packs / tag / "content.zip"
                 generator(path)
@@ -142,6 +153,10 @@ class RequestedPictureReplacementsTests(unittest.TestCase):
                 self.assertTrue((dest / f"levels/{new}-v1.json").exists())
             self.assertEqual(published["online-mona-lisa-detailed-90"]["width"],
                              90)
+            for slug in DETAILED_CLASSIC_SLUGS:
+                ident = "online-classic-animated70-" + slug
+                self.assertEqual(published[ident]["width"], 70)
+                self.assertEqual(published[ident]["height"], 70)
 
     def test_offline_nasir_molk_redesign_is_versioned_and_catalogued(self):
         levels = ROOT / "apps/game/assets/levels"

@@ -353,6 +353,20 @@ jobs:
               --notes "15 distinct original pixel-art homages to public-domain classic paintings. Each 64x64 picture includes a checksum-bound eight-frame online animation companion and bilingual metadata. Assets are immutable Release files and are not bundled in the APK." \
               --latest=false
           fi
+      - name: Publish seven detailed 70x70 animated classic paintings
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-animated-classics-70-7-v1 >/dev/null 2>&1; then
+            python3 tool/online_animated_masterworks_70_7_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-animated-classics-70-7-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: seven detailed 70x70 animated classic paintings" \
+              --notes "Detailed 70x70 replacements for Primavera, Tower of Babel, Hunters in the Snow, Ophelia, The Lady of Shalott, Olympia and Luncheon on the Grass. Each level includes additional hand-authored pixel details and an eight-frame animation. New immutable IDs replace the old 64x64 cards in the public catalog; APK size and historical release assets remain unchanged." \
+              --latest=false
+          fi
       - name: Publish twenty new 65x65 Iranian landmarks and cultural pictures
         if: github.event_name == 'workflow_run'
         env:

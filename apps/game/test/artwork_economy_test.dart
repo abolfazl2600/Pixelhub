@@ -49,8 +49,25 @@ void main() {
         'online-elephant-detailed': 'online-elephant',
         'online-penguin-detailed': 'online-penguin',
         'online-parrot-detailed': 'online-parrot',
+        'online-classic-animated70-primavera':
+            'online-classic-animated64-primavera',
+        'online-classic-animated70-tower-babel':
+            'online-classic-animated64-tower-babel',
+        'online-classic-animated70-hunters-snow':
+            'online-classic-animated64-hunters-snow',
+        'online-classic-animated70-ophelia':
+            'online-classic-animated64-ophelia',
+        'online-classic-animated70-lady-shalott':
+            'online-classic-animated64-lady-shalott',
+        'online-classic-animated70-olympia':
+            'online-classic-animated64-olympia',
+        'online-classic-animated70-luncheon-grass':
+            'online-classic-animated64-luncheon-grass',
       }.entries) {
-        final redesigned = _art(pair.key, 48, 16);
+        final side = pair.key.startsWith('online-classic-animated70-')
+            ? 70
+            : 48;
+        final redesigned = _art(pair.key, side, 16);
         expect(difficultyForLevel(redesigned), ArtworkDifficulty.hard);
         expect(
           priceForLevel(redesigned),
