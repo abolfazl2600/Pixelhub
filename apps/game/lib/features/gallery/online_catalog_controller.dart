@@ -20,14 +20,12 @@ const _retiredOnlineReplacements = <String, String>{
   'online-elephant': 'online-elephant-detailed',
   'online-penguin': 'online-penguin-detailed',
   'online-parrot': 'online-parrot-detailed',
-  'online-classic-animated64-primavera':
-      'online-classic-animated70-primavera',
+  'online-classic-animated64-primavera': 'online-classic-animated70-primavera',
   'online-classic-animated64-tower-babel':
       'online-classic-animated70-tower-babel',
   'online-classic-animated64-hunters-snow':
       'online-classic-animated70-hunters-snow',
-  'online-classic-animated64-ophelia':
-      'online-classic-animated70-ophelia',
+  'online-classic-animated64-ophelia': 'online-classic-animated70-ophelia',
   'online-classic-animated64-lady-shalott':
       'online-classic-animated70-lady-shalott',
   'online-classic-animated64-olympia':
