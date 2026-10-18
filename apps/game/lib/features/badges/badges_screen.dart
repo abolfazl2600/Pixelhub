@@ -104,9 +104,13 @@ class _BadgesScreenState extends State<BadgesScreen> {
                 builder: (context, constraints) {
                   // Two legible columns on phones; three on tablets/desktop.
                   final columns = constraints.maxWidth >= 700 ? 3 : 2;
-                  final cardHeight = constraints.maxWidth >= 700
-                      ? 326.0
-                      : 342.0;
+                  // Reserve enough vertical room for a larger medal and
+                  // readable mission text without wasting space on phones.
+                  final cardWidth =
+                      (constraints.maxWidth - 32.0 - (columns - 1) * 14.0) /
+                      columns;
+                  final medalSize = math.min(270.0, cardWidth - 18.0);
+                  final cardHeight = math.max(342.0, medalSize + 174.0);
                   return CustomScrollView(
                     key: const ValueKey('badges-scroll'),
                     physics: const AlwaysScrollableScrollPhysics(),
@@ -336,7 +340,7 @@ class _AchievementCard extends StatelessWidget {
                     builder: (context, constraints) {
                       // Let the medal use the available card width instead of
                       // putting it inside a fixed square tile.
-                      final medalSize = math.min(156.0, constraints.maxWidth).toDouble();
+                      final medalSize = math.min(270.0, constraints.maxWidth).toDouble();
                       return SizedBox(
                         height: medalSize,
                         child: Center(
