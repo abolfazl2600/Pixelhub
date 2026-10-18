@@ -1,6 +1,6 @@
 ## Unreleased — achievement badge presentation
 
-- Enlarged achievement artwork responsively and removed the separate square icon tile and decorative watermark behind transparent badge images. Kept card backgrounds, mission descriptions, progress and lock states intact.
+- Increased the achievement artwork's responsive display limit from 156 to 270 logical pixels, giving larger medals more vertical room on wider displays; small cards retain legible mission text and progress. Medals continue to render without a separate square background tile or decorative watermark.
 
 ## 0.3.2+5 — Google Play upload candidate (source prepared; not released)
 
