@@ -46,7 +46,7 @@ The current visual reference is the **seven-category first-tier pixel diorama se
 
 ## Implemented first-tier category badges (October 2026)
 
-Seven individually cropped, transparent 512×512, nearest-neighbor pixel-art PNGs are stored at `badge_content/images/*_first.png` and served through the existing online badge catalog. No icons are bundled in the APK. In the collection UI, earned artwork is rendered directly without a separate square icon tile or decorative watermark behind transparent pixels; its display size adapts to the available card width. The public catalogue retains the previous 5-/10-completion achievements and all stable existing IDs.
+Seven individually cropped, transparent 512×512, nearest-neighbor pixel-art PNGs are stored at `badge_content/images/*_first.png` and served through the existing online badge catalog. No icons are bundled in the APK. In the collection UI, earned artwork is rendered directly without a separate square icon tile or decorative watermark behind transparent pixels; its display size adapts to the available card width. The artwork display is now capped at 270 logical pixels (subject to card width); card heights grow accordingly on wider displays, with narrow phone cards retaining their minimum height. The public catalogue retains the previous 5-/10-completion achievements and all stable existing IDs.
 
 | Badge ID | Category | Symbol | Trigger |
 | --- | --- | --- | --- |
