@@ -14,6 +14,7 @@ from online_animated_masterworks_64_pack import (
     PICTURES, PREFIX, animation_frames, create_pack, motion_frame,
 )
 from online_release import assemble, checksum, validated_animation
+from online_classics_detailed_96_5_pack import PREFIX as DETAILED_PREFIX, create_pack as detailed_five_classics
 
 
 class AnimatedClassicMasterworks64Tests(unittest.TestCase):
@@ -94,14 +95,21 @@ class AnimatedClassicMasterworks64Tests(unittest.TestCase):
                                      hashlib.sha256(anim_blob).hexdigest())
                     self.assertEqual(validated_animation(archive, stem, item, level),
                                      ("animations/" + stem + ".json", anim_blob))
+            detailed_five_classics(
+                parent / "pixelhub-content-detailed-classics-96-5-v1" / "content.zip"
+            )
             output = parent / "pages"
             assemble(parent, output)
             combined = json.loads((output / "catalog.json").read_bytes())
             ours = [entry for entry in combined["pictures"]
                     if entry["id"].startswith(PREFIX)]
-            self.assertEqual(len(ours), 10)
+            self.assertEqual(len(ours), 8)  # Mother and Parasol are superseded.
+            detailed = [entry for entry in combined["pictures"]
+                        if entry["id"].startswith(DETAILED_PREFIX)]
+            self.assertEqual(len(detailed), 5)
             self.assertTrue(all(entry.get("animation", {}).get("frameCount") == 8
                                 for entry in ours))
+            self.assertEqual(sum("animation" in entry for entry in detailed), 4)
             for item in ours:
                 stem = item["id"] + "-v1"
                 self.assertTrue((output / "animations" / (stem+".json")).is_file())

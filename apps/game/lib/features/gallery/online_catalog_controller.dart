@@ -31,6 +31,15 @@ const _retiredOnlineReplacements = <String, String>{
   'online-classic-animated64-olympia': 'online-classic-animated70-olympia',
   'online-classic-animated64-luncheon-grass':
       'online-classic-animated70-luncheon-grass',
+  'online-girl-pearl': 'online-classic-detailed96-girl-pearl',
+  'online-classic-animated64-boating-party':
+      'online-classic-detailed96-boating-party',
+  'online-classic-animated64-childs-bath':
+      'online-classic-detailed96-childs-bath',
+  'online-classic-animated64-whistlers-mother':
+      'online-classic-detailed96-whistlers-mother',
+  'online-classic-animated64-woman-parasol':
+      'online-classic-detailed96-woman-parasol',
 };
 
 /// Public, versioned files served by the same repository's GitHub Pages site.

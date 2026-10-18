@@ -367,6 +367,20 @@ jobs:
               --notes "Detailed 70x70 replacements for Primavera, Tower of Babel, Hunters in the Snow, Ophelia, The Lady of Shalott, Olympia and Luncheon on the Grass. Each level includes additional hand-authored pixel details and an eight-frame animation. New immutable IDs replace the old 64x64 cards in the public catalog; APK size and historical release assets remain unchanged." \
               --latest=false
           fi
+      - name: Publish five hand-redrawn 96x96 classic paintings
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-detailed-classics-96-5-v1 >/dev/null 2>&1; then
+            python3 tool/online_classics_detailed_96_5_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-detailed-classics-96-5-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: five hand-redrawn 96x96 classic paintings" \
+              --notes "Pixel-by-pixel recipes for Girl with a Pearl Earring, The Boating Party, The Child's Bath, Whistler's Mother and Woman with a Parasol. Four downloadable animation companions preserved; five immutable online content IDs replace the old gallery cards. No application version change." \
+              --latest=false
+          fi
       - name: Publish twenty new 65x65 Iranian landmarks and cultural pictures
         if: github.event_name == 'workflow_run'
         env:

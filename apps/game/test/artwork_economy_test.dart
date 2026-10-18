@@ -63,8 +63,19 @@ void main() {
             'online-classic-animated64-olympia',
         'online-classic-animated70-luncheon-grass':
             'online-classic-animated64-luncheon-grass',
+        'online-classic-detailed96-girl-pearl': 'online-girl-pearl',
+        'online-classic-detailed96-boating-party':
+            'online-classic-animated64-boating-party',
+        'online-classic-detailed96-childs-bath':
+            'online-classic-animated64-childs-bath',
+        'online-classic-detailed96-whistlers-mother':
+            'online-classic-animated64-whistlers-mother',
+        'online-classic-detailed96-woman-parasol':
+            'online-classic-animated64-woman-parasol',
       }.entries) {
-        final side = pair.key.startsWith('online-classic-animated70-')
+        final side = pair.key.startsWith('online-classic-detailed96-')
+            ? 96
+            : pair.key.startsWith('online-classic-animated70-')
             ? 70
             : 48;
         final redesigned = _art(pair.key, side, 16);

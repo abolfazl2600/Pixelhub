@@ -13,6 +13,8 @@ from online_flags_20_pack import create_pack as historical_flags
 from online_masterworks_pack import create_pack as historical_masterworks
 from online_animals_pack import create_pack as historical_animals
 from online_animated_masterworks_64_15_pack import create_pack as historical_classics
+from online_animated_masterworks_64_pack import create_pack as historical_animated_classics
+from online_classics_detailed_96_5_pack import create_pack as detailed_five_classics, PREFIX as DETAILED_FIVE_PREFIX
 from online_animated_masterworks_70_7_pack import SELECTED_SLUGS as DETAILED_CLASSIC_SLUGS, create_pack as detailed_classics
 from online_animal_redesigns_pack import ARTWORKS as ANIMAL_ARTWORKS, create_pack as animal_redesigns
 from online_starry_night_replacement_pack import create_pack as detailed_starry
@@ -37,6 +39,11 @@ PREVIOUS = {
     "online-classic-animated64-lady-shalott": "online-classic-animated70-lady-shalott",
     "online-classic-animated64-olympia": "online-classic-animated70-olympia",
     "online-classic-animated64-luncheon-grass": "online-classic-animated70-luncheon-grass",
+    "online-girl-pearl": "online-classic-detailed96-girl-pearl",
+    "online-classic-animated64-boating-party": "online-classic-detailed96-boating-party",
+    "online-classic-animated64-childs-bath": "online-classic-detailed96-childs-bath",
+    "online-classic-animated64-whistlers-mother": "online-classic-detailed96-whistlers-mother",
+    "online-classic-animated64-woman-parasol": "online-classic-detailed96-woman-parasol",
 }
 
 
@@ -137,6 +144,8 @@ class RequestedPictureReplacementsTests(unittest.TestCase):
                 ("pixelhub-content-animal-redesigns-3-v1", animal_redesigns),
                 ("pixelhub-content-animated-classics-64-15-v1", historical_classics),
                 ("pixelhub-content-animated-classics-70-7-v1", detailed_classics),
+                ("pixelhub-content-animated-masterworks-64-10-v1", historical_animated_classics),
+                ("pixelhub-content-detailed-classics-96-5-v1", detailed_five_classics),
             ]:
                 path = packs / tag / "content.zip"
                 generator(path)
@@ -157,6 +166,10 @@ class RequestedPictureReplacementsTests(unittest.TestCase):
                 ident = "online-classic-animated70-" + slug
                 self.assertEqual(published[ident]["width"], 70)
                 self.assertEqual(published[ident]["height"], 70)
+            for old, new in PREVIOUS.items():
+                if new.startswith(DETAILED_FIVE_PREFIX):
+                    self.assertEqual(published[new]["width"], 96)
+                    self.assertEqual(published[new]["height"], 96)
 
     def test_offline_nasir_molk_redesign_is_versioned_and_catalogued(self):
         levels = ROOT / "apps/game/assets/levels"

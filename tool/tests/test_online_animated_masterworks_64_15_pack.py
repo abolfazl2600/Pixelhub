@@ -16,6 +16,7 @@ from online_animated_masterworks_64_15_pack import (
 )
 from online_release import assemble, checksum, validated_animation
 from online_animated_masterworks_70_7_pack import PREFIX as DETAILED_PREFIX, create_pack as detailed_classics
+from online_classics_detailed_96_5_pack import PREFIX as DETAILED_FIVE_PREFIX, create_pack as detailed_five_classics
 
 
 class AnimatedFifteenClassicPackTests(unittest.TestCase):
@@ -67,6 +68,9 @@ class AnimatedFifteenClassicPackTests(unittest.TestCase):
             create_pack(zip_path)
             replacement_zip = root / "pixelhub-content-animated-classics-70-7-v1" / "content.zip"
             detailed_classics(replacement_zip)
+            detailed_five_classics(
+                root / "pixelhub-content-detailed-classics-96-5-v1" / "content.zip"
+            )
             with zipfile.ZipFile(zip_path) as archive:
                 manifest = json.loads(archive.read("catalog.json"))
                 self.assertEqual(manifest["schemaVersion"],1)
@@ -106,10 +110,16 @@ class AnimatedFifteenClassicPackTests(unittest.TestCase):
             catalog = json.loads((output/"catalog.json").read_text(encoding="utf8"))
             online = [p for p in catalog["pictures"] if p["id"].startswith(PREFIX)]
             detailed = [p for p in catalog["pictures"] if p["id"].startswith(DETAILED_PREFIX)]
-            self.assertEqual(len(online), 8)
+            extra = [p for p in catalog["pictures"]
+                     if p["id"].startswith(DETAILED_FIVE_PREFIX)]
+            self.assertEqual(len(online), 6)
             self.assertEqual(len(detailed), 7)
+            self.assertEqual(len(extra), 5)
             self.assertTrue(all(p["animation"]["frameCount"] == 8 for p in online + detailed))
-            for entry in online + detailed:
+            self.assertEqual(sum("animation" in p for p in extra), 4)
+            for entry in online + detailed + extra:
+                if "animation" not in entry:
+                    continue
                 stem = entry["id"]+"-v1"
                 self.assertTrue((output/"previews"/(stem+".png")).exists())
                 self.assertTrue((output/"animations"/(stem+".json")).exists())
