@@ -105,8 +105,8 @@ class _BadgesScreenState extends State<BadgesScreen> {
                   // Two legible columns on phones; three on tablets/desktop.
                   final columns = constraints.maxWidth >= 700 ? 3 : 2;
                   final cardHeight = constraints.maxWidth >= 700
-                      ? 293.0
-                      : 315.0;
+                      ? 326.0
+                      : 342.0;
                   return CustomScrollView(
                     key: const ValueKey('badges-scroll'),
                     physics: const AlwaysScrollableScrollPhysics(),
@@ -327,52 +327,40 @@ class _AchievementCard extends StatelessWidget {
         child: Stack(
           clipBehavior: Clip.hardEdge,
           children: [
-            if (earned)
-              const PositionedDirectional(
-                end: -39,
-                top: -20,
-                child: IgnorePointer(
-                  child: Icon(
-                    Icons.spa_rounded,
-                    size: 115,
-                    color: Color(0x1666a877),
-                  ),
-                ),
-              ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(11, 18, 11, 15),
+              padding: const EdgeInsets.fromLTRB(9, 14, 9, 14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Align(
-                    child: Container(
-                      width: 113,
-                      height: 113,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: earned
-                            ? Colors.transparent
-                            : const Color(0xfff3f4f0),
-                      ),
-                      child: earned
-                          ? (iconBytes == null
-                                ? const Icon(
-                                    Icons.workspace_premium_outlined,
-                                    color: _BadgePalette.green,
-                                    size: 48,
-                                  )
-                                : Image.memory(
-                                    iconBytes!,
-                                    width: 111,
-                                    height: 111,
-                                    filterQuality: FilterQuality.none,
-                                    gaplessPlayback: true,
-                                  ))
-                          : const _MysteryEmblem(),
-                    ),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      // Let the medal use the available card width instead of
+                      // putting it inside a fixed square tile.
+                      final medalSize = math.min(156.0, constraints.maxWidth);
+                      return SizedBox(
+                        height: medalSize,
+                        child: Center(
+                          child: earned
+                              ? (iconBytes == null
+                                  ? const Icon(
+                                      Icons.workspace_premium_outlined,
+                                      color: _BadgePalette.green,
+                                      size: 68,
+                                    )
+                                  : Image.memory(
+                                      iconBytes!,
+                                      width: medalSize,
+                                      height: medalSize,
+                                      fit: BoxFit.contain,
+                                      filterQuality: FilterQuality.none,
+                                      gaplessPlayback: true,
+                                    ))
+                              : _MysteryEmblem(size: medalSize * 0.84),
+                        ),
+                      );
+                    },
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
                   Text(
                     title,
                     maxLines: 2,
@@ -434,20 +422,22 @@ class _AchievementCard extends StatelessWidget {
 }
 
 class _MysteryEmblem extends StatelessWidget {
-  const _MysteryEmblem();
+  const _MysteryEmblem({required this.size});
+
+  final double size;
 
   @override
-  Widget build(BuildContext context) => const SizedBox(
-    width: 72,
-    height: 72,
+  Widget build(BuildContext context) => SizedBox(
+    width: size,
+    height: size,
     child: CustomPaint(
-      painter: _MysteryPainter(),
+      painter: const _MysteryPainter(),
       child: Center(
         child: Text(
           '?',
           style: TextStyle(
             color: Color(0xff8d9690),
-            fontSize: 37,
+            fontSize: size * 0.51,
             fontWeight: FontWeight.w800,
           ),
         ),
@@ -462,25 +452,34 @@ class _MysteryPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    final scale = math.min(size.width, size.height) / 72;
     final center = Offset(size.width / 2, size.height / 2);
     final outer = Paint()..color = _BadgePalette.mystery;
     for (var i = 0; i < 12; i++) {
       final angle = i * math.pi / 6;
       canvas.drawCircle(
-        center + Offset(24 * math.cos(angle), 24 * math.sin(angle)),
-        11,
+        center +
+            Offset(
+              24 * scale * math.cos(angle),
+              24 * scale * math.sin(angle),
+            ),
+        11 * scale,
         outer,
       );
     }
-    canvas.drawCircle(center, 29, outer);
-    canvas.drawCircle(center, 21, Paint()..color = const Color(0xffeff1ed));
+    canvas.drawCircle(center, 29 * scale, outer);
     canvas.drawCircle(
       center,
-      21,
+      21 * scale,
+      Paint()..color = const Color(0xffeff1ed),
+    );
+    canvas.drawCircle(
+      center,
+      21 * scale,
       Paint()
         ..color = const Color(0xffc1c7c0)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.5,
+        ..strokeWidth = 1.5 * scale,
     );
   }
 
