@@ -28,8 +28,7 @@ const _retiredOnlineReplacements = <String, String>{
   'online-classic-animated64-ophelia': 'online-classic-animated70-ophelia',
   'online-classic-animated64-lady-shalott':
       'online-classic-animated70-lady-shalott',
-  'online-classic-animated64-olympia':
-      'online-classic-animated70-olympia',
+  'online-classic-animated64-olympia': 'online-classic-animated70-olympia',
   'online-classic-animated64-luncheon-grass':
       'online-classic-animated70-luncheon-grass',
 };
