@@ -245,6 +245,20 @@ jobs:
               --notes "Twenty original exact 10x10 color-by-number objects for the Objects category. Every level is authored as 100 discrete cells, with bilingual metadata and nearest-neighbor PNG previews. These immutable online Release assets are not bundled into the app or committed as generated files." \
               --latest=false
           fi
+      - name: Publish ten detailed 15x15 objects as online-only art
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-objects-detailed-15-10-v1 >/dev/null 2>&1; then
+            python3 tool/online_objects_detailed_15_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-objects-detailed-15-10-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: 10 detailed 15x15 object paintings" \
+              --notes "Ten original exact 15x15 bilingual color-by-number paintings: ornate gold key, royal crown, antique bell, steel anchor, red scissors, chess knight, ruby potion bottle, silver wrench, knight helmet and lit flashlight. Each painting has 225 colorable cells and a lossless pixel-perfect PNG preview. Immutable Release-only online content; no APK asset, saved-progress migration or app version change." \
+              --latest=false
+          fi
       - name: Publish twenty original playful coloring pictures outside git
         if: github.event_name == 'workflow_run'
         env:
