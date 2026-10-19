@@ -61,7 +61,7 @@ class DetailedObjectFifteenPackTests(unittest.TestCase):
                         self.assertEqual(picture["checksum"], level["checksum"])
                         self.assertEqual(picture["title"], level["titles"]["fa"])
                         self.assertEqual(picture["titleEn"], level["titles"]["en"])
-                        self.assertEqual(preview[:8], b"\\x89PNG\\r\\n\\x1a\\n")
+                        self.assertEqual(preview[:8], b"\x89PNG\r\n\x1a\n")
                         self.assertEqual(struct.unpack(">II", preview[16:24]), (15, 15))
             output = root / "site"
             assemble(root, output)
