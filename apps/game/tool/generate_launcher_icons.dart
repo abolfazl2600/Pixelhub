@@ -2,13 +2,13 @@ import 'dart:io';
 
 import 'package:image/image.dart' as img;
 
-/// Regenerate platform icon sizes from the owner-selected, checked-in source.
+/// Regenerate platform icon sizes from the owner-selected rainbow brush source.
 /// Run from apps/game after flutter pub get, before Android or Web builds.
 void main() {
   final sourceFile = File('assets/brand/pixelhub_mark.png');
   final source = img.decodePng(sourceFile.readAsBytesSync());
-  if (source == null || source.width != 256 || source.height != 256) {
-    throw StateError('Expected a valid 256 x 256 PixelHub launcher PNG.');
+  if (source == null || source.width != source.height || source.width < 128) {
+    throw StateError('Expected a square PixelHub launcher PNG of at least 128 pixels.');
   }
 
   final sizes = <String, int>{
