@@ -511,7 +511,7 @@ def make_level(item):
     art = paint(kind)
     level = {
         "schemaVersion": 2,
-        "levelId": f"online-{city}-{slug}-96",
+        "levelId": f"online-iran-{city}-{slug}-96",
         "levelVersion": 1,
         "titles": {"fa": title_fa, "en": title_en},
         "width": SIDE,
