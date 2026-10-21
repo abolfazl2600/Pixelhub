@@ -279,7 +279,10 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
               child: Row(
                 children: [
                   for (var i = 0; i < controller.level.palette.length; i++)
-                    AnimatedSwitcher(
+                    IgnorePointer(
+                      // Prevent tapping a fading-out, already finished chip.
+                      ignoring: session.remaining[i] == 0,
+                      child: AnimatedSwitcher(
                       key: ValueKey('palette-slot-$i'),
                       duration: const Duration(milliseconds: 320),
                       switchInCurve: Curves.easeOutCubic,
@@ -382,6 +385,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                           : SizedBox.shrink(
                               key: ValueKey('palette-hidden-$i'),
                             ),
+                      ),
                     ),
                 ],
               ),
