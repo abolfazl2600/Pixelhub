@@ -3,7 +3,7 @@
 - `levels/sunflower.json` (preserved V1 fixture): original 16 × 16 pixel fixture created for Pixelhub V1; licensed under the repository Apache-2.0 license. No competitor artwork or user photos.
 - `fonts/Vazirmatn.ttf`: Vazirmatn by Saber Rastikerdar, distributed under the SIL Open Font License 1.1. Source: [Google Fonts](https://github.com/google/fonts/tree/main/ofl/vazirmatn). The unmodified font and its license are bundled locally; no runtime font service.
 - `fonts/Roboto.ttf`: Flutter Web's engine fallback font, bundled to avoid remote font requests. Unmodified Google Fonts Roboto, SIL OFL 1.1; see `fonts/Roboto-OFL.txt`.
-- Web and Android launcher icons: owner-selected blue easel-and-brush pixel-coloring design (2026-10-13), replacing the earlier geometric flower. The optimized 256 × 256 source is `brand/pixelhub_mark.png`; deterministic launcher sizes are regenerated via `apps/game/tool/generate_launcher_icons.dart` before Android and Web builds. Verify artwork usage rights before external distribution.
+- Web and Android launcher icons: owner-selected neon purple paintbrush painting a rainbow of pixel tiles (2026-10-21), replacing the earlier blue easel illustration. The checked-in square PNG source is `brand/pixelhub_mark.png` (optimized 128 × 128 launcher source); `apps/game/tool/generate_launcher_icons.dart` regenerates the required Android mipmap, Web manifest, favicon and 512 × 512 Play listing sizes during Android and Web builds. Source art is AI-generated and owner-selected. Verify distribution rights and visually review the generated store listing icon before publication.
 
 V1 fixtures carry `schemaVersion` and `contentVersion`. A production level checksum and migrations are part of the V2 contract; V1 has no saved sessions.
 
