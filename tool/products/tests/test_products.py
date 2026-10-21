@@ -89,6 +89,18 @@ class ProductTests(unittest.TestCase):
         with ZipFile(stream) as z:
             with self.assertRaisesRegex(ConfigurationError,'Unsigned AAB payload'):verify_jar_coverage(z)
 
+    def test_scaffolding_does_not_delete_a_concurrently_created_product(self):
+        from argparse import Namespace
+        import create_product
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);(root/'products').mkdir()
+            (root/'products/schema.json').write_text(json.dumps(self.schema))
+            target=root/'products/nature.yaml';target.write_text('concurrent owner content')
+            args=Namespace(id='nature',name='Nature',name_fa=None,package_id='example.test.nature',template='kids',ready=False,icon=None,catalog=None)
+            with patch.object(create_product,'ROOT',root), patch.object(create_product,'load_registry',return_value=self.products):
+                with self.assertRaises(FileExistsError):create_product.create(args)
+            self.assertEqual(target.read_text(),'concurrent owner content')
+
     def test_main_storage_key_contract_is_preserved(self):
         # Runtime isolation is additionally exercised in product_storage_test.dart.
         self.assertEqual(self.products['pixelhub'].data['identity']['storage_scope'],'pixelhub')
