@@ -1349,3 +1349,45 @@ When retiring further paintings, **do not add new IDs to legacy
 `retiredIds`**. Extend the versioned hint field and compatible clients as
 appropriate. Python publisher and Flutter catalog tests cover the historical
 failure mode; successful Web CI is required before Pages publication.
+
+## Twenty detailed Isfahan and Shiraz landmarks (96x96)
+
+Source generator: tool/online_isfahan_shiraz_20_96_pack.py. The pack
+contains 20 original hand-composed 96x96 color-by-number scenes: 10 Isfahan
+and 10 Shiraz views, each with distinct structures, Persian and English
+titles, brick and mosaic ornament, landscape elements, and a PNG preview.
+The collection does not repeat already released standalone landmarks.
+
+| City | New view | Immutable artwork ID |
+| --- | --- | --- |
+| Isfahan | Naqsh-e Jahan Square | online-iran-isfahan-naqsh-jahan-square-96 |
+| Isfahan | Hasht Behesht Palace | online-iran-isfahan-hasht-behesht-96 |
+| Isfahan | Menar Jonban | online-iran-isfahan-menar-jonban-96 |
+| Isfahan | Qeysarie Bazaar Gate | online-iran-isfahan-qeysarie-gate-96 |
+| Isfahan | Chaharbagh Abbasi | online-iran-isfahan-chaharbagh-abbasi-96 |
+| Isfahan | Shahrestan Bridge | online-iran-isfahan-shahrestan-bridge-96 |
+| Isfahan | Marnan Bridge | online-iran-isfahan-marnan-bridge-96 |
+| Isfahan | Hakim Mosque | online-iran-isfahan-hakim-mosque-96 |
+| Isfahan | Historic Pigeon Towers | online-iran-isfahan-pigeon-towers-96 |
+| Isfahan | Atashgah Fire Temple | online-iran-isfahan-atashgah-96 |
+| Shiraz | Vakil Mosque | online-iran-shiraz-vakil-mosque-96 |
+| Shiraz | Vakil Bazaar | online-iran-shiraz-vakil-bazaar-96 |
+| Shiraz | Vakil Bathhouse | online-iran-shiraz-vakil-bath-96 |
+| Shiraz | Narenjestan-e Qavam | online-iran-shiraz-narenjestan-qavam-96 |
+| Shiraz | Afif-Abad Garden | online-iran-shiraz-afif-abad-96 |
+| Shiraz | Delgosha Garden | online-iran-shiraz-delgosha-garden-96 |
+| Shiraz | Jahan Nama Garden | online-iran-shiraz-jahan-nama-garden-96 |
+| Shiraz | Haft Tanan Museum | online-iran-shiraz-haft-tanan-96 |
+| Shiraz | Khaju Kermani Tomb | online-iran-shiraz-khaju-kermani-96 |
+| Shiraz | Shapouri House | online-iran-shiraz-shapouri-house-96 |
+
+The GitHub Pages publisher creates exactly one new immutable Release:
+pixelhub-content-isfahan-shiraz-96-20-v1. Each picture uses schema-v2
+numbered level data, levelVersion 1, and checksum-bound PNG previews.
+The manifest category remains the old-client-compatible 'patterns',
+while the game's online-iran- ID overlay displays the artwork under
+Persian architecture. Contents live only in Releases, not in APKs.
+Generate manually using:
+python3 tool/online_isfahan_shiraz_20_96_pack.py /tmp/content.zip
+Code merge does not prove publication; Release, catalog aggregation,
+and Pages deployment must finish successfully before the gallery updates.
