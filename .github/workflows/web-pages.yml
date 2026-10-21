@@ -521,6 +521,20 @@ jobs:
               --notes "Three fresh 48x48 pixel-art replacements for the elephant, penguin and parrot gallery pictures. The previous IDs are retired from the visible catalog; original Release assets remain immutable." \
               --latest=false
           fi
+      - name: Publish twenty detailed 96x96 Isfahan and Shiraz online paintings
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-isfahan-shiraz-96-20-v1 >/dev/null 2>&1; then
+            python3 tool/online_isfahan_shiraz_20_96_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-isfahan-shiraz-96-20-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub: 20 detailed 96x96 landmarks of Isfahan and Shiraz" \
+              --notes "10 hand-composed new Isfahan views and 10 new Shiraz views in bilingual 96x96 number-coloring grids with PNG previews. Legacy-compatible patterns metadata, Persian architecture display overlay, immutable new artwork IDs. No APK assets added or previous artwork changed." \
+              --latest=false
+          fi
       - name: Download release packs and assemble online catalog
         env:
           GH_TOKEN: ${{ github.token }}
