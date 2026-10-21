@@ -249,8 +249,9 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
     );
   }
 
-  /// Horizontally scrolling palette remains visible while the canvas/tools
-  /// occupy the vertical scroll area. Color selection never moves the canvas.
+  /// Pin the palette below the canvas and gently remove each completed
+  /// color from its original slot. Newly available colors (e.g. after a
+  /// reset/cancelled stroke) expand back into their original position.
   Widget _paletteStrip(BuildContext context, PaintingController controller) {
     final session = controller.session!;
     final s = context.strings;
@@ -278,75 +279,113 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
               child: Row(
                 children: [
                   for (var i = 0; i < controller.level.palette.length; i++)
-                    Padding(
-                      padding: const EdgeInsetsDirectional.only(end: 8),
-                      child: Builder(
-                        builder: (context) {
-                          final color = Color(controller.level.palette[i]);
-                          return Semantics(
-                            label: s.colorLabel(
-                              context.digits(i + 1),
-                              context.digits(session.remaining[i]),
-                            ),
-                            button: true,
-                            selected: session.selectedColor == i,
-                            child: ExcludeSemantics(
-                              child: Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  key: ValueKey('color-$i'),
-                                  borderRadius: BorderRadius.circular(16),
-                                  onTap: _toolBusy
-                                      ? null
-                                      : () => controller.selectColor(i),
-                                  child: Container(
-                                    width: 56,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(16),
-                                      border: Border.all(
-                                        color: session.selectedColor == i
-                                            ? PixelTokens.green
-                                            : PixelTokens.backdrop,
-                                        width: session.selectedColor == i
-                                            ? 2
-                                            : 1,
-                                      ),
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        CircleAvatar(
-                                          radius: 14,
-                                          backgroundColor: color,
-                                          child: Text(
-                                            context.digits(i + 1),
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w700,
-                                              color:
-                                                  ThemeData.estimateBrightnessForColor(
-                                                        color,
-                                                      ) ==
-                                                      Brightness.dark
-                                                  ? Colors.white
-                                                  : PixelTokens.ink,
+                    IgnorePointer(
+                      // Prevent tapping a fading-out, already finished chip.
+                      ignoring: session.remaining[i] == 0,
+                      child: AnimatedSwitcher(
+                        key: ValueKey('palette-slot-$i'),
+                        duration: const Duration(milliseconds: 320),
+                        switchInCurve: Curves.easeOutCubic,
+                        switchOutCurve: Curves.easeInCubic,
+                        // The default Stack layout holds the outgoing width
+                        // until the animation ends. A Row allows the palette
+                        // to close that gap continuously as the chip fades.
+                        layoutBuilder: (currentChild, previousChildren) => Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ...previousChildren,
+                            if (currentChild != null) currentChild,
+                          ],
+                        ),
+                        transitionBuilder: (child, animation) => SizeTransition(
+                          axis: Axis.horizontal,
+                          sizeFactor: animation,
+                          child: FadeTransition(
+                            opacity: animation,
+                            child: child,
+                          ),
+                        ),
+                        child: session.remaining[i] > 0
+                            ? Padding(
+                                key: ValueKey('palette-visible-$i'),
+                                padding: const EdgeInsetsDirectional.only(end: 8),
+                                child: Semantics(
+                                  label: s.colorLabel(
+                                    context.digits(i + 1),
+                                    context.digits(session.remaining[i]),
+                                  ),
+                                  button: true,
+                                  selected: session.selectedColor == i,
+                                  child: ExcludeSemantics(
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        key: ValueKey('color-$i'),
+                                        borderRadius: BorderRadius.circular(16),
+                                        onTap: _toolBusy
+                                            ? null
+                                            : () => controller.selectColor(i),
+                                        child: Container(
+                                          width: 56,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(16),
+                                            border: Border.all(
+                                              color: session.selectedColor == i
+                                                  ? PixelTokens.green
+                                                  : PixelTokens.backdrop,
+                                              width: session.selectedColor == i
+                                                  ? 2
+                                                  : 1,
                                             ),
                                           ),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              CircleAvatar(
+                                                radius: 14,
+                                                backgroundColor: Color(
+                                                  controller.level.palette[i],
+                                                ),
+                                                child: Text(
+                                                  context.digits(i + 1),
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.w700,
+                                                    color: ThemeData
+                                                                .estimateBrightnessForColor(
+                                                                  Color(
+                                                                    controller
+                                                                        .level
+                                                                        .palette[i],
+                                                                  ),
+                                                                ) ==
+                                                            Brightness.dark
+                                                        ? Colors.white
+                                                        : PixelTokens.ink,
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 2),
+                                              Text(
+                                                context.digits(
+                                                  session.remaining[i],
+                                                ),
+                                                style: const TextStyle(
+                                                  fontSize: 11,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          context.digits(session.remaining[i]),
-                                          style: const TextStyle(fontSize: 11),
-                                        ),
-                                      ],
+                                      ),
                                     ),
                                   ),
                                 ),
+                              )
+                            : SizedBox.shrink(
+                                key: ValueKey('palette-hidden-$i'),
                               ),
-                            ),
-                          );
-                        },
-                      ),
+                        ),
                     ),
                 ],
               ),

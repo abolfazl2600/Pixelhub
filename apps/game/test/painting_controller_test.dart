@@ -180,4 +180,34 @@ void main() {
       expect(controller.session!.generation, 1);
     },
   );
+
+  test('palette selection advances only after a full stroke is released', () async {
+    final store = MemoryPreferences();
+    final controller = PaintingController(fixture(), store);
+    addTearDown(controller.dispose);
+    await controller.load();
+    controller.beginStroke();
+    controller.paintLine(0, 0, 1, 1);
+    expect(controller.session!.remaining[0], 0);
+    // Do not switch color while a finger can still be moving over the board.
+    expect(controller.session!.selectedColor, 0);
+    controller.endStroke();
+    expect(controller.session!.selectedColor, 1);
+    await controller.flush();
+  });
+
+  test('cancelled stroke restores its exhausted color without auto-advance', () async {
+    final store = MemoryPreferences();
+    final controller = PaintingController(fixture(), store);
+    addTearDown(controller.dispose);
+    await controller.load();
+    controller.beginStroke();
+    controller.paintLine(0, 0, 1, 1);
+    expect(controller.session!.remaining[0], 0);
+    controller.cancelStroke();
+    expect(controller.session!.remaining[0], 2);
+    expect(controller.session!.selectedColor, 0);
+    await controller.flush();
+  });
+
 }
