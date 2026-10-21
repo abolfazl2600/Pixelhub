@@ -49,7 +49,7 @@ jobs:
           channel: stable
           cache: true
       - run: bash tool/validate.sh
-      - name: Generate blue Android launcher and Play listing icon
+      - name: Generate rainbow paintbrush Android launcher and Play listing icon
         working-directory: apps/game
         run: dart run tool/generate_launcher_icons.dart
       - name: Decode private Play upload keystore

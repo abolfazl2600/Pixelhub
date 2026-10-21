@@ -3,4 +3,5 @@
     <color name="pixelhub_green">#194837</color>
     <color name="pixelhub_canvas">#F8F7F1</color>
     <color name="pixelhub_blue">#069AEA</color>
+    <color name="pixelhub_icon_background">#100B4E</color>
 </resources>
