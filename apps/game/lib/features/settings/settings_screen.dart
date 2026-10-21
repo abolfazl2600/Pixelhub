@@ -1,3 +1,4 @@
+import '../../products/product_configuration.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -93,15 +94,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              const Text('PixelHub · 0.3.2'),
+              Text(
+                '${ProductScope.of(context).name} · ${ProductScope.of(context).versionName}+${ProductScope.of(context).versionCode}',
+              ),
               const SizedBox(height: 12),
               Text(s.aboutMessage, style: const TextStyle(height: 1.8)),
               const SizedBox(height: 16),
-              OutlinedButton.icon(
-                onPressed: _busy ? null : () => context.push('/profile'),
-                icon: const Icon(Icons.person_outline_rounded),
-                label: Text(s.profile),
-              ),
+              if (ProductScope.of(context).features.profile)
+                OutlinedButton.icon(
+                  onPressed: _busy ? null : () => context.push('/profile'),
+                  icon: const Icon(Icons.person_outline_rounded),
+                  label: Text(s.profile),
+                ),
               const SizedBox(height: 14),
               OutlinedButton.icon(
                 onPressed: _busy ? null : () => context.push('/privacy'),

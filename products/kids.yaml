@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "id": "kids",
+  "ready": true,
+  "identity": {
+    "name": "PixelHub Kids",
+    "display_name_fa": "پیکسل‌هاب کودکان",
+    "application_id": "io.github.abolfazl2600.pixelhub.kids",
+    "storage_scope": "pixelhub_kids",
+    "version_name": "1.0.0",
+    "version_code": 1,
+    "icon": "apps/game/assets/brand/kids_mark.png",
+    "publisher": "abolfazl2600"
+  },
+  "appearance": {
+    "primary": "#7856C8",
+    "secondary": "#F2B957",
+    "background": "#FFF9EF",
+    "theme_mode": "light",
+    "font_family": "Vazirmatn",
+    "home_layout": "kids",
+    "default_style": "pixel",
+    "large_controls": true,
+    "navigation": [
+      "gallery",
+      "my-gallery",
+      "settings"
+    ]
+  },
+  "content": {
+    "offline_manifest": "apps/game/assets/products/kids-catalog.json",
+    "online_root": "https://abolfazl2600.github.io/Pixelhub/online/",
+    "categories": [
+      "nature",
+      "animals",
+      "objects",
+      "space",
+      "patterns"
+    ],
+    "default_categories": [
+      "nature",
+      "animals",
+      "objects",
+      "space",
+      "patterns"
+    ],
+    "max_dimension": 32,
+    "online_manifest": "products/kids/catalog.json"
+  },
+  "features": {
+    "coins": false,
+    "achievements": false,
+    "animations": true,
+    "image_import": false,
+    "diamond_painting": false,
+    "canvas_painting": false,
+    "sound_effects": true,
+    "online_catalog": true,
+    "profile": false,
+    "museum": false,
+    "free_painting": false,
+    "background_music": false
+  },
+  "distribution": {
+    "targets": [
+      "android",
+      "web"
+    ],
+    "signing_prefix": "KIDS",
+    "environment": "release-kids",
+    "web_base_href": "/Pixelhub/kids/",
+    "artifact_prefix": "kids"
+  }
+}

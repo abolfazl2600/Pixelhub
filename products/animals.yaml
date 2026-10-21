@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "animals",
+  "ready": false,
+  "identity": {
+    "name": "PixelHub Animals",
+    "display_name_fa": "پیکسل‌هاب حیوانات",
+    "application_id": "io.github.abolfazl2600.pixelhub.animals",
+    "storage_scope": "pixelhub_animals",
+    "version_name": "1.0.0",
+    "version_code": 1,
+    "icon": "apps/game/assets/brand/animals_mark.png",
+    "publisher": "abolfazl2600"
+  },
+  "appearance": {
+    "primary": "#376F53",
+    "secondary": "#F2B957",
+    "background": "#FFF9EF",
+    "theme_mode": "light",
+    "font_family": "Vazirmatn",
+    "home_layout": "classic",
+    "default_style": "pixel",
+    "large_controls": false,
+    "navigation": [
+      "gallery",
+      "my-gallery",
+      "settings"
+    ]
+  },
+  "content": {
+    "offline_manifest": "apps/game/assets/products/animals-catalog.json",
+    "online_root": "",
+    "categories": [
+      "animals"
+    ],
+    "default_categories": [
+      "animals"
+    ],
+    "max_dimension": 512,
+    "online_manifest": "products/animals/catalog.json"
+  },
+  "features": {
+    "coins": false,
+    "achievements": false,
+    "animations": true,
+    "image_import": false,
+    "diamond_painting": false,
+    "canvas_painting": false,
+    "sound_effects": false,
+    "online_catalog": false,
+    "profile": false,
+    "museum": false,
+    "free_painting": false,
+    "background_music": false
+  },
+  "distribution": {
+    "targets": [
+      "android",
+      "web"
+    ],
+    "signing_prefix": "ANIMALS",
+    "environment": "release-animals",
+    "web_base_href": "/Pixelhub/animals/",
+    "artifact_prefix": "animals"
+  }
+}

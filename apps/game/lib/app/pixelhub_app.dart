@@ -32,6 +32,8 @@ import '../l10n/strings.dart';
 import '../platform_adapters/document_language.dart';
 import '../platform_adapters/offline_support.dart';
 import 'bootstrap_controller.dart';
+import '../products/product_configuration.dart';
+import '../products/product_home.dart';
 
 class _StyleChanges extends ChangeNotifier {
   void notify() => notifyListeners();
@@ -45,8 +47,10 @@ class PixelhubApp extends StatefulWidget {
     this.artworkRepository,
     this.initialRoute,
     this.diagnostics,
+    this.product,
     super.key,
   });
+  final ProductConfiguration? product;
   final LevelRepository repository;
   final ProgressRepository? progressRepository;
   final PreferencesRepository? preferences;
@@ -59,6 +63,7 @@ class PixelhubApp extends StatefulWidget {
 }
 
 class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
+  ProductConfiguration get product => widget.product ?? selectedProduct;
   late final BootstrapController _bootstrap;
   late final GoRouter _router;
   late final ProgressRepository _progress;
@@ -89,12 +94,14 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     _diagnostics = widget.diagnostics ?? LocalDiagnostics();
     final local =
         widget.progressRepository == null || widget.preferences == null
-        ? LocalPreferences()
+        ? LocalPreferences(scope: product.storageScope)
         : null;
     _progress = widget.progressRepository ?? local!;
     _preferences = widget.preferences ?? local!;
     final preferences = _preferences;
+    _renderStyle = ArtworkRenderStyle.fromStorage(product.defaultStyle);
     _sounds = GameSounds(
+      available: product.features.soundEffects,
       preferences: preferences is SoundEffectsPreferences
           ? preferences as SoundEffectsPreferences
           : null,
@@ -107,6 +114,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
               : MemoryPreferences()),
       _progress,
       sounds: _sounds,
+      coinsEnabled: product.features.coins,
       recentArtworkRepository: preferences is RecentArtworkRepository
           ? preferences as RecentArtworkRepository
           : null,
@@ -123,11 +131,18 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
           ? preferences as BadgeStorage
           : MemoryPreferences(),
     );
-    unawaited(_badges.initialize());
+    if (product.features.achievements) unawaited(_badges.initialize());
     _online = OnlineCatalogController(
       preferences is OnlineLevelStorage
           ? preferences as OnlineLevelStorage
           : MemoryPreferences(),
+      enabled: product.features.onlineCatalog,
+      animationsEnabled: product.features.animations,
+      allowedCategories: product.categories,
+      maxDimension: product.maxDimension,
+      baseUrl: Uri.parse(product.onlineRoot),
+      catalogPath: product.onlineManifest,
+      productId: product.id,
     );
     _online.addListener(() {
       if (_online.isLoaded) _library.setDownloadedOnline(_online.downloaded);
@@ -143,7 +158,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
           _diagnostics.recordCatalogLoad(catalogTimer.elapsedMilliseconds);
         }
         _library.setCatalog(_bootstrap.levels, _bootstrap.metadata);
-        if (!_animationCatalogRequested) {
+        if (product.features.animations && !_animationCatalogRequested) {
           _animationCatalogRequested = true;
           unawaited(_loadAnimationCatalog());
         }
@@ -264,6 +279,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
   }
 
   PixelAnimation? _animationFor(LevelDefinition level) {
+    if (!product.features.animations) return null;
     final online = _online.animations[level.id];
     if (online != null) return online;
     final bundled = _bundledAnimations.value[level.id];
@@ -283,7 +299,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       final saved = await stylePreferences.readArtworkStyle();
       if (mounted && saved != null) {
         final style = ArtworkRenderStyle.fromStorage(saved);
-        if (_renderStyle != style) {
+        if (product.allowsStyle(style.storageId) && _renderStyle != style) {
           setState(() => _renderStyle = style);
           _styleChanges.notify();
         }
@@ -294,7 +310,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
   }
 
   Future<void> _setArtworkStyle(ArtworkRenderStyle style) async {
-    if (_renderStyle == style) return;
+    if (!product.allowsStyle(style.storageId) || _renderStyle == style) return;
     setState(() => _renderStyle = style);
     // The active route is rebuilt by _routeChanges, not by this State's
     // setState alone. Notify it so PaintingPreviewScreen and PaintingBoard
@@ -438,7 +454,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     if (preferences is ArtworkStylePreferences) {
       final stylePreferences = preferences as ArtworkStylePreferences;
       try {
-        await stylePreferences.writeArtworkStyle('pixel');
+        await stylePreferences.writeArtworkStyle(product.defaultStyle);
       } on Object {
         // Clear still succeeds if this optional preference cannot be reset.
       }
@@ -446,7 +462,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     if (mounted) {
       setState(() {
         _locale = const Locale('fa');
-        _renderStyle = ArtworkRenderStyle.pixel;
+        _renderStyle = ArtworkRenderStyle.fromStorage(product.defaultStyle);
       });
       _styleChanges.notify();
     }
@@ -478,10 +494,15 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       ListenableBuilder(
         listenable: _routeChanges,
         builder: (context, _) {
+          if (!product.allowsPage(page) ||
+              (!product.features.imageImport &&
+                  (id?.startsWith('private-') ?? false))) {
+            return _notFound(context);
+          }
           // Privacy is reachable even when the picture catalog fails to load.
           if (page == 'privacy') return const PrivacyScreen();
           if (_bootstrap.status == BootstrapStatus.loading) {
-            return const _SplashScreen();
+            return _SplashScreen(product: product);
           }
           if (_bootstrap.status == BootstrapStatus.error) {
             return _LoadError(onRetry: _bootstrap.load);
@@ -515,13 +536,13 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
           if (page == 'settings') {
             return SettingsScreen(
               library: _library,
-              sounds: _sounds,
+              sounds: product.features.soundEffects ? _sounds : null,
               onClear: _clearLocalData,
             );
           }
           if (page == 'import' || (id?.startsWith('private-') ?? false)) {
             if (_library.status == LibraryStatus.loading) {
-              return const _SplashScreen();
+              return _SplashScreen(product: product);
             }
             if (_library.status == LibraryStatus.error) {
               return _LoadError(
@@ -534,6 +555,14 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
             return ImportScreen(library: _library);
           }
           if (id == null) {
+            if (product.homeLayout != 'classic') {
+              return ProductHome(
+                product: product,
+                levels: _bootstrap.levels,
+                library: _library,
+                onLanguageToggle: _toggleLanguage,
+              );
+            }
             return HomeScreen(levels: _bootstrap.levels, library: _library);
           }
           final matches = _library.levels.where((level) => level.id == id);
@@ -564,15 +593,52 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) => MaterialApp.router(
-    title: 'PixelHub',
+    title: product.name,
     debugShowCheckedModeBanner: false,
-    theme: PixelTokens.theme,
+    theme: _productTheme(Brightness.light),
+    darkTheme: _productTheme(Brightness.dark),
+    themeMode: product.themeMode,
     locale: _locale,
     supportedLocales: AppLocalizations.supportedLocales,
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     routerConfig: _router,
-    builder: (context, child) => MobileFrame(child: child!),
+    builder: (context, child) => ProductScope(
+      product: product,
+      child: MobileFrame(child: child!),
+    ),
   );
+
+  ThemeData _productTheme(Brightness brightness) {
+    if (product.id == 'pixelhub' && brightness == Brightness.light) {
+      return PixelTokens.theme;
+    }
+    final colors = ColorScheme.fromSeed(
+      seedColor: product.primary,
+      secondary: product.secondary,
+      surface: brightness == Brightness.light ? product.background : null,
+      brightness: brightness,
+    );
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: colors,
+      fontFamily: product.fontFamily,
+      scaffoldBackgroundColor: colors.surface,
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          minimumSize: Size(64, product.largeControls ? 68 : 56),
+          textStyle: TextStyle(
+            fontFamily: product.fontFamily,
+            fontSize: product.largeControls ? 20 : 16,
+          ),
+        ),
+      ),
+      iconButtonTheme: IconButtonThemeData(
+        style: IconButton.styleFrom(
+          minimumSize: Size.square(product.largeControls ? 60 : 48),
+        ),
+      ),
+    );
+  }
 
   @override
   void dispose() {
@@ -595,7 +661,8 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
 }
 
 class _SplashScreen extends StatelessWidget {
-  const _SplashScreen();
+  const _SplashScreen({required this.product});
+  final ProductConfiguration product;
   @override
   Widget build(BuildContext context) => Scaffold(
     body: SafeArea(
@@ -606,15 +673,15 @@ class _SplashScreen extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Image.asset(
-                'assets/brand/pixelhub_mark.png',
+                product.icon,
                 width: 88,
                 height: 88,
                 filterQuality: FilterQuality.none,
-                semanticLabel: 'PixelHub',
+                semanticLabel: product.name,
               ),
               const SizedBox(height: 16),
-              const Text(
-                'PixelHub',
+              Text(
+                product.name,
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 24),

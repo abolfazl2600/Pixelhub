@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "id": "art",
+  "ready": true,
+  "identity": {
+    "name": "PixelHub Art",
+    "display_name_fa": "پیکسل‌هاب هنر",
+    "application_id": "io.github.abolfazl2600.pixelhub.art",
+    "storage_scope": "pixelhub_art",
+    "version_name": "1.0.0",
+    "version_code": 1,
+    "icon": "apps/game/assets/brand/art_mark.png",
+    "publisher": "abolfazl2600"
+  },
+  "appearance": {
+    "primary": "#825735",
+    "secondary": "#F2B957",
+    "background": "#FFF9EF",
+    "theme_mode": "light",
+    "font_family": "Vazirmatn",
+    "home_layout": "art",
+    "default_style": "canvas",
+    "large_controls": false,
+    "navigation": [
+      "gallery",
+      "my-gallery",
+      "museum",
+      "profile",
+      "settings"
+    ]
+  },
+  "content": {
+    "offline_manifest": "apps/game/assets/products/art-catalog.json",
+    "online_root": "https://abolfazl2600.github.io/Pixelhub/online/",
+    "categories": [
+      "masterpieces"
+    ],
+    "default_categories": [
+      "masterpieces"
+    ],
+    "max_dimension": 512,
+    "online_manifest": "products/art/catalog.json"
+  },
+  "features": {
+    "coins": false,
+    "achievements": false,
+    "animations": true,
+    "image_import": false,
+    "diamond_painting": true,
+    "canvas_painting": true,
+    "sound_effects": false,
+    "online_catalog": true,
+    "profile": true,
+    "museum": true,
+    "free_painting": false,
+    "background_music": false
+  },
+  "distribution": {
+    "targets": [
+      "android",
+      "web"
+    ],
+    "signing_prefix": "ART",
+    "environment": "release-art",
+    "web_base_href": "/Pixelhub/art/",
+    "artifact_prefix": "art"
+  }
+}

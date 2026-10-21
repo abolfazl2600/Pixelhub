@@ -137,3 +137,7 @@ The browser suite covers both languages, real localStorage writes, wrong-color r
 [V3 decisions](docs/adr/0003-v3-private-gallery-and-import.md) · [V3 pending acceptance](docs/qa/v3-manual-checklist.md) · [Product plan](docs/product-plan/README.md) · [V2 decisions](docs/adr/0002-v2-painting-and-localization.md) · [V2 validation](docs/qa/v2-validation.md) · [Manual checklist](docs/qa/v2-manual-checklist.md) · [Asset provenance](apps/game/assets/README.md) · [Changelog](CHANGELOG.md).
 
 The original V3 bundle had no online gallery; the new optional release-backed online gallery is added in source. Accounts/sync, ads, purchases and community are still inactive. V3 has not been tested or built locally under the owner’s workflow; no CI, public deployment, offline or physical-phone result is claimed. Prior V2 validation applies to its historical implementation only.
+
+## Multi-application products
+
+PixelHub, Kids and Art share one engine with independent product configuration, Android flavors and Web builds. See [the platform guide](docs/multi-app/README.md) for building products, signing, content isolation and adding a new application.

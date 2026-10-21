@@ -1,3 +1,4 @@
+import '../../products/product_configuration.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -146,7 +147,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
       return;
     }
     final cost = precisionToolPrice(tool);
-    if (widget.library.coins < cost) {
+    if (widget.library.coinsEnabled && widget.library.coins < cost) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(context.strings.precisionToolInsufficient)),
       );
@@ -163,10 +164,14 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.strings.precisionToolFilled(
-              context.digits(filled),
-              context.digits(cost),
-            ),
+            widget.library.coinsEnabled
+                ? context.strings.precisionToolFilled(
+                    context.digits(filled),
+                    context.digits(cost),
+                  )
+                : (context.isPersian
+                      ? '${context.digits(filled)} خانه رنگ شد.'
+                      : '${context.digits(filled)} cells colored.'),
           ),
         ),
       );
@@ -292,10 +297,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                         // to close that gap continuously as the chip fades.
                         layoutBuilder: (currentChild, previousChildren) => Row(
                           mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ...previousChildren,
-                            if (currentChild != null) currentChild,
-                          ],
+                          children: [...previousChildren, ?currentChild],
                         ),
                         transitionBuilder: (child, animation) => SizeTransition(
                           axis: Axis.horizontal,
@@ -308,7 +310,9 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                         child: session.remaining[i] > 0
                             ? Padding(
                                 key: ValueKey('palette-visible-$i'),
-                                padding: const EdgeInsetsDirectional.only(end: 8),
+                                padding: const EdgeInsetsDirectional.only(
+                                  end: 8,
+                                ),
                                 child: Semantics(
                                   label: s.colorLabel(
                                     context.digits(i + 1),
@@ -328,7 +332,9 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                                         child: Container(
                                           width: 56,
                                           decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(16),
+                                            borderRadius: BorderRadius.circular(
+                                              16,
+                                            ),
                                             border: Border.all(
                                               color: session.selectedColor == i
                                                   ? PixelTokens.green
@@ -351,14 +357,14 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                                                   context.digits(i + 1),
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.w700,
-                                                    color: ThemeData
-                                                                .estimateBrightnessForColor(
-                                                                  Color(
-                                                                    controller
-                                                                        .level
-                                                                        .palette[i],
-                                                                  ),
-                                                                ) ==
+                                                    color:
+                                                        ThemeData.estimateBrightnessForColor(
+                                                              Color(
+                                                                controller
+                                                                    .level
+                                                                    .palette[i],
+                                                              ),
+                                                            ) ==
                                                             Brightness.dark
                                                         ? Colors.white
                                                         : PixelTokens.ink,
@@ -385,7 +391,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                             : SizedBox.shrink(
                                 key: ValueKey('palette-hidden-$i'),
                               ),
-                        ),
+                      ),
                     ),
                 ],
               ),
@@ -588,23 +594,25 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                 const SizedBox(height: 8),
                 _saveState(),
                 const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const Icon(Icons.monetization_on_outlined, size: 18),
-                    const SizedBox(width: 6),
-                    Text(
-                      s.artworkCoins(
-                        context.digits(rewardForLevel(controller.level)),
+                if (ProductScope.of(context).features.coins)
+                  Row(
+                    children: [
+                      const Icon(Icons.monetization_on_outlined, size: 18),
+                      const SizedBox(width: 6),
+                      Text(
+                        s.artworkCoins(
+                          context.digits(rewardForLevel(controller.level)),
+                        ),
+                        style: const TextStyle(fontWeight: FontWeight.w700),
                       ),
-                      style: const TextStyle(fontWeight: FontWeight.w700),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
                 const SizedBox(height: 4),
-                Text(
-                  '${s.walletCoins}: ${context.digits(widget.library.coins)}',
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
+                if (ProductScope.of(context).features.coins)
+                  Text(
+                    '${s.walletCoins}: ${context.digits(widget.library.coins)}',
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
                 const SizedBox(height: 12),
                 Wrap(
                   spacing: 8,
@@ -642,25 +650,28 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                         ArtworkRenderStyle.pixel,
                       ),
                     ),
-                    ChoiceChip(
-                      key: const ValueKey('style-canvas'),
-                      avatar: const Icon(Icons.texture_rounded, size: 18),
-                      label: Text(s.canvasStyle),
-                      selected: widget.renderStyle == ArtworkRenderStyle.canvas,
-                      onSelected: (_) => widget.onRenderStyleChanged?.call(
-                        ArtworkRenderStyle.canvas,
+                    if (ProductScope.of(context).features.canvasPainting)
+                      ChoiceChip(
+                        key: const ValueKey('style-canvas'),
+                        avatar: const Icon(Icons.texture_rounded, size: 18),
+                        label: Text(s.canvasStyle),
+                        selected:
+                            widget.renderStyle == ArtworkRenderStyle.canvas,
+                        onSelected: (_) => widget.onRenderStyleChanged?.call(
+                          ArtworkRenderStyle.canvas,
+                        ),
                       ),
-                    ),
-                    ChoiceChip(
-                      key: const ValueKey('style-diamond'),
-                      avatar: const Icon(Icons.diamond_outlined, size: 18),
-                      label: Text(s.diamondStyle),
-                      selected:
-                          widget.renderStyle == ArtworkRenderStyle.diamond,
-                      onSelected: (_) => widget.onRenderStyleChanged?.call(
-                        ArtworkRenderStyle.diamond,
+                    if (ProductScope.of(context).features.diamondPainting)
+                      ChoiceChip(
+                        key: const ValueKey('style-diamond'),
+                        avatar: const Icon(Icons.diamond_outlined, size: 18),
+                        label: Text(s.diamondStyle),
+                        selected:
+                            widget.renderStyle == ArtworkRenderStyle.diamond,
+                        onSelected: (_) => widget.onRenderStyleChanged?.call(
+                          ArtworkRenderStyle.diamond,
+                        ),
                       ),
-                    ),
                     IconButton(
                       tooltip: s.reset,
                       onPressed: _reset,
@@ -724,16 +735,17 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                             const Icon(Icons.auto_fix_high_rounded),
                             const SizedBox(height: 3),
                             Text(s.magicWandTool, textAlign: TextAlign.center),
-                            Text(
-                              s.precisionToolCost(
-                                context.digits(
-                                  precisionToolPrice(
-                                    PrecisionPaintTool.magicWand,
+                            if (widget.library.coinsEnabled)
+                              Text(
+                                s.precisionToolCost(
+                                  context.digits(
+                                    precisionToolPrice(
+                                      PrecisionPaintTool.magicWand,
+                                    ),
                                   ),
                                 ),
+                                style: const TextStyle(fontSize: 11),
                               ),
-                              style: const TextStyle(fontSize: 11),
-                            ),
                           ],
                         ),
                       ),
@@ -766,16 +778,17 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                               s.colorSplashTool,
                               textAlign: TextAlign.center,
                             ),
-                            Text(
-                              s.precisionToolCost(
-                                context.digits(
-                                  precisionToolPrice(
-                                    PrecisionPaintTool.colorSplash,
+                            if (widget.library.coinsEnabled)
+                              Text(
+                                s.precisionToolCost(
+                                  context.digits(
+                                    precisionToolPrice(
+                                      PrecisionPaintTool.colorSplash,
+                                    ),
                                   ),
                                 ),
+                                style: const TextStyle(fontSize: 11),
                               ),
-                              style: const TextStyle(fontSize: 11),
-                            ),
                           ],
                         ),
                       ),
@@ -897,59 +910,63 @@ class CompletionScreen extends StatelessWidget {
             const SizedBox(height: 12),
             Text(context.strings.completedMessage, textAlign: TextAlign.center),
             const SizedBox(height: 16),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.monetization_on_rounded,
-                        size: 28,
-                        color: PixelTokens.green,
-                      ),
-                      const SizedBox(width: 8),
-                      Flexible(
-                        child: Text(
-                          rewardReceived
-                              ? context.strings.completionCoinsEarned(
-                                  context.digits(rewardCoins),
-                                )
-                              : context.strings.artworkCoins(
-                                  context.digits(rewardCoins),
-                                ),
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 19,
-                            fontWeight: FontWeight.w800,
+            if (ProductScope.of(context).features.coins)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 18,
+                ),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.monetization_on_rounded,
+                          size: 28,
+                          color: PixelTokens.green,
+                        ),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            rewardReceived
+                                ? context.strings.completionCoinsEarned(
+                                    context.digits(rewardCoins),
+                                  )
+                                : context.strings.artworkCoins(
+                                    context.digits(rewardCoins),
+                                  ),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 19,
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    rewardReceived
-                        ? context.strings.completionCoinsReceived
-                        : rewardSaveError
-                        ? context.strings.coinSaveFailed
-                        : context.strings.completionCoinsPending,
-                    textAlign: TextAlign.center,
-                  ),
-                  if (!rewardReceived && rewardSaveError)
-                    TextButton(
-                      onPressed: onRetryReward,
-                      child: Text(context.strings.retry),
+                      ],
                     ),
-                ],
+                    const SizedBox(height: 6),
+                    Text(
+                      rewardReceived
+                          ? context.strings.completionCoinsReceived
+                          : rewardSaveError
+                          ? context.strings.coinSaveFailed
+                          : context.strings.completionCoinsPending,
+                      textAlign: TextAlign.center,
+                    ),
+                    if (!rewardReceived && rewardSaveError)
+                      TextButton(
+                        onPressed: onRetryReward,
+                        child: Text(context.strings.retry),
+                      ),
+                  ],
+                ),
               ),
-            ),
             const SizedBox(height: 24),
             ClipRRect(
               borderRadius: BorderRadius.circular(24),
@@ -964,17 +981,19 @@ class CompletionScreen extends StatelessWidget {
             const SizedBox(height: 16),
             ExportButton(level: controller.level, renderStyle: renderStyle),
             const SizedBox(height: 8),
-            OutlinedButton.icon(
-              key: const ValueKey('completion-open-badges'),
-              onPressed: () => context.push('/badges'),
-              icon: const Icon(Icons.workspace_premium_outlined),
-              label: Text(
-                context.isPersian
-                    ? 'مشاهده نشان‌های افتخار'
-                    : 'View achievements',
+            if (ProductScope.of(context).features.achievements)
+              OutlinedButton.icon(
+                key: const ValueKey('completion-open-badges'),
+                onPressed: () => context.push('/badges'),
+                icon: const Icon(Icons.workspace_premium_outlined),
+                label: Text(
+                  context.isPersian
+                      ? 'مشاهده نشان‌های افتخار'
+                      : 'View achievements',
+                ),
               ),
-            ),
-            if (onAddToMuseum != null) ...[
+            if (onAddToMuseum != null &&
+                ProductScope.of(context).features.museum) ...[
               const SizedBox(height: 8),
               OutlinedButton.icon(
                 key: const ValueKey('completion-add-to-museum'),

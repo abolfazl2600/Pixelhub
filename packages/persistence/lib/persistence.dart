@@ -23,7 +23,11 @@ abstract interface class SoundEffectsPreferences {
 
 final class AssetLevelRepository
     implements LevelRepository, CatalogMetadataRepository {
-  AssetLevelRepository({AssetBundle? bundle}) : _bundle = bundle ?? rootBundle;
+  AssetLevelRepository({
+    AssetBundle? bundle,
+    this.catalogPath = LevelAssets.catalog,
+  }) : _bundle = bundle ?? rootBundle;
+  final String catalogPath;
   final AssetBundle _bundle;
 
   Future<LevelDefinition> _load(String path) async {
@@ -36,11 +40,14 @@ final class AssetLevelRepository
   }
 
   @override
-  Future<LevelDefinition> loadPreview() => _load(LevelAssets.sunflower);
+  Future<LevelDefinition> loadPreview() async =>
+      catalogPath == LevelAssets.catalog
+      ? await _load(LevelAssets.sunflower)
+      : (await loadLevels()).first;
 
   @override
   Future<List<LevelDefinition>> loadLevels() async {
-    final decoded = jsonDecode(await _bundle.loadString(LevelAssets.catalog));
+    final decoded = jsonDecode(await _bundle.loadString(catalogPath));
     if (decoded is! List<Object?> || decoded.isEmpty || decoded.length > 200) {
       throw const FormatException('Invalid local catalog.');
     }
@@ -99,15 +106,23 @@ final class LocalPreferences
         SoundEffectsPreferences,
         BadgeStorage,
         MuseumRepository {
-  LocalPreferences({SharedPreferencesAsync? preferences})
-    : _preferences = preferences ?? SharedPreferencesAsync();
+  LocalPreferences({
+    SharedPreferencesAsync? preferences,
+    String scope = 'pixelhub',
+  }) : _preferences = preferences ?? SharedPreferencesAsync(),
+       _scope = scope {
+    if (!RegExp(r'^[a-z][a-z0-9_]*$').hasMatch(scope)) {
+      throw ArgumentError.value(scope, 'scope', 'Invalid storage scope');
+    }
+  }
+  final String _scope;
   final SharedPreferencesAsync _preferences;
   Future<void> _writes = Future.value();
 
-  static const _badgeCatalogKey = 'pixelhub.badges.catalog.v1';
-  static const _badgeEarnedKey = 'pixelhub.badges.earned.v1';
+  String get _badgeCatalogKey => '$_scope.badges.catalog.v1';
+  String get _badgeEarnedKey => '$_scope.badges.earned.v1';
 
-  String _badgeImageKey(String id) => 'pixelhub.badges.image.v1.$id';
+  String _badgeImageKey(String id) => '$_scope.badges.image.v1.$id';
 
   @override
   Future<String?> readBadgeCatalog() async {
@@ -149,19 +164,19 @@ final class LocalPreferences
     () => _preferences.setString(_badgeImageKey(id), base64Encode(image)),
   );
 
-  String _key(String id, int version) => 'pixelhub.progress.v1.$id.$version';
+  String _key(String id, int version) => '$_scope.progress.v1.$id.$version';
 
   @override
   Future<List<LevelDefinition>> readDownloadedLevels() async {
     await _writes;
-    final source = await _preferences.getString('pixelhub.online.index.v1');
+    final source = await _preferences.getString('$_scope.online.index.v1');
     if (source == null) return [];
     final ids = (jsonDecode(source) as List<Object?>).cast<String>();
     if (ids.length > 1000) throw const FormatException('Too many downloads.');
     final result = <LevelDefinition>[];
     for (final id in ids) {
       if (!RegExp(r'^online-[a-z0-9-]+$').hasMatch(id)) continue;
-      final text = await _preferences.getString('pixelhub.online.level.$id');
+      final text = await _preferences.getString('$_scope.online.level.$id');
       if (text == null) continue;
       try {
         result.add(
@@ -177,7 +192,7 @@ final class LocalPreferences
   @override
   Future<Map<String, String>> readDownloadedCategories() async {
     await _writes;
-    final source = await _preferences.getString('pixelhub.online.index.v1');
+    final source = await _preferences.getString('$_scope.online.index.v1');
     if (source == null) return {};
     final ids = (jsonDecode(source) as List<Object?>).cast<String>();
     if (ids.length > 1000) throw const FormatException('Too many downloads.');
@@ -185,7 +200,7 @@ final class LocalPreferences
     for (final id in ids) {
       if (!RegExp(r'^online-[a-z0-9-]+$').hasMatch(id)) continue;
       final category = await _preferences.getString(
-        'pixelhub.online.category.$id',
+        '$_scope.online.category.$id',
       );
       // Older installations may have no category; ignore damaged metadata.
       if (category != null && onlinePictureCategories.contains(category)) {
@@ -204,7 +219,7 @@ final class LocalPreferences
     for (final level in downloaded) {
       if (!level.id.startsWith('online-')) continue;
       final source = await _preferences.getString(
-        'pixelhub.online.animation.${level.id}',
+        '$_scope.online.animation.${level.id}',
       );
       if (source == null) continue;
       try {
@@ -230,10 +245,7 @@ final class LocalPreferences
     if (utf8.encode(value).length > 2 * 1024 * 1024) {
       throw const FormatException('Animation exceeds local storage limit.');
     }
-    await _preferences.setString(
-      'pixelhub.online.animation.${level.id}',
-      value,
-    );
+    await _preferences.setString('$_scope.online.animation.${level.id}', value);
   });
 
   @override
@@ -241,7 +253,7 @@ final class LocalPreferences
     if (!RegExp(r'^online-[a-z0-9-]+$').hasMatch(id)) {
       throw const FormatException('Invalid animation ID.');
     }
-    await _preferences.remove('pixelhub.online.animation.$id');
+    await _preferences.remove('$_scope.online.animation.$id');
   });
 
   @override
@@ -253,12 +265,12 @@ final class LocalPreferences
         !onlinePictureCategories.contains(category)) {
       throw const FormatException('Invalid online level or category.');
     }
-    final key = 'pixelhub.online.level.${level.id}';
+    final key = '$_scope.online.level.${level.id}';
     final payload = jsonEncode(level.toJson());
     if (utf8.encode(payload).length > 262144) {
       throw const FormatException('Downloaded picture too large.');
     }
-    final source = await _preferences.getString('pixelhub.online.index.v1');
+    final source = await _preferences.getString('$_scope.online.index.v1');
     final ids = source == null
         ? <String>[]
         : (jsonDecode(source) as List<Object?>).cast<String>().toList();
@@ -271,10 +283,10 @@ final class LocalPreferences
     await _preferences.setString(key, payload);
     // Write category before the index so a newly listed download is complete.
     await _preferences.setString(
-      'pixelhub.online.category.${level.id}',
+      '$_scope.online.category.${level.id}',
       category,
     );
-    await _preferences.setString('pixelhub.online.index.v1', jsonEncode(ids));
+    await _preferences.setString('$_scope.online.index.v1', jsonEncode(ids));
   });
 
   @override
@@ -284,12 +296,12 @@ final class LocalPreferences
             !onlinePictureCategories.contains(category)) {
           throw const FormatException('Invalid online category metadata.');
         }
-        final source = await _preferences.getString('pixelhub.online.index.v1');
+        final source = await _preferences.getString('$_scope.online.index.v1');
         if (source == null ||
             !(jsonDecode(source) as List<Object?>).contains(id)) {
           return; // Never recreate metadata for an already-deleted download.
         }
-        await _preferences.setString('pixelhub.online.category.$id', category);
+        await _preferences.setString('$_scope.online.category.$id', category);
       });
 
   @override
@@ -297,15 +309,15 @@ final class LocalPreferences
     if (!RegExp(r'^online-[a-z0-9-]+$').hasMatch(id)) {
       throw const FormatException('Invalid downloaded level ID.');
     }
-    final source = await _preferences.getString('pixelhub.online.index.v1');
+    final source = await _preferences.getString('$_scope.online.index.v1');
     final ids = source == null
         ? <String>[]
         : (jsonDecode(source) as List<Object?>).cast<String>().toList();
-    await _preferences.remove('pixelhub.online.level.$id');
-    await _preferences.remove('pixelhub.online.category.$id');
-    await _preferences.remove('pixelhub.online.animation.$id');
+    await _preferences.remove('$_scope.online.level.$id');
+    await _preferences.remove('$_scope.online.category.$id');
+    await _preferences.remove('$_scope.online.animation.$id');
     ids.remove(id);
-    await _preferences.setString('pixelhub.online.index.v1', jsonEncode(ids));
+    await _preferences.setString('$_scope.online.index.v1', jsonEncode(ids));
   });
 
   @override
@@ -340,7 +352,7 @@ final class LocalPreferences
     // The verified account scope is encoded in the key and the document.
     ProgressSyncOutbox(accountId: accountId);
     final encoded = base64UrlEncode(utf8.encode(accountId));
-    return 'pixelhub.sync.outbox.v1.$encoded';
+    return '$_scope.sync.outbox.v1.$encoded';
   }
 
   Future<ProgressSyncOutbox> _loadOutbox(String accountId) async {
@@ -396,26 +408,26 @@ final class LocalPreferences
   ) => _changeOutbox(accountId, (outbox) => outbox.acknowledge(operationId));
 
   @override
-  Future<String?> readLanguage() => _preferences.getString('pixelhub.language');
+  Future<String?> readLanguage() => _preferences.getString('$_scope.language');
 
   @override
   Future<void> writeLanguage(String language) =>
-      _enqueue(() => _preferences.setString('pixelhub.language', language));
+      _enqueue(() => _preferences.setString('$_scope.language', language));
 
   @override
   Future<bool?> readSoundEffectsEnabled() async {
     await _writes;
-    return _preferences.getBool('pixelhub.soundEffects.v1');
+    return _preferences.getBool('$_scope.soundEffects.v1');
   }
 
   @override
   Future<void> writeSoundEffectsEnabled(bool enabled) =>
-      _enqueue(() => _preferences.setBool('pixelhub.soundEffects.v1', enabled));
+      _enqueue(() => _preferences.setBool('$_scope.soundEffects.v1', enabled));
 
   @override
   Future<String?> readArtworkStyle() async {
     await _writes;
-    final value = await _preferences.getString('pixelhub.artworkStyle.v1');
+    final value = await _preferences.getString('$_scope.artworkStyle.v1');
     return value == 'canvas' || value == 'pixel' || value == 'diamond'
         ? value
         : null;
@@ -429,14 +441,14 @@ final class LocalPreferences
       );
     }
     return _enqueue(
-      () => _preferences.setString('pixelhub.artworkStyle.v1', style),
+      () => _preferences.setString('$_scope.artworkStyle.v1', style),
     );
   }
 
   @override
   Future<String?> readRecentArtworkId() async {
     await _writes;
-    final id = await _preferences.getString('pixelhub.recentArtwork.v1');
+    final id = await _preferences.getString('$_scope.recentArtwork.v1');
     return id != null && RegExp(r'^[a-z0-9-]+$').hasMatch(id) ? id : null;
   }
 
@@ -446,13 +458,13 @@ final class LocalPreferences
       return Future<void>.error(const FormatException('Invalid artwork ID.'));
     }
     return _enqueue(
-      () => _preferences.setString('pixelhub.recentArtwork.v1', id),
+      () => _preferences.setString('$_scope.recentArtwork.v1', id),
     );
   }
 
   @override
   Future<void> clearRecentArtworkId() =>
-      _enqueue(() => _preferences.remove('pixelhub.recentArtwork.v1'));
+      _enqueue(() => _preferences.remove('$_scope.recentArtwork.v1'));
 
   Future<void> _enqueue(Future<void> Function() operation) {
     final result = _writes.then((_) => operation());
@@ -463,7 +475,7 @@ final class LocalPreferences
   @override
   Future<ArtworkLibrary> readLibrary() async {
     await _writes;
-    final source = await _preferences.getString('pixelhub.library.v1');
+    final source = await _preferences.getString('$_scope.library.v1');
     if (source == null) return ArtworkLibrary();
     return ArtworkLibrary.fromJson(jsonDecode(source) as Map<String, Object?>);
   }
@@ -476,16 +488,14 @@ final class LocalPreferences
         const FormatException('Local library capacity reached.'),
       );
     }
-    return _enqueue(
-      () => _preferences.setString('pixelhub.library.v1', source),
-    );
+    return _enqueue(() => _preferences.setString('$_scope.library.v1', source));
   }
 
   @override
   Future<void> removeProgress(LevelDefinition level) =>
       _enqueue(() => _preferences.remove(_key(level.id, level.contentVersion)));
 
-  static const _museumKey = 'pixelhub.museum.v1';
+  String get _museumKey => '$_scope.museum.v1';
 
   @override
   Future<MuseumLayout> readMuseum() async {
@@ -504,7 +514,7 @@ final class LocalPreferences
   Future<void> clearPixelhubData() => _enqueue(() async {
     // Do not clear unrelated plugin/application preferences on the same origin.
     final keys = await _preferences.getKeys();
-    for (final key in keys.where((key) => key.startsWith('pixelhub.'))) {
+    for (final key in keys.where((key) => key.startsWith('$_scope.'))) {
       await _preferences.remove(key);
     }
   });

@@ -1,3 +1,4 @@
+import '../../products/product_configuration.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -76,7 +77,8 @@ class ProfileScreen extends StatelessWidget {
                     trailing: LanguageButton(onToggle: onLanguageToggle),
                   ),
                 ),
-                if (badges != null) ...[
+                if (badges != null &&
+                    ProductScope.of(context).features.achievements) ...[
                   const SizedBox(height: 12),
                   Card(
                     child: ListTile(
@@ -125,17 +127,19 @@ class ProfileScreen extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 8),
-                _MetricTile(
-                  icon: Icons.monetization_on_outlined,
-                  title: s.walletCoins,
-                  value: context.digits(library.coins),
-                ),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text(s.walletExplanation),
+                if (ProductScope.of(context).features.coins)
+                  _MetricTile(
+                    icon: Icons.monetization_on_outlined,
+                    title: s.walletCoins,
+                    value: context.digits(library.coins),
                   ),
-                ),
+                if (ProductScope.of(context).features.coins)
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(s.walletExplanation),
+                    ),
+                  ),
                 const SizedBox(height: 18),
                 Text(
                   s.analyticsTitle,

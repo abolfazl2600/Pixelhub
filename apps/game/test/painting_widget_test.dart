@@ -590,59 +590,66 @@ void main() {
     expect(controller.session!.isCompleted(4 * 16 + 4), isFalse);
   });
 
-  testWidgets('completed colors fade away and next unfinished color is selected', (
-    tester,
-  ) async {
-    final controller = await pumpPainting(tester);
-    final board = tester.getRect(find.byKey(const ValueKey('painting-board')));
-    expect(find.byKey(const ValueKey('color-0')), findsOneWidget);
-    expect(find.byKey(const ValueKey('color-1')), findsOneWidget);
-
-    // Paint every cell of color zero, without completing the whole picture.
-    for (final cell in [(0, 0), (1, 1)]) {
-      await tester.tapAt(
-        board.topLeft +
-            Offset(
-              board.width * (cell.$1 + .5) / 2,
-              board.height * (cell.$2 + .5) / 2,
-            ),
+  testWidgets(
+    'completed colors fade away and next unfinished color is selected',
+    (tester) async {
+      final controller = await pumpPainting(tester);
+      final board = tester.getRect(
+        find.byKey(const ValueKey('painting-board')),
       );
-      // Finish each tap, but leave the fade transition running.
-      await tester.pump();
-    }
+      expect(find.byKey(const ValueKey('color-0')), findsOneWidget);
+      expect(find.byKey(const ValueKey('color-1')), findsOneWidget);
 
-    expect(controller.session!.remaining[0], 0);
-    expect(controller.session!.selectedColor, 1);
-    expect(find.byKey(const ValueKey('palette-hidden-0')), findsOneWidget);
-    await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('color-0')), findsNothing);
-    expect(find.byKey(const ValueKey('color-1')), findsOneWidget);
+      // Paint every cell of color zero, without completing the whole picture.
+      for (final cell in [(0, 0), (1, 1)]) {
+        await tester.tapAt(
+          board.topLeft +
+              Offset(
+                board.width * (cell.$1 + .5) / 2,
+                board.height * (cell.$2 + .5) / 2,
+              ),
+        );
+        // Finish each tap, but leave the fade transition running.
+        await tester.pump();
+      }
 
-    // Reset brings the finished color back with the reverse transition.
-    controller.reset();
-    await tester.pumpAndSettle();
-    expect(controller.session!.remaining[0], 2);
-    expect(find.byKey(const ValueKey('color-0')), findsOneWidget);
-    expect(find.byKey(const ValueKey('color-1')), findsOneWidget);
-  });
+      expect(controller.session!.remaining[0], 0);
+      expect(controller.session!.selectedColor, 1);
+      expect(find.byKey(const ValueKey('palette-hidden-0')), findsOneWidget);
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('color-0')), findsNothing);
+      expect(find.byKey(const ValueKey('color-1')), findsOneWidget);
 
-  testWidgets('loading saved progress hides completed palette colors immediately', (
-    tester,
-  ) async {
-    final level = fixture();
-    final stored = MemoryPreferences();
-    final session = PaintingSession(level);
-    session.selectColor(0);
-    session.paintCell(0);
-    session.paintCell(3);
-    session.endStroke();
-    await stored.write(session.snapshot);
+      // Reset brings the finished color back with the reverse transition.
+      controller.reset();
+      await tester.pumpAndSettle();
+      expect(controller.session!.remaining[0], 2);
+      expect(find.byKey(const ValueKey('color-0')), findsOneWidget);
+      expect(find.byKey(const ValueKey('color-1')), findsOneWidget);
+    },
+  );
 
-    final controller = await pumpPainting(tester, level: level, storage: stored);
-    expect(controller.session!.remaining[0], 0);
-    expect(controller.session!.selectedColor, 1);
-    expect(find.byKey(const ValueKey('color-0')), findsNothing);
-    expect(find.byKey(const ValueKey('color-1')), findsOneWidget);
-  });
+  testWidgets(
+    'loading saved progress hides completed palette colors immediately',
+    (tester) async {
+      final level = fixture();
+      final stored = MemoryPreferences();
+      final session = PaintingSession(level);
+      session.selectColor(0);
+      session.paintCell(0);
+      session.paintCell(3);
+      session.endStroke();
+      await stored.write(session.snapshot);
 
+      final controller = await pumpPainting(
+        tester,
+        level: level,
+        storage: stored,
+      );
+      expect(controller.session!.remaining[0], 0);
+      expect(controller.session!.selectedColor, 1);
+      expect(find.byKey(const ValueKey('color-0')), findsNothing);
+      expect(find.byKey(const ValueKey('color-1')), findsOneWidget);
+    },
+  );
 }

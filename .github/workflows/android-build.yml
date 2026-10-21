@@ -1,205 +1,24 @@
 name: "Build Android (preview APK or signed store APK + Play AAB)"
-
 on:
   workflow_dispatch:
     inputs:
       ref:
-        description: 'Optional SHA or tag; leave empty to build the selected branch'
+        description: Optional branch, SHA or tag
         required: false
         type: string
       build_kind:
-        description: 'Select debug preview APK or signed store APK + Play AAB (needs secrets)'
+        description: PixelHub preview or signed store outputs
         required: true
         default: play-aab
         type: choice
-        options:
-          - preview-apk
-          - play-aab
-
+        options: [preview-apk, play-aab]
 permissions:
   contents: read
-
 jobs:
   android:
-    runs-on: ubuntu-latest
-    timeout-minutes: 40
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          ref: ${{ inputs.ref || github.ref }}
-          persist-credentials: false
-      - name: Record actual source identity
-        id: source
-        run: |
-          printf 'sha=%s\n' "$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-          python3 - <<'PY'
-          import os, re
-          from pathlib import Path
-          version = re.search(r'^version: ([0-9]+\.[0-9]+\.[0-9]+)', Path('apps/game/pubspec.yaml').read_text(), re.M).group(1)
-          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
-              output.write(f'version={version}\n')
-          PY
-      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
-        with:
-          distribution: temurin
-          java-version: '17'
-      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
-        with:
-          flutter-version: '3.35.7'
-          channel: stable
-          cache: true
-      - run: bash tool/validate.sh
-      - name: Generate rainbow paintbrush Android launcher and Play listing icon
-        working-directory: apps/game
-        run: dart run tool/generate_launcher_icons.dart
-      - name: Decode private Play upload keystore
-        if: ${{ inputs.build_kind == 'play-aab' }}
-        env:
-          KEYSTORE_B64: ${{ secrets.PIXELHUB_UPLOAD_KEYSTORE_BASE64 }}
-          STORE_PASSWORD: ${{ secrets.PIXELHUB_UPLOAD_STORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.PIXELHUB_UPLOAD_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.PIXELHUB_UPLOAD_KEY_PASSWORD }}
-        run: |
-          python3 - <<'PY'
-          import base64
-          import os
-          from pathlib import Path
-          if any(not os.environ.get(k) for k in (
-              'KEYSTORE_B64', 'STORE_PASSWORD', 'KEY_ALIAS', 'KEY_PASSWORD'
-          )):
-              raise SystemExit('Missing private Google Play upload signing secrets.')
-          output = Path(os.environ['RUNNER_TEMP']) / 'pixelhub-upload.jks'
-          output.write_bytes(base64.b64decode(os.environ['KEYSTORE_B64'], validate=True))
-          output.chmod(0o600)
-          PY
-      - name: Build preview APK (debug signed, NOT for Google Play)
-        if: ${{ inputs.build_kind == 'preview-apk' }}
-        run: flutter build apk --debug --no-pub
-        working-directory: apps/game
-      - name: Build signed Google Play AAB
-        if: ${{ inputs.build_kind == 'play-aab' }}
-        working-directory: apps/game
-        env:
-          PIXELHUB_RELEASE_STORE_FILE: ${{ runner.temp }}/pixelhub-upload.jks
-          PIXELHUB_RELEASE_STORE_PASSWORD: ${{ secrets.PIXELHUB_UPLOAD_STORE_PASSWORD }}
-          PIXELHUB_RELEASE_KEY_ALIAS: ${{ secrets.PIXELHUB_UPLOAD_KEY_ALIAS }}
-          PIXELHUB_RELEASE_KEY_PASSWORD: ${{ secrets.PIXELHUB_UPLOAD_KEY_PASSWORD }}
-        run: |
-          test -s "$PIXELHUB_RELEASE_STORE_FILE"
-          test -n "$PIXELHUB_RELEASE_STORE_PASSWORD"
-          test -n "$PIXELHUB_RELEASE_KEY_ALIAS"
-          test -n "$PIXELHUB_RELEASE_KEY_PASSWORD"
-          flutter build appbundle --release --no-pub
-      - name: Build signed release APK for Android app stores
-        if: ${{ inputs.build_kind == 'play-aab' }}
-        working-directory: apps/game
-        env:
-          PIXELHUB_RELEASE_STORE_FILE: ${{ runner.temp }}/pixelhub-upload.jks
-          PIXELHUB_RELEASE_STORE_PASSWORD: ${{ secrets.PIXELHUB_UPLOAD_STORE_PASSWORD }}
-          PIXELHUB_RELEASE_KEY_ALIAS: ${{ secrets.PIXELHUB_UPLOAD_KEY_ALIAS }}
-          PIXELHUB_RELEASE_KEY_PASSWORD: ${{ secrets.PIXELHUB_UPLOAD_KEY_PASSWORD }}
-        run: flutter build apk --release --no-pub
-      - name: Verify signed release APK and record SHA-256
-        if: ${{ inputs.build_kind == 'play-aab' }}
-        working-directory: apps/game
-        run: |
-          apk="build/app/outputs/flutter-apk/app-release.apk"
-          test -s "$apk"
-          apksigner="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
-          test -x "$apksigner"
-          "$apksigner" verify --verbose --print-certs "$apk"
-          shasum -a 256 "$apk"
-          du -h "$apk"
-      - name: Verify signed Play AAB and record SHA-256
-        if: ${{ inputs.build_kind == 'play-aab' }}
-        working-directory: apps/game
-        run: |
-          bundle="build/app/outputs/bundle/release/app-release.aab"
-          test -s "$bundle"
-          echo 'Checking JAR signature on the release Android App Bundle...'
-          jarsigner -verify -verbose "$bundle" > "$RUNNER_TEMP/pixelhub-signature-verification.log"
-          grep -q 'jar verified.' "$RUNNER_TEMP/pixelhub-signature-verification.log"
-          echo 'Upload-key JAR signature verified.'
-          shasum -a 256 "$bundle"
-          python3 - <<'PY'
-          from pathlib import Path
-          from zipfile import ZipFile
-          target = Path('build/app/outputs/bundle/release/app-release.aab')
-          with ZipFile(target) as bundle:
-              required = ['base/manifest/AndroidManifest.xml', 'BundleConfig.pb']
-              for entry in required:
-                  if entry not in bundle.namelist():
-                      raise SystemExit(f'Invalid Play AAB: missing {entry}')
-              print(f'AAB structure verified: {target.stat().st_size} bytes.')
-          PY
-      - name: Print Android package size breakdown
-        env:
-          BUILD_KIND: ${{ inputs.build_kind }}
-        run: |
-          python3 - <<'PY'
-          import os
-          from pathlib import Path
-          from zipfile import ZipFile
-
-          kind = os.environ['BUILD_KIND']
-          path = (Path('apps/game/build/app/outputs/bundle/release/app-release.aab')
-                  if kind == 'play-aab'
-                  else Path('apps/game/build/app/outputs/flutter-apk/app-debug.apk'))
-          print(f'Artifact: {path}')
-          print(f'Package size: {path.stat().st_size / 1048576:.2f} MiB')
-          with ZipFile(path) as package:
-              entries = package.infolist()
-              compressed = sorted(entries, key=lambda item: item.compress_size, reverse=True)
-              print('Largest package entries (compressed MiB):')
-              for item in compressed[:12]:
-                  print(f'  {item.compress_size / 1048576:6.2f}  {item.filename}')
-              natives = {}
-              for item in entries:
-                  if item.filename.endswith('.so'):
-                      abi = next((part for part in item.filename.split('/')
-                                  if part in ('arm64-v8a','armeabi-v7a','x86_64')), 'other')
-                      natives[abi] = natives.get(abi, 0) + item.compress_size
-              print('Native libraries by ABI (compressed MiB):')
-              for abi, total in sorted(natives.items()):
-                  print(f'  {abi}: {total / 1048576:.2f}')
-          PY
-      - name: Record artifact commit
-        env:
-          SOURCE_SHA: ${{ steps.source.outputs.sha }}
-          BUILD_KIND: ${{ inputs.build_kind }}
-        run: |
-          printf '%s\n' "$SOURCE_SHA" > apps/game/build/app/outputs/flutter-apk/commit.txt
-          if [[ "$BUILD_KIND" == "play-aab" ]]; then
-            printf '%s\n' "$SOURCE_SHA" > apps/game/build/app/outputs/bundle/release/commit.txt
-          fi
-      - name: Upload preview APK
-        if: ${{ inputs.build_kind == 'preview-apk' }}
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: pixelhub-preview-apk-v${{ steps.source.outputs.version }}-${{ steps.source.outputs.sha }}
-          path: |
-            apps/game/build/app/outputs/flutter-apk/app-debug.apk
-            apps/game/build/app/outputs/flutter-apk/commit.txt
-          if-no-files-found: error
-          retention-days: 14
-      - name: Upload signed store APK
-        if: ${{ inputs.build_kind == 'play-aab' }}
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: pixelhub-store-apk-v${{ steps.source.outputs.version }}-${{ steps.source.outputs.sha }}
-          path: |
-            apps/game/build/app/outputs/flutter-apk/app-release.apk
-            apps/game/build/app/outputs/flutter-apk/commit.txt
-          if-no-files-found: error
-          retention-days: 14
-      - name: Upload signed Play AAB
-        if: ${{ inputs.build_kind == 'play-aab' }}
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: pixelhub-play-aab-v${{ steps.source.outputs.version }}-${{ steps.source.outputs.sha }}
-          path: |
-            apps/game/build/app/outputs/bundle/release/app-release.aab
-            apps/game/build/app/outputs/bundle/release/commit.txt
-            apps/game/build/play-listing/icon-512.png
-          if-no-files-found: error
-          retention-days: 14
+    uses: ./.github/workflows/build-products.yml
+    with:
+      application: pixelhub
+      build_type: ${{ inputs.build_kind == 'play-aab' && 'release-all' || 'preview-apk' }}
+      source_ref: ${{ inputs.ref || github.ref }}
+    secrets: inherit

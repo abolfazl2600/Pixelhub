@@ -1,3 +1,4 @@
+import '../../products/product_configuration.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -35,9 +36,9 @@ class HomeScreen extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'PixelHub',
+                      ProductScope.of(context).name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -51,31 +52,33 @@ class HomeScreen extends StatelessWidget {
                     icon: const Icon(Icons.settings_outlined),
                     onPressed: () => context.push('/settings'),
                   ),
-                  IconButton(
-                    tooltip: s.profile,
-                    icon: const Icon(Icons.person_outline_rounded),
-                    onPressed: () => context.push('/profile'),
-                  ),
+                  if (ProductScope.of(context).features.profile)
+                    IconButton(
+                      tooltip: s.profile,
+                      icon: const Icon(Icons.person_outline_rounded),
+                      onPressed: () => context.push('/profile'),
+                    ),
                 ],
               ),
-              Card(
-                color: PixelTokens.lemon,
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.monetization_on_outlined),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          '${s.walletCoins}: ${context.digits(library.coins)}',
-                          style: const TextStyle(fontWeight: FontWeight.w700),
+              if (ProductScope.of(context).features.coins)
+                Card(
+                  color: PixelTokens.lemon,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.monetization_on_outlined),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            '${s.walletCoins}: ${context.digits(library.coins)}',
+                            style: const TextStyle(fontWeight: FontWeight.w700),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
               const SizedBox(height: 24),
               Text(
                 s.headline,
@@ -139,23 +142,27 @@ class HomeScreen extends StatelessWidget {
                     icon: const Icon(Icons.collections_outlined),
                     label: Text(s.myGallery),
                   ),
-                  OutlinedButton.icon(
-                    key: const ValueKey('open-museum'),
-                    onPressed: () => context.push('/museum'),
-                    icon: const Icon(Icons.museum_outlined),
-                    label: Text(s.museumTitle),
-                  ),
-                  OutlinedButton.icon(
-                    key: const ValueKey('open-badges'),
-                    onPressed: () => context.push('/badges'),
-                    icon: const Icon(Icons.workspace_premium_outlined),
-                    label: Text(context.isPersian ? 'نشان‌ها' : 'Badges'),
-                  ),
-                  OutlinedButton.icon(
-                    onPressed: () => context.push('/import'),
-                    icon: const Icon(Icons.add_photo_alternate_outlined),
-                    label: Text(s.importPhoto),
-                  ),
+                  if (ProductScope.of(context).features.museum)
+                    if (ProductScope.of(context).features.museum)
+                      OutlinedButton.icon(
+                        key: const ValueKey('open-museum'),
+                        onPressed: () => context.push('/museum'),
+                        icon: const Icon(Icons.museum_outlined),
+                        label: Text(s.museumTitle),
+                      ),
+                  if (ProductScope.of(context).features.achievements)
+                    OutlinedButton.icon(
+                      key: const ValueKey('open-badges'),
+                      onPressed: () => context.push('/badges'),
+                      icon: const Icon(Icons.workspace_premium_outlined),
+                      label: Text(context.isPersian ? 'نشان‌ها' : 'Badges'),
+                    ),
+                  if (ProductScope.of(context).features.imageImport)
+                    OutlinedButton.icon(
+                      onPressed: () => context.push('/import'),
+                      icon: const Icon(Icons.add_photo_alternate_outlined),
+                      label: Text(s.importPhoto),
+                    ),
                 ],
               ),
               const SizedBox(height: 24),

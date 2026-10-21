@@ -1,3 +1,4 @@
+import groovy.json.JsonSlurper
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -13,6 +14,10 @@ val signingKeys = listOf(
     "PIXELHUB_RELEASE_KEY_PASSWORD",
 )
 val hasPlaySigning = signingKeys.all { !System.getenv(it).isNullOrBlank() }
+val selectedProduct = System.getenv("PIXELHUB_BUILD_PRODUCT") ?: "pixelhub"
+@Suppress("UNCHECKED_CAST")
+val productRegistry = JsonSlurper().parse(rootProject.file("../../../products/android-products.json")) as List<Map<String, Any>>
+
 
 
 android {
@@ -40,6 +45,19 @@ android {
         versionName = flutter.versionName
     }
 
+    flavorDimensions += "product"
+    productFlavors {
+        productRegistry.forEach { product ->
+            create(product["id"] as String) {
+                dimension = "product"
+                applicationId = product["applicationId"] as String
+                versionName = product["versionName"] as String
+                versionCode = (product["versionCode"] as Number).toInt()
+                resValue("string", "app_name", product["name"] as String)
+            }
+        }
+    }
+
     signingConfigs {
         if (hasPlaySigning) {
             create("playRelease") {
@@ -53,10 +71,26 @@ android {
     buildTypes {
         release {
             // Do not silently fall back to the Android debug certificate.
-            if (hasPlaySigning) {
-                signingConfig = signingConfigs.getByName("playRelease")
-            }
+            // Signing is assigned only to the selected flavor below.
+            signingConfig = null
         }
+    }
+    productFlavors.configureEach {
+        if (name == selectedProduct && hasPlaySigning) {
+            signingConfig = signingConfigs.getByName("playRelease")
+        }
+    }
+}
+
+// Never create an unsigned release or accidentally reuse another product's key.
+gradle.taskGraph.whenReady {
+    val releaseProducts = productRegistry.filter { product ->
+        val variant = (product["id"] as String).replaceFirstChar { it.uppercase() } + "Release"
+        allTasks.any { it.project == project && (it.name == "assemble$variant" || it.name == "bundle$variant" || it.name == "package$variant") }
+    }
+    if (releaseProducts.isNotEmpty()) {
+        check(hasPlaySigning) { "Missing release signing environment; use preview-apk for testing." }
+        check(releaseProducts.all { it["id"] == selectedProduct }) { "Build each release product separately with its own signing environment." }
     }
 }
 

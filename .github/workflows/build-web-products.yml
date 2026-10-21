@@ -1,0 +1,40 @@
+name: Build independent Web products
+on:
+  workflow_dispatch:
+    inputs:
+      application:
+        description: Product ID or all (ready products only)
+        type: string
+        default: all
+      source_ref:
+        description: Optional branch, tag or SHA
+        type: string
+        required: false
+permissions:
+  contents: read
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ inputs.source_ref || github.ref }}
+          persist-credentials: false
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        with:
+          flutter-version: '3.35.7'
+          channel: stable
+          cache: true
+      - name: Build selected Web products
+        env:
+          APPLICATION: ${{ inputs.application }}
+        run: |
+          python3 tool/products/generate.py --check
+          python3 tool/products/build_web.py --product "$APPLICATION"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: web-products-${{ github.run_id }}
+          path: apps/game/build/products/
+          if-no-files-found: error
+          retention-days: 14

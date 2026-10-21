@@ -1,0 +1,35 @@
+[
+  {
+    "id": "art",
+    "applicationId": "io.github.abolfazl2600.pixelhub.art",
+    "name": "PixelHub Art",
+    "versionName": "1.0.0",
+    "versionCode": 1,
+    "signingPrefix": "ART",
+    "icon": "assets/brand/art_mark.png",
+    "background": "#FFF9EF",
+    "primary": "#825735"
+  },
+  {
+    "id": "kids",
+    "applicationId": "io.github.abolfazl2600.pixelhub.kids",
+    "name": "PixelHub Kids",
+    "versionName": "1.0.0",
+    "versionCode": 1,
+    "signingPrefix": "KIDS",
+    "icon": "assets/brand/kids_mark.png",
+    "background": "#FFF9EF",
+    "primary": "#7856C8"
+  },
+  {
+    "id": "pixelhub",
+    "applicationId": "io.github.abolfazl2600.pixelhub",
+    "name": "PixelHub",
+    "versionName": "0.4.1",
+    "versionCode": 8,
+    "signingPrefix": "PIXELHUB",
+    "icon": "assets/brand/pixelhub_mark.png",
+    "background": "#F9F7F1",
+    "primary": "#316349"
+  }
+]

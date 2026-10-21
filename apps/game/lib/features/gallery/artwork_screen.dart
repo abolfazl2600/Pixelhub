@@ -1,3 +1,4 @@
+import '../../products/product_configuration.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:level_schema/level_schema.dart';
@@ -157,18 +158,20 @@ class ArtworkScreen extends StatelessWidget {
                 ),
               ],
               const SizedBox(height: 10),
-              Row(
-                children: [
-                  const Icon(Icons.monetization_on_outlined, size: 20),
-                  const SizedBox(width: 6),
-                  Text(
-                    '${s.walletCoins}: ${context.digits(library.coins)}',
-                    style: const TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                ],
-              ),
+              if (ProductScope.of(context).features.coins)
+                Row(
+                  children: [
+                    const Icon(Icons.monetization_on_outlined, size: 20),
+                    const SizedBox(width: 6),
+                    Text(
+                      '${s.walletCoins}: ${context.digits(library.coins)}',
+                      style: const TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                  ],
+                ),
               const SizedBox(height: 6),
-              Text(s.artworkReward(context.digits(rewardForLevel(level)))),
+              if (ProductScope.of(context).features.coins)
+                Text(s.artworkReward(context.digits(rewardForLevel(level)))),
               const SizedBox(height: 8),
               if (!library.canPaint(level))
                 Text(s.artworkCost(context.digits(priceForLevel(level)))),

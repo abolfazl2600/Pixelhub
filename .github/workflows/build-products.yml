@@ -1,0 +1,111 @@
+name: Build products
+
+on:
+  workflow_dispatch:
+    inputs:
+      application:
+        description: Product ID (pixelhub, kids, art, animals, relax) or all; validated from registry
+        type: string
+        default: pixelhub
+      build_type:
+        description: Android output
+        type: choice
+        default: preview-apk
+        options: [preview-apk, release-apk, play-aab, release-all]
+      source_ref:
+        description: Optional branch, tag or commit SHA
+        type: string
+        required: false
+  workflow_call:
+    inputs:
+      application:
+        type: string
+        default: pixelhub
+      build_type:
+        type: string
+        default: preview-apk
+      source_ref:
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: products-${{ github.ref }}-${{ inputs.application }}-${{ inputs.build_type }}
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      sha: ${{ steps.plan.outputs.sha }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ inputs.source_ref || github.ref }}
+          persist-credentials: false
+          fetch-depth: 0
+      - id: plan
+        env:
+          APPLICATION: ${{ inputs.application }}
+          BUILD_TYPE: ${{ inputs.build_type }}
+        run: |
+          python3 tool/products/cli.py validate
+          case "$BUILD_TYPE" in preview-apk|release-apk|play-aab|release-all) ;; *) echo 'Invalid build type' >&2; exit 1;; esac
+          echo "matrix=$(python3 tool/products/cli.py matrix --application "$APPLICATION")" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  android:
+    needs: plan
+    name: ${{ matrix.product }} / ${{ inputs.build_type }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: ${{ inputs.build_type == 'preview-apk' && 'preview' || matrix.environment }}
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.plan.outputs.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        with:
+          flutter-version: '3.35.7'
+          channel: stable
+          cache: true
+      - uses: gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d # v4
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+      - name: Validate configuration and generated registry
+        run: |
+          python3 tool/products/generate.py --check
+          python3 tool/products/check_versions.py
+      - name: Build and verify independent product
+        env:
+          PRODUCT_ID: ${{ matrix.product }}
+          BUILD_TYPE: ${{ inputs.build_type }}
+          PRODUCT_UPLOAD_KEYSTORE_BASE64: ${{ secrets[format('{0}_UPLOAD_KEYSTORE_BASE64', matrix.signing_prefix)] }}
+          PRODUCT_UPLOAD_STORE_PASSWORD: ${{ secrets[format('{0}_UPLOAD_STORE_PASSWORD', matrix.signing_prefix)] }}
+          PRODUCT_UPLOAD_KEY_ALIAS: ${{ secrets[format('{0}_UPLOAD_KEY_ALIAS', matrix.signing_prefix)] }}
+          PRODUCT_UPLOAD_KEY_PASSWORD: ${{ secrets[format('{0}_UPLOAD_KEY_PASSWORD', matrix.signing_prefix)] }}
+        run: python3 tool/products/build.py --product "$PRODUCT_ID" --type "$BUILD_TYPE" --output "artifacts/$PRODUCT_ID"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ${{ matrix.product }}-${{ inputs.build_type }}-${{ needs.plan.outputs.sha }}
+          path: artifacts/${{ matrix.product }}/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Report output
+        env:
+          PRODUCT_ID: ${{ matrix.product }}
+        run: cat "artifacts/$PRODUCT_ID/manifest.json" >> "$GITHUB_STEP_SUMMARY"
