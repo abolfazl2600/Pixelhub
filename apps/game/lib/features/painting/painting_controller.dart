@@ -37,6 +37,7 @@ class PaintingController extends ChangeNotifier {
       final progress = await repository.read(level);
       if (_disposed || request != _loadGeneration) return;
       session = PaintingSession(level, progress: progress);
+      _selectNextUnfinishedColor();
       _completionReported = session!.isComplete;
       hintIndex = null;
       status = PaintingStatus.ready;
@@ -55,6 +56,9 @@ class PaintingController extends ChangeNotifier {
   void beginStroke() => session!.beginStroke();
   void endStroke() {
     session!.endStroke();
+    // Keep the just-completed color active until the stroke finishes. A
+    // mid-drag selection change would interrupt painting that same color.
+    _selectNextUnfinishedColor();
     _notify();
   }
 
@@ -78,6 +82,7 @@ class PaintingController extends ChangeNotifier {
     final count = session!.paintToolTargets(targets);
     if (count > 0) {
       hintIndex = null;
+      _selectNextUnfinishedColor();
       _changed();
     }
     return count;
@@ -116,6 +121,7 @@ class PaintingController extends ChangeNotifier {
     final painted = active.paintBurst();
     if (painted > 0) {
       hintIndex = null;
+      _selectNextUnfinishedColor();
       _changed();
     }
     return painted;
@@ -129,10 +135,29 @@ class PaintingController extends ChangeNotifier {
   void reset() {
     session ??= PaintingSession(level);
     session!.reset();
+    _selectNextUnfinishedColor();
     _completionReported = false;
     hintIndex = null;
     status = PaintingStatus.ready;
     _changed();
+  }
+
+  /// Automatically advance only after a completed stroke or batch tool.
+  /// Colors with no remaining cells stay out of the palette; if an earlier
+  /// color comes back after reset/cancel, its palette entry can reappear.
+  void _selectNextUnfinishedColor() {
+    final active = session;
+    if (active == null || active.isComplete) return;
+    final remaining = active.remaining;
+    final selected = active.selectedColor;
+    if (remaining[selected] > 0) return;
+    for (var step = 1; step < remaining.length; step++) {
+      final next = (selected + step) % remaining.length;
+      if (remaining[next] > 0) {
+        active.selectColor(next);
+        return;
+      }
+    }
   }
 
   void _changed() {
