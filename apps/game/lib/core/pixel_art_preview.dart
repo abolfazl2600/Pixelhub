@@ -24,9 +24,12 @@ class PixelArtPreview extends StatelessWidget {
       context.digits(level.height),
     ),
     image: true,
-    child: AspectRatio(
-      aspectRatio: level.width / level.height,
-      child: CustomPaint(painter: _FixturePainter(level, renderStyle)),
+    // Relax tight card constraints so the painted cells keep their shape.
+    child: Center(
+      child: AspectRatio(
+        aspectRatio: level.width / level.height,
+        child: CustomPaint(painter: _FixturePainter(level, renderStyle)),
+      ),
     ),
   );
 }
