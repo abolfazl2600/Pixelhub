@@ -72,7 +72,9 @@ class ProductHome extends StatelessWidget {
                       style: Theme.of(context).textTheme.headlineSmall
                           ?.copyWith(
                             color: kids
-                                ? Theme.of(context).colorScheme.onPrimaryContainer
+                                ? Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimaryContainer
                                 : null,
                             fontWeight: kids ? FontWeight.w800 : null,
                           ),
