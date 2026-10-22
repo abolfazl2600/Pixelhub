@@ -13,9 +13,9 @@
     "publisher": "abolfazl2600"
   },
   "appearance": {
-    "primary": "#7856C8",
-    "secondary": "#F2B957",
-    "background": "#FFF9EF",
+    "primary": "#7054D7",
+    "secondary": "#FFC857",
+    "background": "#FFF9F1",
     "theme_mode": "light",
     "font_family": "Vazirmatn",
     "home_layout": "kids",

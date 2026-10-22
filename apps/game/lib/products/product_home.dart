@@ -45,9 +45,22 @@ class ProductHome extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            Row(
-              children: [
-                Image.asset(product.icon, width: 64, height: 64),
+            Container(
+              padding: kids ? const EdgeInsets.all(16) : EdgeInsets.zero,
+              decoration: kids
+                  ? BoxDecoration(
+                      borderRadius: BorderRadius.circular(28),
+                      gradient: LinearGradient(
+                        colors: [
+                          Theme.of(context).colorScheme.primaryContainer,
+                          Theme.of(context).colorScheme.tertiaryContainer,
+                        ],
+                      ),
+                    )
+                  : null,
+              child: Row(
+                children: [
+                  Image.asset(product.icon, width: 64, height: 64),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Text(
@@ -56,10 +69,15 @@ class ProductHome extends StatelessWidget {
                         : (fa
                               ? 'کارگاه آثار کلاسیک'
                               : 'The classic art studio'),
-                    style: Theme.of(context).textTheme.headlineSmall,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      color: kids
+                          ? Theme.of(context).colorScheme.onPrimaryContainer
+                          : null,
+                      fontWeight: kids ? FontWeight.w800 : null,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             const SizedBox(height: 20),
             if (kids)
@@ -139,17 +157,31 @@ class ProductHome extends StatelessWidget {
     );
   }
 
-  Widget _guide(IconData icon, String text) => Row(
-    children: [
-      Icon(icon, size: 32),
-      const SizedBox(width: 16),
-      Expanded(child: Text(text, style: const TextStyle(fontSize: 18))),
-    ],
+  Widget _guide(IconData icon, String text) => Builder(
+    builder: (context) => Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.tertiaryContainer,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Icon(
+            icon,
+            size: 30,
+            color: Theme.of(context).colorScheme.onTertiaryContainer,
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(child: Text(text, style: const TextStyle(fontSize: 18))),
+      ],
+    ),
   );
 
   Widget _card(BuildContext context, LevelDefinition level, bool kids) {
     final fa = context.isPersian;
     return Card(
+      color: kids ? Theme.of(context).colorScheme.surfaceContainerLow : null,
       margin: EdgeInsets.only(bottom: kids ? 0 : 20),
       child: Padding(
         padding: const EdgeInsets.all(16),

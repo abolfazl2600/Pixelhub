@@ -337,7 +337,9 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                                             ),
                                             border: Border.all(
                                               color: session.selectedColor == i
-                                                  ? PixelTokens.green
+                                                  ? (ProductScope.of(context).id == 'kids'
+                                                        ? Theme.of(context).colorScheme.primary
+                                                        : PixelTokens.green)
                                                   : PixelTokens.backdrop,
                                               width: session.selectedColor == i
                                                   ? 2
@@ -896,10 +898,12 @@ class CompletionScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Icon(
+            Icon(
               Icons.celebration_rounded,
               size: 48,
-              color: PixelTokens.green,
+              color: ProductScope.of(context).id == 'kids'
+                  ? Theme.of(context).colorScheme.tertiary
+                  : PixelTokens.green,
             ),
             const SizedBox(height: 16),
             Text(

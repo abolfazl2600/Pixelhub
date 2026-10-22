@@ -609,6 +609,9 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
   );
 
   ThemeData _productTheme(Brightness brightness) {
+    if (product.id == 'kids') {
+      return _kidsTheme(brightness);
+    }
     if (product.id == 'pixelhub' && brightness == Brightness.light) {
       return PixelTokens.theme;
     }
@@ -636,6 +639,80 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
         style: IconButton.styleFrom(
           minimumSize: Size.square(product.largeControls ? 60 : 48),
         ),
+      ),
+    );
+  }
+
+  /// Kids has its own playful surfaces and touch targets, without changing
+  /// the existing PixelHub or Art themes.
+  ThemeData _kidsTheme(Brightness brightness) {
+    final colors = ColorScheme.fromSeed(
+      seedColor: product.primary,
+      secondary: product.secondary,
+      tertiary: const Color(0xff35bba5),
+      surface: brightness == Brightness.light ? product.background : null,
+      brightness: brightness,
+    );
+    const largeRadius = 24.0;
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: colors,
+      fontFamily: product.fontFamily,
+      scaffoldBackgroundColor: colors.surface,
+      appBarTheme: AppBarTheme(
+        backgroundColor: colors.surface,
+        foregroundColor: colors.onSurface,
+        centerTitle: true,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+      ),
+      cardTheme: CardThemeData(
+        color: colors.surfaceContainerLowest,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(largeRadius),
+          side: BorderSide(color: colors.outlineVariant),
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: colors.primary,
+          foregroundColor: colors.onPrimary,
+          minimumSize: const Size(64, 68),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          textStyle: TextStyle(
+            fontFamily: product.fontFamily,
+            fontSize: 19,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: colors.primary,
+          minimumSize: const Size(60, 56),
+          side: BorderSide(color: colors.outlineVariant),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          textStyle: TextStyle(
+            fontFamily: product.fontFamily,
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+      iconButtonTheme: IconButtonThemeData(
+        style: IconButton.styleFrom(
+          foregroundColor: colors.primary,
+          minimumSize: const Size.square(60),
+        ),
+      ),
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        color: colors.tertiary,
+        linearTrackColor: colors.tertiaryContainer,
       ),
     );
   }

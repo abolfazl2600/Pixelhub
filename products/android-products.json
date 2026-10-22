@@ -18,8 +18,8 @@
     "versionCode": 1,
     "signingPrefix": "KIDS",
     "icon": "assets/brand/kids_mark.png",
-    "background": "#FFF9EF",
-    "primary": "#7856C8"
+    "background": "#FFF9F1",
+    "primary": "#7054D7"
   },
   {
     "id": "pixelhub",
