@@ -74,8 +74,10 @@ void main() {
         expect(theme.colorScheme.primary, const Color(0xff7054D7));
         expect(theme.colorScheme.secondary, const Color(0xffFFC857));
         expect(theme.scaffoldBackgroundColor, const Color(0xffFFF9F1));
-        expect(theme.filledButtonTheme.style?.minimumSize?.resolve({}),
-            const Size(64, 68));
+        expect(
+          theme.filledButtonTheme.style?.minimumSize?.resolve({}),
+          const Size(64, 68),
+        );
       }
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox.shrink());

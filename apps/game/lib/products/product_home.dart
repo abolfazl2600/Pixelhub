@@ -61,19 +61,21 @@ class ProductHome extends StatelessWidget {
               child: Row(
                 children: [
                   Image.asset(product.icon, width: 64, height: 64),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    kids
-                        ? (fa ? 'با رنگ‌ها بازی کن!' : 'Play with colors!')
-                        : (fa
-                              ? 'کارگاه آثار کلاسیک'
-                              : 'The classic art studio'),
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: kids
-                          ? Theme.of(context).colorScheme.onPrimaryContainer
-                          : null,
-                      fontWeight: kids ? FontWeight.w800 : null,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      kids
+                          ? (fa ? 'با رنگ‌ها بازی کن!' : 'Play with colors!')
+                          : (fa
+                                ? 'کارگاه آثار کلاسیک'
+                                : 'The classic art studio'),
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(
+                            color: kids
+                                ? Theme.of(context).colorScheme.onPrimaryContainer
+                                : null,
+                            fontWeight: kids ? FontWeight.w800 : null,
+                          ),
                     ),
                   ),
                 ],

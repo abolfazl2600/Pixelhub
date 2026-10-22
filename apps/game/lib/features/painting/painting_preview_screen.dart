@@ -260,6 +260,9 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
   Widget _paletteStrip(BuildContext context, PaintingController controller) {
     final session = controller.session!;
     final s = context.strings;
+    final selectedBorderColor = ProductScope.of(context).id == 'kids'
+        ? Theme.of(context).colorScheme.primary
+        : PixelTokens.green;
     return Container(
       height: 108,
       decoration: BoxDecoration(
@@ -337,9 +340,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                                             ),
                                             border: Border.all(
                                               color: session.selectedColor == i
-                                                  ? (ProductScope.of(context).id == 'kids'
-                                                        ? Theme.of(context).colorScheme.primary
-                                                        : PixelTokens.green)
+                                                  ? selectedBorderColor
                                                   : PixelTokens.backdrop,
                                               width: session.selectedColor == i
                                                   ? 2
