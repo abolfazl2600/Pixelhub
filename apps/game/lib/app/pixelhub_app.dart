@@ -648,6 +648,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
   ThemeData _kidsTheme(Brightness brightness) {
     final colors = ColorScheme.fromSeed(
       seedColor: product.primary,
+      primary: product.primary,
       secondary: product.secondary,
       tertiary: const Color(0xff35bba5),
       surface: brightness == Brightness.light ? product.background : null,
