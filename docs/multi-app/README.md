@@ -45,8 +45,9 @@ python3 tool/products/generate.py
 
 “Ready” is a configuration/build eligibility state, not a claim of store release,
 verified signing or completed device QA. No animals/relax artwork or empty app was
-invented. The new Kids/Art marks are independent geometric product marks; the
-owner's original rainbow-brush mark is unchanged.
+invented. Kids now uses the owner-selected colorful pixel-art scene of a child drawing
+beside a panda, with a rainbow, star and crayons. Art keeps its separate
+geometric mark; PixelHub's original rainbow-brush mark remains unchanged.
 
 ## Runtime composition and features
 
