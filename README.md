@@ -70,6 +70,12 @@ The next roadmap stage is account-based progress synchronization. A pure conflic
 
 Expected Pages address: **https://abolfazl2600.github.io/Pixelhub/**. Check Actions for actual deployment status. Painting deep links use `#/painting/sunflower` (or another picture ID); static-host refresh works with hash routes.
 
+### Product-specific Web apps
+
+- **PixelHub Kids:** https://abolfazl2600.github.io/Pixelhub/kids/
+  
+  Kids has a separate Web build and path. To include it in GitHub Pages deployments, set the repository Actions variable `PIXELHUB_WEB_PRODUCTS` to `kids` in **Settings → Secrets and variables → Actions → Variables**, then run [Publish verified Web artifact](https://github.com/abolfazl2600/Pixelhub/actions/workflows/web-pages.yml) on `main`. The URL is expected to work after that deployment succeeds; it is not guaranteed to be live before the product is enabled and deployed.
+
 The preview APK uses Android debug signing and cannot be submitted to Google Play. The `play-aab` mode requires the owner's release upload key through GitHub Secrets and never falls back to debug signing. Android compile/target SDK is set to 36; compatibility and 16 KB native-library checks remain part of release QA. Nothing triggers an Android build automatically. A bilingual [privacy policy](https://abolfazl2600.github.io/Pixelhub/privacy.html) is stored under `apps/game/web/privacy.html` and shown in the app; public URL deployment needs verification.
 
 ## Development
