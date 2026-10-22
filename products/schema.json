@@ -1,0 +1,320 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "enum": [
+        1
+      ]
+    },
+    "id": {
+      "type": "string",
+      "pattern": "[a-z][a-z0-9_]{1,29}"
+    },
+    "ready": {
+      "type": "boolean"
+    },
+    "identity": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "display_name_fa": {
+          "type": "string",
+          "minLength": 1
+        },
+        "application_id": {
+          "type": "string",
+          "pattern": "[a-z][a-z0-9_]*(?:\\.[a-z][a-z0-9_]*){2,}"
+        },
+        "storage_scope": {
+          "type": "string",
+          "pattern": "[a-z][a-z0-9_]*"
+        },
+        "version_name": {
+          "type": "string",
+          "pattern": "[0-9]+\\.[0-9]+\\.[0-9]+"
+        },
+        "version_code": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2100000000
+        },
+        "icon": {
+          "type": "string"
+        },
+        "publisher": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "name",
+        "display_name_fa",
+        "application_id",
+        "storage_scope",
+        "version_name",
+        "version_code",
+        "icon",
+        "publisher"
+      ],
+      "additionalProperties": false
+    },
+    "appearance": {
+      "type": "object",
+      "properties": {
+        "primary": {
+          "type": "string",
+          "pattern": "#[0-9A-Fa-f]{6}"
+        },
+        "secondary": {
+          "type": "string",
+          "pattern": "#[0-9A-Fa-f]{6}"
+        },
+        "background": {
+          "type": "string",
+          "pattern": "#[0-9A-Fa-f]{6}"
+        },
+        "theme_mode": {
+          "type": "string",
+          "enum": [
+            "light",
+            "dark",
+            "system"
+          ]
+        },
+        "font_family": {
+          "type": "string",
+          "enum": [
+            "Vazirmatn",
+            "Roboto"
+          ]
+        },
+        "home_layout": {
+          "type": "string",
+          "enum": [
+            "classic",
+            "kids",
+            "art"
+          ]
+        },
+        "default_style": {
+          "type": "string",
+          "enum": [
+            "pixel",
+            "canvas",
+            "diamond"
+          ]
+        },
+        "large_controls": {
+          "type": "boolean"
+        },
+        "navigation": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "gallery",
+              "my-gallery",
+              "import",
+              "museum",
+              "profile",
+              "badges",
+              "settings"
+            ]
+          },
+          "uniqueItems": true,
+          "minItems": 1
+        }
+      },
+      "required": [
+        "primary",
+        "secondary",
+        "background",
+        "theme_mode",
+        "font_family",
+        "home_layout",
+        "default_style",
+        "large_controls",
+        "navigation"
+      ],
+      "additionalProperties": false
+    },
+    "content": {
+      "type": "object",
+      "properties": {
+        "offline_manifest": {
+          "type": "string"
+        },
+        "online_root": {
+          "type": "string"
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "nature",
+              "animals",
+              "objects",
+              "masterpieces",
+              "persian_architecture",
+              "patterns",
+              "space"
+            ]
+          },
+          "uniqueItems": true,
+          "minItems": 1
+        },
+        "default_categories": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "nature",
+              "animals",
+              "objects",
+              "masterpieces",
+              "persian_architecture",
+              "patterns",
+              "space"
+            ]
+          },
+          "uniqueItems": true,
+          "minItems": 1
+        },
+        "max_dimension": {
+          "type": "integer",
+          "minimum": 8,
+          "maximum": 512
+        },
+        "online_manifest": {
+          "type": "string",
+          "pattern": "[a-zA-Z0-9_./-]+\\.json"
+        }
+      },
+      "required": [
+        "offline_manifest",
+        "online_root",
+        "categories",
+        "default_categories",
+        "max_dimension",
+        "online_manifest"
+      ],
+      "additionalProperties": false
+    },
+    "features": {
+      "type": "object",
+      "properties": {
+        "coins": {
+          "type": "boolean"
+        },
+        "achievements": {
+          "type": "boolean"
+        },
+        "animations": {
+          "type": "boolean"
+        },
+        "image_import": {
+          "type": "boolean"
+        },
+        "diamond_painting": {
+          "type": "boolean"
+        },
+        "canvas_painting": {
+          "type": "boolean"
+        },
+        "sound_effects": {
+          "type": "boolean"
+        },
+        "online_catalog": {
+          "type": "boolean"
+        },
+        "profile": {
+          "type": "boolean"
+        },
+        "museum": {
+          "type": "boolean"
+        },
+        "free_painting": {
+          "type": "boolean"
+        },
+        "background_music": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "coins",
+        "achievements",
+        "animations",
+        "image_import",
+        "diamond_painting",
+        "canvas_painting",
+        "sound_effects",
+        "online_catalog",
+        "profile",
+        "museum",
+        "free_painting",
+        "background_music"
+      ],
+      "additionalProperties": false
+    },
+    "distribution": {
+      "type": "object",
+      "properties": {
+        "targets": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "android",
+              "web"
+            ]
+          },
+          "uniqueItems": true,
+          "minItems": 1
+        },
+        "signing_prefix": {
+          "type": "string",
+          "pattern": "[A-Z][A-Z0-9_]*"
+        },
+        "environment": {
+          "type": "string",
+          "pattern": "[a-z][a-z0-9-]*"
+        },
+        "web_base_href": {
+          "type": "string",
+          "pattern": "/[A-Za-z0-9/_-]+/"
+        },
+        "artifact_prefix": {
+          "type": "string",
+          "pattern": "[a-z][a-z0-9_-]*"
+        }
+      },
+      "required": [
+        "targets",
+        "signing_prefix",
+        "environment",
+        "web_base_href",
+        "artifact_prefix"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "ready",
+    "identity",
+    "appearance",
+    "content",
+    "features",
+    "distribution"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pixelhub.local/product.schema.json",
+  "title": "PixelHub product configuration"
+}

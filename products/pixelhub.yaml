@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "id": "pixelhub",
+  "ready": true,
+  "identity": {
+    "name": "PixelHub",
+    "display_name_fa": "پیکسل‌هاب",
+    "application_id": "io.github.abolfazl2600.pixelhub",
+    "storage_scope": "pixelhub",
+    "version_name": "0.4.1",
+    "version_code": 8,
+    "icon": "apps/game/assets/brand/pixelhub_mark.png",
+    "publisher": "abolfazl2600"
+  },
+  "appearance": {
+    "primary": "#316349",
+    "secondary": "#F2B957",
+    "background": "#F9F7F1",
+    "theme_mode": "light",
+    "font_family": "Vazirmatn",
+    "home_layout": "classic",
+    "default_style": "pixel",
+    "large_controls": false,
+    "navigation": [
+      "gallery",
+      "my-gallery",
+      "import",
+      "museum",
+      "profile",
+      "badges",
+      "settings"
+    ]
+  },
+  "content": {
+    "offline_manifest": "apps/game/assets/levels/catalog.json",
+    "online_root": "https://abolfazl2600.github.io/Pixelhub/online/",
+    "categories": [
+      "nature",
+      "animals",
+      "objects",
+      "masterpieces",
+      "persian_architecture",
+      "patterns",
+      "space"
+    ],
+    "default_categories": [
+      "nature",
+      "animals",
+      "objects",
+      "masterpieces",
+      "persian_architecture",
+      "patterns",
+      "space"
+    ],
+    "max_dimension": 512,
+    "online_manifest": "catalog.json"
+  },
+  "features": {
+    "coins": true,
+    "achievements": true,
+    "animations": true,
+    "image_import": true,
+    "diamond_painting": true,
+    "canvas_painting": true,
+    "sound_effects": true,
+    "online_catalog": true,
+    "profile": true,
+    "museum": true,
+    "free_painting": false,
+    "background_music": false
+  },
+  "distribution": {
+    "targets": [
+      "android",
+      "web"
+    ],
+    "signing_prefix": "PIXELHUB",
+    "environment": "release-pixelhub",
+    "web_base_href": "/Pixelhub/",
+    "artifact_prefix": "pixelhub"
+  }
+}

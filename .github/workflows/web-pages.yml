@@ -28,7 +28,7 @@ jobs:
       (github.event_name == 'release' &&
       startsWith(github.event.release.tag_name, 'pixelhub-content-'))
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 40
     permissions:
       actions: read
       contents: write
@@ -559,6 +559,36 @@ jobs:
         run: python3 tool/online_landmark_animations_10.py site/online tool/animation_batches
       - name: Add checksum-bound animation companions to existing pictures
         run: python3 tool/publish_animation_companions.py site/online
+      - name: Publish isolated product content manifests
+        run: python3 tool/products/publish_catalogs.py site/online
+      # Explicit repository allowlist, empty by default. Subsequent Pages
+      # deployments retain enabled products by rebuilding their separate paths.
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        if: vars.PIXELHUB_WEB_PRODUCTS != ''
+        with:
+          flutter-version: '3.35.7'
+          channel: stable
+          cache: true
+      - name: Build explicitly enabled Web products
+        if: vars.PIXELHUB_WEB_PRODUCTS != ''
+        env:
+          WEB_PRODUCTS: ${{ vars.PIXELHUB_WEB_PRODUCTS }}
+        run: |
+          python3 - <<'PYCODE'
+          import os, shutil, subprocess, sys
+          from pathlib import Path
+          sys.path.insert(0, 'tool/products')
+          from registry import select
+          for product_id in os.environ['WEB_PRODUCTS'].split(','):
+              if product_id.strip() == 'all':
+                  raise SystemExit('Use explicit product IDs in PIXELHUB_WEB_PRODUCTS')
+              product = select(product_id.strip())[0]
+              if product.id == 'pixelhub':
+                  raise SystemExit('PIXELHUB_WEB_PRODUCTS is only for additional products')
+              subprocess.run(['python3', 'tool/products/build_web.py', '--product', product.id], check=True)
+              destination = product.data['distribution']['web_base_href'].removeprefix('/Pixelhub/').strip('/')
+              shutil.copytree(Path('apps/game/build/products') / product.id, Path('site') / destination)
+          PYCODE
       - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
         with:

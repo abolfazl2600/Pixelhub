@@ -16,11 +16,13 @@ class LibraryController extends ChangeNotifier {
     this.progressRepository, {
     this.recentArtworkRepository,
     this.sounds,
+    this.coinsEnabled = true,
   });
   final ArtworkRepository repository;
   final ProgressRepository progressRepository;
   final RecentArtworkRepository? recentArtworkRepository;
   final GameSounds? sounds;
+  final bool coinsEnabled;
   ArtworkLibrary library = ArtworkLibrary();
   LibraryStatus status = LibraryStatus.loading;
   List<LevelDefinition> catalog = [];
@@ -239,6 +241,7 @@ class LibraryController extends ChangeNotifier {
   int get totalPoints => library.totalPoints;
 
   bool canPaint(LevelDefinition level) =>
+      !coinsEnabled ||
       alwaysFreeArtwork(level.id) ||
       library.unlocked.contains(level.id) ||
       // Preserve access to levels started before the wallet was introduced.
@@ -265,6 +268,7 @@ class LibraryController extends ChangeNotifier {
   /// Requests are serialized alongside artwork purchases and completion
   /// rewards, so two quick taps cannot overspend the balance.
   Future<void> spendToolCoins(int cost) => _mutate(() async {
+    if (!coinsEnabled) return;
     if (cost <= 0) throw ArgumentError.value(cost, 'cost');
     if (library.coins < cost) {
       throw StateError('Insufficient coins');
@@ -278,7 +282,7 @@ class LibraryController extends ChangeNotifier {
   /// Once per level ID, even after reset or app relaunch. A failed wallet
   /// write can be retried safely without duplicating a reward.
   Future<void> rewardCompletion(LevelDefinition level) => _mutate(() async {
-    if (library.rewarded.contains(level.id)) return;
+    if (!coinsEnabled || library.rewarded.contains(level.id)) return;
     final reward = rewardForLevel(level);
     final next = library.copyWith(
       coins: library.coins + reward,

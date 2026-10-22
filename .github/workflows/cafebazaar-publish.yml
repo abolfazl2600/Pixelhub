@@ -137,13 +137,13 @@ jobs:
         run: |
           set -euo pipefail
           test -s "$PIXELHUB_RELEASE_STORE_FILE"
-          flutter build apk --release --no-pub
+          flutter build apk --release --flavor pixelhub --dart-define=PRODUCT_ID=pixelhub --no-pub
 
       - name: Verify signature, package ID and release artifact
         working-directory: apps/game
         run: |
           set -euo pipefail
-          apk="build/app/outputs/flutter-apk/app-release.apk"
+          apk="build/app/outputs/flutter-apk/app-pixelhub-release.apk"
           test -s "$apk"
           apksigner="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
           aapt="$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -n 1)"
@@ -169,7 +169,7 @@ jobs:
         with:
           name: pixelhub-cafebazaar-apk-v${{ steps.source.outputs.version }}-${{ steps.source.outputs.sha }}
           path: |
-            apps/game/build/app/outputs/flutter-apk/app-release.apk
+            apps/game/build/app/outputs/flutter-apk/app-pixelhub-release.apk
             apps/game/build/app/outputs/flutter-apk/commit.txt
           if-no-files-found: error
           retention-days: 14
@@ -184,7 +184,7 @@ jobs:
           RESUME_EXISTING_DRAFT: ${{ inputs.resume_existing_draft }}
         run: |
           set -euo pipefail
-          args=(--apk apps/game/build/app/outputs/flutter-apk/app-release.apk)
+          args=(--apk apps/game/build/app/outputs/flutter-apk/app-pixelhub-release.apk)
           if [[ "$RESUME_EXISTING_DRAFT" == "true" ]]; then
             args+=(--resume-existing-draft)
           fi

@@ -1,3 +1,4 @@
+import '../../products/product_configuration.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -5,7 +6,6 @@ import 'package:level_schema/level_schema.dart';
 
 import '../../core/pixel_art_preview.dart';
 import '../../l10n/strings.dart';
-import 'artwork_categories.dart';
 import 'artwork_difficulty.dart';
 import 'artwork_economy.dart';
 import 'gallery_filters.dart';
@@ -43,11 +43,22 @@ class _GalleryScreenState extends State<GalleryScreen> {
   String _category = 'all', _filter = 'all', _search = '';
   String _difficulty = 'all';
   int _onlineVisibleCount = 6;
+  bool _defaultsApplied = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_defaultsApplied) {
+      _defaultsApplied = true;
+      final categories = ProductScope.of(context).defaultCategories;
+      if (categories.length == 1) _category = categories.single;
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    if (!widget.personal) {
+    if (!widget.personal && widget.online.enabled) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) widget.online.checkForUpdates();
       });
@@ -217,21 +228,22 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 6),
-                Text(
-                  context.strings.artworkCoins(
-                    context.digits(
-                      artworkReward(
-                        difficultyForOnlineGrid(
-                          width: picture.width,
-                          height: picture.height,
-                          colorCount: picture.colorCount,
+                if (ProductScope.of(context).features.coins)
+                  Text(
+                    context.strings.artworkCoins(
+                      context.digits(
+                        artworkReward(
+                          difficultyForOnlineGrid(
+                            width: picture.width,
+                            height: picture.height,
+                            colorCount: picture.colorCount,
+                          ),
                         ),
                       ),
                     ),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontWeight: FontWeight.w700),
-                ),
                 if (picture.animation != null) ...[
                   const SizedBox(height: 6),
                   Text(
@@ -359,15 +371,16 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 )
               else if (library.library.unlocked.contains(level.id))
                 Text(s.artworkOwned, style: const TextStyle(fontSize: 11)),
-              Text(
-                s.artworkCoins(context.digits(rewardForLevel(level))),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
+              if (ProductScope.of(context).features.coins)
+                Text(
+                  s.artworkCoins(context.digits(rewardForLevel(level))),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-              ),
               const SizedBox(height: 2),
               if (count > 0) ...[
                 LinearProgressIndicator(
@@ -498,23 +511,24 @@ class _GalleryScreenState extends State<GalleryScreen> {
                     ),
                     style: const TextStyle(fontSize: 10),
                   ),
-                  Text(
-                    s.artworkCoins(
-                      context.digits(
-                        artworkReward(
-                          difficultyForOnlineGrid(
-                            width: picture.width,
-                            height: picture.height,
-                            colorCount: picture.colorCount,
+                  if (ProductScope.of(context).features.coins)
+                    Text(
+                      s.artworkCoins(
+                        context.digits(
+                          artworkReward(
+                            difficultyForOnlineGrid(
+                              width: picture.width,
+                              height: picture.height,
+                              colorCount: picture.colorCount,
+                            ),
                           ),
                         ),
                       ),
+                      style: const TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                    style: const TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
                 ],
               ),
               const SizedBox(height: 2),
@@ -556,7 +570,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
       final library = widget.library;
       final online = widget.online;
       final levels = library.levels.where(_matches).toList();
-      final available = widget.personal
+      final available =
+          widget.personal || !ProductScope.of(context).features.onlineCatalog
           ? <OnlinePicture>[]
           : matchingOnlinePictures(
               online.available,
@@ -581,14 +596,16 @@ class _GalleryScreenState extends State<GalleryScreen> {
           ),
           title: Text(widget.personal ? s.myGallery : s.gallery),
           actions: [
-            IconButton(
-              tooltip: s.profile,
-              onPressed: () => context.push('/profile'),
-              icon: const Icon(Icons.person_outline_rounded),
-            ),
+            if (ProductScope.of(context).features.profile)
+              IconButton(
+                tooltip: s.profile,
+                onPressed: () => context.push('/profile'),
+                icon: const Icon(Icons.person_outline_rounded),
+              ),
           ],
         ),
-        floatingActionButton: widget.personal
+        floatingActionButton:
+            widget.personal && ProductScope.of(context).features.imageImport
             ? FloatingActionButton(
                 onPressed: () => context.push('/import'),
                 tooltip: s.importPhoto,
@@ -613,18 +630,24 @@ class _GalleryScreenState extends State<GalleryScreen> {
                         onChanged: _updateSearch,
                       ),
                       const SizedBox(height: 12),
-                      Wrap(
-                        spacing: 12,
-                        runSpacing: 6,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          const Icon(Icons.monetization_on_outlined, size: 20),
-                          Text(
-                            '${s.walletCoins}: ${context.digits(library.coins)}',
-                            style: const TextStyle(fontWeight: FontWeight.w700),
-                          ),
-                        ],
-                      ),
+                      if (ProductScope.of(context).features.coins)
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 6,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.monetization_on_outlined,
+                              size: 20,
+                            ),
+                            Text(
+                              '${s.walletCoins}: ${context.digits(library.coins)}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
                       const SizedBox(height: 12),
                       Wrap(
                         spacing: 6,
@@ -636,7 +659,12 @@ class _GalleryScreenState extends State<GalleryScreen> {
                             onSelected: (_) => _selectCategory('all'),
                           ),
                           for (final category in [
-                            ...publicArtworkCategories,
+                            ...ProductScope.of(context).defaultCategories,
+                            ...ProductScope.of(context).categories.where(
+                              (category) => !ProductScope.of(
+                                context,
+                              ).defaultCategories.contains(category),
+                            ),
                             if (widget.personal) 'personal',
                           ])
                             ChoiceChip(
@@ -759,7 +787,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                         _localCard(context, levels[index]),
                   ),
                 ),
-              if (!widget.personal) ...[
+              if (!widget.personal && widget.online.enabled) ...[
                 SliverPadding(
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
                   sliver: SliverToBoxAdapter(

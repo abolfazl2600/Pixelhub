@@ -12,10 +12,14 @@ export 'sound_cue.dart';
 
 /// Optional local audio: a playback problem never blocks painting or the wallet.
 class GameSounds extends ChangeNotifier {
-  GameSounds({SoundEffectsPreferences? preferences, SoundEffectPlayer? player})
-    : _preferences = preferences,
-      _player = player ?? platform.createSoundEffectPlayer();
+  GameSounds({
+    SoundEffectsPreferences? preferences,
+    SoundEffectPlayer? player,
+    this.available = true,
+  }) : _preferences = preferences,
+       _player = player ?? platform.createSoundEffectPlayer();
 
+  final bool available;
   final SoundEffectsPreferences? _preferences;
   final SoundEffectPlayer _player;
   Future<void> _tail = Future<void>.value();
@@ -23,9 +27,10 @@ class GameSounds extends ChangeNotifier {
   bool _prepared = false;
   bool _disposed = false;
 
-  bool get enabled => _enabled;
+  bool get enabled => available && _enabled;
 
   Future<void> initialize() async {
+    if (!available) return;
     final preferences = _preferences;
     if (preferences != null) {
       try {
@@ -47,7 +52,7 @@ class GameSounds extends ChangeNotifier {
   }
 
   Future<void> setEnabled(bool value) async {
-    if (_disposed || _enabled == value) return;
+    if (!available || _disposed || _enabled == value) return;
     _enabled = value;
     notifyListeners();
     try {
@@ -59,7 +64,9 @@ class GameSounds extends ChangeNotifier {
 
   /// Serialize cues so the coin reward does not mask the completion melody.
   Future<void> play(SoundCue cue) {
-    if (!_prepared || !_enabled || _disposed) return Future<void>.value();
+    if (!available || !_prepared || !_enabled || _disposed) {
+      return Future<void>.value();
+    }
     final next = _tail.then((_) async {
       if (_disposed || !_enabled) return;
       try {

@@ -39,6 +39,10 @@ self.addEventListener('fetch', event => {
   if (url.pathname.endsWith('/offline-worker.js') || url.pathname.endsWith('/offline-manifest.json') || url.pathname.endsWith('/commit.txt')) return;
   event.respondWith((async () => {
     const cache = await caches.open(CACHE);
+    // A parent scope may control an as-yet-unregistered child product.
+    // Only this exact application's entry navigation can use its index.
+    const ownNavigation = url.pathname === scope.pathname || url.pathname === scope.pathname + 'index.html';
+    if (request.mode === 'navigate' && !ownNavigation) return fetch(request);
     const cached = request.mode === 'navigate'
       ? await cache.match(new URL('index.html', self.registration.scope))
       : await cache.match(request, {ignoreSearch: true});

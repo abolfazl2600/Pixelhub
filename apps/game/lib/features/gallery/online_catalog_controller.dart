@@ -173,12 +173,34 @@ final class OnlinePicture {
 }
 
 class OnlineCatalogController extends ChangeNotifier {
-  OnlineCatalogController(this.storage, {Uri? baseUrl, http.Client? client})
-    : _baseUrl = baseUrl ?? Uri.parse(onlineContentRoot),
-      _client = client ?? http.Client(),
-      _ownsClient = client == null;
+  OnlineCatalogController(
+    this.storage, {
+    Uri? baseUrl,
+    http.Client? client,
+    this.enabled = true,
+    this.animationsEnabled = true,
+    this.allowedCategories = const [],
+    this.maxDimension = 512,
+    this.catalogPath = 'catalog.json',
+    this.productId = 'pixelhub',
+  }) : _baseUrl = baseUrl ?? Uri.parse(onlineContentRoot),
+       _client = client ?? http.Client(),
+       _ownsClient = client == null;
 
   final OnlineLevelStorage storage;
+  final bool enabled, animationsEnabled;
+  final List<String> allowedCategories;
+  final int maxDimension;
+  final String catalogPath, productId;
+
+  bool accepts(OnlinePicture picture) =>
+      enabled &&
+      (allowedCategories.isEmpty ||
+          allowedCategories.contains(
+            displayArtworkCategory(picture.id, picture.category),
+          )) &&
+      picture.width <= maxDimension &&
+      picture.height <= maxDimension;
   final Uri _baseUrl;
   final http.Client _client;
   final bool _ownsClient;
@@ -194,7 +216,16 @@ class OnlineCatalogController extends ChangeNotifier {
   String? failedDownloadId;
   bool _disposed = false;
 
-  List<LevelDefinition> get downloaded => List.unmodifiable(_downloaded.values);
+  List<LevelDefinition> get downloaded => List.unmodifiable(
+    _downloaded.values.where(
+      (level) =>
+          (productId == 'pixelhub' ||
+              allowedCategories.isEmpty ||
+              allowedCategories.contains(_downloadedCategories[level.id])) &&
+          level.width <= maxDimension &&
+          level.height <= maxDimension,
+    ),
+  );
   Map<String, PixelAnimation> get animations => Map.unmodifiable(_animations);
 
   /// Online catalog metadata supplements local categories. A downloaded level
@@ -270,7 +301,8 @@ class OnlineCatalogController extends ChangeNotifier {
     OnlinePicture picture,
     LevelDefinition level,
   ) async {
-    if (_disposed ||
+    if (!animationsEnabled ||
+        _disposed ||
         picture.animation == null ||
         storage is! OnlineAnimationStorage ||
         _animations.containsKey(level.id) ||
@@ -328,6 +360,11 @@ class OnlineCatalogController extends ChangeNotifier {
   }
 
   Future<void> loadDownloaded() async {
+    if (!enabled) {
+      isLoaded = true;
+      _notify();
+      return;
+    }
     try {
       for (final level in await storage.readDownloadedLevels()) {
         if (level.id.startsWith('online-')) _downloaded[level.id] = level;
@@ -358,7 +395,7 @@ class OnlineCatalogController extends ChangeNotifier {
           if (category != null) _downloadedCategories[id] = category;
         }
       }
-      if (storage is OnlineAnimationStorage) {
+      if (animationsEnabled && storage is OnlineAnimationStorage) {
         try {
           _animations.clear();
           _animations.addAll(
@@ -380,19 +417,21 @@ class OnlineCatalogController extends ChangeNotifier {
 
   /// Gallery entry fetches metadata, then missing frames for existing downloads.
   Future<void> checkForUpdates() async {
+    if (!enabled) return;
     if (status == OnlineCatalogStatus.checking) return;
     status = OnlineCatalogStatus.checking;
     _notify();
     try {
       final cacheBuster = DateTime.now().millisecondsSinceEpoch;
       final source = await _loadRemote(
-        'catalog.json?v=$cacheBuster',
+        '$catalogPath?v=$cacheBuster',
         timeout: const Duration(seconds: 12),
         maxBytes: 4 * 1024 * 1024,
       );
       final json = jsonDecode(source);
       if (json is! Map<String, dynamic> ||
           json['schemaVersion'] != 1 ||
+          (productId != 'pixelhub' && json['productId'] != productId) ||
           json['pictures'] is! List) {
         throw const FormatException('Invalid online catalog.');
       }
@@ -446,9 +485,9 @@ class OnlineCatalogController extends ChangeNotifier {
         }
       }
       if (_disposed) return;
-      pictures = List.unmodifiable(result);
+      pictures = List.unmodifiable(result.where(accepts));
       status = OnlineCatalogStatus.ready;
-      unawaited(_backfillAnimations(result));
+      if (animationsEnabled) unawaited(_backfillAnimations(pictures));
       // Upgrade legacy downloads only when an authoritative catalog is
       // available. Failure to write metadata must not hide online pictures.
       for (final picture in result) {
@@ -471,7 +510,11 @@ class OnlineCatalogController extends ChangeNotifier {
   }
 
   Future<void> download(OnlinePicture picture) async {
-    if (downloadingId != null || _downloaded.containsKey(picture.id)) return;
+    if (!accepts(picture) ||
+        downloadingId != null ||
+        _downloaded.containsKey(picture.id)) {
+      return;
+    }
     downloadingId = picture.id;
     failedDownloadId = null;
     _notify();

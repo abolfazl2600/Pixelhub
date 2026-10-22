@@ -44,7 +44,8 @@ flutter:
     - assets/levels/
     - assets/animations/
     - assets/sounds/
-    - assets/brand/pixelhub_mark.png
+    - assets/brand/
+    - assets/products/
   fonts:
     # Flutter Web's engine default is also local, avoiding its remote fallback.
     - family: Roboto

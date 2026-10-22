@@ -22,6 +22,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
+          fetch-depth: 0
       - name: Validate immutable online-release policy
         run: python3 -m unittest discover -s tool/tests -p 'test_*.py' -v
       - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
@@ -30,6 +31,11 @@ jobs:
           channel: stable
           cache: true
       - run: bash tool/validate.sh
+      - name: Check independent version history
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: python3 tool/products/check_versions.py --base "$BASE_SHA"
 
   web:
     needs: validate
@@ -74,4 +80,55 @@ jobs:
           name: pixelhub-web-${{ github.sha }}
           path: apps/game/build/web
           if-no-files-found: error
+          retention-days: 14
+
+  product-web:
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        with:
+          flutter-version: '3.35.7'
+          channel: stable
+          cache: true
+      - name: Build affected specialized products
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess
+          base = os.environ.get('BASE_SHA', '')
+          args = ['python3', 'tool/products/cli.py', 'affected']
+          if base and set(base) != {'0'}: args += ['--base', base]
+          affected = json.loads(subprocess.check_output(args, text=True))
+          for product in affected:
+              if product != 'pixelhub':
+                  subprocess.run(['python3', 'tool/products/build_web.py', '--product', product], check=True)
+          PY
+      - name: Install product browser checks
+        run: |
+          if test -d apps/game/build/products; then
+            npm ci --prefix tool/browser
+            (cd tool/browser && npx playwright install --with-deps chromium)
+          fi
+      - name: Exercise specialized Web products
+        run: |
+          if test -d apps/game/build/products; then node tool/browser/products.cjs; fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: product-browser-${{ github.sha }}
+          path: tool/browser/artifacts/
+          if-no-files-found: ignore
+          retention-days: 14
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: specialized-web-${{ github.sha }}
+          path: apps/game/build/products/
+          if-no-files-found: ignore
           retention-days: 14

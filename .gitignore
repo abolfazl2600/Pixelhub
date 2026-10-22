@@ -24,3 +24,5 @@ tool/browser/artifacts/
 apps/game/lib/l10n/generated/
 
 **/__pycache__/
+
+/artifacts/
