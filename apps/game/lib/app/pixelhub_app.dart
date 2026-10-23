@@ -163,7 +163,8 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
           _diagnostics.recordCatalogLoad(catalogTimer.elapsedMilliseconds);
         }
         _library.setCatalog(_bootstrap.levels, _bootstrap.metadata);
-        if (BuildModules.animations && product.features.animations &&
+        if (BuildModules.animations &&
+            product.features.animations &&
             !_animationCatalogRequested) {
           _animationCatalogRequested = true;
           unawaited(_loadAnimationCatalog());
@@ -521,7 +522,8 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
             );
           }
           if (page == 'museum') {
-            if (!BuildModules.museum || !product.features.museum ||
+            if (!BuildModules.museum ||
+                !product.features.museum ||
                 _museum == null) {
               return _notFound(context);
             }
