@@ -22,10 +22,10 @@ void main() {
   });
 
   test(
-    'all forty-nine checksummed pictures load, including 32, 64 and 128 grids',
+    'all fifty-nine checksummed pictures load, including 32, 64 and 128 grids',
     () async {
       final levels = await AssetLevelRepository().loadLevels();
-      expect(levels, hasLength(49));
+      expect(levels, hasLength(59));
       expect(
         levels.map((l) => l.width).toSet(),
         containsAll([16, 32, 64, 128]),
@@ -93,7 +93,7 @@ void main() {
         for (final category in publicArtworkCategories) category: 0,
       };
 
-      expect(levels.map((art) => art.id).toSet(), hasLength(49));
+      expect(levels.map((art) => art.id).toSet(), hasLength(59));
       expect(
         levels.where((art) => newIds.contains(art.id)).length,
         newIds.length,
