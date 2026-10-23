@@ -32,6 +32,7 @@ import '../l10n/strings.dart';
 import '../platform_adapters/document_language.dart';
 import '../platform_adapters/offline_support.dart';
 import 'bootstrap_controller.dart';
+import '../products/build_modules.dart';
 import '../products/product_configuration.dart';
 import '../products/product_home.dart';
 
@@ -69,7 +70,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
   late final ProgressRepository _progress;
   late final PreferencesRepository _preferences;
   late final LibraryController _library;
-  late final MuseumController _museum;
+  late final MuseumController? _museum;
   late final BadgeController _badges;
   late final GameSounds _sounds;
   late final OnlineCatalogController _online;
@@ -119,25 +120,29 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
           ? preferences as RecentArtworkRepository
           : null,
     );
-    _museum = MuseumController(
-      preferences is MuseumRepository
-          ? preferences as MuseumRepository
-          : MemoryPreferences(),
-      _library,
-    );
+    _museum = BuildModules.museum && product.features.museum
+        ? MuseumController(
+            preferences is MuseumRepository
+                ? preferences as MuseumRepository
+                : MemoryPreferences(),
+            _library,
+          )
+        : null;
     _badges = BadgeController(
       _library,
       preferences is BadgeStorage
           ? preferences as BadgeStorage
           : MemoryPreferences(),
     );
-    if (product.features.achievements) unawaited(_badges.initialize());
+    if (BuildModules.badges && product.features.achievements) {
+      unawaited(_badges.initialize());
+    }
     _online = OnlineCatalogController(
       preferences is OnlineLevelStorage
           ? preferences as OnlineLevelStorage
           : MemoryPreferences(),
-      enabled: product.features.onlineCatalog,
-      animationsEnabled: product.features.animations,
+      enabled: BuildModules.online && product.features.onlineCatalog,
+      animationsEnabled: BuildModules.animations && product.features.animations,
       allowedCategories: product.categories,
       maxDimension: product.maxDimension,
       baseUrl: Uri.parse(product.onlineRoot),
@@ -158,7 +163,8 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
           _diagnostics.recordCatalogLoad(catalogTimer.elapsedMilliseconds);
         }
         _library.setCatalog(_bootstrap.levels, _bootstrap.metadata);
-        if (product.features.animations && !_animationCatalogRequested) {
+        if (BuildModules.animations && product.features.animations &&
+            !_animationCatalogRequested) {
           _animationCatalogRequested = true;
           unawaited(_loadAnimationCatalog());
         }
@@ -167,7 +173,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     _routeChanges = Listenable.merge([
       _bootstrap,
       _library,
-      _museum,
+      if (_museum != null) _museum!,
       _badges,
       _online,
       _bundledAnimations,
@@ -239,7 +245,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     unawaited(_loadArtworkStyle());
     unawaited(_library.loadRecentArtwork());
     unawaited(_library.load());
-    unawaited(_museum.load());
+    if (_museum != null) unawaited(_museum!.load());
     unawaited(_bootstrap.load());
     unawaited(prepareOfflineApp());
   }
@@ -279,7 +285,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
   }
 
   PixelAnimation? _animationFor(LevelDefinition level) {
-    if (!product.features.animations) return null;
+    if (!BuildModules.animations || !product.features.animations) return null;
     final online = _online.animations[level.id];
     if (online != null) return online;
     final bundled = _bundledAnimations.value[level.id];
@@ -431,7 +437,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
 
   Future<void> _clearLocalData() async {
     await _languageWrites;
-    await _museum.settle();
+    if (_museum != null) await _museum!.settle();
     await _badges.settle();
     await Future.wait(_sessions.values.map((controller) => controller.flush()));
     for (final controller in _sessions.values) {
@@ -440,7 +446,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     _sessions.clear();
     try {
       await _library.clear();
-      _museum.resetAfterClear();
+      _museum?.resetAfterClear();
       _badges.resetAfterClear();
       unawaited(_badges.refresh());
       await _sounds.setEnabled(true);
@@ -515,17 +521,27 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
             );
           }
           if (page == 'museum') {
+            if (!BuildModules.museum || !product.features.museum ||
+                _museum == null) {
+              return _notFound(context);
+            }
             return MuseumScreen(
-              museum: _museum,
+              museum: _museum!,
               library: _library,
               animationFor: _animationFor,
               addArtworkId: museumArtworkId,
             );
           }
           if (page == 'badges') {
+            if (!BuildModules.badges || !product.features.achievements) {
+              return _notFound(context);
+            }
             return BadgesScreen(badges: _badges);
           }
           if (page == 'profile') {
+            if (!BuildModules.profile || !product.features.profile) {
+              return _notFound(context);
+            }
             return ProfileScreen(
               library: _library,
               diagnostics: _diagnostics,
@@ -536,7 +552,9 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
           if (page == 'settings') {
             return SettingsScreen(
               library: _library,
-              sounds: product.features.soundEffects ? _sounds : null,
+              sounds: BuildModules.sounds && product.features.soundEffects
+                  ? _sounds
+                  : null,
               onClear: _clearLocalData,
             );
           }
@@ -552,6 +570,9 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
             }
           }
           if (page == 'import') {
+            if (!BuildModules.imageImport || !product.features.imageImport) {
+              return _notFound(context);
+            }
             return ImportScreen(library: _library);
           }
           if (id == null) {
@@ -725,7 +746,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     _styleChanges.dispose();
     _bootstrap.dispose();
     _library.dispose();
-    _museum.dispose();
+    _museum?.dispose();
     _badges.dispose();
     _sounds.dispose();
     _online.dispose();

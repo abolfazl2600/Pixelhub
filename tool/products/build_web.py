@@ -6,14 +6,21 @@ import shutil
 import subprocess
 from pathlib import Path
 from registry import ROOT, select
+from module_bundle import plan_assets, selected_product_assets, inspect_web
 
 
 def build(product):
     if 'web' not in product.data['distribution']['targets']: raise SystemExit('Web target disabled')
     app=ROOT/'apps/game';web=app/'build/web';target=app/f'build/products/{product.id}'
-    subprocess.run(['flutter','pub','get','--enforce-lockfile'],cwd=app,check=True)
-    subprocess.run(['dart','run','tool/generate_launcher_icons.dart',product.id],cwd=app,check=True)
-    subprocess.run(['flutter','build','web','--release','--base-href',product.data['distribution']['web_base_href'],f'--dart-define=PRODUCT_ID={product.id}','--no-web-resources-cdn','--pwa-strategy=none'],cwd=app,check=True)
+    plan=plan_assets(product)
+    with selected_product_assets(plan):
+        subprocess.run(['flutter','pub','get','--enforce-lockfile'],cwd=app,check=True)
+        subprocess.run(['dart','run','tool/generate_launcher_icons.dart',product.id],cwd=app,check=True)
+        subprocess.run(['flutter','build','web','--release','--base-href',
+            product.data['distribution']['web_base_href'],
+            f'--dart-define=PRODUCT_ID={product.id}',*plan.dart_defines,
+            '--no-web-resources-cdn','--pwa-strategy=none','--no-pub'],cwd=app,check=True)
+        inspect_web(web,plan)
     manifest=json.loads((web/'manifest.json').read_text());manifest.update(name=product.data['identity']['name'],short_name=product.data['identity']['name'],id=product.data['distribution']['web_base_href'],scope=product.data['distribution']['web_base_href'],theme_color=product.data['appearance']['primary'],background_color=product.data['appearance']['background'])
     (web/'manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
     import html
@@ -26,7 +33,7 @@ def build(product):
     if not (web/'privacy.html').is_file():raise SystemExit('Missing privacy page')
     sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
     (web/'commit.txt').write_text(sha+'\n')
-    (web/'product.json').write_text(json.dumps(dict(product_id=product.id,application_id=product.application_id,version_name=product.version_name,version_code=product.version_code,commit_sha=sha))+'\n')
+    (web/'product.json').write_text(json.dumps(dict(product_id=product.id,application_id=product.application_id,version_name=product.version_name,version_code=product.version_code,commit_sha=sha,module_bundle=plan.as_report()))+'\n')
     subprocess.run(['python3',ROOT/'tool/prepare_offline_web.py',web],check=True)
     if target.exists():shutil.rmtree(target)
     shutil.copytree(web,target)

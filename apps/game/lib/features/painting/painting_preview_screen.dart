@@ -1,3 +1,4 @@
+import '../../products/build_modules.dart';
 import '../../products/product_configuration.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
@@ -653,7 +654,8 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                         ArtworkRenderStyle.pixel,
                       ),
                     ),
-                    if (ProductScope.of(context).features.canvasPainting)
+                    if (BuildModules.canvas &&
+                        ProductScope.of(context).features.canvasPainting)
                       ChoiceChip(
                         key: const ValueKey('style-canvas'),
                         avatar: const Icon(Icons.texture_rounded, size: 18),
@@ -664,7 +666,8 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                           ArtworkRenderStyle.canvas,
                         ),
                       ),
-                    if (ProductScope.of(context).features.diamondPainting)
+                    if (BuildModules.diamond &&
+                        ProductScope.of(context).features.diamondPainting)
                       ChoiceChip(
                         key: const ValueKey('style-diamond'),
                         avatar: const Icon(Icons.diamond_outlined, size: 18),

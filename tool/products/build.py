@@ -17,6 +17,7 @@ import subprocess
 import tempfile
 from zipfile import ZipFile
 from registry import ROOT, select, ConfigurationError
+from module_bundle import plan_assets, selected_product_assets, inspect_android
 
 KINDS = ['preview-apk','release-apk','play-aab','release-all']
 
@@ -152,23 +153,33 @@ def build(product,kind,output):
             match=re.search(r'SHA256:\s*([A-Fa-f0-9:]+)',cert_json)
             if not match or 'CN=Android Debug' in cert_json: raise ConfigurationError('Invalid or debug release certificate')
             cert=match.group(1).replace(':','').lower()
-        subprocess.run(['flutter','pub','get','--enforce-lockfile'],cwd=app,check=True,env=env)
-        subprocess.run(['dart','run','tool/generate_launcher_icons.dart',product.id],cwd=app,check=True,env=env)
-        common=['--flavor',product.id,f'--dart-define=PRODUCT_ID={product.id}','--build-name',product.version_name,'--build-number',str(product.version_code),'--no-pub']
+        plan = plan_assets(product)
+        common=['--flavor',product.id,f'--dart-define=PRODUCT_ID={product.id}',
+                *plan.dart_defines,'--build-name',product.version_name,
+                '--build-number',str(product.version_code),'--no-pub']
         targets=['apk','appbundle'] if kind=='release-all' else ['appbundle'] if kind=='play-aab' else ['apk']
         sha=run(['git','rev-parse','HEAD'],cwd=ROOT).strip()
         artifacts=[]
-        for target in targets:
-            mode='release' if release else 'debug'
-            subprocess.run(['flutter','build',target,'--'+mode,*common],cwd=app,check=True,env=env)
-            path=app/f'build/app/outputs/flutter-apk/app-{product.id}-{mode}.apk' if target=='apk' else app/f'build/app/outputs/bundle/{product.id}Release/app-{product.id}-release.aab'
-            if not path.is_file(): raise ConfigurationError(f'Missing build output: {path}')
-            signer=verify_apk(path,product,release,cert) if target=='apk' else verify_aab(path,product,cert)
-            label='preview' if not release else 'play' if target=='appbundle' else 'release'
-            name=f'{product.data["distribution"]["artifact_prefix"]}-{label}-v{product.version_name}+{product.version_code}-{sha[:8]}{path.suffix}'
-            destination=output/name;shutil.copyfile(path,destination)
-            artifacts.append(dict(file=name,sha256=hashlib.sha256(destination.read_bytes()).hexdigest(),signing_verified=True,signer_sha256=signer,signing_type='upload-key' if release else 'debug'))
-        manifest=dict(source_dirty=source_dirty,product_id=product.id,application_id=product.application_id,version_name=product.version_name,version_code=product.version_code,commit_sha=sha,build_type=kind,build_timestamp=datetime.datetime.now(datetime.timezone.utc).isoformat(),artifacts=artifacts)
+        # pubspec.yaml is restored even when signing/build/verification fails.
+        with selected_product_assets(plan):
+            subprocess.run(['flutter','pub','get','--enforce-lockfile'],cwd=app,check=True,env=env)
+            subprocess.run(['dart','run','tool/generate_launcher_icons.dart',product.id],cwd=app,check=True,env=env)
+            for target in targets:
+                mode='release' if release else 'debug'
+                subprocess.run(['flutter','build',target,'--'+mode,*common],cwd=app,check=True,env=env)
+                path=app/f'build/app/outputs/flutter-apk/app-{product.id}-{mode}.apk' if target=='apk' else app/f'build/app/outputs/bundle/{product.id}Release/app-{product.id}-release.aab'
+                if not path.is_file(): raise ConfigurationError(f'Missing build output: {path}')
+                signer=verify_apk(path,product,release,cert) if target=='apk' else verify_aab(path,product,cert)
+                asset_verification=inspect_android(path,plan)
+                label='preview' if not release else 'play' if target=='appbundle' else 'release'
+                name=f'{product.data["distribution"]["artifact_prefix"]}-{label}-v{product.version_name}+{product.version_code}-{sha[:8]}{path.suffix}'
+                destination=output/name;shutil.copyfile(path,destination)
+                artifacts.append(dict(file=name,bytes=destination.stat().st_size,
+                    sha256=hashlib.sha256(destination.read_bytes()).hexdigest(),
+                    signing_verified=True,signer_sha256=signer,
+                    signing_type='upload-key' if release else 'debug',
+                    **asset_verification))
+        manifest=dict(source_dirty=source_dirty,product_id=product.id,application_id=product.application_id,version_name=product.version_name,version_code=product.version_code,commit_sha=sha,build_type=kind,build_timestamp=datetime.datetime.now(datetime.timezone.utc).isoformat(),artifacts=artifacts,module_bundle=plan.as_report())
         (output/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
         print(f'Verified {product.id}: '+', '.join(a['file'] for a in artifacts))
 

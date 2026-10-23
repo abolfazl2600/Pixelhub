@@ -62,6 +62,15 @@ The definitive badge art direction is the **large, high-detail, crisp pixel-art 
 
 The next roadmap stage is account-based progress synchronization. A pure conflict-resolution contract now lives in `packages/game_domain/lib/progress_sync.dart` (ADR 0004): disjoint completed cells merge within the same server reset generation, while a Reset invalidates older-generation writes. This is **domain groundwork only**, not an online feature. The [backend contract files](backend/README.md) now include a draft OpenAPI document and unexecuted PostgreSQL migration with an idempotency ledger schema. A separate account-scoped durable FIFO outbox now persists queued operations on Android/Web, but no UI or network adapter uses it yet. Auth, a running API, network sync, guest migration, account deletion and cross-device verification are still pending. Personal photo originals remain local.
 
+## Product-aware module bundles
+
+Android and specialized Web builds select optional feature flags at compile
+time and package only the selected product's offline pictures, animations,
+sounds and artwork. Android archives are verified against the selected asset
+manifest before artifacts are uploaded. The existing runtime feature switches
+alone did not remove resources; see [modular build architecture](docs/multi-app/modular-build.md)
+for guarantees, limitations and instructions for adding new modules.
+
 ## GitHub Actions: automatic Web, manual Android
 
 - **[Checks and Web artifacts](https://github.com/abolfazl2600/Pixelhub/actions/workflows/ci.yml)** runs formatting, package analysis, unit/widget tests, Web build and browser checks automatically on PRs, main pushes and version tags. **It does not build an APK.**
