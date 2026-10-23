@@ -122,6 +122,86 @@
       "watermelon"
     ]
   },
+  "fruit-strawberry": {
+    "category": "nature",
+    "tags": [
+      "nature",
+      "fruit",
+      "strawberry"
+    ]
+  },
+  "fruit-banana": {
+    "category": "nature",
+    "tags": [
+      "nature",
+      "fruit",
+      "banana"
+    ]
+  },
+  "fruit-pineapple": {
+    "category": "nature",
+    "tags": [
+      "nature",
+      "fruit",
+      "pineapple"
+    ]
+  },
+  "fruit-orange": {
+    "category": "nature",
+    "tags": [
+      "nature",
+      "fruit",
+      "orange"
+    ]
+  },
+  "fruit-pear": {
+    "category": "nature",
+    "tags": [
+      "nature",
+      "fruit",
+      "pear"
+    ]
+  },
+  "fruit-lemon": {
+    "category": "nature",
+    "tags": [
+      "nature",
+      "fruit",
+      "lemon"
+    ]
+  },
+  "fruit-peach": {
+    "category": "nature",
+    "tags": [
+      "nature",
+      "fruit",
+      "peach"
+    ]
+  },
+  "fruit-kiwi": {
+    "category": "nature",
+    "tags": [
+      "nature",
+      "fruit",
+      "kiwi"
+    ]
+  },
+  "fruit-grapes": {
+    "category": "nature",
+    "tags": [
+      "nature",
+      "fruit",
+      "grapes"
+    ]
+  },
+  "fruit-pomegranate": {
+    "category": "nature",
+    "tags": [
+      "nature",
+      "fruit",
+      "pomegranate"
+    ]
+  },
   "butterfly": {
     "category": "animals",
     "tags": [
