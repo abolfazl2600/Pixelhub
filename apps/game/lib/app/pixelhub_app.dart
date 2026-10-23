@@ -174,7 +174,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     _routeChanges = Listenable.merge([
       _bootstrap,
       _library,
-      if (_museum != null) _museum!,
+      if (_museum != null) _museum,
       _badges,
       _online,
       _bundledAnimations,
@@ -246,7 +246,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     unawaited(_loadArtworkStyle());
     unawaited(_library.loadRecentArtwork());
     unawaited(_library.load());
-    if (_museum != null) unawaited(_museum!.load());
+    if (_museum != null) unawaited(_museum.load());
     unawaited(_bootstrap.load());
     unawaited(prepareOfflineApp());
   }
@@ -438,7 +438,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
 
   Future<void> _clearLocalData() async {
     await _languageWrites;
-    if (_museum != null) await _museum!.settle();
+    if (_museum != null) await _museum.settle();
     await _badges.settle();
     await Future.wait(_sessions.values.map((controller) => controller.flush()));
     for (final controller in _sessions.values) {
@@ -528,7 +528,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
               return _notFound(context);
             }
             return MuseumScreen(
-              museum: _museum!,
+              museum: _museum,
               library: _library,
               animationFor: _animationFor,
               addArtworkId: museumArtworkId,
