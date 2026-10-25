@@ -91,24 +91,19 @@ void main() {
     final complete = snapshot(15, 3, generation: 1);
     final old = snapshot(1, 1);
     expect(
-      () => prepareTimelapseFrames(
-        level,
-        complete,
-        [checkpoint(25, 25, old), checkpoint(100, 100, snapshot(15, 2))],
-      ),
+      () => prepareTimelapseFrames(level, complete, [
+        checkpoint(25, 25, old),
+        checkpoint(100, 100, snapshot(15, 2)),
+      ]),
       throwsFormatException,
     );
     expect(
-      () => prepareTimelapseFrames(
-        level,
-        complete,
-        [checkpoint(25, 25, snapshot(1, 1, generation: 1))],
-      ),
+      () => prepareTimelapseFrames(level, complete, [
+        checkpoint(25, 25, snapshot(1, 1, generation: 1)),
+      ]),
       throwsFormatException,
     );
-    final expired = DateTime.now().toUtc().subtract(
-      const Duration(hours: 121),
-    );
+    final expired = DateTime.now().toUtc().subtract(const Duration(hours: 121));
     expect(
       () => prepareTimelapseFrames(level, complete, [
         checkpoint(25, 25, snapshot(1, 1, generation: 1), at: expired),

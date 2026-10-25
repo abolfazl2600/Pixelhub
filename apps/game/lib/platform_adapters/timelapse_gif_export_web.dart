@@ -6,11 +6,7 @@ import 'dart:ui';
 import 'package:share_plus/share_plus.dart';
 import 'package:web/web.dart' as web;
 
-Future<bool> saveTimelapseGif(
-  Uint8List bytes,
-  String name,
-  Rect origin,
-) async {
+Future<bool> saveTimelapseGif(Uint8List bytes, String name, Rect origin) async {
   final blob = web.Blob(
     [bytes.toJS].toJS,
     web.BlobPropertyBag(type: 'image/gif'),

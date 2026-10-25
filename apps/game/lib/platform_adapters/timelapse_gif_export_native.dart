@@ -7,11 +7,8 @@ import 'package:share_plus/share_plus.dart';
 
 /// Android's Sharesheet offers Files/Drive and compatible save destinations.
 /// Only the temporary source file is deleted; saved destination files persist.
-Future<bool> saveTimelapseGif(
-  Uint8List bytes,
-  String name,
-  Rect origin,
-) => shareTimelapseGif(bytes, name, origin);
+Future<bool> saveTimelapseGif(Uint8List bytes, String name, Rect origin) =>
+    shareTimelapseGif(bytes, name, origin);
 
 Future<bool> shareTimelapseGif(
   Uint8List bytes,

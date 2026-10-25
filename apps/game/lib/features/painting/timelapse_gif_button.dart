@@ -112,7 +112,9 @@ class _TimelapseGifDialogState extends State<TimelapseGifDialog> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              context.isPersian ? 'ذخیره GIF ناموفق بود.' : 'GIF export failed.',
+              context.isPersian
+                  ? 'ذخیره GIF ناموفق بود.'
+                  : 'GIF export failed.',
             ),
           ),
         );
