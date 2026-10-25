@@ -192,6 +192,37 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
     }
   }
 
+  /// On narrow Kids screens, avoid squeezing two labeled tools into one row.
+  Widget _toolButtons(
+    BuildContext context, {
+    required Widget left,
+    required Widget right,
+  }) => LayoutBuilder(
+    builder: (context, constraints) {
+      final stacked =
+          ProductScope.of(context).id == 'kids' &&
+          (constraints.maxWidth < 410 ||
+              MediaQuery.textScalerOf(context).scale(16) > 21);
+      if (stacked) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            left,
+            const SizedBox(height: 8),
+            right,
+          ],
+        );
+      }
+      return Row(
+        children: [
+          Expanded(child: left),
+          const SizedBox(width: 8),
+          Expanded(child: right),
+        ],
+      );
+    },
+  );
+
   void _hint() {
     if (_toolBusy) return;
     if (widget.controller.showHint() != null) widget.diagnostics.recordHint();
@@ -686,28 +717,22 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        key: const ValueKey('hint-tool'),
-                        onPressed: session.isComplete ? null : _hint,
-                        icon: const Icon(Icons.lightbulb_outline_rounded),
-                        label: Text(s.hintTool),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        key: const ValueKey('bomb-tool'),
-                        onPressed: session.remaining[session.selectedColor] == 0
-                            ? null
-                            : _bomb,
-                        icon: const Icon(Icons.auto_awesome_rounded),
-                        label: Text(s.bombTool),
-                      ),
-                    ),
-                  ],
+                _toolButtons(
+                  context,
+                  left: OutlinedButton.icon(
+                    key: const ValueKey('hint-tool'),
+                    onPressed: session.isComplete ? null : _hint,
+                    icon: const Icon(Icons.lightbulb_outline_rounded),
+                    label: Text(s.hintTool),
+                  ),
+                  right: OutlinedButton.icon(
+                    key: const ValueKey('bomb-tool'),
+                    onPressed: session.remaining[session.selectedColor] == 0
+                        ? null
+                        : _bomb,
+                    icon: const Icon(Icons.auto_awesome_rounded),
+                    label: Text(s.bombTool),
+                  ),
                 ),
                 const SizedBox(height: 10),
                 Text(
@@ -715,91 +740,85 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                   style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 6),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        key: const ValueKey('magic-wand-tool'),
-                        onPressed: _toolBusy
-                            ? null
-                            : () => _togglePrecisionTool(
-                                PrecisionPaintTool.magicWand,
-                              ),
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor:
-                              _activeTool == PrecisionPaintTool.magicWand
-                              ? PixelTokens.lemon
-                              : null,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 4,
-                            vertical: 8,
+                _toolButtons(
+                  context,
+                  left: OutlinedButton(
+                    key: const ValueKey('magic-wand-tool'),
+                    onPressed: _toolBusy
+                        ? null
+                        : () => _togglePrecisionTool(
+                            PrecisionPaintTool.magicWand,
                           ),
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.auto_fix_high_rounded),
-                            const SizedBox(height: 3),
-                            Text(s.magicWandTool, textAlign: TextAlign.center),
-                            if (widget.library.coinsEnabled)
-                              Text(
-                                s.precisionToolCost(
-                                  context.digits(
-                                    precisionToolPrice(
-                                      PrecisionPaintTool.magicWand,
-                                    ),
-                                  ),
-                                ),
-                                style: const TextStyle(fontSize: 11),
-                              ),
-                          ],
-                        ),
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor:
+                          _activeTool == PrecisionPaintTool.magicWand
+                          ? PixelTokens.lemon
+                          : null,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 8,
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: OutlinedButton(
-                        key: const ValueKey('color-splash-tool'),
-                        onPressed: _toolBusy
-                            ? null
-                            : () => _togglePrecisionTool(
-                                PrecisionPaintTool.colorSplash,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.auto_fix_high_rounded),
+                        const SizedBox(height: 3),
+                        Text(s.magicWandTool, textAlign: TextAlign.center),
+                        if (widget.library.coinsEnabled)
+                          Text(
+                            s.precisionToolCost(
+                              context.digits(
+                                precisionToolPrice(
+                                  PrecisionPaintTool.magicWand,
+                                ),
                               ),
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor:
-                              _activeTool == PrecisionPaintTool.colorSplash
-                              ? PixelTokens.lemon
-                              : null,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 4,
-                            vertical: 8,
-                          ),
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.blur_on_rounded),
-                            const SizedBox(height: 3),
-                            Text(
-                              s.colorSplashTool,
-                              textAlign: TextAlign.center,
                             ),
-                            if (widget.library.coinsEnabled)
-                              Text(
-                                s.precisionToolCost(
-                                  context.digits(
-                                    precisionToolPrice(
-                                      PrecisionPaintTool.colorSplash,
-                                    ),
-                                  ),
-                                ),
-                                style: const TextStyle(fontSize: 11),
-                              ),
-                          ],
-                        ),
+                            style: const TextStyle(fontSize: 11),
+                          ),
+                      ],
+                    ),
+                  ),
+                  right: OutlinedButton(
+                    key: const ValueKey('color-splash-tool'),
+                    onPressed: _toolBusy
+                        ? null
+                        : () => _togglePrecisionTool(
+                            PrecisionPaintTool.colorSplash,
+                          ),
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor:
+                          _activeTool == PrecisionPaintTool.colorSplash
+                          ? PixelTokens.lemon
+                          : null,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 8,
                       ),
                     ),
-                  ],
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.blur_on_rounded),
+                        const SizedBox(height: 3),
+                        Text(
+                          s.colorSplashTool,
+                          textAlign: TextAlign.center,
+                        ),
+                        if (widget.library.coinsEnabled)
+                          Text(
+                            s.precisionToolCost(
+                              context.digits(
+                                precisionToolPrice(
+                                  PrecisionPaintTool.colorSplash,
+                                ),
+                              ),
+                            ),
+                            style: const TextStyle(fontSize: 11),
+                          ),
+                      ],
+                    ),
+                  ),
                 ),
                 if (_activeTool != null) ...[
                   const SizedBox(height: 6),
