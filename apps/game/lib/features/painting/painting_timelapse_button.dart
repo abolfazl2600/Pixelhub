@@ -1,14 +1,10 @@
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:game_domain/game_domain.dart';
-import 'package:level_schema/level_schema.dart';
 
 import '../../l10n/strings.dart';
 import '../../platform_adapters/timelapse_export.dart';
 import 'painting_controller.dart';
-import 'replay_checkpoint_store.dart';
 import 'timelapse_gif_encoder.dart';
 
 /// Loads genuine, unexpired checkpoints and creates a bounded local GIF.
