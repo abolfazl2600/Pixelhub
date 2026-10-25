@@ -177,8 +177,9 @@ class ProductHome extends StatelessWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: columns,
+                      // Reserve more of each tile for the drawing, less for actions.
                       mainAxisExtent:
-                          288.0 + math.max(0.0, textScale - 1.0) * 64.0,
+                          268.0 + math.max(0.0, textScale - 1.0) * 64.0,
                       crossAxisSpacing: 12,
                       mainAxisSpacing: 12,
                     ),
@@ -196,63 +197,33 @@ class ProductHome extends StatelessWidget {
     );
   }
 
-  /// Big, legible links on narrow phones; equal-width actions on tablets.
-  Widget _kidsNavigation(BuildContext context) => LayoutBuilder(
-    builder: (context, constraints) {
-      final pages = product.navigation
-          .where((page) => product.allowsPage(page) && page != 'settings')
-          .toList();
-      final stacked =
-          constraints.maxWidth < 440 ||
-          MediaQuery.textScalerOf(context).scale(16) > 22;
-      Widget action(String page) {
-        final scheme = Theme.of(context).colorScheme;
-        final gallery = page == 'gallery';
-        return SizedBox(
-          width: double.infinity,
-          height: 64,
-          child: OutlinedButton.icon(
-            onPressed: () => context.push('/$page'),
-            style: OutlinedButton.styleFrom(
-              backgroundColor: gallery
-                  ? scheme.primaryContainer
-                  : scheme.secondaryContainer,
-              foregroundColor: gallery
-                  ? scheme.onPrimaryContainer
-                  : scheme.onSecondaryContainer,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
+  /// Compact navigation chips wrap naturally without occupying full-width rows.
+  Widget _kidsNavigation(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Wrap(
+      spacing: 10,
+      runSpacing: 8,
+      children: [
+        for (final page in product.navigation)
+          if (product.allowsPage(page) && page != 'settings')
+            OutlinedButton.icon(
+              onPressed: () => context.push('/$page'),
+              style: OutlinedButton.styleFrom(
+                backgroundColor: page == 'gallery'
+                    ? scheme.primaryContainer
+                    : scheme.secondaryContainer,
+                foregroundColor: page == 'gallery'
+                    ? scheme.onPrimaryContainer
+                    : scheme.onSecondaryContainer,
+                minimumSize: const Size(0, 48),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+              ),
+              icon: Icon(_icon(page), size: 20),
+              label: Text(_label(context, page)),
             ),
-            icon: Icon(_icon(page), size: 24),
-            label: Text(
-              _label(context, page),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        );
-      }
-
-      if (stacked) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            for (final page in pages) ...[
-              action(page),
-              if (page != pages.last) const SizedBox(height: 10),
-            ],
-          ],
-        );
-      }
-      return Row(
-        children: [
-          for (final page in pages) ...[
-            if (page != pages.first) const SizedBox(width: 12),
-            Expanded(child: action(page)),
-          ],
-        ],
-      );
-    },
-  );
+      ],
+    );
+  }
 
   Widget _guide(IconData icon, String text) => Builder(
     builder: (context) => Row(
@@ -308,11 +279,13 @@ class ProductHome extends StatelessWidget {
                 aspectRatio: 1.4,
                 child: PixelArtPreview(level: level),
               ),
-            const SizedBox(height: 8),
+            SizedBox(height: kids ? 6 : 8),
             Text(
               level.titleFor(fa ? 'fa' : 'en'),
+              maxLines: kids ? 2 : null,
+              overflow: kids ? TextOverflow.ellipsis : null,
               style: TextStyle(
-                fontSize: kids ? 20 : 22,
+                fontSize: kids ? 18 : 22,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -333,14 +306,17 @@ class ProductHome extends StatelessWidget {
                 key: ValueKey('product-paint-${level.id}'),
                 onPressed: () => context.go('/painting/${level.id}'),
                 style: FilledButton.styleFrom(
-                  minimumSize: const Size(0, 60),
+                  minimumSize: const Size(0, 48),
                   padding: const EdgeInsets.symmetric(horizontal: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                 ),
                 child: Text(
                   actionLabel,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 15),
                 ),
               )
             else

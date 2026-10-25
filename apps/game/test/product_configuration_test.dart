@@ -82,6 +82,15 @@ void main() {
         expect(artwork.width, lessThanOrEqualTo(176));
         expect(artwork.height, lessThanOrEqualTo(176));
         expect(artwork.width / artwork.height, closeTo(1, 0.001));
+        // Compact 48dp action occupies far less space than the artwork.
+        final paintButton = find.byKey(
+          const ValueKey('product-paint-sunflower'),
+        );
+        await tester.ensureVisible(paintButton);
+        await tester.pumpAndSettle();
+        final buttonHeight = tester.getSize(paintButton).height;
+        expect(buttonHeight, lessThanOrEqualTo(52));
+        expect(artwork.height / buttonHeight, greaterThan(2));
         final themedContext = tester.element(find.byType(ProductHome));
         final theme = Theme.of(themedContext);
         expect(theme.colorScheme.primary, const Color(0xff146B60));
@@ -89,7 +98,7 @@ void main() {
         expect(theme.scaffoldBackgroundColor, const Color(0xffFFF9F1));
         expect(
           theme.filledButtonTheme.style?.minimumSize?.resolve({}),
-          const Size(64, 68),
+          const Size(48, 52),
         );
       }
       expect(tester.takeException(), isNull);

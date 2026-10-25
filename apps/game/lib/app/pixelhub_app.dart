@@ -713,14 +713,14 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
         style: FilledButton.styleFrom(
           backgroundColor: colors.primary,
           foregroundColor: colors.onPrimary,
-          minimumSize: const Size(64, 68),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          minimumSize: const Size(48, 52),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
           ),
           textStyle: TextStyle(
             fontFamily: product.fontFamily,
-            fontSize: 19,
+            fontSize: 16,
             fontWeight: FontWeight.w800,
           ),
         ),
@@ -729,15 +729,15 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
         style: OutlinedButton.styleFrom(
           backgroundColor: const Color(0xffEBF7F1),
           foregroundColor: colors.primary,
-          minimumSize: const Size(60, 56),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          minimumSize: const Size(48, 48),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           side: BorderSide(color: colors.outlineVariant),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(14),
           ),
           textStyle: TextStyle(
             fontFamily: product.fontFamily,
-            fontSize: 16,
+            fontSize: 15,
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -745,7 +745,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       iconButtonTheme: IconButtonThemeData(
         style: IconButton.styleFrom(
           foregroundColor: colors.primary,
-          minimumSize: const Size.square(52),
+          minimumSize: const Size.square(48),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
