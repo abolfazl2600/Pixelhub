@@ -292,9 +292,12 @@ class _GalleryScreenState extends State<GalleryScreen> {
     final library = widget.library;
     final count = library.completed(level);
     final s = context.strings;
+    final isKids = ProductScope.of(context).id == 'kids';
     return Card(
       key: ValueKey('local-picture-${level.id}'),
-      color: PixelTokens.peach,
+      color: isKids
+          ? Theme.of(context).colorScheme.surfaceContainerLow
+          : PixelTokens.peach,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => context.push('/artwork/${level.id}'),
@@ -344,9 +347,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
                         ? s.removeFavorite
                         : s.addFavorite,
                     visualDensity: VisualDensity.compact,
-                    constraints: const BoxConstraints(
-                      minWidth: 36,
-                      minHeight: 36,
+                    constraints: BoxConstraints(
+                      minWidth: isKids ? 44 : 36,
+                      minHeight: isKids ? 44 : 36,
                     ),
                     padding: EdgeInsets.zero,
                     onPressed:
@@ -358,7 +361,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
                           ? Icons.favorite
                           : Icons.favorite_border,
                       size: 20,
-                      color: PixelTokens.green,
+                      color: isKids
+                          ? Theme.of(context).colorScheme.primary
+                          : PixelTokens.green,
                     ),
                   ),
                 ],
@@ -416,9 +421,12 @@ class _GalleryScreenState extends State<GalleryScreen> {
   Widget _onlineCard(BuildContext context, OnlinePicture picture) {
     final s = context.strings;
     final downloading = widget.online.downloadingId == picture.id;
+    final isKids = ProductScope.of(context).id == 'kids';
     return Card(
       key: ValueKey('online-picture-${picture.id}'),
-      color: PixelTokens.peach,
+      color: isKids
+          ? Theme.of(context).colorScheme.surfaceContainerLow
+          : PixelTokens.peach,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => _showOnlinePreview(picture),
@@ -496,21 +504,22 @@ class _GalleryScreenState extends State<GalleryScreen> {
                       colorCount: picture.colorCount,
                     ),
                   ),
-                  Text(
-                    s.artworkCost(
-                      context.digits(
-                        artworkPrice(
-                          picture.id,
-                          difficultyForOnlineGrid(
-                            width: picture.width,
-                            height: picture.height,
-                            colorCount: picture.colorCount,
+                  if (ProductScope.of(context).features.coins)
+                    Text(
+                      s.artworkCost(
+                        context.digits(
+                          artworkPrice(
+                            picture.id,
+                            difficultyForOnlineGrid(
+                              width: picture.width,
+                              height: picture.height,
+                              colorCount: picture.colorCount,
+                            ),
                           ),
                         ),
                       ),
+                      style: const TextStyle(fontSize: 10),
                     ),
-                    style: const TextStyle(fontSize: 10),
-                  ),
                   if (ProductScope.of(context).features.coins)
                     Text(
                       s.artworkCoins(
@@ -538,9 +547,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   key: ValueKey('online-download-${picture.id}'),
                   tooltip: s.downloadPicture,
                   visualDensity: VisualDensity.compact,
-                  constraints: const BoxConstraints(
-                    minWidth: 36,
-                    minHeight: 36,
+                  constraints: BoxConstraints(
+                    minWidth: isKids ? 44 : 36,
+                    minHeight: isKids ? 44 : 36,
                   ),
                   padding: EdgeInsets.zero,
                   icon: downloading
@@ -580,12 +589,31 @@ class _GalleryScreenState extends State<GalleryScreen> {
               difficulty: _difficulty,
             );
       final visible = available.take(_onlineVisibleCount).toList();
-      const grid = SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: 240,
-        mainAxisExtent: 318,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-      );
+      final isKids = ProductScope.of(context).id == 'kids';
+      final textScale =
+          MediaQuery.textScalerOf(context).scale(16) / 16;
+      final gridWidth = MediaQuery.sizeOf(context).width - 32;
+      final kidsColumns =
+          gridWidth < 320 || (textScale >= 1.4 && gridWidth < 600)
+          ? 1
+          : gridWidth < 700
+          ? 2
+          : gridWidth < 970
+          ? 3
+          : 4;
+      final SliverGridDelegate grid = isKids
+          ? SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: kidsColumns,
+              mainAxisExtent: 340 + (textScale > 1 ? (textScale - 1) * 76 : 0),
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+            )
+          : const SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 240,
+              mainAxisExtent: 318,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+            );
 
       return Scaffold(
         appBar: AppBar(

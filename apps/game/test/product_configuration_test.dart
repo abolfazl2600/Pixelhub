@@ -84,7 +84,7 @@ void main() {
         expect(artwork.width / artwork.height, closeTo(1, 0.001));
         final themedContext = tester.element(find.byType(ProductHome));
         final theme = Theme.of(themedContext);
-        expect(theme.colorScheme.primary, const Color(0xff7054D7));
+        expect(theme.colorScheme.primary, const Color(0xff146B60));
         expect(theme.colorScheme.secondary, const Color(0xffFFC857));
         expect(theme.scaffoldBackgroundColor, const Color(0xffFFF9F1));
         expect(

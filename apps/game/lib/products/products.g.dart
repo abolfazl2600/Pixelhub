@@ -60,7 +60,7 @@ const productRegistry = <String, ProductConfiguration>{
     categories: ['nature', 'animals', 'objects', 'space', 'patterns'],
     defaultCategories: ['nature', 'animals', 'objects', 'space', 'patterns'],
     maxDimension: 32,
-    primary: Color(0xff7054D7),
+    primary: Color(0xff146B60),
     secondary: Color(0xffFFC857),
     background: Color(0xffFFF9F1),
     themeMode: ThemeMode.light,

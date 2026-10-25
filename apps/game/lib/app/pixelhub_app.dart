@@ -627,7 +627,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     routerConfig: _router,
     builder: (context, child) => ProductScope(
       product: product,
-      child: MobileFrame(child: child!),
+      child: MobileFrame(limitWebWidth: product.id == 'kids', child: child!),
     ),
   );
 
@@ -673,9 +673,20 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       seedColor: product.primary,
       primary: product.primary,
       secondary: product.secondary,
-      tertiary: const Color(0xff35bba5),
+      tertiary: const Color(0xffC26039),
       surface: brightness == Brightness.light ? product.background : null,
       brightness: brightness,
+    ).copyWith(
+      onPrimary: Colors.white,
+      onSecondary: const Color(0xff443318),
+      primaryContainer: const Color(0xffDCF3E9),
+      onPrimaryContainer: const Color(0xff174C43),
+      secondaryContainer: const Color(0xffFFF0C7),
+      onSecondaryContainer: const Color(0xff493717),
+      surfaceContainerLow: const Color(0xffFFFCF5),
+      surfaceContainerLowest: Colors.white,
+      onSurface: const Color(0xff263C35),
+      outlineVariant: const Color(0xffC9DDD4),
     );
     const largeRadius = 24.0;
     return ThemeData(
@@ -703,6 +714,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
           backgroundColor: colors.primary,
           foregroundColor: colors.onPrimary,
           minimumSize: const Size(64, 68),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -715,8 +727,10 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
+          backgroundColor: const Color(0xffEBF7F1),
           foregroundColor: colors.primary,
           minimumSize: const Size(60, 56),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           side: BorderSide(color: colors.outlineVariant),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
@@ -731,8 +745,33 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
       iconButtonTheme: IconButtonThemeData(
         style: IconButton.styleFrom(
           foregroundColor: colors.primary,
-          minimumSize: const Size.square(60),
+          minimumSize: const Size.square(52),
         ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: colors.primary,
+          minimumSize: const Size(48, 48),
+        ),
+      ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: colors.primary,
+        foregroundColor: colors.onPrimary,
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: const Color(0xffF0F7F0),
+        selectedColor: colors.secondaryContainer,
+        checkmarkColor: colors.primary,
+        side: BorderSide(color: colors.outlineVariant),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+        ),
+        labelStyle: TextStyle(
+          color: colors.onSurface,
+          fontFamily: product.fontFamily,
+          fontWeight: FontWeight.w600,
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
         color: colors.tertiary,

@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart'
-    show TargetPlatform, defaultTargetPlatform;
+    show TargetPlatform, defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
 
 abstract final class PixelTokens {
@@ -55,9 +55,14 @@ abstract final class PixelTokens {
 /// Phones/tablets fill the viewport. Wide desktop windows use a centered,
 /// bounded canvas so painting controls and previews never stretch indefinitely.
 class MobileFrame extends StatelessWidget {
-  const MobileFrame({required this.child, super.key});
+  const MobileFrame({
+    required this.child,
+    this.limitWebWidth = false,
+    super.key,
+  });
 
   final Widget child;
+  final bool limitWebWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +76,7 @@ class MobileFrame extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final boundDesktop =
-            isDesktopPlatform &&
+            (isDesktopPlatform || (kIsWeb && limitWebWidth)) &&
             constraints.maxWidth >= PixelTokens.desktopBreakpoint;
         final width = boundDesktop
             ? PixelTokens.desktopMaxWidth

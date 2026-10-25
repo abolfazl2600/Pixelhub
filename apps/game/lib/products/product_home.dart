@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:level_schema/level_schema.dart';
@@ -25,6 +27,10 @@ class ProductHome extends StatelessWidget {
   Widget build(BuildContext context) {
     final kids = product.homeLayout == 'kids';
     final fa = context.isPersian;
+    final viewportWidth = MediaQuery.sizeOf(context).width;
+    final horizontalPadding = kids
+        ? math.max(16.0, (viewportWidth - 1000) / 2)
+        : 20.0;
     return Scaffold(
       appBar: AppBar(
         title: Text(fa ? product.displayNameFa : product.name),
@@ -32,18 +38,33 @@ class ProductHome extends StatelessWidget {
           IconButton(
             onPressed: onLanguageToggle,
             tooltip: fa ? 'English' : 'فارسی',
+            style: kids
+                ? IconButton.styleFrom(
+                    minimumSize: const Size.square(48),
+                    padding: EdgeInsets.zero,
+                  )
+                : null,
             icon: const Icon(Icons.language),
           ),
           IconButton(
             onPressed: () => context.push('/settings'),
             tooltip: context.strings.settings,
+            style: kids
+                ? IconButton.styleFrom(
+                    minimumSize: const Size.square(48),
+                    padding: EdgeInsets.zero,
+                  )
+                : null,
             icon: const Icon(Icons.settings_outlined),
           ),
         ],
       ),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.symmetric(
+            horizontal: horizontalPadding,
+            vertical: 20,
+          ),
           children: [
             Container(
               padding: kids ? const EdgeInsets.all(16) : EdgeInsets.zero,
@@ -120,30 +141,44 @@ class ProductHome extends StatelessWidget {
                 style: const TextStyle(height: 1.8),
               ),
             const SizedBox(height: 16),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final page in product.navigation)
-                  if (product.allowsPage(page) && page != 'settings')
-                    OutlinedButton.icon(
-                      onPressed: () => context.push('/$page'),
-                      icon: Icon(_icon(page)),
-                      label: Text(_label(context, page)),
-                    ),
-              ],
-            ),
+            if (kids)
+              _kidsNavigation(context)
+            else
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final page in product.navigation)
+                    if (product.allowsPage(page) && page != 'settings')
+                      OutlinedButton.icon(
+                        onPressed: () => context.push('/$page'),
+                        icon: Icon(_icon(page)),
+                        label: Text(_label(context, page)),
+                      ),
+                ],
+              ),
             const SizedBox(height: 20),
             if (kids)
               LayoutBuilder(
                 builder: (context, constraints) {
-                  final columns = constraints.maxWidth >= 380 ? 2 : 1;
+                  final textScale =
+                      MediaQuery.textScalerOf(context).scale(18) / 18;
+                  final width = constraints.maxWidth;
+                  final columns =
+                      width < 340 || (textScale >= 1.4 && width < 600)
+                      ? 1
+                      : width < 680
+                      ? 2
+                      : width < 970
+                      ? 3
+                      : 4;
                   return GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: columns,
-                      mainAxisExtent: 280,
+                      mainAxisExtent:
+                          288 + math.max(0.0, textScale - 1) * 64,
                       crossAxisSpacing: 12,
                       mainAxisSpacing: 12,
                     ),
@@ -160,6 +195,64 @@ class ProductHome extends StatelessWidget {
       ),
     );
   }
+
+  /// Big, legible links on narrow phones; equal-width actions on tablets.
+  Widget _kidsNavigation(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      final pages = product.navigation
+          .where((page) => product.allowsPage(page) && page != 'settings')
+          .toList();
+      final stacked =
+          constraints.maxWidth < 440 ||
+          MediaQuery.textScalerOf(context).scale(16) > 22;
+      Widget action(String page) {
+        final scheme = Theme.of(context).colorScheme;
+        final gallery = page == 'gallery';
+        return SizedBox(
+          width: double.infinity,
+          height: 64,
+          child: OutlinedButton.icon(
+            onPressed: () => context.push('/$page'),
+            style: OutlinedButton.styleFrom(
+              backgroundColor: gallery
+                  ? scheme.primaryContainer
+                  : scheme.secondaryContainer,
+              foregroundColor: gallery
+                  ? scheme.onPrimaryContainer
+                  : scheme.onSecondaryContainer,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+            ),
+            icon: Icon(_icon(page), size: 24),
+            label: Text(
+              _label(context, page),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        );
+      }
+
+      if (stacked) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (final page in pages) ...[
+              action(page),
+              if (page != pages.last) const SizedBox(height: 10),
+            ],
+          ],
+        );
+      }
+      return Row(
+        children: [
+          for (final page in pages) ...[
+            if (page != pages.first) const SizedBox(width: 12),
+            Expanded(child: action(page)),
+          ],
+        ],
+      );
+    },
+  );
 
   Widget _guide(IconData icon, String text) => Builder(
     builder: (context) => Row(
@@ -184,11 +277,14 @@ class ProductHome extends StatelessWidget {
 
   Widget _card(BuildContext context, LevelDefinition level, bool kids) {
     final fa = context.isPersian;
+    final actionLabel = library.completed(level) > 0
+        ? context.strings.continuePainting
+        : context.strings.startPainting;
     return Card(
       color: kids ? Theme.of(context).colorScheme.surfaceContainerLow : null,
       margin: EdgeInsets.only(bottom: kids ? 0 : 20),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(kids ? 12 : 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -232,16 +328,28 @@ class ProductHome extends StatelessWidget {
               ),
               const SizedBox(height: 12),
             ],
-            FilledButton.icon(
-              key: ValueKey('product-paint-${level.id}'),
-              onPressed: () => context.go('/painting/${level.id}'),
-              icon: const Icon(Icons.brush_rounded),
-              label: Text(
-                library.completed(level) > 0
-                    ? context.strings.continuePainting
-                    : context.strings.startPainting,
+            if (kids)
+              FilledButton(
+                key: ValueKey('product-paint-${level.id}'),
+                onPressed: () => context.go('/painting/${level.id}'),
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(0, 60),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                ),
+                child: Text(
+                  actionLabel,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 16),
+                ),
+              )
+            else
+              FilledButton.icon(
+                key: ValueKey('product-paint-${level.id}'),
+                onPressed: () => context.go('/painting/${level.id}'),
+                icon: const Icon(Icons.brush_rounded),
+                label: Text(actionLabel),
               ),
-            ),
           ],
         ),
       ),
