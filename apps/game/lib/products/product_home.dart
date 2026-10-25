@@ -53,18 +53,13 @@ class ProductHome extends StatelessWidget {
               child: Text(
                 kids
                     ? (fa ? 'با رنگ‌ها بازی کن!' : 'Play with colors!')
-                    : (fa
-                          ? 'کارگاه آثار کلاسیک'
-                          : 'The classic art studio'),
-                style: Theme.of(context).textTheme.headlineSmall
-                    ?.copyWith(
-                      color: kids
-                          ? Theme.of(
-                              context,
-                            ).colorScheme.onPrimaryContainer
-                          : null,
-                      fontWeight: kids ? FontWeight.w800 : null,
-                    ),
+                    : (fa ? 'کارگاه آثار کلاسیک' : 'The classic art studio'),
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: kids
+                      ? Theme.of(context).colorScheme.onPrimaryContainer
+                      : null,
+                  fontWeight: kids ? FontWeight.w800 : null,
+                ),
               ),
             ),
           ],
@@ -91,9 +86,7 @@ class ProductHome extends StatelessWidget {
                 const SizedBox(height: 12),
                 _guide(
                   Icons.celebration_outlined,
-                  fa
-                      ? '۳. نقاشی‌ات را کامل کن!'
-                      : '3. Complete your picture!',
+                  fa ? '۳. نقاشی‌ات را کامل کن!' : '3. Complete your picture!',
                 ),
               ],
             ),
@@ -181,8 +174,7 @@ class ProductHome extends StatelessWidget {
                             MediaQuery.textScalerOf(context).scale(18) / 18;
                         final width = constraints.crossAxisExtent;
                         var columns = 4;
-                        if (width < 340 ||
-                            (textScale >= 1.4 && width < 600)) {
+                        if (width < 340 || (textScale >= 1.4 && width < 600)) {
                           columns = 1;
                         } else if (width < 680) {
                           columns = 2;
@@ -190,14 +182,15 @@ class ProductHome extends StatelessWidget {
                           columns = 3;
                         }
                         return SliverGrid.builder(
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: columns,
-                            mainAxisExtent:
-                                268.0 +
-                                math.max(0.0, textScale - 1.0) * 64.0,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                          ),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: columns,
+                                mainAxisExtent:
+                                    268.0 +
+                                    math.max(0.0, textScale - 1.0) * 64.0,
+                                crossAxisSpacing: 12,
+                                mainAxisSpacing: 12,
+                              ),
                           itemCount: levels.length,
                           itemBuilder: (context, index) =>
                               _card(context, levels[index], true),
