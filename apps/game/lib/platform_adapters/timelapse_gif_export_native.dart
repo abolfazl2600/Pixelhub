@@ -30,6 +30,8 @@ Future<bool> shareTimelapseGif(
     );
     return result.status != ShareResultStatus.dismissed;
   } finally {
-    if (await file.exists()) await file.delete();
+    if (await file.exists()) {
+      await file.delete();
+    }
   }
 }
