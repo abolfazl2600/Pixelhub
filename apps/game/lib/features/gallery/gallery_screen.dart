@@ -590,21 +590,20 @@ class _GalleryScreenState extends State<GalleryScreen> {
             );
       final visible = available.take(_onlineVisibleCount).toList();
       final isKids = ProductScope.of(context).id == 'kids';
-      final textScale =
-          MediaQuery.textScalerOf(context).scale(16) / 16;
+      final textScale = MediaQuery.textScalerOf(context).scale(16) / 16;
       final gridWidth = MediaQuery.sizeOf(context).width - 32;
-      final kidsColumns =
-          gridWidth < 320 || (textScale >= 1.4 && gridWidth < 600)
-          ? 1
-          : gridWidth < 700
-          ? 2
-          : gridWidth < 970
-          ? 3
-          : 4;
+      var kidsColumns = 4;
+      if (gridWidth < 320 || (textScale >= 1.4 && gridWidth < 600)) {
+        kidsColumns = 1;
+      } else if (gridWidth < 700) {
+        kidsColumns = 2;
+      } else if (gridWidth < 970) {
+        kidsColumns = 3;
+      }
       final SliverGridDelegate grid = isKids
           ? SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: kidsColumns,
-              mainAxisExtent: 340 + (textScale > 1 ? (textScale - 1) * 76 : 0),
+              mainAxisExtent: 340.0 + (textScale > 1.0 ? (textScale - 1.0) * 76.0 : 0.0),
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
             )
