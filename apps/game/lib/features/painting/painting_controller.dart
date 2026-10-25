@@ -11,7 +11,10 @@ enum PaintingStatus { loading, ready, error }
 enum SaveStatus { saved, saving, error }
 
 class PaintingController extends ChangeNotifier {
-  PaintingController(this.level, this.repository, {this.onCompleted,
+  PaintingController(
+    this.level,
+    this.repository, {
+    this.onCompleted,
     ReplayCheckpointStore? replayStore,
   }) : _replayStore = replayStore ?? ReplayCheckpointStore();
 
@@ -190,25 +193,35 @@ class PaintingController extends ChangeNotifier {
     if (active == null) return;
     final count = active.completedCount;
     final generation = active.generation;
-    if (generation != _lastReplayGeneration || count < _lastReplayCompletedCount) {
+    if (generation != _lastReplayGeneration ||
+        count < _lastReplayCompletedCount) {
       _lastReplayGeneration = generation;
       _lastReplayCompletedCount = count;
       return;
     }
     if (count <= _lastReplayCompletedCount) return;
     final total = level.cells.length;
-    final previousPercent = (_lastReplayCompletedCount * 100 ~/ total).clamp(0, 100);
+    final previousPercent = (_lastReplayCompletedCount * 100 ~/ total).clamp(
+      0,
+      100,
+    );
     final attainedPercent = (count * 100 ~/ total).clamp(0, 100);
     if (attainedPercent > previousPercent) {
       final snapshot = active.snapshot;
-      for (var milestone = previousPercent + 1; milestone <= attainedPercent; milestone++) {
-        unawaited(_replayStore.record(
-          levelId: level.id,
-          generation: generation,
-          milestonePercent: milestone,
-          attainedPercent: attainedPercent,
-          snapshot: snapshot,
-        ));
+      for (
+        var milestone = previousPercent + 1;
+        milestone <= attainedPercent;
+        milestone++
+      ) {
+        unawaited(
+          _replayStore.record(
+            levelId: level.id,
+            generation: generation,
+            milestonePercent: milestone,
+            attainedPercent: attainedPercent,
+            snapshot: snapshot,
+          ),
+        );
       }
     }
     _lastReplayCompletedCount = count;

@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Local-only, bounded replay checkpoints. Keys are isolated from gameplay saves.
 final class ReplayCheckpointStore {
   ReplayCheckpointStore({SharedPreferencesAsync? preferences})
-      : _preferences = preferences ?? SharedPreferencesAsync();
+    : _preferences = preferences ?? SharedPreferencesAsync();
 
   static const _prefix = 'pixelhub.replay_checkpoint.v1.';
   static const retention = Duration(hours: 120);
@@ -23,9 +23,13 @@ final class ReplayCheckpointStore {
     required int attainedPercent,
     required ProgressSnapshot snapshot,
   }) async {
-    if (milestonePercent < 1 || milestonePercent > 100 ||
-        attainedPercent < milestonePercent || attainedPercent > 100 ||
-        snapshot.levelId != levelId || snapshot.generation != generation) return;
+    if (milestonePercent < 1 ||
+        milestonePercent > 100 ||
+        attainedPercent < milestonePercent ||
+        attainedPercent > 100 ||
+        snapshot.levelId != levelId ||
+        snapshot.generation != generation)
+      return;
     final now = DateTime.now().toUtc();
     final record = jsonEncode(<String, Object>{
       'schemaVersion': 1,
@@ -70,11 +74,17 @@ final class ReplayCheckpointStore {
     } on Object {
       return const [];
     }
-    result.removeWhere((item) => item['milestonePercent'] is! int ||
-        (item['milestonePercent'] as int) < 1 ||
-        (item['milestonePercent'] as int) > 100);
-    result.sort((a, b) => (a['milestonePercent'] as int)
-        .compareTo(b['milestonePercent'] as int));
+    result.removeWhere(
+      (item) =>
+          item['milestonePercent'] is! int ||
+          (item['milestonePercent'] as int) < 1 ||
+          (item['milestonePercent'] as int) > 100,
+    );
+    result.sort(
+      (a, b) => (a['milestonePercent'] as int).compareTo(
+        b['milestonePercent'] as int,
+      ),
+    );
     return List.unmodifiable(result);
   }
 
