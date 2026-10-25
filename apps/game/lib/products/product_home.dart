@@ -164,21 +164,21 @@ class ProductHome extends StatelessWidget {
                   final textScale =
                       MediaQuery.textScalerOf(context).scale(18) / 18;
                   final width = constraints.maxWidth;
-                  final columns =
-                      width < 340 || (textScale >= 1.4 && width < 600)
-                      ? 1
-                      : width < 680
-                      ? 2
-                      : width < 970
-                      ? 3
-                      : 4;
+                  var columns = 4;
+                  if (width < 340 || (textScale >= 1.4 && width < 600)) {
+                    columns = 1;
+                  } else if (width < 680) {
+                    columns = 2;
+                  } else if (width < 970) {
+                    columns = 3;
+                  }
                   return GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: columns,
                       mainAxisExtent:
-                          288 + math.max(0.0, textScale - 1) * 64,
+                          288.0 + math.max(0.0, textScale - 1.0) * 64.0,
                       crossAxisSpacing: 12,
                       mainAxisSpacing: 12,
                     ),
