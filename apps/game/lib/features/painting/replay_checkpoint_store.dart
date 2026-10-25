@@ -28,8 +28,9 @@ final class ReplayCheckpointStore {
         attainedPercent < milestonePercent ||
         attainedPercent > 100 ||
         snapshot.levelId != levelId ||
-        snapshot.generation != generation)
+        snapshot.generation != generation) {
       return;
+    }
     final now = DateTime.now().toUtc();
     final record = jsonEncode(<String, Object>{
       'schemaVersion': 1,
