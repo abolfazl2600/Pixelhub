@@ -4,17 +4,26 @@ import 'package:flutter/foundation.dart';
 import 'package:game_domain/game_domain.dart';
 import 'package:level_schema/level_schema.dart';
 import 'package:painting_engine/painting_engine.dart';
+import 'replay_checkpoint_store.dart';
 
 enum PaintingStatus { loading, ready, error }
 
 enum SaveStatus { saved, saving, error }
 
 class PaintingController extends ChangeNotifier {
-  PaintingController(this.level, this.repository, {this.onCompleted});
+  PaintingController(
+    this.level,
+    this.repository, {
+    this.onCompleted,
+    ReplayCheckpointStore? replayStore,
+  }) : _replayStore = replayStore;
 
   final LevelDefinition level;
   final ProgressRepository repository;
   final VoidCallback? onCompleted;
+  ReplayCheckpointStore? _replayStore;
+  int _lastReplayCompletedCount = 0;
+  int _lastReplayGeneration = 0;
   bool _completionReported = false;
   PaintingStatus status = PaintingStatus.loading;
   SaveStatus saveStatus = SaveStatus.saved;
@@ -37,6 +46,16 @@ class PaintingController extends ChangeNotifier {
       final progress = await repository.read(level);
       if (_disposed || request != _loadGeneration) return;
       session = PaintingSession(level, progress: progress);
+      _lastReplayCompletedCount = session!.completedCount;
+      _lastReplayGeneration = session!.generation;
+      // Replay storage is optional. Memory-only widget tests and storage
+      // failures must not stop a painting from loading.
+      try {
+        final replay = _replayStore ??= ReplayCheckpointStore();
+        unawaited(replay.purgeExpired());
+      } on Object {
+        // Core progress is independent of replay recording.
+      }
       _selectNextUnfinishedColor();
       _completionReported = session!.isComplete;
       hintIndex = null;
@@ -56,6 +75,7 @@ class PaintingController extends ChangeNotifier {
   void beginStroke() => session!.beginStroke();
   void endStroke() {
     session!.endStroke();
+    _captureReplayMilestones();
     // Keep the just-completed color active until the stroke finishes. A
     // mid-drag selection change would interrupt painting that same color.
     _selectNextUnfinishedColor();
@@ -65,7 +85,7 @@ class PaintingController extends ChangeNotifier {
   bool paintLine(int x1, int y1, int x2, int y2) {
     if (session!.paintLine(x1, y1, x2, y2) == 0) return false;
     hintIndex = null;
-    _changed();
+    _changed(captureReplay: false);
     return true;
   }
 
@@ -160,7 +180,10 @@ class PaintingController extends ChangeNotifier {
     }
   }
 
-  void _changed() {
+  void _changed({bool captureReplay = true}) {
+    if (captureReplay) {
+      _captureReplayMilestones();
+    }
     if (session!.isComplete && !_completionReported) {
       _completionReported = true;
       onCompleted?.call();
@@ -169,6 +192,55 @@ class PaintingController extends ChangeNotifier {
     saveStatus = SaveStatus.saving;
     _notify();
     unawaited(flush());
+  }
+
+  /// Capture immutable cell-state snapshots at every newly reached 1% milestone.
+  /// A stroke crossing several thresholds stores the same attained state for
+  /// each crossed milestone and records attainedPercent to avoid fabricating
+  /// intermediate cell states. Replay persistence is best-effort and isolated.
+  void _captureReplayMilestones() {
+    final active = session;
+    if (active == null) return;
+    final count = active.completedCount;
+    final generation = active.generation;
+    if (generation != _lastReplayGeneration ||
+        count < _lastReplayCompletedCount) {
+      _lastReplayGeneration = generation;
+      _lastReplayCompletedCount = count;
+      return;
+    }
+    if (count <= _lastReplayCompletedCount) return;
+    final total = level.cells.length;
+    final previousPercent = (_lastReplayCompletedCount * 100 ~/ total).clamp(
+      0,
+      100,
+    );
+    final attainedPercent = (count * 100 ~/ total).clamp(0, 100);
+    if (attainedPercent > previousPercent) {
+      final snapshot = active.snapshot;
+      ReplayCheckpointStore replay;
+      try {
+        replay = _replayStore ??= ReplayCheckpointStore();
+      } on Object {
+        return;
+      }
+      for (
+        var milestone = previousPercent + 1;
+        milestone <= attainedPercent;
+        milestone++
+      ) {
+        unawaited(
+          replay.record(
+            levelId: level.id,
+            generation: generation,
+            milestonePercent: milestone,
+            attainedPercent: attainedPercent,
+            snapshot: snapshot,
+          ),
+        );
+      }
+    }
+    _lastReplayCompletedCount = count;
   }
 
   /// Coalesces queued changes but never writes an old snapshot after a reset.
