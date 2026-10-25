@@ -11,6 +11,7 @@ import 'package:pixelhub/features/gallery/artwork_economy.dart';
 import 'package:pixelhub/features/profile/profile_screen.dart';
 import 'package:pixelhub/features/painting/painting_controller.dart';
 import 'package:pixelhub/features/painting/painting_preview_screen.dart';
+import 'package:pixelhub/products/product_configuration.dart';
 
 import 'bootstrap_test.dart' show fixture;
 
@@ -218,6 +219,59 @@ void main() {
       expect(controller.saveStatus, SaveStatus.saved);
     },
   );
+
+  for (final productId in ['pixelhub', 'kids']) {
+    testWidgets('$productId uses the shared, touch-friendly tools panel', (
+      tester,
+    ) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(320, 900);
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final storage = MemoryPreferences();
+      await tester.pumpWidget(
+        PixelhubApp(
+          product: productById(productId),
+          repository: FixedLevels(fixture()),
+          progressRepository: storage,
+          preferences: storage,
+          initialRoute: '/painting/sunflower',
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      const toolKeys = [
+        ValueKey('hint-tool'),
+        ValueKey('bomb-tool'),
+        ValueKey('magic-wand-tool'),
+        ValueKey('color-splash-tool'),
+      ];
+      final panel = find.byKey(const ValueKey('painting-tools-panel'));
+      await tester.ensureVisible(panel);
+      await tester.pumpAndSettle();
+      expect(panel, findsOneWidget);
+      expect(find.text('ابزارهای کمکی'), findsOneWidget);
+      for (final key in toolKeys) {
+        final button = find.byKey(key);
+        expect(button, findsOneWidget);
+        expect(tester.getSize(button).height, greaterThanOrEqualTo(48));
+      }
+      if (productId == 'kids') {
+        expect(find.text('رایگان'), findsNothing);
+      } else {
+        expect(find.text('رایگان'), findsNWidgets(2));
+      }
+      final magic = find.byKey(const ValueKey('magic-wand-tool'));
+      await tester.tap(magic);
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const ValueKey('precision-tool-instructions')),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   testWidgets(
     'focus mode hides secondary controls, keeps coloring and restores them',

@@ -193,32 +193,236 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
     }
   }
 
-  /// On narrow Kids screens, avoid squeezing two labeled tools into one row.
-  Widget _toolButtons(
+  /// One responsive, touch-friendly tool palette across all product flavors.
+  /// Keep the keys and callbacks stable for existing painting interactions.
+  Widget _toolAction(
     BuildContext context, {
-    required Widget left,
-    required Widget right,
-  }) => LayoutBuilder(
-    builder: (context, constraints) {
-      final stacked =
-          ProductScope.of(context).id == 'kids' &&
-          (constraints.maxWidth < 410 ||
-              MediaQuery.textScalerOf(context).scale(16) > 21);
-      if (stacked) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [left, const SizedBox(height: 8), right],
-        );
-      }
-      return Row(
+    required Key key,
+    required IconData icon,
+    required String label,
+    required VoidCallback? onPressed,
+    String? subtitle,
+    bool selected = false,
+  }) {
+    final colors = Theme.of(context).colorScheme;
+    return Semantics(
+      selected: selected,
+      child: OutlinedButton(
+        key: key,
+        onPressed: onPressed,
+        style: OutlinedButton.styleFrom(
+          minimumSize: const Size(0, 88),
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+          backgroundColor: selected
+              ? colors.primaryContainer
+              : colors.surface,
+          foregroundColor: selected
+              ? colors.onPrimaryContainer
+              : colors.onSurface,
+          side: BorderSide(
+            color: selected ? colors.primary : colors.outlineVariant,
+            width: selected ? 2 : 1,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: 26),
+                if (selected) ...[
+                  const SizedBox(width: 5),
+                  const Icon(Icons.check_circle_rounded, size: 16),
+                ],
+              ],
+            ),
+            const SizedBox(height: 5),
+            Text(
+              label,
+              maxLines: 2,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+            ),
+            if (subtitle != null) ...[
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                maxLines: 2,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 11),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _toolsPanel(BuildContext context, PaintingSession session) {
+    final s = context.strings;
+    final colors = Theme.of(context).colorScheme;
+    final coinsEnabled = widget.library.coinsEnabled;
+    final free = context.isPersian ? 'رایگان' : 'Free';
+    final actions = <Widget>[
+      _toolAction(
+        context,
+        key: const ValueKey('hint-tool'),
+        icon: Icons.lightbulb_outline_rounded,
+        label: s.hintTool,
+        subtitle: coinsEnabled ? free : null,
+        onPressed: session.isComplete || _toolBusy ? null : _hint,
+      ),
+      _toolAction(
+        context,
+        key: const ValueKey('bomb-tool'),
+        icon: Icons.flare_rounded,
+        label: s.bombTool,
+        subtitle: coinsEnabled ? free : null,
+        onPressed: session.remaining[session.selectedColor] == 0 || _toolBusy
+            ? null
+            : _bomb,
+      ),
+      _toolAction(
+        context,
+        key: const ValueKey('magic-wand-tool'),
+        icon: Icons.auto_fix_high_rounded,
+        label: s.magicWandTool,
+        selected: _activeTool == PrecisionPaintTool.magicWand,
+        subtitle: coinsEnabled
+            ? s.precisionToolCost(
+                context.digits(
+                  precisionToolPrice(PrecisionPaintTool.magicWand),
+                ),
+              )
+            : null,
+        onPressed: _toolBusy || widget.library.busy
+            ? null
+            : () => _togglePrecisionTool(PrecisionPaintTool.magicWand),
+      ),
+      _toolAction(
+        context,
+        key: const ValueKey('color-splash-tool'),
+        icon: Icons.water_drop_outlined,
+        label: s.colorSplashTool,
+        selected: _activeTool == PrecisionPaintTool.colorSplash,
+        subtitle: coinsEnabled
+            ? s.precisionToolCost(
+                context.digits(
+                  precisionToolPrice(PrecisionPaintTool.colorSplash),
+                ),
+              )
+            : null,
+        onPressed: _toolBusy || widget.library.busy
+            ? null
+            : () => _togglePrecisionTool(PrecisionPaintTool.colorSplash),
+      ),
+    ];
+
+    return Container(
+      key: const ValueKey('painting-tools-panel'),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: colors.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(child: left),
-          const SizedBox(width: 8),
-          Expanded(child: right),
+          Row(
+            children: [
+              Icon(Icons.tune_rounded, size: 20, color: colors.primary),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  context.isPersian ? 'ابزارهای کمکی' : 'Helpful tools',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              if (coinsEnabled)
+                Tooltip(
+                  message: s.freeToolsNote,
+                  child: Icon(
+                    Icons.info_outline_rounded,
+                    size: 20,
+                    color: colors.onSurfaceVariant,
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final textScale =
+                  MediaQuery.textScalerOf(context).scale(14) / 14;
+              var columns = 2;
+              if (constraints.maxWidth < 245 ||
+                  (textScale >= 1.5 && constraints.maxWidth < 550)) {
+                columns = 1;
+              } else if (constraints.maxWidth >= 690 && textScale < 1.4) {
+                columns = 4;
+              }
+              const spacing = 8.0;
+              final width =
+                  (constraints.maxWidth - (columns - 1) * spacing) / columns;
+              return Wrap(
+                spacing: spacing,
+                runSpacing: spacing,
+                children: [
+                  for (final action in actions)
+                    SizedBox(width: width, child: action),
+                ],
+              );
+            },
+          ),
+          if (_activeTool != null) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 10,
+              ),
+              decoration: BoxDecoration(
+                color: colors.primaryContainer,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.touch_app_outlined,
+                    color: colors.onPrimaryContainer,
+                    size: 22,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      s.precisionToolInstructions,
+                      key: const ValueKey('precision-tool-instructions'),
+                      style: TextStyle(
+                        color: colors.onPrimaryContainer,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
-      );
-    },
-  );
+      ),
+    );
+  }
 
   void _hint() {
     if (_toolBusy) return;
@@ -714,124 +918,8 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                _toolButtons(
-                  context,
-                  left: OutlinedButton.icon(
-                    key: const ValueKey('hint-tool'),
-                    onPressed: session.isComplete ? null : _hint,
-                    icon: const Icon(Icons.lightbulb_outline_rounded),
-                    label: Text(s.hintTool),
-                  ),
-                  right: OutlinedButton.icon(
-                    key: const ValueKey('bomb-tool'),
-                    onPressed: session.remaining[session.selectedColor] == 0
-                        ? null
-                        : _bomb,
-                    icon: const Icon(Icons.auto_awesome_rounded),
-                    label: Text(s.bombTool),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  s.precisionToolTitle,
-                  style: const TextStyle(fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: 6),
-                _toolButtons(
-                  context,
-                  left: OutlinedButton(
-                    key: const ValueKey('magic-wand-tool'),
-                    onPressed: _toolBusy
-                        ? null
-                        : () => _togglePrecisionTool(
-                            PrecisionPaintTool.magicWand,
-                          ),
-                    style: OutlinedButton.styleFrom(
-                      backgroundColor:
-                          _activeTool == PrecisionPaintTool.magicWand
-                          ? PixelTokens.lemon
-                          : null,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 4,
-                        vertical: 8,
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.auto_fix_high_rounded),
-                        const SizedBox(height: 3),
-                        Text(s.magicWandTool, textAlign: TextAlign.center),
-                        if (widget.library.coinsEnabled)
-                          Text(
-                            s.precisionToolCost(
-                              context.digits(
-                                precisionToolPrice(
-                                  PrecisionPaintTool.magicWand,
-                                ),
-                              ),
-                            ),
-                            style: const TextStyle(fontSize: 11),
-                          ),
-                      ],
-                    ),
-                  ),
-                  right: OutlinedButton(
-                    key: const ValueKey('color-splash-tool'),
-                    onPressed: _toolBusy
-                        ? null
-                        : () => _togglePrecisionTool(
-                            PrecisionPaintTool.colorSplash,
-                          ),
-                    style: OutlinedButton.styleFrom(
-                      backgroundColor:
-                          _activeTool == PrecisionPaintTool.colorSplash
-                          ? PixelTokens.lemon
-                          : null,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 4,
-                        vertical: 8,
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.blur_on_rounded),
-                        const SizedBox(height: 3),
-                        Text(s.colorSplashTool, textAlign: TextAlign.center),
-                        if (widget.library.coinsEnabled)
-                          Text(
-                            s.precisionToolCost(
-                              context.digits(
-                                precisionToolPrice(
-                                  PrecisionPaintTool.colorSplash,
-                                ),
-                              ),
-                            ),
-                            style: const TextStyle(fontSize: 11),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-                if (_activeTool != null) ...[
-                  const SizedBox(height: 6),
-                  Text(
-                    s.precisionToolInstructions,
-                    key: const ValueKey('precision-tool-instructions'),
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                ],
-                const SizedBox(height: 4),
-                Text(
-                  s.freeToolsNote,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: PixelTokens.muted,
-                  ),
-                ),
+                _toolsPanel(context, session),
+                const SizedBox(height: 8),
                 if (controller.hintIndex != null) ...[
                   const SizedBox(height: 4),
                   Text(
