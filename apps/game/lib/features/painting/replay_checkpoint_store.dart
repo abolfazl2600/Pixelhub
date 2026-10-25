@@ -39,8 +39,12 @@ final class ReplayCheckpointStore {
     // A per-key write makes repeated updates idempotent. Errors are swallowed:
     // replay is optional and must never interrupt painting or autosave.
     try {
-      await _enqueue(() => _preferences.setString(
-        _key(levelId, generation, milestonePercent), record));
+      await _enqueue(() async {
+        final key = _key(levelId, generation, milestonePercent);
+        // Preserve the first captured state for this generation/milestone.
+        if (await _preferences.getString(key) != null) return;
+        await _preferences.setString(key, record);
+      });
     } on Object {
       // Storage quota or platform failures disable this checkpoint only.
     }
@@ -66,6 +70,9 @@ final class ReplayCheckpointStore {
     } on Object {
       return const [];
     }
+    result.removeWhere((item) => item['milestonePercent'] is! int ||
+        (item['milestonePercent'] as int) < 1 ||
+        (item['milestonePercent'] as int) > 100);
     result.sort((a, b) => (a['milestonePercent'] as int)
         .compareTo(b['milestonePercent'] as int));
     return List.unmodifiable(result);
