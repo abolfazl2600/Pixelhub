@@ -669,25 +669,26 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
   /// Kids has its own playful surfaces and touch targets, without changing
   /// the existing PixelHub or Art themes.
   ThemeData _kidsTheme(Brightness brightness) {
-    final colors = ColorScheme.fromSeed(
-      seedColor: product.primary,
-      primary: product.primary,
-      secondary: product.secondary,
-      tertiary: const Color(0xffC26039),
-      surface: brightness == Brightness.light ? product.background : null,
-      brightness: brightness,
-    ).copyWith(
-      onPrimary: Colors.white,
-      onSecondary: const Color(0xff443318),
-      primaryContainer: const Color(0xffDCF3E9),
-      onPrimaryContainer: const Color(0xff174C43),
-      secondaryContainer: const Color(0xffFFF0C7),
-      onSecondaryContainer: const Color(0xff493717),
-      surfaceContainerLow: const Color(0xffFFFCF5),
-      surfaceContainerLowest: Colors.white,
-      onSurface: const Color(0xff263C35),
-      outlineVariant: const Color(0xffC9DDD4),
-    );
+    final colors =
+        ColorScheme.fromSeed(
+          seedColor: product.primary,
+          primary: product.primary,
+          secondary: product.secondary,
+          tertiary: const Color(0xffC26039),
+          surface: brightness == Brightness.light ? product.background : null,
+          brightness: brightness,
+        ).copyWith(
+          onPrimary: Colors.white,
+          onSecondary: const Color(0xff443318),
+          primaryContainer: const Color(0xffDCF3E9),
+          onPrimaryContainer: const Color(0xff174C43),
+          secondaryContainer: const Color(0xffFFF0C7),
+          onSecondaryContainer: const Color(0xff493717),
+          surfaceContainerLow: const Color(0xffFFFCF5),
+          surfaceContainerLowest: Colors.white,
+          onSurface: const Color(0xff263C35),
+          outlineVariant: const Color(0xffC9DDD4),
+        );
     const largeRadius = 24.0;
     return ThemeData(
       useMaterial3: true,
@@ -763,9 +764,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
         selectedColor: colors.secondaryContainer,
         checkmarkColor: colors.primary,
         side: BorderSide(color: colors.outlineVariant),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         labelStyle: TextStyle(
           color: colors.onSurface,
           fontFamily: product.fontFamily,

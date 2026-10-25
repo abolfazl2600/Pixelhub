@@ -603,7 +603,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
       final SliverGridDelegate grid = isKids
           ? SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: kidsColumns,
-              mainAxisExtent: 340.0 + (textScale > 1.0 ? (textScale - 1.0) * 76.0 : 0.0),
+              mainAxisExtent:
+                  340.0 + (textScale > 1.0 ? (textScale - 1.0) * 76.0 : 0.0),
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
             )

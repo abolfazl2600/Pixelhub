@@ -67,6 +67,18 @@ class PaintingController extends ChangeNotifier {
     _notify();
   }
 
+  /// Waits for queued checkpoint writes, then reads only unexpired replay data.
+  /// The renderer validates the current reset generation separately.
+  Future<List<Map<String, Object?>>> readReplayCheckpoints() async {
+    try {
+      final replay = _replayStore ??= ReplayCheckpointStore();
+      await replay.waitForPendingWrites();
+      return await replay.readValid(level.id);
+    } on Object {
+      return const [];
+    }
+  }
+
   void selectColor(int color) {
     session!.selectColor(color);
     _notify();

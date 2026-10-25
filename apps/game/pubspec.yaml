@@ -16,6 +16,7 @@ dependencies:
   http: 1.6.0
   crypto: 3.0.6
   share_plus: 11.1.0
+  path_provider: 2.1.5
   shared_preferences: 2.5.3
   painting_engine:
     path: ../../packages/painting_engine

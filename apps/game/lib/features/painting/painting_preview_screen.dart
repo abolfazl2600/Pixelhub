@@ -14,6 +14,7 @@ import 'painting_board.dart';
 import 'artwork_render_style.dart';
 import 'painting_controller.dart';
 import 'completed_artwork_preview.dart';
+import 'timelapse_gif_button.dart';
 import 'package:level_schema/level_schema.dart';
 
 /// Keep vertical painting strokes from scrolling the surrounding controls.
@@ -206,11 +207,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
       if (stacked) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            left,
-            const SizedBox(height: 8),
-            right,
-          ],
+          children: [left, const SizedBox(height: 8), right],
         );
       }
       return Row(
@@ -801,10 +798,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
                       children: [
                         const Icon(Icons.blur_on_rounded),
                         const SizedBox(height: 3),
-                        Text(
-                          s.colorSplashTool,
-                          textAlign: TextAlign.center,
-                        ),
+                        Text(s.colorSplashTool, textAlign: TextAlign.center),
                         if (widget.library.coinsEnabled)
                           Text(
                             s.precisionToolCost(
@@ -1007,6 +1001,8 @@ class CompletionScreen extends StatelessWidget {
             saveState,
             const SizedBox(height: 16),
             ExportButton(level: controller.level, renderStyle: renderStyle),
+            const SizedBox(height: 8),
+            TimelapseGifButton(controller: controller),
             const SizedBox(height: 8),
             if (ProductScope.of(context).features.achievements)
               OutlinedButton.icon(
