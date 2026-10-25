@@ -56,6 +56,7 @@ final class ReplayCheckpointStore {
   }
 
   Future<List<Map<String, Object?>>> readValid(String levelId) async {
+    await _writes;
     await purgeExpired();
     final result = <Map<String, Object?>>[];
     try {

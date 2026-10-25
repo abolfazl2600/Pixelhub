@@ -14,6 +14,7 @@ import 'painting_board.dart';
 import 'artwork_render_style.dart';
 import 'painting_controller.dart';
 import 'completed_artwork_preview.dart';
+import 'painting_timelapse_button.dart';
 import 'package:level_schema/level_schema.dart';
 
 /// Keep vertical painting strokes from scrolling the surrounding controls.
@@ -1007,6 +1008,8 @@ class CompletionScreen extends StatelessWidget {
             saveState,
             const SizedBox(height: 16),
             ExportButton(level: controller.level, renderStyle: renderStyle),
+            const SizedBox(height: 8),
+            PaintingTimelapseButton(controller: controller),
             const SizedBox(height: 8),
             if (ProductScope.of(context).features.achievements)
               OutlinedButton.icon(
