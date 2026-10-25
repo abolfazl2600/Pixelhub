@@ -16,12 +16,12 @@ class PaintingController extends ChangeNotifier {
     this.repository, {
     this.onCompleted,
     ReplayCheckpointStore? replayStore,
-  }) : _replayStore = replayStore ?? ReplayCheckpointStore();
+  }) : _replayStore = replayStore;
 
   final LevelDefinition level;
   final ProgressRepository repository;
   final VoidCallback? onCompleted;
-  final ReplayCheckpointStore _replayStore;
+  ReplayCheckpointStore? _replayStore;
   int _lastReplayCompletedCount = 0;
   int _lastReplayGeneration = 0;
   bool _completionReported = false;
@@ -48,7 +48,14 @@ class PaintingController extends ChangeNotifier {
       session = PaintingSession(level, progress: progress);
       _lastReplayCompletedCount = session!.completedCount;
       _lastReplayGeneration = session!.generation;
-      unawaited(_replayStore.purgeExpired());
+      // Replay storage is optional. Memory-only widget tests and storage
+      // failures must not stop a painting from loading.
+      try {
+        final replay = _replayStore ??= ReplayCheckpointStore();
+        unawaited(replay.purgeExpired());
+      } on Object {
+        // Core progress is independent of replay recording.
+      }
       _selectNextUnfinishedColor();
       _completionReported = session!.isComplete;
       hintIndex = null;
@@ -68,6 +75,7 @@ class PaintingController extends ChangeNotifier {
   void beginStroke() => session!.beginStroke();
   void endStroke() {
     session!.endStroke();
+    _captureReplayMilestones();
     // Keep the just-completed color active until the stroke finishes. A
     // mid-drag selection change would interrupt painting that same color.
     _selectNextUnfinishedColor();
@@ -77,7 +85,7 @@ class PaintingController extends ChangeNotifier {
   bool paintLine(int x1, int y1, int x2, int y2) {
     if (session!.paintLine(x1, y1, x2, y2) == 0) return false;
     hintIndex = null;
-    _changed();
+    _changed(captureReplay: false);
     return true;
   }
 
@@ -172,8 +180,8 @@ class PaintingController extends ChangeNotifier {
     }
   }
 
-  void _changed() {
-    _captureReplayMilestones();
+  void _changed({bool captureReplay = true}) {
+    if (captureReplay) _captureReplayMilestones();
     if (session!.isComplete && !_completionReported) {
       _completionReported = true;
       onCompleted?.call();
@@ -208,13 +216,19 @@ class PaintingController extends ChangeNotifier {
     final attainedPercent = (count * 100 ~/ total).clamp(0, 100);
     if (attainedPercent > previousPercent) {
       final snapshot = active.snapshot;
+      ReplayCheckpointStore replay;
+      try {
+        replay = _replayStore ??= ReplayCheckpointStore();
+      } on Object {
+        return;
+      }
       for (
         var milestone = previousPercent + 1;
         milestone <= attainedPercent;
         milestone++
       ) {
         unawaited(
-          _replayStore.record(
+          replay.record(
             levelId: level.id,
             generation: generation,
             milestonePercent: milestone,
