@@ -26,6 +26,9 @@ class _PaintingTimelapseButtonState extends State<PaintingTimelapseButton> {
   bool _cancelled = false;
   Uint8List? _gif;
   String? _error;
+  StateSetter? _dialogRefresh;
+
+  void _updateDialog() => _dialogRefresh?.call(() {});
 
   Future<void> _generate() async {
     if (_busy) return;
@@ -35,6 +38,7 @@ class _PaintingTimelapseButtonState extends State<PaintingTimelapseButton> {
       _gif = null;
       _error = null;
     });
+    _updateDialog();
     try {
       final session = widget.controller.session!;
       final generation = session.generation;
@@ -51,14 +55,19 @@ class _PaintingTimelapseButtonState extends State<PaintingTimelapseButton> {
       final bytes = await compute(encodePaintingTimelapse, payload);
       if (_cancelled || !mounted) return;
       setState(() => _gif = bytes);
+      _updateDialog();
     } on Object {
       if (mounted && !_cancelled) {
         setState(() => _error = context.isPersian
             ? 'مراحل ضبط‌شده کافی نیستند یا منقضی شده‌اند.'
             : 'Replay steps are missing, incomplete or expired.');
+        _updateDialog();
       }
     } finally {
-      if (mounted) setState(() => _busy = false);
+      if (mounted) {
+        setState(() => _busy = false);
+        _updateDialog();
+      }
     }
   }
 
@@ -68,7 +77,9 @@ class _PaintingTimelapseButtonState extends State<PaintingTimelapseButton> {
       builder: (dialogContext) => AlertDialog(
         title: Text(context.isPersian ? 'تایم‌لپس نقاشی' : 'Painting timelapse'),
         content: StatefulBuilder(
-          builder: (dialogContext, refresh) => SizedBox(
+          builder: (dialogContext, refresh) {
+            _dialogRefresh = refresh;
+            return SizedBox(
             width: 330,
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -112,10 +123,14 @@ class _PaintingTimelapseButtonState extends State<PaintingTimelapseButton> {
                 ),
               ],
             ),
-          ),
+          );
+          },
         ),
       ),
-    );
+    ).then((_) {
+      _cancelled = true;
+      _dialogRefresh = null;
+    });
     _generate();
   }
 
