@@ -52,10 +52,7 @@ class _FixturePainter extends CustomPainter {
     );
     if (!cellSize.isFinite || cellSize <= 0) return;
 
-    final artworkSize = Size(
-      cellSize * level.width,
-      cellSize * level.height,
-    );
+    final artworkSize = Size(cellSize * level.width, cellSize * level.height);
     canvas.save();
     canvas.translate(
       (size.width - artworkSize.width) / 2,
