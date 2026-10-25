@@ -113,6 +113,38 @@ void main() {
     });
   }
 
+  testWidgets('Kids home stays usable on narrow phones and tablets', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    for (final size in <Size>[
+      const Size(320, 760),
+      const Size(390, 844),
+      const Size(820, 1024),
+      const Size(1180, 920),
+    ]) {
+      tester.view.physicalSize = size;
+      final store = MemoryPreferences();
+      final repository = TestRepository();
+      await tester.pumpWidget(
+        PixelhubApp(
+          product: productById('kids'),
+          repository: repository,
+          progressRepository: store,
+          preferences: store,
+        ),
+      );
+      repository.requests.single.complete(fixture());
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ProductHome), findsOneWidget);
+      expect(find.text('۱. یک رنگ انتخاب کن'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox.shrink());
+    }
+  });
+
   test('unsupported product and disabled styles fail explicitly', () {
     expect(() => productById('animals'), throwsStateError);
     expect(productById('kids').allowsStyle('diamond'), isFalse);
