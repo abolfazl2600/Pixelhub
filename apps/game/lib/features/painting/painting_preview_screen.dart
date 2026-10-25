@@ -214,9 +214,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
           minimumSize: const Size(0, 88),
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-          backgroundColor: selected
-              ? colors.primaryContainer
-              : colors.surface,
+          backgroundColor: selected ? colors.primaryContainer : colors.surface,
           foregroundColor: selected
               ? colors.onPrimaryContainer
               : colors.onSurface,
@@ -344,9 +342,9 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
               Expanded(
                 child: Text(
                   context.isPersian ? 'ابزارهای کمکی' : 'Helpful tools',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
                 ),
               ),
               if (coinsEnabled)
@@ -363,8 +361,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
           const SizedBox(height: 12),
           LayoutBuilder(
             builder: (context, constraints) {
-              final textScale =
-                  MediaQuery.textScalerOf(context).scale(14) / 14;
+              final textScale = MediaQuery.textScalerOf(context).scale(14) / 14;
               var columns = 2;
               if (constraints.maxWidth < 245 ||
                   (textScale >= 1.5 && constraints.maxWidth < 550)) {
@@ -388,10 +385,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
           if (_activeTool != null) ...[
             const SizedBox(height: 12),
             Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 10,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
                 color: colors.primaryContainer,
                 borderRadius: BorderRadius.circular(14),

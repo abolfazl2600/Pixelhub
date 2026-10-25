@@ -47,7 +47,7 @@ async function main() {
       await page.waitForFunction(() => !document.getElementById('bootstrap-status'), undefined, {timeout:60000});
       const activation = page.locator('flt-semantics-placeholder');
       if (await activation.count()) await activation.evaluate(e => e.click());
-      const start = page.getByRole('button', {name:/شروع.*رنگ‌آمیزی|ادامه نقاشی|Start.*coloring|Continue painting|View result|دیدن نتیجه/}).first();
+      const start = page.getByRole('button', {name:/شروع.*رنگ‌آمیزی|ادامه نقاشی|نقاشی کن|Start.*coloring|Continue painting|^Paint$|View result|دیدن نتیجه/}).first();
       await start.waitFor({timeout:30000});
       if (id !== 'pixelhub') {
         await page.getByText(config.identity.display_name_fa, {exact:true}).waitFor();
