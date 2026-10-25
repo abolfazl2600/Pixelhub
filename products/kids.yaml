@@ -24,6 +24,7 @@
     "navigation": [
       "gallery",
       "my-gallery",
+      "badges",
       "settings"
     ]
   },
@@ -49,7 +50,7 @@
   },
   "features": {
     "coins": false,
-    "achievements": false,
+    "achievements": true,
     "animations": true,
     "image_import": false,
     "diamond_painting": false,

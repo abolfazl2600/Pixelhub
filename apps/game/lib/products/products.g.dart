@@ -53,7 +53,7 @@ const productRegistry = <String, ProductConfiguration>{
     homeLayout: 'kids',
     defaultStyle: 'pixel',
     largeControls: true,
-    navigation: ['gallery', 'my-gallery', 'settings'],
+    navigation: ['gallery', 'my-gallery', 'badges', 'settings'],
     offlineManifest: 'assets/products/kids-catalog.json',
     onlineRoot: 'https://abolfazl2600.github.io/Pixelhub/online/',
     onlineManifest: 'products/kids/catalog.json',
@@ -66,7 +66,7 @@ const productRegistry = <String, ProductConfiguration>{
     themeMode: ThemeMode.light,
     features: ProductFeatures(
       coins: false,
-      achievements: false,
+      achievements: true,
       animations: true,
       imageImport: false,
       diamondPainting: false,

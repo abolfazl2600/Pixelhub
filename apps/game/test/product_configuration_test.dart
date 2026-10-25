@@ -223,5 +223,9 @@ void main() {
     expect(productById('kids').allowsStyle('diamond'), isFalse);
     expect(productById('art').allowsStyle('canvas'), isTrue);
     expect(productById('kids').allowsPage('import'), isFalse);
+    expect(productById('kids').features.achievements, isTrue);
+    expect(productById('kids').features.coins, isFalse);
+    expect(productById('kids').allowsPage('badges'), isTrue);
+    expect(productById('kids').navigation, contains('badges'));
   });
 }
