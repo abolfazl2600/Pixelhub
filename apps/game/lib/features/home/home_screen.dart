@@ -176,9 +176,20 @@ class HomeScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: PixelArtPreview(level: level),
+                    Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          maxWidth: 260,
+                          maxHeight: 260,
+                        ),
+                        child: AspectRatio(
+                          aspectRatio: level.width / level.height,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: PixelArtPreview(level: level),
+                          ),
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Text(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:persistence/persistence.dart';
 import 'package:pixelhub/app/pixelhub_app.dart';
+import 'package:pixelhub/core/pixel_art_preview.dart';
 import 'package:pixelhub/features/gallery/library_controller.dart';
 import 'package:pixelhub/products/product_configuration.dart';
 import 'package:pixelhub/products/product_home.dart';
@@ -69,6 +70,18 @@ void main() {
       if (id == 'kids') {
         expect(find.byTooltip('پروفایل'), findsNothing);
         expect(find.text('۱. یک رنگ انتخاب کن'), findsOneWidget);
+        // A square drawing in Kids must never fill a rectangular card.
+        final previewFinder = find.byType(PixelArtPreview);
+        await tester.ensureVisible(previewFinder);
+        await tester.pumpAndSettle();
+        final artworkFinder = find.descendant(
+          of: previewFinder,
+          matching: find.byType(CustomPaint),
+        );
+        final artwork = tester.getSize(artworkFinder.first);
+        expect(artwork.width, lessThanOrEqualTo(176));
+        expect(artwork.height, lessThanOrEqualTo(176));
+        expect(artwork.width / artwork.height, closeTo(1, 0.001));
         final themedContext = tester.element(find.byType(ProductHome));
         final theme = Theme.of(themedContext);
         expect(theme.colorScheme.primary, const Color(0xff7054D7));

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:level_schema/level_schema.dart';
 
@@ -42,21 +44,39 @@ class _FixturePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    // Fit uniformly even if a parent gives us a wide or tall canvas.
+    // Both edges of each pixel must always have the same length.
+    final cellSize = math.min(
+      size.width / level.width,
+      size.height / level.height,
+    );
+    if (!cellSize.isFinite || cellSize <= 0) return;
+
+    final artworkSize = Size(
+      cellSize * level.width,
+      cellSize * level.height,
+    );
+    canvas.save();
+    canvas.translate(
+      (size.width - artworkSize.width) / 2,
+      (size.height - artworkSize.height) / 2,
+    );
+
     final paint = Paint()..isAntiAlias = false;
     if (renderStyle == ArtworkRenderStyle.diamond) {
       canvas.drawRect(
-        Offset.zero & size,
+        Offset.zero & artworkSize,
         Paint()..color = const Color(0xffe9edf4),
       );
     }
     for (var y = 0; y < level.height; y++) {
       for (var x = 0; x < level.width; x++) {
         paint.color = Color(level.palette[level.cells[y * level.width + x]]);
-        final rect = Rect.fromLTRB(
-          x * size.width / level.width,
-          y * size.height / level.height,
-          (x + 1) * size.width / level.width,
-          (y + 1) * size.height / level.height,
+        final rect = Rect.fromLTWH(
+          x * cellSize,
+          y * cellSize,
+          cellSize,
+          cellSize,
         );
         if (renderStyle == ArtworkRenderStyle.diamond) {
           paintDiamondGem(canvas, rect, paint.color, column: x, row: y);
@@ -67,10 +87,11 @@ class _FixturePainter extends CustomPainter {
     }
     artworkStylePainters[renderStyle]?.call(
       canvas,
-      Offset.zero & size,
-      cellWidth: size.width / level.width,
-      cellHeight: size.height / level.height,
+      Offset.zero & artworkSize,
+      cellWidth: cellSize,
+      cellHeight: cellSize,
     );
+    canvas.restore();
   }
 
   @override

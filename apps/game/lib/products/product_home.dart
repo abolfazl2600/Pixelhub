@@ -193,7 +193,20 @@ class ProductHome extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (kids)
-              Expanded(child: PixelArtPreview(level: level))
+              Expanded(
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxWidth: 176,
+                      maxHeight: 176,
+                    ),
+                    child: AspectRatio(
+                      aspectRatio: level.width / level.height,
+                      child: PixelArtPreview(level: level),
+                    ),
+                  ),
+                ),
+              )
             else
               AspectRatio(
                 aspectRatio: 1.4,
