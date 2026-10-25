@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:level_schema/level_schema.dart';
 import 'package:persistence/persistence.dart';
 import 'package:pixelhub/app/pixelhub_app.dart';
 import 'package:pixelhub/core/pixel_art_preview.dart';
@@ -8,6 +9,24 @@ import 'package:pixelhub/products/product_configuration.dart';
 import 'package:pixelhub/products/product_home.dart';
 
 import 'bootstrap_test.dart' show TestRepository, fixture;
+
+class _ManyKidsLevels extends TestRepository {
+  @override
+  Future<List<LevelDefinition>> loadLevels() async => [
+    for (var index = 0; index < 100; index++)
+      LevelDefinition(
+        id: 'kids-sliver-$index',
+        title: 'نقاشی $index',
+        titleEn: 'Painting $index',
+        schemaVersion: 2,
+        contentVersion: 1,
+        width: 2,
+        height: 2,
+        palette: [0xff146B60],
+        cells: [0, 0, 0, 0],
+      ),
+  ];
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -152,6 +171,49 @@ void main() {
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox.shrink());
     }
+  });
+
+  testWidgets('Kids home lazily builds a SliverGrid for large catalogs', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(390, 844);
+    addTearDown(tester.view.reset);
+
+    final store = MemoryPreferences();
+    await tester.pumpWidget(
+      PixelhubApp(
+        product: productById('kids'),
+        repository: _ManyKidsLevels(),
+        progressRepository: store,
+        preferences: store,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ProductHome), findsOneWidget);
+    expect(find.byType(CustomScrollView), findsOneWidget);
+    expect(find.byType(SliverGrid), findsOneWidget);
+    expect(find.byType(GridView), findsNothing);
+    expect(find.byType(PixelArtPreview).evaluate().length, lessThan(100));
+    expect(
+      find.byKey(const ValueKey('product-paint-kids-sliver-99')),
+      findsNothing,
+    );
+
+    final scroll = tester.state<ScrollableState>(
+      find.descendant(
+        of: find.byType(CustomScrollView),
+        matching: find.byType(Scrollable),
+      ).first,
+    );
+    scroll.position.jumpTo(scroll.position.maxScrollExtent);
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('product-paint-kids-sliver-99')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
   });
 
   test('unsupported product and disabled styles fail explicitly', () {

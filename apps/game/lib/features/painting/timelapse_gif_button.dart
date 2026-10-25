@@ -98,9 +98,13 @@ class _TimelapseGifDialogState extends State<TimelapseGifDialog> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              context.isPersian
-                  ? 'GIF برای ذخیره یا اشتراک‌گذاری آماده شد.'
-                  : 'GIF is ready to save or share.',
+              share
+                  ? (context.isPersian
+                        ? 'GIF برای اشتراک‌گذاری آماده شد.'
+                        : 'GIF is ready to share.')
+                  : (context.isPersian
+                        ? 'GIF در دستگاه ذخیره شد.'
+                        : 'GIF saved to your device.'),
             ),
           ),
         );
@@ -110,9 +114,13 @@ class _TimelapseGifDialogState extends State<TimelapseGifDialog> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              context.isPersian
-                  ? 'ذخیره GIF ناموفق بود.'
-                  : 'GIF export failed.',
+              share
+                  ? (context.isPersian
+                        ? 'اشتراک‌گذاری GIF ناموفق بود.'
+                        : 'GIF sharing failed.')
+                  : (context.isPersian
+                        ? 'ذخیره GIF ناموفق بود.'
+                        : 'GIF saving failed.'),
             ),
           ),
         );

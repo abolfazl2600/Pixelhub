@@ -2,13 +2,28 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
 
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
-/// Android's Sharesheet offers Files/Drive and compatible save destinations.
-/// Only the temporary source file is deleted; saved destination files persist.
-Future<bool> saveTimelapseGif(Uint8List bytes, String name, Rect origin) =>
-    shareTimelapseGif(bytes, name, origin);
+/// Save writes the GIF to Pictures/PixelHub on Android 10+, or the user-selected
+/// destination on older Android, without broad storage permissions.
+const _gifStorageChannel = MethodChannel('pixelhub/timelapse_gif');
+
+Future<bool> saveTimelapseGif(Uint8List bytes, String name, Rect origin) async {
+  if (bytes.isEmpty ||
+      bytes.length > 16 * 1024 * 1024 ||
+      !RegExp(r'^[A-Za-z0-9][A-Za-z0-9._-]{0,119}\.gif$').hasMatch(name)) {
+    throw ArgumentError('Invalid GIF file.');
+  }
+  return await _gifStorageChannel.invokeMethod<bool>('save', {
+        'name': name,
+        'bytes': bytes,
+      }) ??
+      false;
+}
+
+/// Share offers a system sheet and uses a temporary source file.
 
 Future<bool> shareTimelapseGif(
   Uint8List bytes,

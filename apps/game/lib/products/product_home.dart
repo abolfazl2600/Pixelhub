@@ -31,6 +31,100 @@ class ProductHome extends StatelessWidget {
     final horizontalPadding = kids
         ? math.max(16.0, (viewportWidth - 1000) / 2)
         : 20.0;
+    final header = <Widget>[
+      Container(
+        padding: kids ? const EdgeInsets.all(16) : EdgeInsets.zero,
+        decoration: kids
+            ? BoxDecoration(
+                borderRadius: BorderRadius.circular(28),
+                gradient: LinearGradient(
+                  colors: [
+                    Theme.of(context).colorScheme.primaryContainer,
+                    Theme.of(context).colorScheme.tertiaryContainer,
+                  ],
+                ),
+              )
+            : null,
+        child: Row(
+          children: [
+            Image.asset(product.icon, width: 64, height: 64),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                kids
+                    ? (fa ? 'با رنگ‌ها بازی کن!' : 'Play with colors!')
+                    : (fa
+                          ? 'کارگاه آثار کلاسیک'
+                          : 'The classic art studio'),
+                style: Theme.of(context).textTheme.headlineSmall
+                    ?.copyWith(
+                      color: kids
+                          ? Theme.of(
+                              context,
+                            ).colorScheme.onPrimaryContainer
+                          : null,
+                      fontWeight: kids ? FontWeight.w800 : null,
+                    ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      const SizedBox(height: 20),
+      if (kids)
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                _guide(
+                  Icons.palette_outlined,
+                  fa ? '۱. یک رنگ انتخاب کن' : '1. Choose a color',
+                ),
+                const SizedBox(height: 12),
+                _guide(
+                  Icons.touch_app_outlined,
+                  fa
+                      ? '۲. خانه‌های همان شماره را لمس کن'
+                      : '2. Tap cells with the matching number',
+                ),
+                const SizedBox(height: 12),
+                _guide(
+                  Icons.celebration_outlined,
+                  fa
+                      ? '۳. نقاشی‌ات را کامل کن!'
+                      : '3. Complete your picture!',
+                ),
+              ],
+            ),
+          ),
+        )
+      else
+        Text(
+          fa
+              ? 'بازآفرینی‌های پیکسلی از نقاشی‌های مشهور. اثر را بشناس، بافت دلخواهت را انتخاب کن و گالری خودت را بچین.'
+              : 'Pixel interpretations of famous paintings. Discover each work, choose a texture and arrange your own gallery.',
+          style: const TextStyle(height: 1.8),
+        ),
+      const SizedBox(height: 16),
+      if (kids)
+        _kidsNavigation(context)
+      else
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final page in product.navigation)
+              if (product.allowsPage(page) && page != 'settings')
+                OutlinedButton.icon(
+                  onPressed: () => context.push('/$page'),
+                  icon: Icon(_icon(page)),
+                  label: Text(_label(context, page)),
+                ),
+          ],
+        ),
+      const SizedBox(height: 20),
+    ];
     return Scaffold(
       appBar: AppBar(
         title: Text(fa ? product.displayNameFa : product.name),
@@ -60,139 +154,66 @@ class ProductHome extends StatelessWidget {
         ],
       ),
       body: SafeArea(
-        child: ListView(
-          padding: EdgeInsets.symmetric(
-            horizontal: horizontalPadding,
-            vertical: 20,
-          ),
-          children: [
-            Container(
-              padding: kids ? const EdgeInsets.all(16) : EdgeInsets.zero,
-              decoration: kids
-                  ? BoxDecoration(
-                      borderRadius: BorderRadius.circular(28),
-                      gradient: LinearGradient(
-                        colors: [
-                          Theme.of(context).colorScheme.primaryContainer,
-                          Theme.of(context).colorScheme.tertiaryContainer,
-                        ],
-                      ),
-                    )
-                  : null,
-              child: Row(
-                children: [
-                  Image.asset(product.icon, width: 64, height: 64),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Text(
-                      kids
-                          ? (fa ? 'با رنگ‌ها بازی کن!' : 'Play with colors!')
-                          : (fa
-                                ? 'کارگاه آثار کلاسیک'
-                                : 'The classic art studio'),
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(
-                            color: kids
-                                ? Theme.of(
-                                    context,
-                                  ).colorScheme.onPrimaryContainer
-                                : null,
-                            fontWeight: kids ? FontWeight.w800 : null,
+        child: kids
+            ? CustomScrollView(
+                slivers: [
+                  SliverPadding(
+                    padding: EdgeInsets.fromLTRB(
+                      horizontalPadding,
+                      20,
+                      horizontalPadding,
+                      0,
+                    ),
+                    sliver: SliverList(
+                      delegate: SliverChildListDelegate(header),
+                    ),
+                  ),
+                  SliverPadding(
+                    padding: EdgeInsets.fromLTRB(
+                      horizontalPadding,
+                      0,
+                      horizontalPadding,
+                      20,
+                    ),
+                    sliver: SliverLayoutBuilder(
+                      builder: (context, constraints) {
+                        final textScale =
+                            MediaQuery.textScalerOf(context).scale(18) / 18;
+                        final width = constraints.crossAxisExtent;
+                        var columns = 4;
+                        if (width < 340 ||
+                            (textScale >= 1.4 && width < 600)) {
+                          columns = 1;
+                        } else if (width < 680) {
+                          columns = 2;
+                        } else if (width < 970) {
+                          columns = 3;
+                        }
+                        return SliverGrid.builder(
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: columns,
+                            mainAxisExtent:
+                                268.0 +
+                                math.max(0.0, textScale - 1.0) * 64.0,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
                           ),
+                          itemCount: levels.length,
+                          itemBuilder: (context, index) =>
+                              _card(context, levels[index], true),
+                        );
+                      },
                     ),
                   ),
                 ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            if (kids)
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      _guide(
-                        Icons.palette_outlined,
-                        fa ? '۱. یک رنگ انتخاب کن' : '1. Choose a color',
-                      ),
-                      const SizedBox(height: 12),
-                      _guide(
-                        Icons.touch_app_outlined,
-                        fa
-                            ? '۲. خانه‌های همان شماره را لمس کن'
-                            : '2. Tap cells with the matching number',
-                      ),
-                      const SizedBox(height: 12),
-                      _guide(
-                        Icons.celebration_outlined,
-                        fa
-                            ? '۳. نقاشی‌ات را کامل کن!'
-                            : '3. Complete your picture!',
-                      ),
-                    ],
-                  ),
-                ),
               )
-            else
-              Text(
-                fa
-                    ? 'بازآفرینی‌های پیکسلی از نقاشی‌های مشهور. اثر را بشناس، بافت دلخواهت را انتخاب کن و گالری خودت را بچین.'
-                    : 'Pixel interpretations of famous paintings. Discover each work, choose a texture and arrange your own gallery.',
-                style: const TextStyle(height: 1.8),
-              ),
-            const SizedBox(height: 16),
-            if (kids)
-              _kidsNavigation(context)
-            else
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
+            : ListView(
+                padding: const EdgeInsets.all(20),
                 children: [
-                  for (final page in product.navigation)
-                    if (product.allowsPage(page) && page != 'settings')
-                      OutlinedButton.icon(
-                        onPressed: () => context.push('/$page'),
-                        icon: Icon(_icon(page)),
-                        label: Text(_label(context, page)),
-                      ),
+                  ...header,
+                  for (final level in levels) _card(context, level, false),
                 ],
               ),
-            const SizedBox(height: 20),
-            if (kids)
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final textScale =
-                      MediaQuery.textScalerOf(context).scale(18) / 18;
-                  final width = constraints.maxWidth;
-                  var columns = 4;
-                  if (width < 340 || (textScale >= 1.4 && width < 600)) {
-                    columns = 1;
-                  } else if (width < 680) {
-                    columns = 2;
-                  } else if (width < 970) {
-                    columns = 3;
-                  }
-                  return GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: columns,
-                      // Reserve more of each tile for the drawing, less for actions.
-                      mainAxisExtent:
-                          268.0 + math.max(0.0, textScale - 1.0) * 64.0,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                    ),
-                    itemCount: levels.length,
-                    itemBuilder: (context, index) =>
-                        _card(context, levels[index], true),
-                  );
-                },
-              )
-            else
-              for (final level in levels) _card(context, level, false),
-          ],
-        ),
       ),
     );
   }
