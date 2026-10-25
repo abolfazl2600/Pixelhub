@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:game_domain/game_domain.dart';
 import 'package:level_schema/level_schema.dart';
-import 'package:painting_engine/painting_engine.dart';
 import 'package:pixelhub/features/painting/painting_controller.dart';
 import 'package:pixelhub/features/painting/timelapse_gif_button.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
