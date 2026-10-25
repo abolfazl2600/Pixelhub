@@ -265,6 +265,7 @@ def assemble(pack_dir, output_dir):
     destination = pathlib.Path(output_dir)
     destination.mkdir(parents=True, exist_ok=True)
     images = {}
+    kids_only = {}
     origins = {}
     for pack in sorted(root.glob("*/content.zip")):
         with zipfile.ZipFile(pack) as archive:
@@ -322,7 +323,12 @@ def assemble(pack_dir, output_dir):
                     # online cards before downloading their level JSON.
                     catalog_item = dict(item)
                     catalog_item["colorCount"] = len(set(data["cells"]))
-                    images[ident] = catalog_item
+                    if ident.startswith("online-kids-persian-number-"):
+                        # Preserve the immutable assets while keeping educational
+                        # Kids levels out of the PixelHub public gallery.
+                        kids_only[ident] = catalog_item
+                    else:
+                        images[ident] = catalog_item
                 origins[ident] = origin
                 files = [(level_path, body), (preview_path, preview)]
                 if animation is not None:
@@ -350,7 +356,13 @@ def assemble(pack_dir, output_dir):
         "retiredIdsV2": newer_retired,
     }
     (destination / "catalog.json").write_bytes(compact(catalog))
-    print(f"Published {len(images)} online pictures.")
+    if kids_only:
+        kids_path = destination / "products/kids/numbers.json"
+        kids_path.parent.mkdir(parents=True, exist_ok=True)
+        kids_path.write_bytes(compact({
+            "schemaVersion": 1, "pictures": list(kids_only.values()),
+        }))
+    print(f"Published {len(images)} shared + {len(kids_only)} Kids-only online pictures.")
 
 
 if __name__ == "__main__":

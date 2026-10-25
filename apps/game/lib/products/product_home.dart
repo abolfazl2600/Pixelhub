@@ -327,7 +327,7 @@ class ProductHome extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  actionLabel,
+                  fa ? 'نقاشی کن' : 'Paint',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(fontSize: 15),

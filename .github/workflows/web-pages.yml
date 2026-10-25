@@ -535,6 +535,20 @@ jobs:
               --notes "10 hand-composed new Isfahan views and 10 new Shiraz views in bilingual 96x96 number-coloring grids with PNG previews. Legacy-compatible patterns metadata, Persian architecture display overlay, immutable new artwork IDs. No APK assets added or previous artwork changed." \
               --latest=false
           fi
+      - name: Publish twenty Persian numerals for Kids as immutable online levels
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-kids-persian-numbers-20-v1 >/dev/null 2>&1; then
+            python3 tool/online_kids_persian_numbers_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-kids-persian-numbers-20-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub Kids: 20 Persian numeral coloring pictures" \
+              --notes "Twenty new 32x32 Persian digit color-by-number pictures from ۱ to ۲۰. Immutable level JSON and pixel-perfect PNG previews are downloadable Release assets; product-specific metadata exposes them only to the Kids online gallery." \
+              --latest=false
+          fi
       - name: Download release packs and assemble online catalog
         env:
           GH_TOKEN: ${{ github.token }}

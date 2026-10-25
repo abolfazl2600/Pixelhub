@@ -107,6 +107,7 @@ void main() {
         );
         await tester.ensureVisible(paintButton);
         await tester.pumpAndSettle();
+        expect(find.text('نقاشی کن'), findsOneWidget);
         final buttonHeight = tester.getSize(paintButton).height;
         expect(buttonHeight, lessThanOrEqualTo(52));
         expect(artwork.height / buttonHeight, greaterThan(2));

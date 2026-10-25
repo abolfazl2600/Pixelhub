@@ -25,10 +25,16 @@ def publish(root):
     sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
     from online_release import RETIRED_ONLINE_IDS
     source=json.loads((root/'catalog.json').read_text())
+    # Extra metadata is produced from the immutable Kids-only Release assets.
+    # It is deliberately absent from the shared PixelHub catalog.
+    kids_extra_path=root/'products/kids/numbers.json'
+    kids_extra=(json.loads(kids_extra_path.read_text())['pictures']
+                if kids_extra_path.exists() else [])
     for product in load_registry().values():
         if product.id=='pixelhub' or not product.ready or not product.data['features']['online_catalog']: continue
         content=product.data['content']
-        pictures=[p for p in source['pictures'] if category(p) in content['categories'] and max(p['width'],p['height'])<=content['max_dimension']]
+        candidates=[*source['pictures'], *(kids_extra if product.id=='kids' else [])]
+        pictures=[p for p in candidates if category(p) in content['categories'] and max(p['width'],p['height'])<=content['max_dimension']]
         ids={p['id'] for p in pictures}
         result={**source,'productId':product.id,'pictures':pictures}
         for field in ('retiredIds','retiredIdsV2'):
