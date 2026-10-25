@@ -71,16 +71,11 @@ Uint8List encodePaintingTimelapse(Map<String, Object?> input) {
   final width = level.width * scale;
   final height = level.height * scale;
   final frames = <ProgressSnapshot?>[null];
-  for (var i = 0; i < unique.length; i++) {
-    if (frames.length >= maxFrames - 1) break;
-    final index =
-        ((i + 1) * (unique.length - 1) / math.min(unique.length, maxFrames - 2))
-            .round()
-            .clamp(0, unique.length - 1);
-    final frame = unique[index];
-    if (frames.last != frame) frames.add(frame);
+  final sampledCount = math.min(unique.length, maxFrames - 1);
+  for (var i = 0; i < sampledCount; i++) {
+    final index = (i * (unique.length - 1) / (sampledCount - 1)).round();
+    frames.add(unique[index]);
   }
-  if (frames.last != unique.last) frames.add(unique.last);
 
   final encoder = img.GifEncoder();
   final frameDuration = math.max(2, durationCentiseconds ~/ frames.length);
