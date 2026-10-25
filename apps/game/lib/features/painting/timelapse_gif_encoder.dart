@@ -32,7 +32,8 @@ Uint8List encodePaintingTimelapse(Map<String, Object?> input) {
     }
   }
   snapshots.sort((a, b) => a.$1.compareTo(b.$1));
-  if (snapshots.isEmpty || snapshots.last.$1 != 100 ||
+  if (snapshots.isEmpty ||
+      snapshots.last.$1 != 100 ||
       !snapshots.last.$2.isCompleted(0) && level.cells.length == 1 ||
       snapshots.last.$2.completedCount != level.cells.length) {
     throw const FormatException('Complete replay checkpoints unavailable.');
@@ -54,7 +55,8 @@ Uint8List encodePaintingTimelapse(Map<String, Object?> input) {
     }
     previous = current.bits;
     previousCount = current.completedCount;
-    if (unique.isEmpty || unique.last.completedCount != current.completedCount) {
+    if (unique.isEmpty ||
+        unique.last.completedCount != current.completedCount) {
       unique.add(current);
     }
   }
@@ -72,9 +74,10 @@ Uint8List encodePaintingTimelapse(Map<String, Object?> input) {
   final frames = <ProgressSnapshot?>[null];
   for (var i = 0; i < unique.length; i++) {
     if (frames.length >= maxFrames - 1) break;
-    final index = ((i + 1) * (unique.length - 1) / math.min(
-      unique.length, maxFrames - 2,
-    )).round().clamp(0, unique.length - 1);
+    final index =
+        ((i + 1) * (unique.length - 1) / math.min(unique.length, maxFrames - 2))
+            .round()
+            .clamp(0, unique.length - 1);
     final frame = unique[index];
     if (frames.last != frame) frames.add(frame);
   }
@@ -91,7 +94,11 @@ Uint8List encodePaintingTimelapse(Map<String, Object?> input) {
         final colored = snapshot != null && snapshot.isCompleted(cell);
         final color = colored ? level.palette[level.cells[cell]] : 0xffeeeeee;
         image.setPixelRgb(
-          x, y, (color >> 16) & 255, (color >> 8) & 255, color & 255,
+          x,
+          y,
+          (color >> 16) & 255,
+          (color >> 8) & 255,
+          color & 255,
         );
       }
     }

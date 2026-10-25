@@ -6,7 +6,10 @@ import 'dart:ui';
 import 'package:web/web.dart' as web;
 
 Future<bool> exportTimelapse(Uint8List bytes, String name, Rect origin) async {
-  final blob = web.Blob([bytes.toJS].toJS, web.BlobPropertyBag(type: 'image/gif'));
+  final blob = web.Blob(
+    [bytes.toJS].toJS,
+    web.BlobPropertyBag(type: 'image/gif'),
+  );
   final url = web.URL.createObjectURL(blob);
   final link = web.HTMLAnchorElement()
     ..href = url
@@ -14,7 +17,11 @@ Future<bool> exportTimelapse(Uint8List bytes, String name, Rect origin) async {
   web.document.body!.appendChild(link);
   link.click();
   link.remove();
-  unawaited(Future<void>.delayed(const Duration(seconds: 30),
-      () => web.URL.revokeObjectURL(url)));
+  unawaited(
+    Future<void>.delayed(
+      const Duration(seconds: 30),
+      () => web.URL.revokeObjectURL(url),
+    ),
+  );
   return true;
 }

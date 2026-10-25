@@ -18,7 +18,8 @@ class PaintingTimelapseButton extends StatefulWidget {
   final PaintingController controller;
 
   @override
-  State<PaintingTimelapseButton> createState() => _PaintingTimelapseButtonState();
+  State<PaintingTimelapseButton> createState() =>
+      _PaintingTimelapseButtonState();
 }
 
 class _PaintingTimelapseButtonState extends State<PaintingTimelapseButton> {
@@ -45,8 +46,9 @@ class _PaintingTimelapseButtonState extends State<PaintingTimelapseButton> {
       // Use the controller's store to ensure queued checkpoint writes are read.
       final records = await widget.controller.readReplayCheckpoints();
       if (_cancelled || !mounted) return;
-      final filtered = records.where((record) =>
-          record['generation'] == generation).toList();
+      final filtered = records
+          .where((record) => record['generation'] == generation)
+          .toList();
       final payload = <String, Object?>{
         'level': widget.controller.level.toJson(),
         'generation': generation,
@@ -58,9 +60,11 @@ class _PaintingTimelapseButtonState extends State<PaintingTimelapseButton> {
       _updateDialog();
     } on Object {
       if (mounted && !_cancelled) {
-        setState(() => _error = context.isPersian
-            ? 'مراحل ضبط‌شده کافی نیستند یا منقضی شده‌اند.'
-            : 'Replay steps are missing, incomplete or expired.');
+        setState(
+          () => _error = context.isPersian
+              ? 'مراحل ضبط‌شده کافی نیستند یا منقضی شده‌اند.'
+              : 'Replay steps are missing, incomplete or expired.',
+        );
         _updateDialog();
       }
     } finally {
@@ -75,55 +79,69 @@ class _PaintingTimelapseButtonState extends State<PaintingTimelapseButton> {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(context.isPersian ? 'تایم‌لپس نقاشی' : 'Painting timelapse'),
+        title: Text(
+          context.isPersian ? 'تایم‌لپس نقاشی' : 'Painting timelapse',
+        ),
         content: StatefulBuilder(
           builder: (dialogContext, refresh) {
             _dialogRefresh = refresh;
             return SizedBox(
-            width: 330,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (_busy) ...[
-                  const CircularProgressIndicator(),
+              width: 330,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (_busy) ...[
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 12),
+                    Text(
+                      context.isPersian ? 'در حال ساخت GIF…' : 'Creating GIF…',
+                    ),
+                  ] else if (_error != null)
+                    Text(_error!)
+                  else if (_gif != null)
+                    Image.memory(
+                      _gif!,
+                      key: const ValueKey('timelapse-gif-preview'),
+                      gaplessPlayback: false,
+                      fit: BoxFit.contain,
+                      width: 300,
+                      height: 300,
+                    )
+                  else
+                    Text(
+                      context.isPersian
+                          ? 'GIF آماده نشده است.'
+                          : 'GIF is not ready.',
+                    ),
                   const SizedBox(height: 12),
-                  Text(context.isPersian ? 'در حال ساخت GIF…' : 'Creating GIF…'),
-                ] else if (_error != null)
-                  Text(_error!)
-                else if (_gif != null)
-                  Image.memory(
-                    _gif!,
-                    key: const ValueKey('timelapse-gif-preview'),
-                    gaplessPlayback: false,
-                    fit: BoxFit.contain,
-                    width: 300,
-                    height: 300,
-                  )
-                else
-                  Text(context.isPersian ? 'GIF آماده نشده است.' : 'GIF is not ready.'),
-                const SizedBox(height: 12),
-                if (_gif != null)
-                  FilledButton.icon(
-                    onPressed: () async {
-                      final origin = (context.findRenderObject()! as RenderBox);
-                      await exportTimelapse(
-                        _gif!, 'pixelhub-${widget.controller.level.id}.gif',
-                        origin.localToGlobal(Offset.zero) & origin.size,
-                      );
+                  if (_gif != null)
+                    FilledButton.icon(
+                      onPressed: () async {
+                        final origin =
+                            (context.findRenderObject()! as RenderBox);
+                        await exportTimelapse(
+                          _gif!,
+                          'pixelhub-${widget.controller.level.id}.gif',
+                          origin.localToGlobal(Offset.zero) & origin.size,
+                        );
+                      },
+                      icon: const Icon(Icons.ios_share),
+                      label: Text(
+                        context.isPersian
+                            ? 'ذخیره / اشتراک‌گذاری GIF'
+                            : 'Save / Share GIF',
+                      ),
+                    ),
+                  TextButton(
+                    onPressed: () {
+                      _cancelled = true;
+                      Navigator.pop(dialogContext);
                     },
-                    icon: const Icon(Icons.ios_share),
-                    label: Text(context.isPersian ? 'ذخیره / اشتراک‌گذاری GIF' : 'Save / Share GIF'),
+                    child: Text(context.isPersian ? 'بستن' : 'Close'),
                   ),
-                TextButton(
-                  onPressed: () {
-                    _cancelled = true;
-                    Navigator.pop(dialogContext);
-                  },
-                  child: Text(context.isPersian ? 'بستن' : 'Close'),
-                ),
-              ],
-            ),
-          );
+                ],
+              ),
+            );
           },
         ),
       ),
@@ -139,6 +157,8 @@ class _PaintingTimelapseButtonState extends State<PaintingTimelapseButton> {
     key: const ValueKey('create-timelapse-gif'),
     onPressed: _busy ? null : _open,
     icon: const Icon(Icons.movie_creation_outlined),
-    label: Text(context.isPersian ? 'ساخت GIF از مراحل نقاشی' : 'Create timelapse GIF'),
+    label: Text(
+      context.isPersian ? 'ساخت GIF از مراحل نقاشی' : 'Create timelapse GIF',
+    ),
   );
 }

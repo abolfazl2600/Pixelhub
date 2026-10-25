@@ -38,35 +38,41 @@ void main() {
     };
   }
 
-  test('encodes actual colored cells in GIF and finishes with original colors', () {
-    final encoded = encodePaintingTimelapse({
-      'level': level.toJson(),
-      'generation': 0,
-      'checkpoints': [
-        checkpoint(100, 15, 0),
-        checkpoint(50, 3, 0),
-        checkpoint(25, 1, 0),
-      ],
-    });
-    expect(utf8.decode(encoded.take(3).toList()), 'GIF');
-    final animation = img.decodeGif(encoded);
-    expect(animation, isNotNull);
-    expect(animation!.numFrames, greaterThanOrEqualTo(3));
-    final last = animation.frames.last;
-    expect(last.getPixel(0, 0).r.toInt(), 255);
-    expect(last.getPixel(last.width - 1, 0).b.toInt(), 255);
-  });
-
-  test('rejects incomplete and mixed generations rather than fabricating replay', () {
-    expect(
-      () => encodePaintingTimelapse({
+  test(
+    'encodes actual colored cells in GIF and finishes with original colors',
+    () {
+      final encoded = encodePaintingTimelapse({
         'level': level.toJson(),
-        'generation': 2,
-        'checkpoints': [checkpoint(25, 1, 2), checkpoint(100, 15, 1)],
-      }),
-      throwsFormatException,
-    );
-  });
+        'generation': 0,
+        'checkpoints': [
+          checkpoint(100, 15, 0),
+          checkpoint(50, 3, 0),
+          checkpoint(25, 1, 0),
+        ],
+      });
+      expect(utf8.decode(encoded.take(3).toList()), 'GIF');
+      final animation = img.decodeGif(encoded);
+      expect(animation, isNotNull);
+      expect(animation!.numFrames, greaterThanOrEqualTo(3));
+      final last = animation.frames.last;
+      expect(last.getPixel(0, 0).r.toInt(), 255);
+      expect(last.getPixel(last.width - 1, 0).b.toInt(), 255);
+    },
+  );
+
+  test(
+    'rejects incomplete and mixed generations rather than fabricating replay',
+    () {
+      expect(
+        () => encodePaintingTimelapse({
+          'level': level.toJson(),
+          'generation': 2,
+          'checkpoints': [checkpoint(25, 1, 2), checkpoint(100, 15, 1)],
+        }),
+        throwsFormatException,
+      );
+    },
+  );
 
   test('rejects non-monotonic colored bitsets', () {
     expect(
