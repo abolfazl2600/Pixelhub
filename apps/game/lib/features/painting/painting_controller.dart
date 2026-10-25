@@ -181,7 +181,9 @@ class PaintingController extends ChangeNotifier {
   }
 
   void _changed({bool captureReplay = true}) {
-    if (captureReplay) _captureReplayMilestones();
+    if (captureReplay) {
+      _captureReplayMilestones();
+    }
     if (session!.isComplete && !_completionReported) {
       _completionReported = true;
       onCompleted?.call();
