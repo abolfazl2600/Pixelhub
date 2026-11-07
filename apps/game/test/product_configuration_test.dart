@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:game_domain/game_domain.dart';
 import 'package:level_schema/level_schema.dart';
 import 'package:persistence/persistence.dart';
 import 'package:pixelhub/app/pixelhub_app.dart';
@@ -26,6 +27,37 @@ class _ManyKidsLevels extends TestRepository {
         cells: [0, 0, 0, 0],
       ),
   ];
+}
+
+class _KidsAnimalsRepository extends TestRepository
+    implements CatalogMetadataRepository {
+  @override
+  Future<List<LevelDefinition>> loadLevels() async => [
+    await loadPreview(),
+    LevelDefinition(
+      id: 'butterfly',
+      title: 'پروانه',
+      titleEn: 'Butterfly',
+      schemaVersion: 2,
+      contentVersion: 1,
+      width: 2,
+      height: 2,
+      palette: [0xff146B60],
+      cells: [0, 0, 0, 0],
+    ),
+  ];
+
+  @override
+  Future<Map<String, CatalogMetadata>> loadMetadata() async => {
+    'sunflower': const CatalogMetadata(
+      category: 'nature',
+      tags: ['nature'],
+    ),
+    'butterfly': const CatalogMetadata(
+      category: 'animals',
+      tags: ['animals'],
+    ),
+  };
 }
 
 void main() {
@@ -182,16 +214,16 @@ void main() {
       addTearDown(tester.view.reset);
       final product = productById('kids');
       final store = MemoryPreferences();
+      final repository = _KidsAnimalsRepository();
       await tester.pumpWidget(
         PixelhubApp(
           product: product,
-          repository: AssetLevelRepository(
-            catalogPath: product.offlineManifest,
-          ),
+          repository: repository,
           progressRepository: store,
           preferences: store,
         ),
       );
+      repository.requests.single.complete(fixture());
       await tester.pumpAndSettle();
 
       final animalsChip = find.byKey(const ValueKey('kids-category-animals'));
