@@ -549,6 +549,20 @@ jobs:
               --notes "Twenty new 32x32 Persian digit color-by-number pictures from ۱ to ۲۰. Immutable level JSON and pixel-perfect PNG previews are downloadable Release assets; product-specific metadata exposes them only to the Kids online gallery." \
               --latest=false
           fi
+      - name: Publish twelve simple animals exclusively for Kids
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.web.outputs.sha }}
+        run: |
+          if ! gh release view pixelhub-content-kids-animals-12-v1 >/dev/null 2>&1; then
+            python3 tool/online_kids_animals_pack.py "$RUNNER_TEMP/content.zip"
+            gh release create pixelhub-content-kids-animals-12-v1 "$RUNNER_TEMP/content.zip" \
+              --target "$TARGET_SHA" \
+              --title "PixelHub Kids: 12 small animal coloring pictures" \
+              --notes "Original 16x16, 24x24 and 32x32 numbered animal levels with pixel-perfect previews. Kids-only metadata; legacy shared PixelHub catalog is unchanged." \
+              --latest=false
+          fi
       - name: Download release packs and assemble online catalog
         env:
           GH_TOKEN: ${{ github.token }}

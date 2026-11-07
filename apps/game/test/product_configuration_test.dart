@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:game_domain/game_domain.dart';
 import 'package:level_schema/level_schema.dart';
 import 'package:persistence/persistence.dart';
 import 'package:pixelhub/app/pixelhub_app.dart';
@@ -26,6 +27,31 @@ class _ManyKidsLevels extends TestRepository {
         cells: [0, 0, 0, 0],
       ),
   ];
+}
+
+class _KidsAnimalsRepository extends TestRepository
+    implements CatalogMetadataRepository {
+  @override
+  Future<List<LevelDefinition>> loadLevels() async => [
+    await loadPreview(),
+    LevelDefinition(
+      id: 'butterfly',
+      title: 'پروانه',
+      titleEn: 'Butterfly',
+      schemaVersion: 2,
+      contentVersion: 1,
+      width: 2,
+      height: 2,
+      palette: [0xff146B60],
+      cells: [0, 0, 0, 0],
+    ),
+  ];
+
+  @override
+  Future<Map<String, CatalogMetadata>> loadMetadata() async => {
+    'sunflower': const CatalogMetadata(category: 'nature', tags: ['nature']),
+    'butterfly': const CatalogMetadata(category: 'animals', tags: ['animals']),
+  };
 }
 
 void main() {
@@ -173,6 +199,45 @@ void main() {
       await tester.pumpWidget(const SizedBox.shrink());
     }
   });
+
+  testWidgets(
+    'Kids category chips reveal animal artwork without re-importing',
+    (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(390, 844);
+      addTearDown(tester.view.reset);
+      final product = productById('kids');
+      final store = MemoryPreferences();
+      final repository = _KidsAnimalsRepository();
+      await tester.pumpWidget(
+        PixelhubApp(
+          product: product,
+          repository: repository,
+          progressRepository: store,
+          preferences: store,
+        ),
+      );
+      repository.requests.single.complete(fixture());
+      await tester.pumpAndSettle();
+
+      final animalsChip = find.byKey(const ValueKey('kids-category-animals'));
+      expect(animalsChip, findsOneWidget);
+      await tester.ensureVisible(animalsChip);
+      await tester.tap(animalsChip);
+      await tester.pumpAndSettle();
+
+      expect(find.text('جانوران'), findsWidgets);
+      expect(
+        find.byKey(const ValueKey('product-paint-sunflower')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const ValueKey('product-paint-butterfly')),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets('Kids home lazily builds a SliverGrid for large catalogs', (
     tester,

@@ -10,7 +10,7 @@ import '../l10n/strings.dart';
 import 'product_configuration.dart';
 
 /// Product-specific composition; every card opens the same painting engine.
-class ProductHome extends StatelessWidget {
+class ProductHome extends StatefulWidget {
   const ProductHome({
     required this.product,
     required this.levels,
@@ -24,8 +24,66 @@ class ProductHome extends StatelessWidget {
   final VoidCallback onLanguageToggle;
 
   @override
+  State<ProductHome> createState() => _ProductHomeState();
+}
+
+class _ProductHomeState extends State<ProductHome> {
+  String _kidsCategory = 'all';
+
+  static String _categoryLabel(String id, bool persian) => switch (id) {
+    'all' => persian ? 'همه' : 'All',
+    'animals' => persian ? 'جانوران' : 'Animals',
+    'nature' => persian ? 'طبیعت' : 'Nature',
+    'objects' => persian ? 'اشیا' : 'Objects',
+    'space' => persian ? 'فضا' : 'Space',
+    'patterns' => persian ? 'الگوها' : 'Patterns',
+    _ => id,
+  };
+
+  static IconData _categoryIcon(String id) => switch (id) {
+    'animals' => Icons.pets_rounded,
+    'nature' => Icons.local_florist_rounded,
+    'objects' => Icons.toys_rounded,
+    'space' => Icons.rocket_launch_rounded,
+    'patterns' => Icons.auto_awesome_rounded,
+    _ => Icons.apps_rounded,
+  };
+
+  Widget _kidsCategoryChips(BuildContext context) {
+    final persian = context.isPersian;
+    final categories = ['all', ...widget.product.defaultCategories];
+    return Semantics(
+      label: persian ? 'دسته‌بندی نقاشی‌ها' : 'Painting categories',
+      child: Wrap(
+        key: const ValueKey('kids-category-filters'),
+        spacing: 8,
+        runSpacing: 8,
+        children: [
+          for (final category in categories)
+            ChoiceChip(
+              key: ValueKey('kids-category-$category'),
+              avatar: Icon(_categoryIcon(category), size: 18),
+              label: Text(_categoryLabel(category, persian)),
+              selected: _kidsCategory == category,
+              onSelected: (_) => setState(() => _kidsCategory = category),
+            ),
+        ],
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final product = widget.product;
+    final levels = widget.levels;
+    final library = widget.library;
+    final onLanguageToggle = widget.onLanguageToggle;
     final kids = product.homeLayout == 'kids';
+    final visibleLevels = kids && _kidsCategory != 'all'
+        ? levels
+              .where((level) => library.category(level) == _kidsCategory)
+              .toList()
+        : levels;
     final fa = context.isPersian;
     final viewportWidth = MediaQuery.sizeOf(context).width;
     final horizontalPadding = kids
@@ -116,6 +174,17 @@ class ProductHome extends StatelessWidget {
                 ),
           ],
         ),
+      if (kids) ...[
+        const SizedBox(height: 16),
+        _kidsCategoryChips(context),
+        const SizedBox(height: 8),
+        Text(
+          _kidsCategory == 'all'
+              ? (fa ? 'نقاشی‌های من' : 'My paintings')
+              : _categoryLabel(_kidsCategory, fa),
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+      ],
       const SizedBox(height: 20),
     ];
     return Scaffold(
@@ -191,9 +260,9 @@ class ProductHome extends StatelessWidget {
                                 crossAxisSpacing: 12,
                                 mainAxisSpacing: 12,
                               ),
-                          itemCount: levels.length,
+                          itemCount: visibleLevels.length,
                           itemBuilder: (context, index) =>
-                              _card(context, levels[index], true),
+                              _card(context, visibleLevels[index], true),
                         );
                       },
                     ),
@@ -213,6 +282,7 @@ class ProductHome extends StatelessWidget {
 
   /// Compact navigation chips wrap naturally without occupying full-width rows.
   Widget _kidsNavigation(BuildContext context) {
+    final product = widget.product;
     final scheme = Theme.of(context).colorScheme;
     return Wrap(
       spacing: 10,
@@ -262,7 +332,7 @@ class ProductHome extends StatelessWidget {
 
   Widget _card(BuildContext context, LevelDefinition level, bool kids) {
     final fa = context.isPersian;
-    final actionLabel = library.completed(level) > 0
+    final actionLabel = widget.library.completed(level) > 0
         ? context.strings.continuePainting
         : context.strings.startPainting;
     return Card(

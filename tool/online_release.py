@@ -266,6 +266,7 @@ def assemble(pack_dir, output_dir):
     destination.mkdir(parents=True, exist_ok=True)
     images = {}
     kids_only = {}
+    kids_animals_only = {}
     origins = {}
     for pack in sorted(root.glob("*/content.zip")):
         with zipfile.ZipFile(pack) as archive:
@@ -324,9 +325,10 @@ def assemble(pack_dir, output_dir):
                     catalog_item = dict(item)
                     catalog_item["colorCount"] = len(set(data["cells"]))
                     if ident.startswith("online-kids-persian-number-"):
-                        # Preserve the immutable assets while keeping educational
-                        # Kids levels out of the PixelHub public gallery.
+                        # Keep Kids educational art out of the shared gallery.
                         kids_only[ident] = catalog_item
+                    elif ident.startswith("online-kids-animal-"):
+                        kids_animals_only[ident] = catalog_item
                     else:
                         images[ident] = catalog_item
                 origins[ident] = origin
@@ -362,7 +364,13 @@ def assemble(pack_dir, output_dir):
         kids_path.write_bytes(compact({
             "schemaVersion": 1, "pictures": list(kids_only.values()),
         }))
-    print(f"Published {len(images)} shared + {len(kids_only)} Kids-only online pictures.")
+    if kids_animals_only:
+        animals_path = destination / "products/kids/animals.json"
+        animals_path.parent.mkdir(parents=True, exist_ok=True)
+        animals_path.write_bytes(compact({
+            "schemaVersion": 1, "pictures": list(kids_animals_only.values()),
+        }))
+    print(f"Published {len(images)} shared + {len(kids_only) + len(kids_animals_only)} Kids-only online pictures.")
 
 
 if __name__ == "__main__":
