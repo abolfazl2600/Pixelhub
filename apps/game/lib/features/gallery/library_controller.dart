@@ -232,6 +232,7 @@ class LibraryController extends ChangeNotifier {
         );
   bool isFavorite(LevelDefinition level) =>
       library.favorites.contains(level.id);
+
   /// Counts only cells the player can paint; existing saves remain readable.
   int completed(LevelDefinition level) {
     final snapshot = progress[level.id];
