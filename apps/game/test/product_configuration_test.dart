@@ -271,8 +271,7 @@ void main() {
       expect(find.textContaining('عکس خودت'), findsNothing);
 
       await tester.tap(browse);
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 200));
+      await tester.pumpAndSettle();
       final gallery = tester.widget<GalleryScreen>(find.byType(GalleryScreen));
       expect(gallery.personal, isFalse);
       final chip = tester.widget<ChoiceChip>(
