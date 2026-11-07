@@ -264,9 +264,7 @@ void main() {
       await tester.tap(find.widgetWithText(ChoiceChip, 'جانوران'));
       await tester.pumpAndSettle();
 
-      final browse = find.byKey(
-        const ValueKey('kids-empty-my-gallery-browse'),
-      );
+      final browse = find.byKey(const ValueKey('kids-empty-my-gallery-browse'));
       expect(browse, findsOneWidget);
       expect(find.text('دیدن نقاشی‌های جانوران'), findsOneWidget);
       expect(find.textContaining('عکس خودت'), findsNothing);
