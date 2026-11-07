@@ -174,6 +174,42 @@ void main() {
     }
   });
 
+  testWidgets('Kids category chips reveal animal artwork without re-importing', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(390, 844);
+    addTearDown(tester.view.reset);
+    final product = productById('kids');
+    final store = MemoryPreferences();
+    await tester.pumpWidget(
+      PixelhubApp(
+        product: product,
+        repository: AssetLevelRepository(catalogPath: product.offlineManifest),
+        progressRepository: store,
+        preferences: store,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final animalsChip = find.byKey(const ValueKey('kids-category-animals'));
+    expect(animalsChip, findsOneWidget);
+    await tester.ensureVisible(animalsChip);
+    await tester.tap(animalsChip);
+    await tester.pumpAndSettle();
+
+    expect(find.text('جانوران'), findsWidgets);
+    expect(
+      find.byKey(const ValueKey('product-paint-sunflower')),
+      findsNothing,
+    );
+    expect(
+      find.byKey(const ValueKey('product-paint-butterfly')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('Kids home lazily builds a SliverGrid for large catalogs', (
     tester,
   ) async {
