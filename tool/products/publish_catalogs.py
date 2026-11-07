@@ -27,9 +27,11 @@ def publish(root):
     source=json.loads((root/'catalog.json').read_text())
     # Extra metadata is produced from the immutable Kids-only Release assets.
     # It is deliberately absent from the shared PixelHub catalog.
-    kids_extra_path=root/'products/kids/numbers.json'
-    kids_extra=(json.loads(kids_extra_path.read_text())['pictures']
-                if kids_extra_path.exists() else [])
+    kids_extra=[]
+    for name in ('numbers.json','animals.json'):
+        kids_extra_path=root/'products/kids'/name
+        if kids_extra_path.exists():
+            kids_extra.extend(json.loads(kids_extra_path.read_text())['pictures'])
     for product in load_registry().values():
         if product.id=='pixelhub' or not product.ready or not product.data['features']['online_catalog']: continue
         content=product.data['content']
