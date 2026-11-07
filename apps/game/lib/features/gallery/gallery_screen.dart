@@ -29,11 +29,13 @@ class GalleryScreen extends StatefulWidget {
     required this.library,
     required this.online,
     this.personal = false,
+    this.initialCategory,
     super.key,
   });
   final LibraryController library;
   final OnlineCatalogController online;
   final bool personal;
+  final String? initialCategory;
 
   @override
   State<GalleryScreen> createState() => _GalleryScreenState();
@@ -50,8 +52,16 @@ class _GalleryScreenState extends State<GalleryScreen> {
     super.didChangeDependencies();
     if (!_defaultsApplied) {
       _defaultsApplied = true;
-      final categories = ProductScope.of(context).defaultCategories;
-      if (categories.length == 1) _category = categories.single;
+      final product = ProductScope.of(context);
+      final requested = widget.initialCategory;
+      if (!widget.personal &&
+          requested != null &&
+          product.categories.contains(requested)) {
+        _category = requested;
+        _onlineVisibleCount = 12;
+      } else if (product.defaultCategories.length == 1) {
+        _category = product.defaultCategories.single;
+      }
     }
   }
 
@@ -799,10 +809,43 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 SliverPadding(
                   padding: const EdgeInsets.fromLTRB(16, 4, 16, 20),
                   sliver: SliverToBoxAdapter(
-                    child: Text(
-                      widget.personal ? s.galleryEmpty : s.noLocalPictures,
-                      style: const TextStyle(color: PixelTokens.muted),
-                    ),
+                    child: isKids && widget.personal
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                context.isPersian
+                                    ? 'در این بخش هنوز نقاشی‌ای با فیلتر انتخاب‌شده نداری. برای انتخاب نقاشی جدید به گالری برو.'
+                                    : 'No saved paintings match your selection yet. Browse the gallery to choose a painting.',
+                                style: const TextStyle(
+                                  color: PixelTokens.muted,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              FilledButton.icon(
+                                key: const ValueKey(
+                                  'kids-empty-my-gallery-browse',
+                                ),
+                                onPressed: () => context.go(
+                                  '/gallery?category=${Uri.encodeComponent(_category)}',
+                                ),
+                                icon: const Icon(Icons.palette_outlined),
+                                label: Text(
+                                  context.isPersian
+                                      ? (_category == 'all'
+                                            ? 'دیدن نقاشی‌ها'
+                                            : 'دیدن نقاشی‌های ${categoryLabel(context, _category)}')
+                                      : (_category == 'all'
+                                            ? 'Browse paintings'
+                                            : 'Browse ${categoryLabel(context, _category)} paintings'),
+                                ),
+                              ),
+                            ],
+                          )
+                        : Text(
+                            widget.personal ? s.galleryEmpty : s.noLocalPictures,
+                            style: const TextStyle(color: PixelTokens.muted),
+                          ),
                   ),
                 )
               else
