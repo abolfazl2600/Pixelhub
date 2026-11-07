@@ -167,8 +167,12 @@ async function main() {
     // Flutter overlays can intercept physical clicks directly after completion.
     // Dispatch on the active semantics node to exercise the actual callbacks.
     await page.getByRole('button',{name:'View result',exact:true}).evaluate(node => node.click());
-    await page.getByRole('button',{name:'Start over',exact:true}).evaluate(node => node.click());
-    await page.getByRole('button',{name:'Start over',exact:true}).last().evaluate(node => node.click()); await saved(179);
+    await page.getByRole('button',{name:'Start over',exact:true}).first().waitFor();
+    await page.getByRole('button',{name:'Start over',exact:true}).first().evaluate(node => node.click());
+    // Wait for Flutter's modal to be built before clicking its confirm action.
+    await page.getByText('Reset this picture?',{exact:true}).waitFor();
+    await page.getByRole('button',{name:'Start over',exact:true}).last().evaluate(node => node.click());
+    await saved(179);
     assert.equal((await record()).generation,1);
 
     // Browser-only wallet fixture: the integration test checks multiple
