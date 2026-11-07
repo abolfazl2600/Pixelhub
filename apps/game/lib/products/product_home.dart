@@ -80,7 +80,9 @@ class _ProductHomeState extends State<ProductHome> {
     final onLanguageToggle = widget.onLanguageToggle;
     final kids = product.homeLayout == 'kids';
     final visibleLevels = kids && _kidsCategory != 'all'
-        ? levels.where((level) => library.category(level) == _kidsCategory).toList()
+        ? levels
+              .where((level) => library.category(level) == _kidsCategory)
+              .toList()
         : levels;
     final fa = context.isPersian;
     final viewportWidth = MediaQuery.sizeOf(context).width;
