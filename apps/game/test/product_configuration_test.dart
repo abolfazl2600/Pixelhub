@@ -49,14 +49,8 @@ class _KidsAnimalsRepository extends TestRepository
 
   @override
   Future<Map<String, CatalogMetadata>> loadMetadata() async => {
-    'sunflower': const CatalogMetadata(
-      category: 'nature',
-      tags: ['nature'],
-    ),
-    'butterfly': const CatalogMetadata(
-      category: 'animals',
-      tags: ['animals'],
-    ),
+    'sunflower': const CatalogMetadata(category: 'nature', tags: ['nature']),
+    'butterfly': const CatalogMetadata(category: 'animals', tags: ['animals']),
   };
 }
 
