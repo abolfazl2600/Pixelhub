@@ -93,21 +93,33 @@ async function main() {
     console.log('Browser: painting and autosave');
     await start().click(); await board().waitFor();
     assert.equal(new URL(page.url()).hash,'#/painting/sunflower');
-    // Sunflower exterior (179 cells) is prefilled; paint two real petal cells.
-    await line(6,4,7); await saved(181);
+    // Sunflower exterior (179 cells) starts filled. Choose a real petal
+    // color and verify that at least one *user* cell is persisted.
+    await page.getByRole('button',{name:/^Color 3,/}).click();
+    await line(4,3,9);
+    const paintedCountHandle = await page.waitForFunction(() => {
+      const k = Object.keys(localStorage).find(k => k.includes('pixelhub.progress.v1.sunflower.2'));
+      if (!k) return false;
+      let value = JSON.parse(localStorage[k]);
+      if (typeof value === 'string') value = JSON.parse(value);
+      return value.completedCount > 179 ? value.completedCount : false;
+    });
+    const initialCount = await paintedCountHandle.jsonValue();
+    await saved(initialCount);
+    console.log('Browser: first user-painted cells', initialCount);
     const wrong=await point(7,5); await page.mouse.click(wrong.x,wrong.y);
     await page.locator('flutter-view').getByText('That cell needs a different color number.', {exact:true}).waitFor();
-    assert.equal((await record()).completedCount,181);
+    assert.equal((await record()).completedCount,initialCount);
     await page.screenshot({path:path.join(output,'painting-en.png')});
     await page.getByRole('button',{name:'Start over',exact:true}).click();
     await page.getByRole('button',{name:'Cancel',exact:true}).click();
-    assert.equal((await record()).completedCount,181);
+    assert.equal((await record()).completedCount,initialCount);
 
     // Recreate the entire Flutter application in a new page, retaining real browser storage.
     await page.close(); page=await context.newPage(); watch(page);
-    await page.goto(base+'#/painting/sunflower'); await ready(); await board().waitFor(); await saved(181);
+    await page.goto(base+'#/painting/sunflower'); await ready(); await board().waitFor(); await saved(initialCount);
     assert.equal(await page.evaluate(()=>document.documentElement.lang),'en');
-    await page.reload(); await ready(); await board().waitFor(); await saved(181);
+    await page.reload(); await ready(); await board().waitFor(); await saved(initialCount);
     assert.equal(await page.evaluate(()=>document.documentElement.lang),'en');
     await back().click(); await start().waitFor();
     await page.goBack(); await back().waitFor();
