@@ -153,7 +153,13 @@ async function main() {
     if(!(await completedMessage.isVisible())) {
       console.log('Browser: finishing remaining cells with the in-game Bomb');
       for(let n=0;n<30 && !(await completedMessage.isVisible());n++) {
-        await page.getByRole('button',{name:/^Bomb/}).click();
+        // The Flutter semantics overlay is frequently recreated immediately
+        // after each paint. Trigger the current node's click synchronously
+        // instead of Playwright's stability retry on a detached node.
+        await page.getByRole('button',{name:/^Bomb/}).evaluate(node => node.click());
+        if(n === 0 || n % 5 === 4) {
+          console.log('Browser: Bomb count',n+1,'saved cells',(await record())?.completedCount);
+        }
       }
     }
     await completedMessage.waitFor(); await saved(256);
