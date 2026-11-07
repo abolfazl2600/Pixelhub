@@ -69,7 +69,9 @@ List<ProgressSnapshot> prepareTimelapseFrames(
         level,
       );
       if (snapshot.generation != completed.generation ||
-          snapshot.completedCount * 100 ~/ level.cells.length != attained) {
+          (snapshot.completedCount - level.preFilledCount) * 100 ~/
+                  level.paintableCellCount !=
+              attained) {
         continue;
       }
       byMilestone.putIfAbsent(milestone, () => snapshot);
@@ -172,7 +174,8 @@ Uint8List renderTimelapseGif(Map<String, Object?> payload) {
   );
   final frameCount = states.length + 1;
   final delay = math.max(2, limits.durationCentiseconds ~/ frameCount);
-  final empty = Uint8List((level.cells.length + 7) ~/ 8);
+  // Frame zero shows the already-filled background, not a blank canvas.
+  final empty = level.initialCompletedBits;
   for (var frame = 0; frame < frameCount; frame++) {
     final bits = frame == 0 ? empty : states[frame - 1].bits;
     final image = img.Image(
