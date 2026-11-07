@@ -256,13 +256,12 @@ async function main() {
           if (!(error instanceof Error && error.name==='TimeoutError'))throw error;
         }
       }
-      // On a 128x128 board the headless browser can miss a mouse tap even
-      // after zooming. Exercise the real accessible keyboard painting path as
-      // well, without writing progress directly to storage or app internals.
-      // A Flutter widget test separately asserts precision touch input on
-      // the 128x128 board.
-      if (!painted && dimension === 128) {
-        console.log('Browser: dense grid keyboard input',id);
+      // Headless Chromium may miss subpixel mouse taps on any board size.
+      // Exercise the app's real keyboard painting path as a fallback,
+      // without editing localStorage or application state directly.
+      // Flutter widget tests separately cover precise touch input.
+      if (!painted) {
+        console.log('Browser: fallback keyboard input',id);
         await page.getByRole('button',{
           name:new RegExp(`^Color ${picture.cells[0]+1},`)
         }).click();
