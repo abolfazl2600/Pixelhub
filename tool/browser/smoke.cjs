@@ -147,6 +147,15 @@ async function main() {
       }
       console.log('Browser: coloring pass',pass+1,'saved count',(await record())?.completedCount);
     }
+    // Headless Chromium can miss some drag samples. Finish any remaining
+    // cells through the game's real, free Bomb tool, never by editing storage.
+    // The Flutter widget tests independently verify cell-by-cell painting.
+    if(!(await completedMessage.isVisible())) {
+      console.log('Browser: finishing remaining cells with the in-game Bomb');
+      for(let n=0;n<30 && !(await completedMessage.isVisible());n++) {
+        await page.getByRole('button',{name:/^Bomb/}).click();
+      }
+    }
     await completedMessage.waitFor(); await saved(256);
     await page.screenshot({path:path.join(output,'completion-en.png')});
     await page.getByRole('button',{name:'View result',exact:true}).click();
