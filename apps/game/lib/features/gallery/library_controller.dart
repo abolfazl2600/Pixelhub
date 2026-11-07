@@ -205,8 +205,8 @@ class LibraryController extends ChangeNotifier {
           snapshot.levelVersion == level.contentVersion &&
           snapshot.levelChecksum == level.checksum &&
           snapshot.cellCount == level.cells.length &&
-          snapshot.completedCount > 0 &&
-          snapshot.completedCount < level.cells.length;
+          completed(level) > 0 &&
+          completed(level) < level.paintableCellCount;
     }
 
     final available = levels;
@@ -220,7 +220,7 @@ class LibraryController extends ChangeNotifier {
   }
 
   int continuePercent(LevelDefinition level) =>
-      ((completed(level) * 100) ~/ level.cells.length).clamp(1, 99);
+      ((completed(level) * 100) ~/ level.paintableCellCount).clamp(1, 99);
 
   String category(LevelDefinition level) => level.id.startsWith('private-')
       ? 'personal'
@@ -232,10 +232,28 @@ class LibraryController extends ChangeNotifier {
         );
   bool isFavorite(LevelDefinition level) =>
       library.favorites.contains(level.id);
-  int completed(LevelDefinition level) =>
-      progress[level.id]?.completedCount ?? 0;
+
+  /// Counts only cells the player can paint; existing saves remain readable.
+  int completed(LevelDefinition level) {
+    final snapshot = progress[level.id];
+    if (snapshot == null) return 0;
+    if (level.preFilledCount == 0) return snapshot.completedCount;
+    if (snapshot.levelVersion != level.contentVersion ||
+        snapshot.levelChecksum != level.checksum ||
+        snapshot.cellCount != level.cells.length) {
+      return 0;
+    }
+    var count = 0;
+    for (var index = 0; index < level.cells.length; index++) {
+      if (!level.isPreFilled(index) && snapshot.isCompleted(index)) {
+        count++;
+      }
+    }
+    return count;
+  }
+
   bool isComplete(LevelDefinition level) =>
-      completed(level) == level.cells.length;
+      completed(level) == level.paintableCellCount;
 
   int get coins => library.coins;
   int get totalPoints => library.totalPoints;
@@ -245,7 +263,7 @@ class LibraryController extends ChangeNotifier {
       alwaysFreeArtwork(level.id) ||
       library.unlocked.contains(level.id) ||
       // Preserve access to levels started before the wallet was introduced.
-      (progress[level.id]?.completedCount ?? 0) > 0;
+      completed(level) > 0;
 
   /// A single serialized library write atomically charges coins and unlocks
   /// the level. Failed/insufficient purchases never alter the balance.

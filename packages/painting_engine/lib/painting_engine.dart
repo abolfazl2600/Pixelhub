@@ -23,6 +23,14 @@ final class PaintingSession {
       revision = progress.revision;
       completedCount = progress.completedCount;
     }
+    // Mark only opt-in exterior background cells as already colored.
+    // Merge with older snapshots rather than invalidating their checksums.
+    for (var index = 0; index < level.cells.length; index++) {
+      if (level.isPreFilled(index) && !isCompleted(index)) {
+        _bits[index ~/ 8] |= 1 << (index % 8);
+        completedCount++;
+      }
+    }
     for (var index = 0; index < level.cells.length; index++) {
       if (!isCompleted(index)) _remaining[level.cells[index]]++;
     }
@@ -41,7 +49,10 @@ final class PaintingSession {
   int get selectedColor => _selectedColor;
 
   bool get isComplete => completedCount == level.cells.length;
-  double get fraction => completedCount / level.cells.length;
+
+  /// User-visible progress excludes cells that were filled before the game.
+  double get fraction =>
+      (completedCount - level.preFilledCount) / level.paintableCellCount;
   bool isCompleted(int index) => _bits[index ~/ 8] & (1 << (index % 8)) != 0;
 
   void selectColor(int color) {
@@ -230,10 +241,15 @@ final class PaintingSession {
     _stroke = null;
     _bits.fillRange(0, _bits.length, 0);
     _remaining.fillRange(0, _remaining.length, 0);
-    for (final color in level.cells) {
-      _remaining[color]++;
-    }
     completedCount = 0;
+    for (var index = 0; index < level.cells.length; index++) {
+      if (level.isPreFilled(index)) {
+        _bits[index ~/ 8] |= 1 << (index % 8);
+        completedCount++;
+      } else {
+        _remaining[level.cells[index]]++;
+      }
+    }
     generation++;
     revision++;
   }

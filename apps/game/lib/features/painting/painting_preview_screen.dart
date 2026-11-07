@@ -811,7 +811,7 @@ class _PaintingPreviewScreenState extends State<PaintingPreviewScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  '${s.progressSummary(context.digits(session.completedCount), context.digits(controller.level.cells.length))} · ${s.progressPercent(context.digits((session.fraction * 100).floor()))}',
+                  '${s.progressSummary(context.digits(session.completedCount - controller.level.preFilledCount), context.digits(controller.level.paintableCellCount))} · ${s.progressPercent(context.digits((session.fraction * 100).floor()))}',
                   key: const ValueKey('progress-summary'),
                   style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
