@@ -5,6 +5,7 @@ import 'package:level_schema/level_schema.dart';
 import 'package:persistence/persistence.dart';
 import 'package:pixelhub/app/pixelhub_app.dart';
 import 'package:pixelhub/core/pixel_art_preview.dart';
+import 'package:pixelhub/features/gallery/gallery_screen.dart';
 import 'package:pixelhub/features/gallery/library_controller.dart';
 import 'package:pixelhub/products/product_configuration.dart';
 import 'package:pixelhub/products/product_home.dart';
@@ -272,7 +273,8 @@ void main() {
       await tester.tap(browse);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 200));
-      expect(find.text('گالری'), findsOneWidget);
+      final gallery = tester.widget<GalleryScreen>(find.byType(GalleryScreen));
+      expect(gallery.personal, isFalse);
       final chip = tester.widget<ChoiceChip>(
         find.widgetWithText(ChoiceChip, 'جانوران'),
       );
