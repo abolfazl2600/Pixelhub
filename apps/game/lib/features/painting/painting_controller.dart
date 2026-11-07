@@ -222,12 +222,17 @@ class PaintingController extends ChangeNotifier {
       return;
     }
     if (count <= _lastReplayCompletedCount) return;
-    final total = level.cells.length;
-    final previousPercent = (_lastReplayCompletedCount * 100 ~/ total).clamp(
+    final total = level.paintableCellCount;
+    final alreadyFilled = level.preFilledCount;
+    final previousPercent =
+        ((_lastReplayCompletedCount - alreadyFilled) * 100 ~/ total).clamp(
+          0,
+          100,
+        );
+    final attainedPercent = ((count - alreadyFilled) * 100 ~/ total).clamp(
       0,
       100,
     );
-    final attainedPercent = (count * 100 ~/ total).clamp(0, 100);
     if (attainedPercent > previousPercent) {
       final snapshot = active.snapshot;
       ReplayCheckpointStore replay;
