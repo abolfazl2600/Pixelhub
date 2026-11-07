@@ -69,7 +69,8 @@ List<ProgressSnapshot> prepareTimelapseFrames(
         level,
       );
       if (snapshot.generation != completed.generation ||
-          (snapshot.completedCount - level.preFilledCount) * 100 ~/
+          (snapshot.completedCount - level.preFilledCount) *
+                  100 ~/
                   level.paintableCellCount !=
               attained) {
         continue;

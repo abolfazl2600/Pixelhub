@@ -18,11 +18,31 @@ void main() {
     height: 5,
     palette: [0xfff7f3e8, 0xff123456],
     cells: [
-      0, 0, 0, 0, 0,
-      0, 1, 1, 1, 0,
-      0, 1, 0, 1, 0,
-      0, 1, 1, 1, 0,
-      0, 0, 0, 0, 0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
     ],
     preFilledBackground: preFill,
   );
@@ -70,7 +90,10 @@ void main() {
     session.selectColor(1);
     expect(session.paintCell(6), isTrue);
     session.endStroke();
-    final oldProgress = ProgressSnapshot.fromJson(session.snapshot.toJson(), legacy);
+    final oldProgress = ProgressSnapshot.fromJson(
+      session.snapshot.toJson(),
+      legacy,
+    );
     final updated = picture();
     expect(updated.checksum, legacy.checksum);
     final restored = PaintingSession(updated, progress: oldProgress);
@@ -79,7 +102,13 @@ void main() {
     expect(restored.isCompleted(12), isFalse);
     expect(restored.completedCount, 17);
     expect(restored.fraction, closeTo(1 / 9, 0.0001));
-    expect(ProgressSnapshot.fromJson(restored.snapshot.toJson(), updated).completedCount, 17);
+    expect(
+      ProgressSnapshot.fromJson(
+        restored.snapshot.toJson(),
+        updated,
+      ).completedCount,
+      17,
+    );
   });
 
   test('new JSON flag round trips; old checksum and defaults are stable', () {
@@ -93,10 +122,7 @@ void main() {
     expect(old.paintableCellCount, 25);
     expect(level.checksum, old.checksum);
     expect(
-      () => LevelDefinition.fromJson({
-        ...json,
-        'preFilledBackground': 'true',
-      }),
+      () => LevelDefinition.fromJson({...json, 'preFilledBackground': 'true'}),
       throwsFormatException,
     );
     final blank = LevelDefinition(
@@ -114,50 +140,50 @@ void main() {
     expect(blank.preFilledCount, 0);
   });
 
-  test('GIF begins with already colored background and respects real progress', () {
-    final level = picture();
-    final session = PaintingSession(level);
-    session.beginStroke();
-    expect(session.paintCell(12), isTrue);
-    session.endStroke();
-    final partial = session.snapshot;
-    session.selectColor(1);
-    session.beginStroke();
-    for (var index = 0; index < level.cells.length; index++) {
-      session.paintCell(index);
-    }
-    session.endStroke();
-    final complete = session.snapshot;
-    expect(session.isComplete, isTrue);
-    final now = DateTime.now().toUtc();
-    final checkpoints = <Map<String, Object?>>[
-      for (final entry in [
-        (11, partial),
-        (100, complete),
-      ])
-        <String, Object?>{
-          'schemaVersion': 1,
-          'levelId': level.id,
-          'generation': entry.$2.generation,
-          'milestonePercent': entry.$1,
-          'attainedPercent': entry.$1,
-          'capturedAt': now.toIso8601String(),
-          'progress': entry.$2.toJson(),
-        },
-    ];
-    final gif = renderTimelapseGif({
-      'level': level.toJson(),
-      'completed': complete.toJson(),
-      'checkpoints': checkpoints,
-      'maxSide': 64,
-    });
-    final decoded = img.decodeGif(gif)!;
-    expect(decoded.numFrames, 3);
-    final exterior = decoded.frames.first.getPixel(0, 0);
-    expect(exterior.b.toInt(), lessThan(240));
-    final center = decoded.frames.first.getPixel(16, 16);
-    expect(center.b.toInt(), greaterThan(240));
-  });
+  test(
+    'GIF begins with already colored background and respects real progress',
+    () {
+      final level = picture();
+      final session = PaintingSession(level);
+      session.beginStroke();
+      expect(session.paintCell(12), isTrue);
+      session.endStroke();
+      final partial = session.snapshot;
+      session.selectColor(1);
+      session.beginStroke();
+      for (var index = 0; index < level.cells.length; index++) {
+        session.paintCell(index);
+      }
+      session.endStroke();
+      final complete = session.snapshot;
+      expect(session.isComplete, isTrue);
+      final now = DateTime.now().toUtc();
+      final checkpoints = <Map<String, Object?>>[
+        for (final entry in [(11, partial), (100, complete)])
+          <String, Object?>{
+            'schemaVersion': 1,
+            'levelId': level.id,
+            'generation': entry.$2.generation,
+            'milestonePercent': entry.$1,
+            'attainedPercent': entry.$1,
+            'capturedAt': now.toIso8601String(),
+            'progress': entry.$2.toJson(),
+          },
+      ];
+      final gif = renderTimelapseGif({
+        'level': level.toJson(),
+        'completed': complete.toJson(),
+        'checkpoints': checkpoints,
+        'maxSide': 64,
+      });
+      final decoded = img.decodeGif(gif)!;
+      expect(decoded.numFrames, 3);
+      final exterior = decoded.frames.first.getPixel(0, 0);
+      expect(exterior.b.toInt(), lessThan(240));
+      final center = decoded.frames.first.getPixel(16, 16);
+      expect(center.b.toInt(), greaterThan(240));
+    },
+  );
 
   test('opt-in fixture bitset never mutates shared mask', () {
     final level = picture();

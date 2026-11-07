@@ -49,6 +49,7 @@ final class PaintingSession {
   int get selectedColor => _selectedColor;
 
   bool get isComplete => completedCount == level.cells.length;
+
   /// User-visible progress excludes cells that were filled before the game.
   double get fraction =>
       (completedCount - level.preFilledCount) / level.paintableCellCount;
