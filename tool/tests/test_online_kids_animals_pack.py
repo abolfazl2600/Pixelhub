@@ -62,7 +62,7 @@ class KidsAnimalPackTests(unittest.TestCase):
                     self.assertEqual(len(data), entry["bytes"])
                     self.assertEqual(json.loads(data)["checksum"], entry["checksum"])
                     self.assertTrue(archive.read(f"previews/{stem}.png").startswith(
-                        b"\\x89PNG\\r\\n\\x1a\\n"
+                        bytes((137, 80, 78, 71, 13, 10, 26, 10))
                     ))
             online = root / "online"
             assemble(packs, online)
