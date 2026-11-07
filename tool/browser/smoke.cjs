@@ -129,19 +129,25 @@ async function main() {
     console.log('Browser: completing all colors');
     const asset=await page.request.get(base+'assets/assets/levels/sunflower-v2.json');
     const level=await asset.json();
-    for(let color=1;color<level.palette.length;color++) {
-      await page.getByRole('button',{name:new RegExp(`^Color ${color+1},`)}).click();
-      await scrollTop();
-      for(let y=0;y<16;y++) {
-        for(let x=0;x<16;) {
-          if(level.cells[y*16+x]!==color || y===0) {x++;continue;}
-          let end=x;
-          while(end+1<16 && level.cells[y*16+end+1]===color)end++;
-          await line(x,y,end); x=end+1;
+    const completedMessage=page.getByText('You did it! Your picture is complete.');
+    for(let pass=0;pass<4;pass++) {
+      if(await completedMessage.isVisible()) break;
+      for(let color=1;color<level.palette.length;color++) {
+        const chip=page.getByRole('button',{name:new RegExp(`^Color ${color+1},`)});
+        if(!(await chip.count())) continue;
+        await chip.click(); await scrollTop();
+        for(let y=0;y<16;y++) {
+          for(let x=0;x<16;) {
+            if(level.cells[y*16+x]!==color || y===0) {x++;continue;}
+            let end=x;
+            while(end+1<16 && level.cells[y*16+end+1]===color)end++;
+            await line(x,y,end); x=end+1;
+          }
         }
       }
+      console.log('Browser: coloring pass',pass+1,'saved count',(await record())?.completedCount);
     }
-    await page.getByText('You did it! Your picture is complete.').waitFor(); await saved(256);
+    await completedMessage.waitFor(); await saved(256);
     await page.screenshot({path:path.join(output,'completion-en.png')});
     await page.getByRole('button',{name:'View result',exact:true}).click();
     await page.getByRole('button',{name:'Start over',exact:true}).click();
