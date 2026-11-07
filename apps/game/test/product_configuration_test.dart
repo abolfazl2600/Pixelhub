@@ -5,6 +5,7 @@ import 'package:level_schema/level_schema.dart';
 import 'package:persistence/persistence.dart';
 import 'package:pixelhub/app/pixelhub_app.dart';
 import 'package:pixelhub/core/pixel_art_preview.dart';
+import 'package:pixelhub/features/gallery/gallery_screen.dart';
 import 'package:pixelhub/features/gallery/library_controller.dart';
 import 'package:pixelhub/products/product_configuration.dart';
 import 'package:pixelhub/products/product_home.dart';
@@ -235,6 +236,48 @@ void main() {
         find.byKey(const ValueKey('product-paint-butterfly')),
         findsOneWidget,
       );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'Empty Kids My Gallery offers a link to the selected animal category',
+    (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(390, 844);
+      addTearDown(tester.view.reset);
+      final product = productById('kids');
+      final store = MemoryPreferences();
+      final repository = _KidsAnimalsRepository();
+      await tester.pumpWidget(
+        PixelhubApp(
+          product: product,
+          repository: repository,
+          progressRepository: store,
+          preferences: store,
+          initialRoute: '/my-gallery',
+        ),
+      );
+      repository.requests.single.complete(fixture());
+      await tester.pumpAndSettle();
+
+      expect(find.text('گالری من'), findsWidgets);
+      await tester.tap(find.widgetWithText(ChoiceChip, 'جانوران'));
+      await tester.pumpAndSettle();
+
+      final browse = find.byKey(const ValueKey('kids-empty-my-gallery-browse'));
+      expect(browse, findsOneWidget);
+      expect(find.text('دیدن نقاشی‌های جانوران'), findsOneWidget);
+      expect(find.textContaining('عکس خودت'), findsNothing);
+
+      await tester.tap(browse);
+      await tester.pumpAndSettle();
+      final gallery = tester.widget<GalleryScreen>(find.byType(GalleryScreen));
+      expect(gallery.personal, isFalse);
+      final chip = tester.widget<ChoiceChip>(
+        find.widgetWithText(ChoiceChip, 'جانوران'),
+      );
+      expect(chip.selected, isTrue);
       expect(tester.takeException(), isNull);
     },
   );

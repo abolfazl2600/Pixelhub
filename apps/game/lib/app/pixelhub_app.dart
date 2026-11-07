@@ -190,7 +190,10 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
           routes: [
             GoRoute(
               path: 'gallery',
-              builder: (context, state) => _route(page: 'gallery'),
+              builder: (context, state) => _route(
+                page: 'gallery',
+                galleryCategory: state.uri.queryParameters['category'],
+              ),
             ),
             GoRoute(
               path: 'my-gallery',
@@ -497,122 +500,127 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     ),
   );
 
-  Widget _route({String? id, String? museumArtworkId, String page = 'home'}) =>
-      ListenableBuilder(
-        listenable: _routeChanges,
-        builder: (context, _) {
-          if (!product.allowsPage(page) ||
-              (!product.features.imageImport &&
-                  (id?.startsWith('private-') ?? false))) {
-            return _notFound(context);
-          }
-          // Privacy is reachable even when the picture catalog fails to load.
-          if (page == 'privacy') return const PrivacyScreen();
-          if (_bootstrap.status == BootstrapStatus.loading) {
-            return _SplashScreen(product: product);
-          }
-          if (_bootstrap.status == BootstrapStatus.error) {
-            return _LoadError(onRetry: _bootstrap.load);
-          }
-          if (page == 'gallery' || page == 'my-gallery') {
-            return GalleryScreen(
-              library: _library,
-              online: _online,
-              personal: page == 'my-gallery',
-            );
-          }
-          if (page == 'museum') {
-            if (!BuildModules.museum ||
-                !product.features.museum ||
-                _museum == null) {
-              return _notFound(context);
-            }
-            return MuseumScreen(
-              museum: _museum,
-              library: _library,
-              animationFor: _animationFor,
-              addArtworkId: museumArtworkId,
-            );
-          }
-          if (page == 'badges') {
-            if (!BuildModules.badges || !product.features.achievements) {
-              return _notFound(context);
-            }
-            return BadgesScreen(badges: _badges);
-          }
-          if (page == 'profile') {
-            if (!BuildModules.profile || !product.features.profile) {
-              return _notFound(context);
-            }
-            return ProfileScreen(
-              library: _library,
-              diagnostics: _diagnostics,
-              badges: _badges,
-              onLanguageToggle: _toggleLanguage,
-            );
-          }
-          if (page == 'settings') {
-            return SettingsScreen(
-              library: _library,
-              sounds: BuildModules.sounds && product.features.soundEffects
-                  ? _sounds
-                  : null,
-              onClear: _clearLocalData,
-            );
-          }
-          if (page == 'import' || (id?.startsWith('private-') ?? false)) {
-            if (_library.status == LibraryStatus.loading) {
-              return _SplashScreen(product: product);
-            }
-            if (_library.status == LibraryStatus.error) {
-              return _LoadError(
-                onRetry: _library.load,
-                message: context.strings.libraryLoadError,
-              );
-            }
-          }
-          if (page == 'import') {
-            if (!BuildModules.imageImport || !product.features.imageImport) {
-              return _notFound(context);
-            }
-            return ImportScreen(library: _library);
-          }
-          if (id == null) {
-            if (product.homeLayout != 'classic') {
-              return ProductHome(
-                product: product,
-                levels: _bootstrap.levels,
-                library: _library,
-                onLanguageToggle: _toggleLanguage,
-              );
-            }
-            return HomeScreen(levels: _bootstrap.levels, library: _library);
-          }
-          final matches = _library.levels.where((level) => level.id == id);
-          if (matches.isEmpty) {
-            return _notFound(context);
-          }
-          if (page == 'artwork' ||
-              (page == 'painting' && !_library.canPaint(matches.first))) {
-            return ArtworkScreen(
-              level: matches.first,
-              library: _library,
-              animation: _animationFor(matches.first),
-              renderStyle: _renderStyle,
-              onDelete: _deleteArtwork,
-            );
-          }
-          return PaintingPreviewScreen(
-            controller: _controller(matches.first),
-            library: _library,
-            animation: _animationFor(matches.first),
-            diagnostics: _diagnostics,
-            renderStyle: _renderStyle,
-            onRenderStyleChanged: (style) => unawaited(_setArtworkStyle(style)),
-            onOpened: () => unawaited(_library.markOpened(matches.first)),
+  Widget _route({
+    String? id,
+    String? museumArtworkId,
+    String? galleryCategory,
+    String page = 'home',
+  }) => ListenableBuilder(
+    listenable: _routeChanges,
+    builder: (context, _) {
+      if (!product.allowsPage(page) ||
+          (!product.features.imageImport &&
+              (id?.startsWith('private-') ?? false))) {
+        return _notFound(context);
+      }
+      // Privacy is reachable even when the picture catalog fails to load.
+      if (page == 'privacy') return const PrivacyScreen();
+      if (_bootstrap.status == BootstrapStatus.loading) {
+        return _SplashScreen(product: product);
+      }
+      if (_bootstrap.status == BootstrapStatus.error) {
+        return _LoadError(onRetry: _bootstrap.load);
+      }
+      if (page == 'gallery' || page == 'my-gallery') {
+        return GalleryScreen(
+          library: _library,
+          online: _online,
+          personal: page == 'my-gallery',
+          initialCategory: galleryCategory,
+        );
+      }
+      if (page == 'museum') {
+        if (!BuildModules.museum ||
+            !product.features.museum ||
+            _museum == null) {
+          return _notFound(context);
+        }
+        return MuseumScreen(
+          museum: _museum,
+          library: _library,
+          animationFor: _animationFor,
+          addArtworkId: museumArtworkId,
+        );
+      }
+      if (page == 'badges') {
+        if (!BuildModules.badges || !product.features.achievements) {
+          return _notFound(context);
+        }
+        return BadgesScreen(badges: _badges);
+      }
+      if (page == 'profile') {
+        if (!BuildModules.profile || !product.features.profile) {
+          return _notFound(context);
+        }
+        return ProfileScreen(
+          library: _library,
+          diagnostics: _diagnostics,
+          badges: _badges,
+          onLanguageToggle: _toggleLanguage,
+        );
+      }
+      if (page == 'settings') {
+        return SettingsScreen(
+          library: _library,
+          sounds: BuildModules.sounds && product.features.soundEffects
+              ? _sounds
+              : null,
+          onClear: _clearLocalData,
+        );
+      }
+      if (page == 'import' || (id?.startsWith('private-') ?? false)) {
+        if (_library.status == LibraryStatus.loading) {
+          return _SplashScreen(product: product);
+        }
+        if (_library.status == LibraryStatus.error) {
+          return _LoadError(
+            onRetry: _library.load,
+            message: context.strings.libraryLoadError,
           );
-        },
+        }
+      }
+      if (page == 'import') {
+        if (!BuildModules.imageImport || !product.features.imageImport) {
+          return _notFound(context);
+        }
+        return ImportScreen(library: _library);
+      }
+      if (id == null) {
+        if (product.homeLayout != 'classic') {
+          return ProductHome(
+            product: product,
+            levels: _bootstrap.levels,
+            library: _library,
+            onLanguageToggle: _toggleLanguage,
+          );
+        }
+        return HomeScreen(levels: _bootstrap.levels, library: _library);
+      }
+      final matches = _library.levels.where((level) => level.id == id);
+      if (matches.isEmpty) {
+        return _notFound(context);
+      }
+      if (page == 'artwork' ||
+          (page == 'painting' && !_library.canPaint(matches.first))) {
+        return ArtworkScreen(
+          level: matches.first,
+          library: _library,
+          animation: _animationFor(matches.first),
+          renderStyle: _renderStyle,
+          onDelete: _deleteArtwork,
+        );
+      }
+      return PaintingPreviewScreen(
+        controller: _controller(matches.first),
+        library: _library,
+        animation: _animationFor(matches.first),
+        diagnostics: _diagnostics,
+        renderStyle: _renderStyle,
+        onRenderStyleChanged: (style) => unawaited(_setArtworkStyle(style)),
+        onOpened: () => unawaited(_library.markOpened(matches.first)),
       );
+    },
+  );
 
   @override
   Widget build(BuildContext context) => MaterialApp.router(
