@@ -843,7 +843,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
                             ],
                           )
                         : Text(
-                            widget.personal ? s.galleryEmpty : s.noLocalPictures,
+                            widget.personal
+                                ? s.galleryEmpty
+                                : s.noLocalPictures,
                             style: const TextStyle(color: PixelTokens.muted),
                           ),
                   ),
