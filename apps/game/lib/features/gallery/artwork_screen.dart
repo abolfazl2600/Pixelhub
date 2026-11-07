@@ -147,13 +147,13 @@ class ArtworkScreen extends StatelessWidget {
               const SizedBox(height: 12),
               if (library.completed(level) > 0) ...[
                 LinearProgressIndicator(
-                  value: library.completed(level) / level.cells.length,
+                  value: library.completed(level) / level.paintableCellCount,
                 ),
                 const SizedBox(height: 8),
                 Text(
                   s.progressSummary(
                     context.digits(library.completed(level)),
-                    context.digits(level.cells.length),
+                    context.digits(level.paintableCellCount),
                   ),
                 ),
               ],
