@@ -190,7 +190,10 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
           routes: [
             GoRoute(
               path: 'gallery',
-              builder: (context, state) => _route(page: 'gallery'),
+              builder: (context, state) => _route(
+                page: 'gallery',
+                galleryCategory: state.uri.queryParameters['category'],
+              ),
             ),
             GoRoute(
               path: 'my-gallery',
@@ -497,7 +500,12 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
     ),
   );
 
-  Widget _route({String? id, String? museumArtworkId, String page = 'home'}) =>
+  Widget _route({
+    String? id,
+    String? museumArtworkId,
+    String? galleryCategory,
+    String page = 'home',
+  }) =>
       ListenableBuilder(
         listenable: _routeChanges,
         builder: (context, _) {
@@ -519,6 +527,7 @@ class _PixelhubAppState extends State<PixelhubApp> with WidgetsBindingObserver {
               library: _library,
               online: _online,
               personal: page == 'my-gallery',
+              initialCategory: galleryCategory,
             );
           }
           if (page == 'museum') {
