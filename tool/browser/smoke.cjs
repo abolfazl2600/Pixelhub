@@ -93,20 +93,21 @@ async function main() {
     console.log('Browser: painting and autosave');
     await start().click(); await board().waitFor();
     assert.equal(new URL(page.url()).hash,'#/painting/sunflower');
-    await line(0,0,15); await saved(16);
+    // Sunflower exterior (179 cells) is prefilled; paint two real petal cells.
+    await line(6,4,7); await saved(181);
     const wrong=await point(7,5); await page.mouse.click(wrong.x,wrong.y);
     await page.locator('flutter-view').getByText('That cell needs a different color number.', {exact:true}).waitFor();
-    assert.equal((await record()).completedCount,16);
+    assert.equal((await record()).completedCount,181);
     await page.screenshot({path:path.join(output,'painting-en.png')});
     await page.getByRole('button',{name:'Start over',exact:true}).click();
     await page.getByRole('button',{name:'Cancel',exact:true}).click();
-    assert.equal((await record()).completedCount,16);
+    assert.equal((await record()).completedCount,181);
 
     // Recreate the entire Flutter application in a new page, retaining real browser storage.
     await page.close(); page=await context.newPage(); watch(page);
-    await page.goto(base+'#/painting/sunflower'); await ready(); await board().waitFor(); await saved(16);
+    await page.goto(base+'#/painting/sunflower'); await ready(); await board().waitFor(); await saved(181);
     assert.equal(await page.evaluate(()=>document.documentElement.lang),'en');
-    await page.reload(); await ready(); await board().waitFor(); await saved(16);
+    await page.reload(); await ready(); await board().waitFor(); await saved(181);
     assert.equal(await page.evaluate(()=>document.documentElement.lang),'en');
     await back().click(); await start().waitFor();
     await page.goBack(); await back().waitFor();
@@ -116,7 +117,7 @@ async function main() {
     console.log('Browser: completing all colors');
     const asset=await page.request.get(base+'assets/assets/levels/sunflower-v2.json');
     const level=await asset.json();
-    for(let color=0;color<level.palette.length;color++) {
+    for(let color=1;color<level.palette.length;color++) {
       await page.getByRole('button',{name:new RegExp(`^Color ${color+1},`)}).click();
       await scrollTop();
       for(let y=0;y<16;y++) {
@@ -132,7 +133,7 @@ async function main() {
     await page.screenshot({path:path.join(output,'completion-en.png')});
     await page.getByRole('button',{name:'View result',exact:true}).click();
     await page.getByRole('button',{name:'Start over',exact:true}).click();
-    await page.getByRole('button',{name:'Start over',exact:true}).last().click(); await saved(0);
+    await page.getByRole('button',{name:'Start over',exact:true}).last().click(); await saved(179);
     assert.equal((await record()).generation,1);
 
     // Browser-only wallet fixture: the integration test checks multiple
