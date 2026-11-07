@@ -239,6 +239,50 @@ void main() {
     },
   );
 
+  testWidgets(
+    'Empty Kids My Gallery offers a link to the selected animal category',
+    (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(390, 844);
+      addTearDown(tester.view.reset);
+      final product = productById('kids');
+      final store = MemoryPreferences();
+      final repository = _KidsAnimalsRepository();
+      await tester.pumpWidget(
+        PixelhubApp(
+          product: product,
+          repository: repository,
+          progressRepository: store,
+          preferences: store,
+          initialRoute: '/my-gallery',
+        ),
+      );
+      repository.requests.single.complete(fixture());
+      await tester.pumpAndSettle();
+
+      expect(find.text('گالری من'), findsWidgets);
+      await tester.tap(find.widgetWithText(ChoiceChip, 'جانوران'));
+      await tester.pumpAndSettle();
+
+      final browse = find.byKey(
+        const ValueKey('kids-empty-my-gallery-browse'),
+      );
+      expect(browse, findsOneWidget);
+      expect(find.text('دیدن نقاشی‌های جانوران'), findsOneWidget);
+      expect(find.textContaining('عکس خودت'), findsNothing);
+
+      await tester.tap(browse);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(find.text('گالری'), findsOneWidget);
+      final chip = tester.widget<ChoiceChip>(
+        find.widgetWithText(ChoiceChip, 'جانوران'),
+      );
+      expect(chip.selected, isTrue);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('Kids home lazily builds a SliverGrid for large catalogs', (
     tester,
   ) async {
